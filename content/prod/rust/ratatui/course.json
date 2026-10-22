@@ -1,0 +1,52 @@
+{
+  "id": "ratatui",
+  "module_sections": [
+    {
+      "name": "Getting started",
+      "tier": "basic",
+      "modules": [
+        { "id": "first-frame", "name": "First frame", "sessions": 3 },
+        { "id": "event-loop", "name": "Event loop", "sessions": 3 },
+        { "id": "blocks-and-borders", "name": "Blocks and borders", "sessions": 2 },
+        { "id": "styling", "name": "Styling", "sessions": 3 }
+      ]
+    },
+    {
+      "name": "Layout",
+      "tier": "basic",
+      "modules": [
+        { "id": "constraints", "name": "Constraints", "sessions": 3 },
+        { "id": "nested-layouts", "name": "Nested layouts", "sessions": 2 },
+        { "id": "centering", "name": "Centering", "sessions": 2 }
+      ]
+    },
+    {
+      "name": "Widgets",
+      "tier": "medium",
+      "modules": [
+        { "id": "lists", "name": "Lists", "sessions": 3 },
+        { "id": "tables", "name": "Tables", "sessions": 3 },
+        { "id": "gauge-and-tabs", "name": "Gauge and tabs", "sessions": 2 },
+        { "id": "scrolling", "name": "Scrolling", "sessions": 2 }
+      ]
+    },
+    {
+      "name": "App structure",
+      "tier": "medium",
+      "modules": [
+        { "id": "app-state", "name": "App state", "sessions": 3 },
+        { "id": "screens", "name": "Screens", "sessions": 3 },
+        { "id": "keys-and-actions", "name": "Keys and actions", "sessions": 2 }
+      ]
+    },
+    {
+      "name": "Custom widgets",
+      "tier": "advanced",
+      "modules": [
+        { "id": "widget-trait", "name": "The Widget trait", "sessions": 3 },
+        { "id": "stateful-widgets", "name": "Stateful widgets", "sessions": 3 },
+        { "id": "testing", "name": "Testing", "sessions": 2 }
+      ]
+    }
+  ]
+}

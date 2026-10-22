@@ -1,0 +1,12 @@
+{
+  "id": "syntax",
+  "module_sections": [
+    {
+      "name": "Foundations",
+      "tier": "basic",
+      "modules": [
+        { "id": "loops", "name": "Loops", "sessions": 1 }
+      ]
+    }
+  ]
+}

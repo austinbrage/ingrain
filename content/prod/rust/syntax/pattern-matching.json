@@ -1,0 +1,37 @@
+{
+  "id": "pattern-matching",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "range-binding",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let age = Some(18);\n\n    match age {\n        Some(n @ 0..=17) => {\n            println!(\"minor {n}\");\n        }\n        Some(n @ 18..=64) => {\n            println!(\"adult {n}\");\n        }\n        Some(n) => println!(\"senior {n}\"),\n        None => println!(\"unknown\"),\n    }\n}",
+          "options": ["minor 18", "adult 18", "senior 18", "unknown"],
+          "answer": 1,
+          "explanation": "The range `18..=64` includes 18, so the second arm matches, and `n @` keeps the matched value in `n`.",
+          "output": { "command": "cargo run", "text": "adult 18" }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "parse-pair",
+          "title": "What does this code do?",
+          "guide": "Read the code, then pick what it does.",
+          "code": "fn parse(s: &str) -> Option<(&str, u32)> {\n    let mut parts = s.split(' ');\n\n    match (parts.next(), parts.next()) {\n        (Some(name), Some(n)) => {\n            let n = n.parse().ok()?;\n            Some((name, n))\n        }\n        _ => None,\n    }\n}",
+          "options": [
+            "Counts the words in a line of text",
+            "Parses a list of numbers separated by spaces",
+            "Splits text into a name and a number, or None"
+          ],
+          "answer": 2,
+          "explanation": "It takes the first two words, parses the second one as a number, and gives `None` if a word is missing or is not a number."
+        }
+      ]
+    }
+  ]
+}

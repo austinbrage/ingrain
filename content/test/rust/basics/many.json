@@ -1,0 +1,82 @@
+{
+  "id": "many",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "a",
+          "title": "Session one exercise",
+          "guide": "Write main.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Start with main.",
+              "text": "fn main() {\n}",
+              "notes": [{ "on": "main", "text": "main is where the program starts." }]
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "let names a value.",
+              "text": "    let a = 1;"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "ok" }
+        },
+        {
+          "type": "typing",
+          "id": "a2",
+          "title": "Session one part two",
+          "guide": "Write main.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Start with main.",
+              "text": "fn main() {\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "b",
+          "title": "Session two exercise",
+          "guide": "Write main.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "use std::io;"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Start with main.",
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 3,
+              "text": "    println!(\"hi\");"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "let names a value.",
+              "text": "    let a = 1;"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "hi" }
+        }
+      ]
+    }
+  ]
+}

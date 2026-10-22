@@ -1,0 +1,10 @@
+{
+  "name": "Go",
+  "sections": [
+    {
+      "id": "core",
+      "name": "Core",
+      "courses": [{ "id": "basics", "name": "Basics" }]
+    }
+  ]
+}

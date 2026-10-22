@@ -1,0 +1,31 @@
+{
+  "id": "syntax",
+  "module_sections": [
+    {
+      "name": "Foundations",
+      "tier": "basic",
+      "modules": [
+        { "id": "variables", "name": "Variables", "sessions": 4 },
+        { "id": "conditionals", "name": "Conditionals", "sessions": 3 },
+        { "id": "loops", "name": "Loops", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Data types",
+      "tier": "basic",
+      "modules": [
+        { "id": "structs", "name": "Structs", "sessions": 4 },
+        { "id": "enums", "name": "Enums", "sessions": 3 },
+        { "id": "pattern-matching", "name": "Pattern matching", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Abstractions",
+      "tier": "medium",
+      "modules": [
+        { "id": "traits", "name": "Traits", "sessions": 5 },
+        { "id": "generics", "name": "Generics", "sessions": 4 }
+      ]
+    }
+  ]
+}

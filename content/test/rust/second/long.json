@@ -1,0 +1,43 @@
+{
+  "id": "long",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "lines",
+          "title": "Long exercise",
+          "guide": "Type every line.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Start with main.",
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "First lets.",
+              "text": "    let a1 = 1;\n    let a2 = 2;\n    let a3 = 3;\n    let a4 = 4;\n    let a5 = 5;\n    let a6 = 6;"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "More lets.",
+              "text": "    let a7 = 7;\n    let a8 = 8;\n    let a9 = 9;\n    let a10 = 10;\n    let a11 = 11;\n    let a12 = 12;"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Last lets.",
+              "text": "    let a13 = 13;\n    let a14 = 14;\n    let a15 = 15;\n    let a16 = 16;\n    let a17 = 17;\n    let a18 = 18; // this comment is long enough to wrap, so its tail wraps"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "" }
+        }
+      ]
+    }
+  ]
+}

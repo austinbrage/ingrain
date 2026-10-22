@@ -1,0 +1,26 @@
+{
+  "name": "Go",
+  "sections": [
+    {
+      "id": "core",
+      "name": "Core",
+      "courses": [
+        { "id": "syntax", "name": "Syntax" },
+        { "id": "structs-and-interfaces", "name": "Structs and interfaces" },
+        { "id": "pointers", "name": "Pointers" },
+        { "id": "error-handling", "name": "Error handling" },
+        { "id": "concurrency", "name": "Concurrency" },
+        { "id": "testing", "name": "Testing" }
+      ]
+    },
+    {
+      "id": "ecosystem",
+      "name": "Ecosystem",
+      "courses": [
+        { "id": "cobra", "name": "cobra" },
+        { "id": "gin", "name": "gin" },
+        { "id": "bubbletea", "name": "bubbletea" }
+      ]
+    }
+  ]
+}

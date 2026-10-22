@@ -1,0 +1,37 @@
+{
+  "id": "quiz",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "total",
+          "title": "What does total do?",
+          "guide": "Pick what the function does.",
+          "code": "fn total(prices: &[u32]) -> u32 {\n    prices.iter().sum()\n}",
+          "options": [
+            "Adds up the prices",
+            "Finds the highest price",
+            "Counts the prices"
+          ],
+          "answer": 0,
+          "explanation": "It sums every price in the list."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "sum",
+          "title": "What does it print?",
+          "guide": "Pick the output.",
+          "code": "fn main() {\n    println!(\"{}\", 1 + 2);\n}",
+          "options": ["2", "3", "12"],
+          "answer": 1,
+          "explanation": "1 + 2 is 3.",
+          "output": { "command": "cargo run", "text": "3" }
+        }
+      ]
+    }
+  ]
+}

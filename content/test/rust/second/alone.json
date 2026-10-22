@@ -1,0 +1,25 @@
+{
+  "id": "alone",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "only",
+          "title": "Alone exercise",
+          "guide": "Write main.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Start with main.",
+              "text": "fn main() {\n    let a = 1;\n}"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "" }
+        }
+      ]
+    }
+  ]
+}

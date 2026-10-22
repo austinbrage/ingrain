@@ -1,0 +1,38 @@
+{
+  "id": "wide",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "copies",
+          "title": "Wide exercise",
+          "guide": "Copy the long code.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Start with main.",
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "copy",
+              "line": 2,
+              "guide": "A long line.",
+              "text": "    let total = compute_total(first, second);",
+              "notes": [{ "on": "compute_total", "text": "It adds the two values and returns the sum." }]
+            },
+            {
+              "mode": "copy",
+              "line": 3,
+              "guide": "A tall chunk.",
+              "text": "    let b1 = 1;\n    let b2 = 2;\n    let b3 = 3;\n    let b4 = 4;\n    let b5 = 5;\n    let b6 = 6;\n    let b7 = 7;\n    let b8 = 8;\n    let b9 = 9;\n    let b10 = 10;\n    let b11 = 11;\n    let b12 = 12;"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "" }
+        }
+      ]
+    }
+  ]
+}

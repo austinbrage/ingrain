@@ -1,0 +1,37 @@
+{
+  "id": "loops",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "for-loop",
+          "title": "Repeat with for",
+          "guide": "Inside `main`, loop **three times** and print the counter.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Every Rust program starts at `main`.\n\n- `fn` declares a function\n- the braces `{ }` hold its body\n\nType it, following the ghost text.",
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "copy",
+              "line": 2,
+              "guide": "`for` repeats a block.\n\n`0..3` counts from **0** up to **3**, not including 3.",
+              "text": "    for i in 0..3 {\n    }"
+            },
+            {
+              "mode": "copy",
+              "line": 3,
+              "guide": "`println!` prints a line. `{i}` puts the value of `i` in the text.",
+              "text": "        println!(\"{i}\");"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "0\n1\n2" }
+        }
+      ]
+    }
+  ]
+}

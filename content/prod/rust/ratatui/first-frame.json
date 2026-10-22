@@ -1,0 +1,257 @@
+{
+  "id": "first-frame",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "hello-ratatui",
+          "title": "Hello, ratatui",
+          "guide": "Build the smallest ratatui app: it draws one line of text and quits when you press any key.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Import the main pieces the app needs from ratatui.",
+              "notes": [
+                { "on": "crossterm", "text": "Lets the app read key presses." },
+                { "on": "DefaultTerminal", "text": "The terminal your app draws in." },
+                { "on": "Frame", "text": "What you draw on." }
+              ],
+              "text": "use ratatui::crossterm::event;\nuse ratatui::{DefaultTerminal, Frame};\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "`main` only starts ratatui. `app` is written next.",
+              "notes": [
+                { "on": "ratatui::run", "text": "Prepares the terminal, runs app, then restores the terminal." }
+              ],
+              "text": "fn main() -> std::io::Result<()> {\n    ratatui::run(app)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "`app` gets the terminal. Every terminal app loops: **draw**, then **wait for an event**.",
+              "text": "fn app(terminal: &mut DefaultTerminal) -> std::io::Result<()> {\n    loop {\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`draw` calls `render` with a `Frame`, then shows the result on screen.",
+              "text": "        terminal.draw(render)?;"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`event::read` waits for an event. Any key press ends the app.",
+              "text": "        if event::read()?.is_key_press() {\n            return Ok(());\n        }"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "`render` only draws; it never reads keys. A plain string is already a widget.",
+              "notes": [
+                { "on": "frame.area()", "text": "The whole terminal screen." },
+                { "on": "render_widget", "text": "Draws a widget inside an area." }
+              ],
+              "text": "fn render(frame: &mut Frame) {\n    frame.render_widget(\"Hello, ratatui!\", frame.area());\n}"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "Hello, ratatui!" }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "paragraph",
+          "title": "A Paragraph",
+          "guide": "A plain string works, but most of the time you draw a **widget** from `ratatui::widgets`. `Paragraph` is the simplest one: it shows text and can align it. The output is drawn for a 30-column terminal.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "use ratatui::Frame;"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`Frame` is already in the file. Widgets live in `ratatui::widgets`.",
+              "text": "use ratatui::widgets::Paragraph;\n"
+            },
+            {
+              "mode": "auto",
+              "line": 4,
+              "text": "fn render(frame: &mut Frame) {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`render` is already in the file. Methods that return the widget can be chained: the **builder style** used all over ratatui.",
+              "notes": [
+                { "on": "Paragraph::new", "text": "Creates a widget from text." },
+                { "on": ".centered()", "text": "Centers the text horizontally." }
+              ],
+              "text": "    let greeting = Paragraph::new(\"Hello, ratatui!\").centered();"
+            },
+            {
+              "mode": "copy",
+              "line": 6,
+              "guide": "Same call as before, now with a `Paragraph`.",
+              "text": "    frame.render_widget(greeting, frame.area());"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "       Hello, ratatui!" }
+        },
+        {
+          "type": "typing",
+          "id": "frame-area",
+          "title": "The frame area",
+          "guide": "`frame.area()` is a `Rect`: the position and size of the whole terminal. Widgets draw **inside** a `Rect`, so knowing the area is the first step to placing anything. The output is drawn for an 80 by 24 terminal.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "use ratatui::Frame;\n"
+            },
+            {
+              "mode": "auto",
+              "line": 3,
+              "text": "fn render(frame: &mut Frame) {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "The import and `render` are already in the file. A `Rect` has four fields: `x`, `y`, `width` and `height`.",
+              "text": "    let area = frame.area();"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`width` and `height` are measured in **cells**: one cell holds one character.",
+              "text": "    let size = format!(\"{} x {}\", area.width, area.height);"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A `String` is a widget too. Draw it in the full area.",
+              "text": "    frame.render_widget(size, area);"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "80 x 24" }
+        },
+        {
+          "type": "typing",
+          "id": "two-widgets",
+          "title": "Two widgets",
+          "guide": "One frame can hold many widgets. Each one gets its own `Rect`, built with `Rect::new(x, y, width, height)`, where `x` and `y` count cells from the top-left corner.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "use ratatui::Frame;"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`Frame` is already in the file. `Rect` lives in `ratatui::layout`, with everything about placing widgets.",
+              "text": "use ratatui::layout::Rect;"
+            },
+            {
+              "mode": "auto",
+              "line": 3,
+              "text": "use ratatui::widgets::Paragraph;\n"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "fn render(frame: &mut Frame) {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "The other import and `render` are already in the file. Creating a widget only **describes** it: nothing is on screen yet.",
+              "text": "    let title = Paragraph::new(\"Title\");\n    let body = Paragraph::new(\"Body\");\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Each widget is drawn in its own `Rect`. Row 1 stays empty.",
+              "notes": [
+                { "on": "Rect::new(0, 0, 20, 1)", "text": "Top-left corner, 20 cells wide, 1 high." },
+                { "on": "Rect::new(0, 2, 20, 1)", "text": "Two rows lower, same size." }
+              ],
+              "text": "    frame.render_widget(title, Rect::new(0, 0, 20, 1));\n    frame.render_widget(body, Rect::new(0, 2, 20, 1));"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "Title\n\nBody" }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "draw-on-every-key",
+          "title": "Draw again on every key",
+          "guide": "`app` draws, waits for a key, and loops, so it draws **again after every event**. What `render` shows can change between frames. Here the screen counts key presses, and `q` quits. The output is the screen after three key presses.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "`Event` is what `event::read` returns, and `KeyCode` names a key.",
+              "text": "use ratatui::crossterm::event::{self, Event, KeyCode};"
+            },
+            {
+              "mode": "auto",
+              "line": 2,
+              "text": "use ratatui::{DefaultTerminal, Frame};\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "`DefaultTerminal` and `Frame` are already imported. `presses` lives outside the loop, so it keeps its value between frames: the app's **state**.",
+              "text": "fn app(terminal: &mut DefaultTerminal) -> std::io::Result<()> {\n    let mut presses = 0;\n\n    loop {\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "`draw` gets a closure so `presses` can be passed to `render`.",
+              "text": "        terminal.draw(|frame| render(frame, presses))?;\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`event::read` returns an `Event`. We only care about key events.",
+              "text": "        if let Event::Key(key) = event::read()? {\n        }"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`q` ends the program.",
+              "text": "            if key.code == KeyCode::Char('q') {\n                return Ok(());\n            }"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Any other key adds one. The loop then draws again with the new number.",
+              "text": "            presses += 1;"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "`render` only reads the state, it never changes it.\n\nState in `app`, drawing in `render`: the base of every larger ratatui program.",
+              "text": "fn render(frame: &mut Frame, presses: u32) {\n    frame.render_widget(format!(\"Key presses: {presses}\"), frame.area());\n}"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "Key presses: 3" }
+        }
+      ]
+    }
+  ]
+}

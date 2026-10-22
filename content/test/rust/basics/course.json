@@ -1,0 +1,14 @@
+{
+  "id": "basics",
+  "module_sections": [
+    {
+      "name": "Foundations",
+      "tier": "basic",
+      "modules": [
+        { "id": "one", "name": "One", "sessions": 1 },
+        { "id": "planned", "name": "Planned", "sessions": 1 },
+        { "id": "many", "name": "Many", "sessions": 2 }
+      ]
+    }
+  ]
+}

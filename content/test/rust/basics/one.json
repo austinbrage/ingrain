@@ -1,0 +1,38 @@
+{
+  "id": "one",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "first",
+          "title": "First exercise",
+          "guide": "Print the value of a.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Start with main.",
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "copy",
+              "line": 2,
+              "guide": "let names a value.",
+              "text": "    let a = 1;",
+              "notes": [{ "on": "= 1;", "text": "The literal 1 is the value." }]
+            },
+            {
+              "mode": "copy",
+              "line": 3,
+              "guide": "println prints it.",
+              "text": "    println!(\"{a}\");"
+            }
+          ],
+          "output": { "command": "cargo run", "text": "1" }
+        }
+      ]
+    }
+  ]
+}

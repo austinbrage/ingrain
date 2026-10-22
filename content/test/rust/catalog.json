@@ -1,0 +1,21 @@
+{
+  "name": "Rust",
+  "sections": [
+    {
+      "id": "core",
+      "name": "Core",
+      "courses": [
+        { "id": "basics", "name": "Basics" },
+        { "id": "second", "name": "Second" }
+      ]
+    },
+    {
+      "id": "ecosystem",
+      "name": "Ecosystem",
+      "courses": [
+        { "id": "tools", "name": "Tools" },
+        { "id": "bare", "name": "Bare" }
+      ]
+    }
+  ]
+}

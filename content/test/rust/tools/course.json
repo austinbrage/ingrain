@@ -1,0 +1,13 @@
+{
+  "id": "tools",
+  "module_sections": [
+    {
+      "name": "Utilities",
+      "tier": "medium",
+      "modules": [
+        { "id": "helpers", "name": "Helpers", "sessions": 1 },
+        { "id": "quiz", "name": "Quiz", "sessions": 1 }
+      ]
+    }
+  ]
+}

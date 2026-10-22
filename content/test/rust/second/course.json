@@ -1,0 +1,14 @@
+{
+  "id": "second",
+  "module_sections": [
+    {
+      "name": "Extras",
+      "tier": "advanced",
+      "modules": [
+        { "id": "alone", "name": "Alone", "sessions": 1 },
+        { "id": "long", "name": "Long", "sessions": 1 },
+        { "id": "wide", "name": "Wide", "sessions": 1 }
+      ]
+    }
+  ]
+}

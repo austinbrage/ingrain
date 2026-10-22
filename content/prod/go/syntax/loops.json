@@ -1,0 +1,27 @@
+{
+  "id": "loops",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "for-loop",
+          "title": "Repeat with for",
+          "guide": "Inside main, loop three times. Go has only one loop keyword: for.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Every Go file starts with a package. Type the package, the fmt import and main.",
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            { "mode": "copy", "line": 6, "text": "\tfor i := 0; i < 3; i++ {\n\t}" },
+            { "mode": "copy", "line": 7, "text": "\t\tfmt.Println(i)" }
+          ],
+          "output": { "command": "go run main.go", "text": "0\n1\n2" }
+        }
+      ]
+    }
+  ]
+}
