@@ -52,12 +52,11 @@ impl ExplorerState {
         // The module file is read on every frame the sessions column is open. It is embedded
         // and small, so nothing is cached, and the marks can never be stale
         let mut sessions = Vec::new();
-        if self.depth == Depth::Sessions {
-            if let (Some(path), Some(module)) =
+        if self.depth == Depth::Sessions
+            && let (Some(path), Some(module)) =
                 (app.content.module_path(self), app.content.module(self))
-            {
-                sessions = app.progress.sessions_done(&path, &module);
-            }
+        {
+            sessions = app.progress.sessions_done(&path, &module);
         }
 
         ModuleMarks {
