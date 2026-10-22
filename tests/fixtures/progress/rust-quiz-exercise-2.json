@@ -1,0 +1,10 @@
+{
+  "last": { "language": "rust", "course": "tools" },
+  "modules": [
+    {
+      "id": "rust/tools/quiz",
+      "in_progress": { "session-1": "sum" },
+      "practiced": 1
+    }
+  ]
+}

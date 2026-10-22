@@ -1,0 +1,11 @@
+{
+  "last": { "language": "rust", "course": "basics" },
+  "modules": [
+    {
+      "id": "rust/basics/many",
+      "in_progress": { "session-1": "a2" },
+      "practiced": 2
+    },
+    { "id": "rust/basics/one", "done": ["session-1"], "practiced": 1 }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "last": { "language": "rust", "course": "basics" },
+  "modules": [
+    { "id": "rust/basics/one", "done": ["session-1"], "practiced": 1 },
+    { "id": "rust/basics/many", "done": ["session-1", "session-2"], "practiced": 2 },
+    { "id": "rust/second/alone", "done": ["session-1"], "practiced": 3 },
+    { "id": "rust/second/long", "done": ["session-1"], "practiced": 4 },
+    { "id": "rust/second/wide", "done": ["session-1"], "practiced": 5 },
+    { "id": "rust/tools/quiz", "done": ["session-1"], "practiced": 6 }
+  ]
+}
