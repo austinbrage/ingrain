@@ -63,5 +63,5 @@ pub fn explorer(
     render_columns(frame, body, catalog, state, course, marks, tick);
 
     // 3. Render Hint
-    render_hint(frame, hint, state.depth);
+    render_hint(frame, hint, state, marks);
 }

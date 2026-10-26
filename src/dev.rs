@@ -140,6 +140,8 @@ fn complete(explorer: ExplorerState, code: &[&str], output: Output) -> Screen {
         exercise: 0,
         session_count: 4,
         exercise_count: 1,
+        retake: false,
+        next_failed: None,
         bar_done: 3,
         bar_total: 3,
         bar_unit: "chunks",

@@ -2,7 +2,7 @@ use super::{Column, Item, NEXT_WORD, typed_text};
 use crate::app::{ExplorerState, ModuleMarks};
 use crate::content::Course;
 
-// The sessions of the selected module: `✓` in green when done, `○` when not
+// The sessions of the selected module: `✓` in green when done, `✗` in red when failed, `○` when not
 pub fn sessions_column(
     state: ExplorerState,
     course: Option<&Course>,
@@ -21,7 +21,14 @@ pub fn sessions_column(
         .iter()
         .enumerate()
         .map(|(index, &done)| {
-            let mark = if done { "✓" } else { "○" };
+            let failed = marks.sessions_failed.get(index).copied().unwrap_or(false);
+            let mark = if failed {
+                "✗"
+            } else if done {
+                "✓"
+            } else {
+                "○"
+            };
             let next = next_session == Some(index);
 
             Item {
@@ -31,7 +38,7 @@ pub fn sessions_column(
                 } else {
                     mark.to_string()
                 },
-                complete: done,
+                complete: done && !failed,
                 next,
             }
         })

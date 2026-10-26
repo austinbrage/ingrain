@@ -17,6 +17,8 @@ pub struct CompleteState {
     pub exercise: usize,
     pub session_count: usize,
     pub exercise_count: usize,
+    pub retake: bool,
+    pub next_failed: Option<usize>,
     pub bar_done: usize,
     pub bar_total: usize,
     pub bar_unit: &'static str,
@@ -33,6 +35,8 @@ impl CompleteState {
             exercise: state.exercise,
             session_count: state.session_count(),
             exercise_count: state.exercise_count(),
+            retake: state.retake,
+            next_failed: state.next_failed,
             bar_done: typing.chunks.len(),
             bar_total: typing.chunks.len(),
             bar_unit: "chunks",
@@ -49,6 +53,8 @@ impl CompleteState {
             exercise: state.exercise,
             session_count: state.session_count(),
             exercise_count: state.exercise_count(),
+            retake: state.retake,
+            next_failed: state.next_failed,
             bar_done: state.exercise + 1,
             bar_total: state.exercise_count(),
             bar_unit: "exercises",
@@ -59,6 +65,14 @@ impl CompleteState {
     }
 
     pub fn next(&self) -> Next {
+        if self.retake {
+            return if self.next_failed.is_some() {
+                Next::Exercise
+            } else {
+                Next::Finish
+            };
+        }
+
         if self.exercise + 1 < self.exercise_count {
             Next::Exercise
         } else if self.session + 1 < self.session_count {
@@ -86,7 +100,7 @@ impl CompleteState {
                 return ExerciseState::open(
                     explorer,
                     self.session,
-                    self.exercise + 1,
+                    self.next_failed.unwrap_or(self.exercise + 1),
                     content,
                     progress,
                 );

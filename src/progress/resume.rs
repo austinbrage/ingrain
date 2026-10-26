@@ -78,7 +78,7 @@ pub fn next_module(
     let prefix = format!("{language}/{course_id}/");
     let is_complete = |index: usize| {
         course.module_at(index).is_some_and(|module| {
-            progress.done_count(&format!("{prefix}{}", module.id)) == module.sessions as usize
+            progress.passed_count(&format!("{prefix}{}", module.id)) == module.sessions as usize
         })
     };
 
@@ -97,26 +97,64 @@ pub fn next_module(
         .find(|&index| !is_complete(index) && is_written(index))
 }
 
-// The first session of a module that is not done, the first one if all are
+// The first session of a module that is not done, then the first one failed, the first one if all passed
 pub fn next_session(progress: &Progress, module_path: &str, module: &Module) -> usize {
     module
         .sessions
         .iter()
         .position(|session| !progress.is_session_done(module_path, &session.id))
+        .or_else(|| {
+            module.sessions.iter().position(|session| {
+                !progress
+                    .failed_exercises(module_path, &session.id)
+                    .is_empty()
+            })
+        })
         .unwrap_or(0)
 }
 
-// The exercise saved for a session, the first one if there is none
+// The first failed exercise of a session from a position on, in content order
+pub fn failed_from(
+    progress: &Progress,
+    module_path: &str,
+    module: &Module,
+    session: usize,
+    from: usize,
+) -> Option<usize> {
+    let session = &module.sessions[session];
+    let failed = progress.failed_exercises(module_path, &session.id);
+
+    session
+        .exercises
+        .iter()
+        .enumerate()
+        .skip(from)
+        .find_map(|(position, exercise)| {
+            failed
+                .iter()
+                .any(|id| id == exercise.id())
+                .then_some(position)
+        })
+}
+
+// The exercise saved for a session, the first one if there is none. A session played
+// through reopens at its first failed exercise, in content order
 pub fn next_exercise(
     progress: &Progress,
     module_path: &str,
     module: &Module,
     session: usize,
 ) -> usize {
-    let session = &module.sessions[session];
+    let data = &module.sessions[session];
+
+    if progress.is_session_done(module_path, &data.id)
+        && let Some(position) = failed_from(progress, module_path, module, session, 0)
+    {
+        return position;
+    }
 
     progress
-        .in_progress_exercise(module_path, &session.id)
-        .and_then(|saved| session.exercise_index(saved))
+        .in_progress_exercise(module_path, &data.id)
+        .and_then(|saved| data.exercise_index(saved))
         .unwrap_or(0)
 }

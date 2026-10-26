@@ -33,13 +33,16 @@ pub fn modules_column(
                     selected = Some(items.len());
                 }
 
-                let done = marks.done.get(module_index).copied().unwrap_or(0);
-                let complete = done == module.sessions as usize;
+                let passed = marks.passed.get(module_index).copied().unwrap_or(0);
+                let failed = marks.failed.get(module_index).copied().unwrap_or(false);
+                let complete = passed == module.sessions as usize;
                 let next = marks.next == Some(module_index);
                 let count = if complete {
-                    format!("✓ {done}/{}", module.sessions)
+                    format!("✓ {passed}/{}", module.sessions)
+                } else if failed {
+                    format!("✗ {passed}/{}", module.sessions)
                 } else {
-                    format!("{done}/{}", module.sessions)
+                    format!("{passed}/{}", module.sessions)
                 };
 
                 items.push(Item {

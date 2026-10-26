@@ -19,6 +19,10 @@ pub struct ExerciseState {
     pub module: Module,
     pub session: usize,
     pub exercise: usize,
+    // A retake plays only the failed exercises of a session that was played through,
+    // and `next_failed` is the one after this
+    pub retake: bool,
+    pub next_failed: Option<usize>,
     pub body: Body,
 }
 
@@ -33,8 +37,16 @@ impl ExerciseState {
         progress: &mut Progress,
     ) -> Option<Screen> {
         let module = content.module(explorer)?;
+        let path = content.module_path(explorer)?;
 
         Self::remember_course(explorer, content, progress);
+
+        let retake = progress.is_retake(&path, &module.sessions[session].id);
+        let next_failed = if retake {
+            progress.next_failed_exercise(&path, &module, session, exercise)
+        } else {
+            None
+        };
 
         let body = match &module.sessions[session].exercises[exercise] {
             Exercise::Typing(typing) => Body::Typing(TypingState::new(typing)),
@@ -46,6 +58,8 @@ impl ExerciseState {
             module,
             session,
             exercise,
+            retake,
+            next_failed,
             body,
         }))
     }
@@ -64,16 +78,21 @@ impl ExerciseState {
         progress.save();
     }
 
-    // Save the finished exercise in progress.json
-    fn record_completion(&self, content: &Content, progress: &mut Progress) {
+    // Save the finished exercise in progress.json, with whether it was passed
+    fn record_completion(&self, content: &Content, progress: &mut Progress, passed: bool) {
         let Some(module) = content.module_path(self.explorer) else {
             return;
         };
 
         let session = &self.module.sessions[self.session];
-        let next_exercise = session.exercises.get(self.exercise + 1).map(Exercise::id);
+        let exercise = session.exercises[self.exercise].id();
+        let next_exercise = if self.retake {
+            None
+        } else {
+            session.exercises.get(self.exercise + 1).map(Exercise::id)
+        };
 
-        progress.complete_exercise(&module, &session.id, next_exercise);
+        progress.complete_exercise(&module, &session.id, exercise, passed, next_exercise);
         Self::remember_course(self.explorer, content, progress);
     }
 
@@ -106,7 +125,7 @@ impl ExerciseState {
         if typing_state.current(typing).is_none() {
             let code = typing_state.file.clone();
             let complete = CompleteState::new(self, typing, code);
-            self.record_completion(content, progress);
+            self.record_completion(content, progress, true);
             return Some(Screen::Complete(complete));
         }
 
@@ -133,8 +152,9 @@ impl ExerciseState {
             (Action::Down, _) => quiz_state.down(quiz),
             (Action::Select, false) => quiz_state.answered = true,
             (Action::Select, true) => {
+                let passed = quiz_state.selected == quiz.answer;
                 let complete = CompleteState::from_quiz(self, quiz);
-                self.record_completion(content, progress);
+                self.record_completion(content, progress, passed);
                 return Some(Screen::Complete(complete));
             }
             (Action::Left | Action::Right | Action::Quit, _) => {}

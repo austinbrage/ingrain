@@ -34,6 +34,9 @@ pub struct ModuleProgress {
     pub done: Vec<String>,
     #[serde(default)]
     pub in_progress: HashMap<String, String>,
+    // The exercises of each session answered wrong and not passed since
+    #[serde(default)]
+    pub failed: HashMap<String, Vec<String>>,
     // Unix seconds of the last exercise finished in this module, 0 if unknown
     #[serde(default)]
     pub practiced: u64,
@@ -109,13 +112,46 @@ impl Progress {
         self.find_module(module).map_or(0, |entry| entry.practiced)
     }
 
-    // Sessions done in each module of a course, in course order
-    pub fn done_counts(&self, language: &str, course_id: &str, course: &Course) -> Vec<usize> {
+    // Sessions done and not failed in a module, 0 if it has no entry yet
+    fn passed_count(&self, module: &str) -> usize {
+        self.find_module(module).map_or(0, |entry| {
+            entry
+                .done
+                .iter()
+                .filter(|id| !entry.failed.contains_key(*id))
+                .count()
+        })
+    }
+
+    // Sessions done and not failed in each module of a course, in course order
+    pub fn passed_counts(&self, language: &str, course_id: &str, course: &Course) -> Vec<usize> {
         course
             .module_sections
             .iter()
             .flat_map(|section| &section.modules)
-            .map(|module| self.done_count(&format!("{language}/{course_id}/{}", module.id)))
+            .map(|module| self.passed_count(&format!("{language}/{course_id}/{}", module.id)))
+            .collect()
+    }
+
+    // Which modules of a course have a failed session, in course order
+    pub fn modules_failed(&self, language: &str, course_id: &str, course: &Course) -> Vec<bool> {
+        course
+            .module_sections
+            .iter()
+            .flat_map(|section| &section.modules)
+            .map(|module| {
+                self.find_module(&format!("{language}/{course_id}/{}", module.id))
+                    .is_some_and(|entry| !entry.failed.is_empty())
+            })
+            .collect()
+    }
+
+    // Which sessions of a module have failed exercises, in module order
+    pub fn sessions_failed(&self, module_path: &str, module: &Module) -> Vec<bool> {
+        module
+            .sessions
+            .iter()
+            .map(|session| !self.failed_exercises(module_path, &session.id).is_empty())
             .collect()
     }
 
@@ -136,6 +172,29 @@ impl Progress {
     fn is_session_done(&self, module: &str, session: &str) -> bool {
         self.find_module(module)
             .is_some_and(|entry| entry.done.iter().any(|id| id == session))
+    }
+
+    // The exercises of a session answered wrong and not passed since
+    fn failed_exercises(&self, module: &str, session: &str) -> &[String] {
+        self.find_module(module)
+            .and_then(|entry| entry.failed.get(session))
+            .map_or(&[], Vec::as_slice)
+    }
+
+    // Whether a session is a retake: played through, with failed exercises left
+    pub fn is_retake(&self, module: &str, session: &str) -> bool {
+        self.is_session_done(module, session) && !self.failed_exercises(module, session).is_empty()
+    }
+
+    // The next failed exercise of a session after a position, None when there is none
+    pub fn next_failed_exercise(
+        &self,
+        module_path: &str,
+        module: &Module,
+        session: usize,
+        after: usize,
+    ) -> Option<usize> {
+        resume::failed_from(self, module_path, module, session, after + 1)
     }
 
     // The exercise saved as next in a session, None if there is none
@@ -209,7 +268,14 @@ impl Progress {
     // ------------------------------------------------------------
 
     // `next_exercise` is None when the finished exercise was the last one of its session
-    pub fn complete_exercise(&mut self, module: &str, session: &str, next_exercise: Option<&str>) {
+    pub fn complete_exercise(
+        &mut self,
+        module: &str,
+        session: &str,
+        exercise: &str,
+        passed: bool,
+        next_exercise: Option<&str>,
+    ) {
         // Find the module's entry, or create it the first time
         let index = match self.modules.iter().position(|entry| entry.id == module) {
             Some(index) => index,
@@ -218,6 +284,7 @@ impl Progress {
                     id: module.to_string(),
                     done: Vec::new(),
                     in_progress: HashMap::new(),
+                    failed: HashMap::new(),
                     practiced: 0,
                 });
                 self.modules.len() - 1
@@ -225,6 +292,23 @@ impl Progress {
         };
         let entry = &mut self.modules[index];
         entry.practiced = Self::now();
+
+        // A wrong answer is remembered until a later try passes it
+        if passed {
+            if let Some(ids) = entry.failed.get_mut(session) {
+                ids.retain(|id| id != exercise);
+
+                if ids.is_empty() {
+                    entry.failed.remove(session);
+                }
+            }
+        } else {
+            let ids = entry.failed.entry(session.to_string()).or_default();
+
+            if !ids.iter().any(|id| id == exercise) {
+                ids.push(exercise.to_string());
+            }
+        }
 
         match next_exercise {
             // More exercises to do: remember the next one

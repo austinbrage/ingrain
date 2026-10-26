@@ -161,7 +161,15 @@ fn render_single_column(frame: &mut Frame, area: Rect, column: &Column, divider:
             } else {
                 format!("{} ", item.right)
             };
-            let line = Line::from(text);
+            // A failed mark is red, and the rest of the text keeps its style
+            let line = match text.split_once('✗') {
+                Some((before, after)) => Line::from(vec![
+                    Span::raw(before.to_string()),
+                    Span::styled("✗", Style::new().fg(palette.red.into())),
+                    Span::raw(after.to_string()),
+                ]),
+                None => Line::from(text),
+            };
 
             if item.complete {
                 line.style(Style::new().fg(palette.green.into()))

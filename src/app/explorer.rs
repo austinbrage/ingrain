@@ -21,13 +21,17 @@ pub struct ExplorerState {
     pub session: usize,
 }
 
-// What the explorer marks on the modules of a course: sessions done, and the next module
+// What the explorer marks on the modules of a course: sessions passed, which have a failed
+// session, and the next module
 #[derive(Default)]
 pub struct ModuleMarks {
-    pub done: Vec<usize>,
+    pub passed: Vec<usize>,
+    pub failed: Vec<bool>,
     pub next: Option<usize>,
     // Which sessions of the selected module are done, only while the sessions column is open
     pub sessions: Vec<bool>,
+    // And which of them are failed
+    pub sessions_failed: Vec<bool>,
 }
 
 impl ExplorerState {
@@ -52,17 +56,21 @@ impl ExplorerState {
         // The module file is read on every frame the sessions column is open. It is embedded
         // and small, so nothing is cached, and the marks can never be stale
         let mut sessions = Vec::new();
+        let mut sessions_failed = Vec::new();
         if self.depth == Depth::Sessions
             && let (Some(path), Some(module)) =
                 (app.content.module_path(self), app.content.module(self))
         {
             sessions = app.progress.sessions_done(&path, &module);
+            sessions_failed = app.progress.sessions_failed(&path, &module);
         }
 
         ModuleMarks {
-            done: app.progress.done_counts(language, course_id, course),
+            passed: app.progress.passed_counts(language, course_id, course),
+            failed: app.progress.modules_failed(language, course_id, course),
             next: app.progress.next_module(language, course_id, course),
             sessions,
+            sessions_failed,
         }
     }
 

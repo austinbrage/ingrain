@@ -1,4 +1,4 @@
-use crate::app::Depth;
+use crate::app::{Depth, ExplorerState, ModuleMarks};
 
 use catppuccin::PALETTE;
 
@@ -22,11 +22,24 @@ const START_HINT: &[(&str, &str)] = &[
     ("←", "back"),
     ("Ctrl-Q", "quit"),
 ];
+const RETAKE_HINT: &[(&str, &str)] = &[
+    ("↑↓", "move"),
+    ("Enter", "retake"),
+    ("←", "back"),
+    ("Ctrl-Q", "quit"),
+];
 
-pub fn render_hint(frame: &mut Frame, area: Rect, depth: Depth) {
-    let keys = match depth {
+pub fn render_hint(frame: &mut Frame, area: Rect, state: ExplorerState, marks: &ModuleMarks) {
+    let failed = marks
+        .sessions_failed
+        .get(state.session)
+        .copied()
+        .unwrap_or(false);
+    let keys = match state.depth {
         Depth::Sections | Depth::Courses => OPEN_HINT,
-        Depth::Modules | Depth::Sessions => START_HINT,
+        Depth::Modules => START_HINT,
+        Depth::Sessions if failed => RETAKE_HINT,
+        Depth::Sessions => START_HINT,
     };
 
     frame.render_widget(Paragraph::new(hint_line(keys)).centered(), area);
