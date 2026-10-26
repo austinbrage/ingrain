@@ -32,6 +32,52 @@
           "explanation": "It takes the first two words, parses the second one as a number, and gives `None` if a word is missing or is not a number."
         }
       ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "match-guard",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let n = 7;\n\n    match n {\n        x if x % 2 == 0 => println!(\"even\"),\n        x if x > 5 => println!(\"big odd {x}\"),\n        _ => println!(\"small odd\"),\n    }\n}",
+          "options": ["even", "small odd", "big odd 7"],
+          "answer": 2,
+          "explanation": "7 is odd, so the first guard fails. The second guard `x > 5` is true, so the arm prints `big odd 7`."
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "slice-shape",
+          "title": "What does this function do?",
+          "guide": "Read the code, then pick what it does.",
+          "code": "fn describe(v: &[i32]) -> &str {\n    match v {\n        [] => \"empty\",\n        [_] => \"one\",\n        [a, .., b] if a == b => \"same ends\",\n        _ => \"other\",\n    }\n}",
+          "options": [
+            "Counts the items of the slice",
+            "Names the shape of a slice",
+            "Checks that a slice is sorted"
+          ],
+          "answer": 1,
+          "explanation": "It matches the slice by its shape (empty, one item, equal first and last items, or anything else) and returns a word for each."
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "missing-arm",
+          "title": "Why does it not compile?",
+          "guide": "Read the code, then pick the cause.",
+          "code": "enum Light {\n    Red,\n    Yellow,\n    Green,\n}\n\nfn go(light: Light) -> bool {\n    match light {\n        Light::Green => true,\n        Light::Red => false,\n    }\n}",
+          "options": [
+            "`Yellow` is not handled by the match",
+            "`go` must return a `Light`",
+            "`true` and `false` need a semicolon"
+          ],
+          "answer": 0,
+          "explanation": "A `match` must cover every variant. Add a `Light::Yellow` arm, or a `_` arm, and it compiles."
+        }
+      ]
     }
   ]
 }

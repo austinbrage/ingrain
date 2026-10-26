@@ -16,7 +16,7 @@
       "modules": [
         { "id": "structs", "name": "Structs", "sessions": 4 },
         { "id": "enums", "name": "Enums", "sessions": 3 },
-        { "id": "pattern-matching", "name": "Pattern matching", "sessions": 1 }
+        { "id": "pattern-matching", "name": "Pattern matching", "sessions": 2 }
       ]
     },
     {
