@@ -345,6 +345,53 @@ mod sessions {
         assert!(saw_next);
         assert!(saw_circle);
     }
+
+    #[test]
+    fn a_failed_session_shows_a_red_cross_instead_of_a_check() {
+        let mut app = TestApp::with_progress("rust-many-session-1-failed");
+        app.press(KeyCode::Down); // selects "Choose a language", Continue is first
+        app.press(KeyCode::Enter); // opens the language cards
+        app.press(KeyCode::Enter); // opens the Rust explorer
+        app.wait(5); // all rows appear
+        app.press(KeyCode::Right); // focus the courses column
+        app.press(KeyCode::Right); // focus the modules column
+        app.press(KeyCode::Down); // Planned
+        app.press(KeyCode::Down); // Many
+        app.press(KeyCode::Enter); // opens its sessions column
+
+        let screen = app.screen();
+        assert!(screen.has_row(&["Session 1", "✗"]));
+        assert!(!screen.has_row(&["Session 1", "✓"]));
+        assert_eq!(
+            screen.foreground_of("✗"),
+            Some(PALETTE.mocha.colors.red.into())
+        );
+    }
+
+    #[test]
+    fn the_hint_says_retake_only_on_a_failed_session() {
+        let mut app = TestApp::with_progress("rust-many-session-1-failed");
+        app.press(KeyCode::Down); // selects "Choose a language", Continue is first
+        app.press(KeyCode::Enter); // opens the language cards
+        app.press(KeyCode::Enter); // opens the Rust explorer
+        app.wait(5); // all rows appear
+        app.press(KeyCode::Right); // focus the courses column
+        app.press(KeyCode::Right); // focus the modules column
+        app.press(KeyCode::Down); // Planned
+        app.press(KeyCode::Down); // Many
+        app.press(KeyCode::Enter); // opens its sessions column, on Session 2
+        let screen = app.screen();
+        assert!(screen.has_row(&["Enter start"]));
+        assert!(!screen.contains("Enter retake"));
+
+        app.press(KeyCode::Up); // Session 1, the failed one
+        let screen = app.screen();
+        assert!(screen.has_row(&["↑↓ move", "Enter retake", "← back", "Ctrl-Q quit"]));
+        assert!(!screen.contains("Enter start"));
+
+        app.press(KeyCode::Down); // Session 2
+        assert!(app.screen().has_row(&["Enter start"]));
+    }
 }
 
 mod marks {
@@ -382,6 +429,103 @@ mod marks {
             assert!(!screen.has_row(&["Planned", "next"]));
         }
         assert!(saw_next);
+        assert!(saw_count);
+    }
+
+    #[test]
+    fn an_exercise_left_with_esc_is_not_failed() {
+        let mut app = TestApp::with_progress("last-rust-tools");
+        app.press(KeyCode::Enter); // Continue opens the first quiz
+        app.press(KeyCode::Esc); // leaves it unanswered
+        app.wait(5); // all rows appear
+
+        let screen = app.screen();
+        assert!(screen.has_row(&["Quiz"]));
+        assert!(!screen.contains("✗"));
+        assert!(app.saved_progress().modules.is_empty());
+    }
+
+    #[test]
+    fn a_wrong_quiz_answer_leaves_a_cross_on_its_module() {
+        let mut app = TestApp::with_progress("last-rust-tools");
+        app.press(KeyCode::Enter); // Continue opens the first quiz
+        app.press(KeyCode::Down); // a wrong option
+        app.press(KeyCode::Enter); // checks it
+        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
+        app.press(KeyCode::Esc); // back to the explorer
+
+        let mut saw_cross = false;
+        for _ in 0..120 {
+            // longer than a full cycle of the typing animation
+            app.wait(1);
+            saw_cross |= app.screen().has_row(&["Quiz", "✗ 0/1"]);
+        }
+        assert!(saw_cross);
+    }
+
+    #[test]
+    fn a_right_quiz_answer_leaves_no_cross_on_its_module() {
+        let mut app = TestApp::with_progress("last-rust-tools");
+        app.press(KeyCode::Enter); // Continue opens the first quiz
+        app.press(KeyCode::Enter); // checks the first option, which is right
+        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
+        app.press(KeyCode::Esc); // back to the explorer
+
+        let mut saw_count = false;
+        for _ in 0..120 {
+            // longer than a full cycle of the typing animation
+            app.wait(1);
+            let screen = app.screen();
+            saw_count |= screen.has_row(&["Quiz", "0/1"]);
+            assert!(!screen.contains("✗"));
+        }
+        assert!(saw_count);
+    }
+
+    #[test]
+    fn a_module_with_a_failed_session_shows_a_red_cross_before_its_count() {
+        let mut app = TestApp::with_progress("rust-quiz-done-failed");
+        app.press(KeyCode::Down); // selects "Choose a language", Continue is first
+        app.press(KeyCode::Enter); // opens the language cards
+        app.press(KeyCode::Enter); // opens the Rust explorer
+        app.wait(5); // all rows appear
+        app.press(KeyCode::Down); // Ecosystem
+        app.press(KeyCode::Right); // focus the courses column, on Tools
+
+        let mut saw_cross = false;
+        for _ in 0..120 {
+            // longer than a full cycle of the typing animation
+            app.wait(1);
+            let screen = app.screen();
+            if screen.has_row(&["Quiz", "✗ 0/1"]) {
+                saw_cross = true;
+                assert_eq!(
+                    screen.foreground_of("✗"),
+                    Some(PALETTE.mocha.colors.red.into())
+                );
+            }
+        }
+        assert!(saw_cross);
+    }
+
+    #[test]
+    fn a_failed_session_is_not_counted_as_done() {
+        let mut app = TestApp::with_progress("rust-quiz-done-failed");
+        app.press(KeyCode::Down); // selects "Choose a language", Continue is first
+        app.press(KeyCode::Enter); // opens the language cards
+        app.press(KeyCode::Enter); // opens the Rust explorer
+        app.wait(5); // all rows appear
+        app.press(KeyCode::Down); // Ecosystem
+        app.press(KeyCode::Right); // focus the courses column, on Tools
+
+        let mut saw_count = false;
+        for _ in 0..120 {
+            // longer than a full cycle of the typing animation
+            app.wait(1);
+            let screen = app.screen();
+            saw_count |= screen.has_row(&["Quiz", "0/1"]);
+            assert!(!screen.has_row(&["Quiz", "✓"]));
+        }
         assert!(saw_count);
     }
 }

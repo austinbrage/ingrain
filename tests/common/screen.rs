@@ -80,6 +80,13 @@ impl Screen {
         Some(self.cell(x, y).bg)
     }
 
+    // The foreground color of the first character of the text, None if it is not on the screen
+    pub fn foreground_of(&self, text: &str) -> Option<Color> {
+        let (x, y) = self.find(text)?;
+
+        Some(self.cell(x, y).fg)
+    }
+
     // The cell at a position, to check its colors and style
     fn cell(&self, x: u16, y: u16) -> &Cell {
         &self.buffer[(x, y)]

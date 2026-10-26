@@ -1,0 +1,11 @@
+{
+  "last": { "language": "rust", "course": "tools" },
+  "modules": [
+    {
+      "id": "rust/tools/quiz",
+      "done": ["session-1"],
+      "failed": { "session-1": ["total"] },
+      "practiced": 1
+    }
+  ]
+}
