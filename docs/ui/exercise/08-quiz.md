@@ -37,7 +37,7 @@ The first option is selected when the exercise opens. The selected row has the g
 ```
 
 ## Right answer
-Enter checks. The guide card becomes the `explanation` card, the options card badge becomes `right`, and the picked option gets a `✓`. Up and Down do nothing now. Enter goes on. Today that opens the complete screen (`05-complete.md`); `docs/todos/11-complete-screens.md` removes it for quizzes, so Enter will go straight to the next exercise.
+Enter checks. The guide card becomes the `explanation` card, the options card badge becomes `right`, and the picked option gets a `✓`. Up and Down do nothing now. Enter goes on. Today that opens the complete screen (`docs/ui/complete/01-exercise.md`); `docs/todos/11-complete-screens.md` removes it for quizzes, so Enter will go straight to the next exercise.
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
