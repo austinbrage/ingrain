@@ -1,3 +1,4 @@
+use catppuccin::PALETTE;
 use ratatui::crossterm::event::KeyCode;
 
 mod common;
@@ -80,7 +81,7 @@ mod session_done {
     use super::*;
 
     #[test]
-    fn enter_opens_the_next_session() {
+    fn the_last_exercise_of_a_session_points_to_the_next_session() {
         let mut app = TestApp::with_progress("rust-many-exercise-2");
         app.press(KeyCode::Enter); // Continue opens the last exercise of session 1
         app.type_chunk("fn main() {\n}");
@@ -90,6 +91,55 @@ mod session_done {
         assert!(screen.contains("Session 1 of 2 complete"));
         assert!(screen.contains("Press Enter for the next session"));
         assert!(screen.has_row(&["[▓▓▓▓▓▓▓▓▓▓▓▓]", "1/1 chunks", "Esc back", "Ctrl-Q quit"]));
+    }
+
+    #[test]
+    fn shows_the_exercises_of_the_session_and_not_the_next_one() {
+        let mut app = TestApp::with_progress("rust-many-exercise-2");
+        app.press(KeyCode::Enter); // Continue opens the last exercise of session 1
+        app.type_chunk("fn main() {\n}");
+        app.press(KeyCode::Enter); // the complete screen goes on, to the session screen
+
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust · Basics · Many", "session 1/2 · exercise 2/2"]));
+        assert!(screen.contains("🬻🬒🬌 🬨🬕🬒🬄🬻🬒🬌 🬻🬒🬌 🬁█🬀 🬵🬆🬪🬏█🬱▐▌    🬨🬕🬪🬏🬵🬆🬪🬏█🬱▐▌🬨🬕🬒🬄"));
+        assert!(screen.has_row(&["╭", "Session 1"]));
+        assert!(screen.has_row(&["1  ✓  Session one exercise", "typing   passed"]));
+        assert!(screen.has_row(&["2  ✓  Session one part two", "typing   passed"]));
+        assert!(screen.contains("2 of 2 exercises passed"));
+        assert!(screen.has_row(&["Enter next session", "Esc back", "Ctrl-Q quit"]));
+        assert!(!screen.contains("Session two exercise"));
+    }
+
+    #[test]
+    fn a_wrong_quiz_answer_shows_a_red_cross_on_its_row() {
+        let mut app = TestApp::with_progress("rust-tools-before-recap");
+        app.press(KeyCode::Enter); // Continue opens the first quiz of Recap
+        app.press(KeyCode::Down); // a wrong option
+        app.press(KeyCode::Enter); // checks it
+        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
+        app.press(KeyCode::Enter); // the complete screen opens the second quiz
+        app.press(KeyCode::Enter); // checks the first option, which is right
+        app.press(KeyCode::Enter); // goes on, to the complete screen
+        app.press(KeyCode::Enter); // the complete screen goes on, to the session screen
+
+        let screen = app.screen();
+        assert!(screen.has_row(&["1  ✗  Recap one", "quiz   failed"]));
+        assert!(screen.has_row(&["2  ✓  Recap two", "quiz   passed"]));
+        assert!(screen.contains("1 of 2 exercises passed"));
+        assert!(screen.has_row(&["[▓▓▓▓▓▓░░░░░░] 1/2"]));
+        assert_eq!(
+            screen.foreground_of("✗"),
+            Some(PALETTE.mocha.colors.red.into())
+        );
+    }
+
+    #[test]
+    fn enter_on_the_recap_opens_the_next_session() {
+        let mut app = TestApp::with_progress("rust-many-exercise-2");
+        app.press(KeyCode::Enter); // Continue opens the last exercise of session 1
+        app.type_chunk("fn main() {\n}");
+        app.press(KeyCode::Enter); // the complete screen goes on, to the session screen
 
         app.press(KeyCode::Enter);
         let screen = app.screen();
@@ -97,7 +147,21 @@ mod session_done {
         assert!(screen.contains("Session two exercise"));
         assert!(screen.contains("use std::io;"));
         assert!(screen.has_row(&["[▓▓▓░░░░░░░░░]", "1/4 chunks"]));
-        assert!(!screen.contains("Press Enter for the next session"));
+        assert!(!screen.contains("2 of 2 exercises passed"));
+    }
+
+    #[test]
+    fn esc_on_the_recap_goes_back_to_the_explorer() {
+        let mut app = TestApp::with_progress("rust-many-exercise-2");
+        app.press(KeyCode::Enter); // Continue opens the last exercise of session 1
+        app.type_chunk("fn main() {\n}");
+        app.press(KeyCode::Enter); // the complete screen goes on, to the session screen
+
+        app.press(KeyCode::Esc);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Ingrain", "Rust › Core › Basics"]));
+        assert!(screen.has_row(&["↑↓ move", "Enter start", "← back", "Ctrl-Q quit"]));
+        assert!(!screen.contains("2 of 2 exercises passed"));
     }
 }
 

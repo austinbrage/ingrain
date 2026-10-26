@@ -7,6 +7,7 @@
     { "id": "rust/second/long", "done": ["session-1"], "practiced": 4 },
     { "id": "rust/second/wide", "done": ["session-1"], "practiced": 5 },
     { "id": "rust/tools/quiz", "done": ["session-1"], "practiced": 6 },
-    { "id": "rust/tools/retake", "done": ["session-1"], "practiced": 7 }
+    { "id": "rust/tools/retake", "done": ["session-1"], "practiced": 7 },
+    { "id": "rust/tools/recap", "done": ["session-1", "session-2"], "practiced": 8 }
   ]
 }

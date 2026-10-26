@@ -1,0 +1,48 @@
+{
+  "id": "recap",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "first",
+          "title": "Recap one",
+          "guide": "Pick what the function does.",
+          "code": "fn one() -> u32 {\n    1\n}",
+          "options": ["Returns one", "Returns two"],
+          "answer": 0,
+          "explanation": "It returns 1."
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "second",
+          "title": "Recap two",
+          "guide": "Pick what the function does.",
+          "code": "fn two() -> u32 {\n    2\n}",
+          "options": ["Returns two", "Returns one"],
+          "answer": 0,
+          "explanation": "It returns 2."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "third",
+          "title": "Recap three",
+          "guide": "Pick what the function does.",
+          "code": "fn three() -> u32 {\n    3\n}",
+          "options": ["Returns three", "Returns two"],
+          "answer": 0,
+          "explanation": "It returns 3."
+        }
+      ]
+    }
+  ]
+}
