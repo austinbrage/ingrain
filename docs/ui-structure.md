@@ -14,7 +14,7 @@ The home has two views: the buttons and the language cards, so there is no separ
 | Draft | File | Notes |
 |---|---|---|
 | `01-home.md` | `ui/home/` | splash: gradient title with a wave, tagline, typing demo. Two views: the buttons, or one card per language. The Continue button has three states: hidden for a new user, a course (`Continue   Rust · Syntax`), and a finished language (`Rust completed · Let's review`, with slow dots). The demo types the language of the last course practiced |
-| `02-explorer.md` | `ui/explorer/` | one screen drawn at three depths (course sections, courses, modules), in the home's corner frame. The module rows show progress: `done/total`, a green `✓` when complete, and the next module in the accent color with a typed `next`. At the sessions depth, a fourth level, the sessions column replaces the modules column (`✓` and `○`, and the next session typed like the next module) |
+| `02-explorer.md` | `ui/explorer/` | one screen drawn at three depths (course sections, courses, modules), in the home's corner frame. The module rows show progress: `done/total`, a green `✓` when complete, and the next module in the accent color with a typed `next`. At the sessions depth, a fourth level, the sessions column replaces the modules column (`✓`, `✗` and `○`, and the next session typed like the next module). A module or a session with failed exercises shows a red `✗` (`✗ 1/4` on the module row), and the hint says `Enter retake` on a failed session row |
 | `exercise/01` to `04` | `ui/exercise/` (`mod.rs` header and footer, `typing/mod.rs` the 2:1 layout, `typing/guide/` the two guide cards and the copy box, `typing/editor/` the window, the code rows and the hints) | the definitive look in two layouts and two chunk modes: `03` ghost wide (built), `04` copy wide (built), `01` and `02` narrow (decided, not built). Boxed header and footer, the editor window and the guide cards flush to the screen edges. See `docs/todos/00-exercise-view.md` |
 | `exercise/08-quiz` | `ui/exercise/quiz/` (`mod.rs` the layout by `kind` and the guide card, `code.rs` the code window, `options.rs` the options card with its wrapping, markers and scroll) | the quiz exercise: the code in a read only window on the left, the guide card (the explanation once answered) and the options card on the right. The right column is 2:1 of the code, 3:2 wider for the `purpose` kind. It repeats a few pieces of `typing/guide/` and `typing/editor/` on purpose (the guide card, the rule, the language label, the title bar), to merge in `todos/05-deep-refactor.md` (6.7 and 6.8) |
 | `exercise/06-guide-alternative` | none | the guide as one card with a dim rule, the version before the two cards. Kept with its code |
@@ -36,8 +36,8 @@ The home has two views: the buttons and the language cards, so there is no separ
 |---|---|
 | `explorer/mod.rs` | shell: corners, header, body, hint, and the call to `render_columns` |
 | `explorer/corners.rs` | the four thick corners, a copy of the home's |
-| `explorer/hint.rs` | the hint line, one key list per depth |
-| `explorer/columns/mod.rs` | `render_columns` (builds, lays out and renders the three columns, with the sessions column in place of the modules column at its depth), `render_single_column`, `Column` and `Item`, the title wave and the cascade, and the typed `next` (`typed_text`) that the modules and sessions columns share |
+| `explorer/hint.rs` | the hint line, one key list per depth, and `Enter retake` on a failed row of the sessions column |
+| `explorer/columns/mod.rs` | `render_columns` (builds, lays out and renders the three columns, with the sessions column in place of the modules column at its depth), `render_single_column`, `Column` and `Item`, the title wave and the cascade, and the typed `next` (`typed_text`) that the modules and sessions columns share. Any `✗` in the right-hand text is drawn red |
 | `explorer/columns/sections.rs` | builds the sections column |
 | `explorer/columns/courses.rs` | builds the courses column |
 | `explorer/columns/modules.rs` | builds the modules column |
@@ -62,9 +62,9 @@ One file per screen in `src/app/`, with the screen's state type and its key hand
 | `app/content.rs` | `Content`: the loaded courses of every language and the questions about a position (`catalog`, `course`, `module`, `course_id`, `module_path`, `breadcrumb`) |
 | `app/input.rs` | `Action` and `to_action` (arrows and `hjkl` move, Enter and Tab select, Esc goes back), and `TypingKey` and `to_typing_key` for the exercise screen. The only place that knows keys |
 | `app/home.rs` | `HomeState` (buttons or language cards), `HomeButton`, `HomeLanguage`, `handle_home_key`, and the Continue button: `continue_label`, `continue_target`, `last_language`, which forward to `Progress` |
-| `app/explorer.rs` | `ExplorerState`, `Depth`, `ModuleMarks` (what the explorer marks on the module rows), one handler per depth, `module_marks`, `explorer_breadcrumb`, `step` |
-| `app/exercise/` | `mod.rs`: `ExerciseState`, `Body` (one variant per exercise type), `ExerciseState::open`, the two handlers (`handle_typing_key` for raw keys, `handle_quiz_action` for actions) and `record_completion`, which saves progress when an exercise ends. `typing.rs`: `TypingState`. `quiz.rs`: `QuizState` (the selected option and whether it was checked) |
-| `app/complete.rs` | `CompleteState` (built by `new` for a typing exercise and by `from_quiz` for a quiz, with the footer bar as `bar_done`, `bar_total` and `bar_unit`), `Next` (what Enter does on the complete screen) and its key handler. A quiz will leave this screen, see `todos/11-complete-screens.md` |
+| `app/explorer.rs` | `ExplorerState`, `Depth`, `ModuleMarks` (what the explorer marks on the module rows: `passed`, `failed`, `next`, and for the open sessions column `sessions` and `sessions_failed`), one handler per depth, `module_marks`, `explorer_breadcrumb`, `step` |
+| `app/exercise/` | `mod.rs`: `ExerciseState` (with `retake` and `next_failed` for a retake of failed exercises), `Body` (one variant per exercise type), `ExerciseState::open`, the two handlers (`handle_typing_key` for raw keys, `handle_quiz_action` for actions) and `record_completion`, which saves progress when an exercise ends. `typing.rs`: `TypingState`. `quiz.rs`: `QuizState` (the selected option and whether it was checked) |
+| `app/complete.rs` | `CompleteState` (built by `new` for a typing exercise and by `from_quiz` for a quiz, with the footer bar as `bar_done`, `bar_total` and `bar_unit`, and `retake` and `next_failed` copied from the exercise), `Next` (what Enter does on the complete screen) and its key handler. A quiz will leave this screen, see `todos/11-complete-screens.md` |
 | `src/dev.rs` (outside `app/`) | opens a screen from command line arguments, for development. Called by `main.rs` |
 
 - `Screen::Explorer(ExplorerState)` carries the language and the path (depth, section, course)
@@ -86,9 +86,9 @@ The progress code lives outside `app/` and `ui/`, in `src/progress/`:
 
 | File | Holds |
 |---|---|
-| `progress/mod.rs` | `Progress` (`last` and `modules`), load and save, the small questions about the file, `continue_label`, `continue_at`, `resume_point`, `done_counts`, `next_module`, and the writes (`complete_exercise`, `set_last`) |
+| `progress/mod.rs` | `Progress` (`last` and `modules`), load and save, the small questions about the file, `continue_label`, `continue_at`, `resume_point`, `passed_counts`, `modules_failed`, `sessions_failed`, `is_retake`, `next_failed_exercise`, `next_module`, and the writes (`complete_exercise`, `set_last`) |
 | `progress/storage.rs` | the disk: the data folder, reading the file (a broken one is kept as `.bak`) and writing it safely |
-| `progress/resume.rs` | the decisions as free functions over `&Progress`: `next_course`, `next_module`, `next_session`, `next_exercise`, `next_review` |
+| `progress/resume.rs` | the decisions as free functions over `&Progress`: `next_course`, `next_module`, `next_session`, `next_exercise`, `failed_from`, `next_review` |
 
 The data shape is in `content-structure.md` and the full walkthrough of how it is written and read is in `progress-flow.md`.
 

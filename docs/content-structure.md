@@ -112,7 +112,7 @@ A `"quiz"` exercise shows code and the user picks one option. It sits in the sam
 - **Options:** at most about 50 characters each, so an option takes two rows at most in the options card. Wrong options must be plausible: a mistake someone could really make reading the code, not a joke or an obvious absurdity. Vary the index of the right one (`answer`) across a module, not always the first
 - **Code width:** the same rule as typing (40 columns or less, never over 50), and short: the code window does not scroll while the user chooses, so it should fit about 14 lines
 - **`output` is checked by running:** when it is there, the author runs the code once while writing the exercise. The same for the `answer` of an `output` quiz
-- No score, and no retry inside the exercise. A wrong answer is saved as finished for now; `docs/todos/09-failed-exercises.md` changes that
+- No score, and no retry inside the exercise. A wrong answer is saved in the `failed` list of its session, and the failed exercises can be retaken (`docs/progress-flow.md`)
 - The rules about options and `answer` are not checked when the module loads, because a panic there would take the app down with its own data. They belong to the content validation (see Open)
 
 ## Ids
@@ -130,8 +130,8 @@ Stored outside the repo, one small file per machine, in the OS data directory (f
 {
   "last": { "language": "rust", "course": "ratatui" },
   "modules": [
-    { "id": "rust/syntax/loops", "done": ["session-1"], "in_progress": {}, "practiced": 1760400000 },
-    { "id": "rust/ratatui/first-frame", "done": ["session-1"], "in_progress": { "session-2": "frame-area" }, "practiced": 1760403600 }
+    { "id": "rust/syntax/loops", "done": ["session-1"], "in_progress": {}, "failed": {}, "practiced": 1760400000 },
+    { "id": "rust/ratatui/first-frame", "done": ["session-1"], "in_progress": { "session-2": "frame-area" }, "failed": { "session-1": ["draw-block"] }, "practiced": 1760403600 }
   ]
 }
 ```
@@ -141,11 +141,12 @@ Stored outside the repo, one small file per machine, in the OS data directory (f
 | `modules[].id` | a module as `<language>/<course>/<module>`, built from the content ids |
 | `modules[].done` | the session ids of that module the user finished |
 | `modules[].in_progress` | a session started but not finished, and the id of the next exercise to do in it |
+| `modules[].failed` | for each session, the exercise ids answered wrong and not passed since (only quizzes fail). A file without it reads as nothing failed |
 | `modules[].practiced` | the time (Unix seconds) of the last exercise finished in the module. It feeds the review |
 
 - A module has an entry only once it has something saved
 - `modules` is ordered: a module moves to the end when one of its sessions is newly finished, so the list ends with the module finished last
-- Counts like `1/4` are the length of a module's `done` over the `sessions` number in `course.json`
+- Counts like `1/4` are the sessions of a module in `done` and not in `failed`, over the `sessions` number in `course.json`
 - A saved id that no longer exists in the content is ignored. A corrupt file is renamed to `progress.json.bak` and a fresh one starts
 - How it is written and read, step by step: `docs/progress-flow.md`
 

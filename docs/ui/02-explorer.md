@@ -136,8 +136,76 @@ Sessions are a fourth level. They appear only when the module has a session comp
 | Modules | sections | courses | modules |
 | Sessions | sections | courses | sessions (replaces modules) |
 
-- The sessions column shows `Session N`, with `✓` in `green` on the completed sessions and `○` on the rest. The first session not done is the next one, in the accent color with the typed `next`, like the next module
+- The sessions column shows `Session N`, with `✓` in `green` on the completed sessions and `○` on the rest. A failed session shows a red `✗` instead (see Failed) The first session not done is the next one, in the accent color with the typed `next`, like the next module
 - The title of the column is the module, and the breadcrumb adds it too (`Rust › Core › Syntax › Loops`). The hint is the modules one
+
+## Failed
+Status: Approved for coding by the author on 2026-10-24. The rest of the file stays Draft.
+
+A session with an exercise answered wrong is **failed** (`docs/progress-flow.md`). The explorer shows it with a `✗` in red where a passed one has the green `✓`, on both columns. Only quizzes can fail, and an exercise left with Esc is not failed, only not visited.
+
+The modules depth. Conditionals and Loops each have a failed session. The `✗` goes in front of the count, as the `✓` does on a complete module, and the count is the sessions passed, so a failed session is not in it (Loops is `1/4`):
+
+```
+┏━━━━━━━                                                                                    ━━━━━━━┓
+┃ Ingrain                                                                     Rust › Core › Syntax ┃
+┃                                                                                                  ┃
+   RUST                          │ CORE                          │ SYNTAX                           
+                                 │                               │                                  
+   ▸ Core                      › │ ▸ Syntax                    › │   FOUNDATIONS            basic   
+     Ecosystem                 › │   Structs and enums         › │     Variables            ✓ 4/4   
+                                 │   Borrow checker            › │     Conditionals         ✗ 2/3   
+                                 │   Error handling            › │ ▌   Loops                ✗ 1/4   
+                                 │   Concurrency               › │                                  
+                                 │   Async                     › │   DATA TYPES             basic   
+                                 │                               │     Structs                0/4   
+                                 │                               │     Enums                  0/3   
+                                 │                               │     Pattern matching       0/5   
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+┃                                                                                                  ┃
+┃                                                                                                  ┃
+┗━━━━━━━                    ↑↓ move   Enter start   ← back   Ctrl-Q quit                    ━━━━━━━┛
+```
+
+The sessions depth, with the failed session selected. The `✗` takes the place of the `✓`. The hint on a failed row says `Enter retake`, because Enter opens only the failed exercises of that session:
+
+```
+┏━━━━━━━                                                                                    ━━━━━━━┓
+┃ Ingrain                                                         Rust › Core › Syntax › Variables ┃
+┃                                                                                                  ┃
+   RUST                          │ CORE                          │ VARIABLES                        
+                                 │                               │                                  
+   ▸ Core                      › │ ▸ Syntax                    › │   Session 1                  ✓   
+     Ecosystem                 › │   Structs and enums         › │ ▌ Session 2                  ✗   
+                                 │   Borrow checker            › │   Session 3              next█   
+                                 │   Error handling            › │   Session 4                  ○   
+                                 │   Concurrency               › │                                  
+                                 │   Async                     › │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+┃                                                                                                  ┃
+┃                                                                                                  ┃
+┗━━━━━━━                   ↑↓ move   Enter retake   ← back   Ctrl-Q quit                    ━━━━━━━┛
+```
+
+- **The next marker:** a module with failed sessions that Continue goes to alternates its right side between the typed `next█` and the count, which keeps its `✗` (`✗ 3/4`)
+- **A failed session that is also the next one:** a wrong answer in the middle of the first pass of a session makes it failed (see `docs/progress-flow.md`) while it is still the first session not done, so its right side alternates `next█` and `✗`
+- **The hint:** `Enter retake` only on a failed row of the sessions column, where Enter is always a retake. On the modules column it stays `Enter start`, because Enter there may open the sessions column first
+- **Color:** the `✗` in the mocha `red`, the same as in the recap drafts (`docs/ui/complete/`). The count after it keeps the color of its row
 
 ## Open
 - Fill or a bold `sky` bar for the focused row. The fill is built, the bar was not tried
