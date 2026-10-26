@@ -12,6 +12,7 @@ use ratatui::{
     Frame,
     layout::{Constraint, Layout},
     style::Style,
+    text::{Line, Span},
     widgets::{Block, BorderType, Paragraph},
 };
 
@@ -91,12 +92,16 @@ pub fn exercise(frame: &mut Frame, breadcrumb: String, state: &ExerciseState) {
 }
 
 // The bar fills with what is done out of the total
-fn bar(done: usize, total: usize, unit: &str) -> String {
+fn bar(done: usize, total: usize, unit: &str) -> Line<'static> {
     let filled = done * BAR_WIDTH / total;
 
-    format!(
-        " [{}{}] {done}/{total} {unit}",
-        "▓".repeat(filled),
-        "░".repeat(BAR_WIDTH - filled),
-    )
+    Line::from(vec![
+        Span::raw(" ["),
+        Span::styled(
+            "▓".repeat(filled),
+            Style::new().fg(PALETTE.mocha.colors.sky.into()),
+        ),
+        Span::raw("░".repeat(BAR_WIDTH - filled)),
+        Span::raw(format!("] {done}/{total} {unit}")),
+    ])
 }
