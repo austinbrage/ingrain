@@ -1,4 +1,4 @@
-.PHONY: dev dev\:watch dev\:fresh test complete complete\:watch complete-long complete-long\:watch exercise exercise\:watch
+.PHONY: dev dev\:watch dev\:fresh test complete complete\:watch complete-long complete-long\:watch complete-session complete-session\:watch exercise exercise\:watch
 
 dev:
 	@cargo run -q
@@ -24,6 +24,12 @@ complete-long:
 
 complete-long\:watch:
 	@exec watchexec -r -c -e rs -- cargo run -q -- complete-long
+
+complete-session:
+	@cargo run -q -- session-done
+
+complete-session\:watch:
+	@exec watchexec -r -c -e rs -- cargo run -q -- session-done
 
 exercise:
 	@cargo run -q -- exercise $(path)
