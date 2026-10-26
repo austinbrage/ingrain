@@ -25,8 +25,6 @@ pub fn draw(frame: &mut Frame, app: &App) {
         Screen::Exercise(ref state) => {
             exercise::exercise(frame, app.content.breadcrumb(state.explorer), state)
         }
-        Screen::Complete(ref state) => {
-            complete::complete(frame, app.content.breadcrumb(state.explorer), state)
-        }
+        Screen::Complete(ref state) => complete::complete(frame, &app.content, state),
     }
 }

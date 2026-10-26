@@ -1,5 +1,6 @@
-use super::content::Content;
-use super::{Action, ExerciseState, ExplorerState, Screen};
+use crate::app::{
+    Action, CompleteState, Content, ExerciseState, ExplorerState, Screen, SessionDone,
+};
 use crate::content::{Output, Quiz, Typing};
 use crate::progress::Progress;
 
@@ -11,7 +12,7 @@ pub enum Next {
 }
 
 // The finished exercise: code and output for the cards, plus its place in the module
-pub struct CompleteState {
+pub struct ExerciseDone {
     pub explorer: ExplorerState,
     pub session: usize,
     pub exercise: usize,
@@ -27,7 +28,7 @@ pub struct CompleteState {
     pub scroll: usize,
 }
 
-impl CompleteState {
+impl ExerciseDone {
     pub fn new(state: &ExerciseState, typing: &Typing, code: Vec<String>) -> Self {
         Self {
             explorer: state.explorer,
@@ -106,7 +107,8 @@ impl CompleteState {
                 );
             }
             (Action::Select, Next::Session) => {
-                return ExerciseState::open(explorer, self.session + 1, 0, content, progress);
+                return SessionDone::new(explorer, self.session, content, progress)
+                    .map(|done| Screen::Complete(CompleteState::Session(done)));
             }
             (Action::Select | Action::Back, _) => return Some(Screen::Explorer(explorer)),
             _ => {}

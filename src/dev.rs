@@ -1,5 +1,6 @@
 use crate::app::{
-    App, Body, CompleteState, Depth, ExerciseState, ExplorerState, HomeLanguage, Screen,
+    App, Body, CompleteState, Depth, DoneRow, ExerciseDone, ExerciseState, ExplorerState,
+    HomeLanguage, Screen, SessionDone,
 };
 use crate::content::{Exercise, Mode, Output};
 
@@ -80,6 +81,25 @@ pub fn start_at(app: &mut App, screen: &str, target: Option<&str>) {
 
             app.screen = complete(explorer, &code, output);
         }
+        // The session recap, with one failed exercise
+        "session-done" => {
+            let row = |title: &str, kind, passed| DoneRow {
+                title: title.to_string(),
+                kind,
+                passed,
+            };
+
+            app.screen = Screen::Complete(CompleteState::Session(SessionDone {
+                explorer,
+                session: 1,
+                session_count: 3,
+                rows: vec![
+                    row("Move a value", "typing", true),
+                    row("Who owns it?", "quiz", false),
+                    row("Borrow it", "typing", true),
+                ],
+            }));
+        }
         _ => {}
     }
 }
@@ -134,7 +154,7 @@ fn skip_to_chunk(app: &mut App, chunk: &str) {
 }
 
 fn complete(explorer: ExplorerState, code: &[&str], output: Output) -> Screen {
-    Screen::Complete(CompleteState {
+    Screen::Complete(CompleteState::Exercise(ExerciseDone {
         explorer,
         session: 0,
         exercise: 0,
@@ -148,5 +168,5 @@ fn complete(explorer: ExplorerState, code: &[&str], output: Output) -> Screen {
         code: code.iter().map(|line| line.to_string()).collect(),
         output: Some(output),
         scroll: 0,
-    })
+    }))
 }

@@ -155,6 +155,23 @@ impl Progress {
             .collect()
     }
 
+    // Which exercises of a session are failed, in session order
+    pub fn exercises_failed(
+        &self,
+        module_path: &str,
+        module: &Module,
+        session: usize,
+    ) -> Vec<bool> {
+        let session = &module.sessions[session];
+        let failed = self.failed_exercises(module_path, &session.id);
+
+        session
+            .exercises
+            .iter()
+            .map(|exercise| failed.iter().any(|id| id == exercise.id()))
+            .collect()
+    }
+
     // Which sessions of a module are done, in module order
     pub fn sessions_done(&self, module_path: &str, module: &Module) -> Vec<bool> {
         module

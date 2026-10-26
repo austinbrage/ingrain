@@ -44,6 +44,21 @@ impl Exercise {
             Exercise::Quiz(quiz) => &quiz.id,
         }
     }
+
+    pub fn title(&self) -> &str {
+        match self {
+            Exercise::Typing(typing) => &typing.title,
+            Exercise::Quiz(quiz) => &quiz.title,
+        }
+    }
+
+    // What the exercise is, as the session recap names it
+    pub fn kind(&self) -> &'static str {
+        match self {
+            Exercise::Typing(_) => "typing",
+            Exercise::Quiz(_) => "quiz",
+        }
+    }
 }
 
 impl Module {

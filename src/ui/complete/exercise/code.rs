@@ -1,6 +1,6 @@
 use catppuccin::PALETTE;
 
-use crate::app::CompleteState;
+use crate::app::ExerciseDone;
 use crate::highlight::Highlighted;
 
 use ratatui::{
@@ -15,7 +15,7 @@ use ratatui::{
 const GUTTER_WIDTH: u16 = 7;
 
 // Draws the finished file as an editor window. Returns true when it overflows, so it can be scrolled
-pub fn render_code(frame: &mut Frame, area: Rect, state: &CompleteState) -> bool {
+pub fn render_code(frame: &mut Frame, area: Rect, state: &ExerciseDone) -> bool {
     let palette = PALETTE.mocha.colors;
     let border = Style::new().fg(palette.sky.into());
     let card = Block::bordered()

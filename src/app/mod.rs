@@ -10,7 +10,7 @@ pub use crate::progress::ContinueLabel;
 use crate::progress::Progress;
 pub use content::Content;
 
-pub use complete::{CompleteState, Next};
+pub use complete::{CompleteState, DoneRow, ExerciseDone, Next, SessionDone};
 pub use exercise::{Body, EditorView, ExerciseState, Kind, QuizState, Row, TypingState};
 pub use explorer::{Depth, ExplorerState, ModuleMarks};
 pub use home::{HomeButton, HomeLanguage, HomeState};

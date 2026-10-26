@@ -5,7 +5,7 @@ pub use quiz::QuizState;
 pub use typing::{EditorView, Kind, Row, TypingState};
 
 use super::content::Content;
-use super::{Action, CompleteState, ExplorerState, Screen, TypingKey};
+use super::{Action, CompleteState, ExerciseDone, ExplorerState, Screen, TypingKey};
 use crate::content::{Exercise, Module};
 use crate::progress::Progress;
 
@@ -124,7 +124,7 @@ impl ExerciseState {
 
         if typing_state.current(typing).is_none() {
             let code = typing_state.file.clone();
-            let complete = CompleteState::new(self, typing, code);
+            let complete = CompleteState::Exercise(ExerciseDone::new(self, typing, code));
             self.record_completion(content, progress, true);
             return Some(Screen::Complete(complete));
         }
@@ -153,7 +153,7 @@ impl ExerciseState {
             (Action::Select, false) => quiz_state.answered = true,
             (Action::Select, true) => {
                 let passed = quiz_state.selected == quiz.answer;
-                let complete = CompleteState::from_quiz(self, quiz);
+                let complete = CompleteState::Exercise(ExerciseDone::from_quiz(self, quiz));
                 self.record_completion(content, progress, passed);
                 return Some(Screen::Complete(complete));
             }
