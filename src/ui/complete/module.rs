@@ -17,17 +17,6 @@ const WORD: &str = "\
 🬨🬕  🬨🬕🬒🬄█ █ 🬨🬕🬒🬄🬨🬕      █ █ 🬨🬕🬨🬓
 ▐▌🬞🬓▐🬕🬄🬏🬬🬭🬝 ▐🬕🬄🬏▐▌🬞🬓    █ █ ▐🬕🬂 
 🬂🬂🬂🬀🬂🬂🬂🬀 🬂  🬂🬂🬂🬀🬂🬂🬂🬀    🬂🬂🬂 🬂🬂  ";
-// The three rows of sparkles: one above the word and two below the numbers. Each character
-// that is not a space marks where a sparkle goes
-const SPARKLES: [&str; 3] = [
-    "  ✦          ·           ✧           ·           ✦           ·  ",
-    "·         ✧          ·           ✦          ·          ✧        ",
-    "     ✧          ✦          ·          ✧          ✦          ·   ",
-];
-
-// The looks a sparkle goes through, and the ticks it stays on each
-const TWINKLE: [char; 3] = ['✦', '✧', '·'];
-const TWINKLE_TICKS: u64 = 6;
 
 pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone, tick: u64) {
     let palette = PALETTE.mocha.colors;
@@ -40,29 +29,9 @@ pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone, ti
     );
     render_header(frame, header, breadcrumb, position);
 
-    // 2. Render Body: sparkles, the word, the caption, the name and the numbers
-    let [
-        sparkles_top,
-        _gap,
-        word_area,
-        _gap2,
-        caption,
-        _gap3,
-        name,
-        numbers,
-        course_area,
-        _gap4,
-        sparkles_mid,
-        _gap5,
-        sparkles_low,
-    ] = Layout::vertical([
-        Constraint::Length(1),
-        Constraint::Length(1),
+    // 2. Render Body: the word, the caption, the name and the numbers
+    let [word_area, _gap2, caption, _gap3, name, numbers, course_area] = Layout::vertical([
         Constraint::Length(3),
-        Constraint::Length(1),
-        Constraint::Length(1),
-        Constraint::Length(1),
-        Constraint::Length(1),
         Constraint::Length(1),
         Constraint::Length(1),
         Constraint::Length(1),
@@ -72,15 +41,6 @@ pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone, ti
     ])
     .flex(Flex::Center)
     .areas(body);
-
-    let sparkle = Style::new().fg(palette.yellow.into());
-    for (area, text) in [sparkles_top, sparkles_mid, sparkles_low]
-        .into_iter()
-        .zip(SPARKLES)
-    {
-        let text = twinkle(text, tick);
-        frame.render_widget(Paragraph::new(text).style(sparkle).centered(), area);
-    }
 
     let word: Vec<Line> = WORD.lines().map(|row| wave_line(row, tick)).collect();
     frame.render_widget(Paragraph::new(word).centered(), word_area);
@@ -144,15 +104,4 @@ fn pluralize(number: usize, word: &str) -> String {
     let plural = if number == 1 { "" } else { "s" };
 
     format!("{number} {word}{plural}")
-}
-
-// A row of sparkles at a tick: each sparkle is one step ahead of the one before it
-fn twinkle(row: &str, tick: u64) -> String {
-    row.chars()
-        .enumerate()
-        .map(|(column, ch)| match ch {
-            ' ' => ' ',
-            _ => TWINKLE[(column as u64 + tick / TWINKLE_TICKS) as usize % TWINKLE.len()],
-        })
-        .collect()
 }
