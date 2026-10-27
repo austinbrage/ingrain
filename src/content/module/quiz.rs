@@ -1,7 +1,5 @@
 use serde::Deserialize;
 
-use super::Output;
-
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Quiz {
@@ -13,7 +11,6 @@ pub struct Quiz {
     pub options: Vec<String>,
     pub answer: usize,
     pub explanation: String,
-    pub output: Option<Output>,
 }
 
 // What the quiz asks: the purpose of the code, its output, the cause of a compiler message, or the kind of error

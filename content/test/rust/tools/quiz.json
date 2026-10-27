@@ -28,8 +28,7 @@
           "code": "fn main() {\n    println!(\"{}\", 1 + 2);\n}",
           "options": ["2", "3", "12"],
           "answer": 1,
-          "explanation": "1 + 2 is 3.",
-          "output": { "command": "cargo run", "text": "3" }
+          "explanation": "1 + 2 is 3."
         }
       ]
     }

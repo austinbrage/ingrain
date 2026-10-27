@@ -82,7 +82,7 @@ impl ExerciseDone {
             retake: state.retake,
             next_failed: state.next_failed,
             code: quiz.code.lines().map(String::from).collect(),
-            output: quiz.output.clone(),
+            output: None,
             scroll: 0,
         }
     }

@@ -153,9 +153,18 @@ impl ExerciseState {
             (Action::Select, false) => quiz_state.answered = true,
             (Action::Select, true) => {
                 let passed = quiz_state.selected == quiz.answer;
-                let complete = CompleteState::Exercise(ExerciseDone::from_quiz(self, quiz));
+                // A quiz has no complete screen. `done` is the state that screen would have, and
+                // it is only used to decide where to go: its Enter handling returns the screen
+                // that follows (the next exercise, the session recap, the module screen or the
+                // explorer). `done` itself is never put on screen
+                let mut done = ExerciseDone::from_quiz(self, quiz);
                 self.record_completion(content, progress, passed);
-                return Some(Screen::Complete(complete));
+                return done.handle_key(Action::Select, content, progress);
+
+                // Before, this Enter opened that state as a complete screen, and the user had
+                // to press Enter again to go on:
+                // let complete = CompleteState::Exercise(ExerciseDone::from_quiz(self, quiz));
+                // return Some(Screen::Complete(complete));
             }
             (Action::Left | Action::Right | Action::Quit, _) => {}
         }
