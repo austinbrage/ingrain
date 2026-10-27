@@ -1,5 +1,6 @@
 use super::{render_footer, render_header, split};
 use crate::app::ModuleDone;
+use crate::ui::wave::wave_line;
 
 use catppuccin::PALETTE;
 use ratatui::{
@@ -9,9 +10,13 @@ use ratatui::{
     text::{Line, Span},
     widgets::Paragraph,
 };
-use tui_big_text::{BigText, PixelSize};
 
 const HINT: &str = "Esc back   Ctrl-Q quit ";
+// The word LEVEL UP, drawn like the home title: three rows, padded to the same width
+const WORD: &str = "\
+🬨🬕  🬨🬕🬒🬄█ █ 🬨🬕🬒🬄🬨🬕      █ █ 🬨🬕🬨🬓
+▐▌🬞🬓▐🬕🬄🬏🬬🬭🬝 ▐🬕🬄🬏▐▌🬞🬓    █ █ ▐🬕🬂 
+🬂🬂🬂🬀🬂🬂🬂🬀 🬂  🬂🬂🬂🬀🬂🬂🬂🬀    🬂🬂🬂 🬂🬂  ";
 // The three rows of sparkles: one above the word and two below the numbers. Each character
 // that is not a space marks where a sparkle goes
 const SPARKLES: [&str; 3] = [
@@ -77,13 +82,8 @@ pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone, ti
         frame.render_widget(Paragraph::new(text).style(sparkle).centered(), area);
     }
 
-    let word = BigText::builder()
-        .pixel_size(PixelSize::Sextant)
-        .style(Style::new().fg(palette.sky.into()))
-        .lines(vec![Line::from("LEVEL UP")])
-        .centered()
-        .build();
-    frame.render_widget(word, word_area);
+    let word: Vec<Line> = WORD.lines().map(|row| wave_line(row, tick)).collect();
+    frame.render_widget(Paragraph::new(word).centered(), word_area);
 
     frame.render_widget(
         Paragraph::new("──  module complete  ──")
