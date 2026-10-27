@@ -12,14 +12,19 @@ use ratatui::{
 use tui_big_text::{BigText, PixelSize};
 
 const HINT: &str = "Esc back   Ctrl-Q quit ";
-// The three rows of sparkles: one above the word and two below the numbers
+// The three rows of sparkles: one above the word and two below the numbers. Each character
+// that is not a space marks where a sparkle goes
 const SPARKLES: [&str; 3] = [
     "  ✦          ·           ✧           ·           ✦           ·  ",
     "·         ✧          ·           ✦          ·          ✧        ",
     "     ✧          ✦          ·          ✧          ✦          ·   ",
 ];
 
-pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone) {
+// The looks a sparkle goes through, and the ticks it stays on each
+const TWINKLE: [char; 3] = ['✦', '✧', '·'];
+const TWINKLE_TICKS: u64 = 6;
+
+pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone, tick: u64) {
     let palette = PALETTE.mocha.colors;
     let [header, body, footer] = split(frame.area());
 
@@ -68,6 +73,7 @@ pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone) {
         .into_iter()
         .zip(SPARKLES)
     {
+        let text = twinkle(text, tick);
         frame.render_widget(Paragraph::new(text).style(sparkle).centered(), area);
     }
 
@@ -138,4 +144,15 @@ fn pluralize(number: usize, word: &str) -> String {
     let plural = if number == 1 { "" } else { "s" };
 
     format!("{number} {word}{plural}")
+}
+
+// A row of sparkles at a tick: each sparkle is one step ahead of the one before it
+fn twinkle(row: &str, tick: u64) -> String {
+    row.chars()
+        .enumerate()
+        .map(|(column, ch)| match ch {
+            ' ' => ' ',
+            _ => TWINKLE[(column as u64 + tick / TWINKLE_TICKS) as usize % TWINKLE.len()],
+        })
+        .collect()
 }

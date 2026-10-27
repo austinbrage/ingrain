@@ -64,7 +64,10 @@ impl App {
     // ------------------------------------------------------------
 
     pub fn animating(&self) -> bool {
-        matches!(self.screen, Screen::Home(_) | Screen::Explorer(_))
+        matches!(
+            self.screen,
+            Screen::Home(_) | Screen::Explorer(_) | Screen::Complete(CompleteState::Module(_))
+        )
     }
 
     pub fn tick(&mut self) {

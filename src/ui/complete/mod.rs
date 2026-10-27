@@ -14,7 +14,7 @@ use ratatui::{
     widgets::{Block, BorderType, Paragraph},
 };
 
-pub fn complete(frame: &mut Frame, content: &Content, state: &CompleteState) {
+pub fn complete(frame: &mut Frame, content: &Content, state: &CompleteState, tick: u64) {
     match state {
         CompleteState::Exercise(done) => {
             exercise::exercise_done(frame, content.breadcrumb(done.explorer), done)
@@ -23,7 +23,7 @@ pub fn complete(frame: &mut Frame, content: &Content, state: &CompleteState) {
             session::session_done(frame, content.breadcrumb(done.explorer), done)
         }
         CompleteState::Module(done) => {
-            module::module_done(frame, content.breadcrumb(done.explorer), done)
+            module::module_done(frame, content.breadcrumb(done.explorer), done, tick)
         }
         CompleteState::ModuleFailed(done) => {
             module_failed::module_failed(frame, content.breadcrumb(done.explorer), done)
