@@ -176,7 +176,7 @@ mod auto {
 
         app.type_chunk("    let a = 1;");
         let screen = app.screen();
-        assert!(screen.contains("Press Enter to finish"));
+        assert!(screen.contains("Enter finish module"));
     }
 }
 
@@ -318,7 +318,7 @@ mod indent {
         let screen = app.screen();
         assert!(screen.contains("    let a = 1;"));
         assert!(screen.has_rows_in_order(&["fn main() {", "let a = 1;", "}"]));
-        assert!(screen.contains("Press Enter to finish"));
+        assert!(screen.contains("Enter finish module"));
     }
 
     #[test]

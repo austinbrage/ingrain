@@ -325,6 +325,7 @@ mod retake {
 
         app.press(KeyCode::Enter); // checks the first option, which is right
         app.press(KeyCode::Enter); // goes on, which today opens the complete screen
+        assert!(app.screen().contains("Next: Exercise 2 of 2"));
         app.press(KeyCode::Enter); // the complete screen opens the next failed exercise
         let screen = app.screen();
         assert!(screen.contains("What does it print?"));

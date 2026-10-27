@@ -8,6 +8,9 @@ use common::TestApp;
 mod exercise_done {
     use super::*;
 
+    // The first row of the word DONE, as `tui_big_text` draws it in `Sextant`
+    const DONE: &str = "🬨🬕🬪🬏🬵🬆🬪🬏█🬱▐▌🬨🬕🬒🬄";
+
     fn finished_first_exercise() -> TestApp {
         let mut app = TestApp::new_user();
         app.press(KeyCode::Enter); // opens the language cards
@@ -29,13 +32,9 @@ mod exercise_done {
         let screen = finished_first_exercise().screen();
 
         assert!(screen.has_row(&["Rust · Basics · Many", "session 1/2 · exercise 1/2"]));
-        assert!(screen.contains("▗▛▜▖▗▛▙ █▖▟▌▜▛▜▖▜▛  ▜▛▀▌▛█▜ ▜▛▀▌"));
-        assert!(screen.contains("█   █ ▐▌███▌▐▙▟▘▐▌  ▐▙▌  █  ▐▙▌"));
-        assert!(screen.contains("▜▖▗▖▜▖▟▘█▝▐▌▐▌  ▐▌▗▌▐▌▘▖ █  ▐▌▘▖"));
-        assert!(screen.contains("▀▀  ▀▘ ▀ ▝▘▀▀  ▀▀▀▘▀▀▀▘▝▀▘ ▀▀▀▘"));
-        assert!(screen.contains("Exercise 1 of 2 complete"));
-        assert!(screen.contains("Press Enter for the next exercise"));
-        assert!(!screen.contains("Session one exercise"));
+        assert!(screen.contains(DONE));
+        assert!(screen.contains("✓ Session one exercise"));
+        assert!(screen.contains("Next: Exercise 2 of 2"));
         assert!(screen.has_row(&["╭", "output"]));
         assert!(screen.contains("● ● ●   main.rs"));
         assert_eq!(screen.column_of("main.rs"), Some(10));
@@ -43,7 +42,8 @@ mod exercise_done {
         assert!(screen.has_rows_in_order(&["fn main() {", "let a = 1;", "}"]));
         assert!(screen.has_row(&["1  fn main() {", "ok"]));
         assert!(screen.has_row(&["2      let a = 1;"]));
-        assert!(screen.has_row(&["[▓▓▓▓▓▓▓▓▓▓▓▓]", "2/2 chunks", "Esc back", "Ctrl-Q quit"]));
+        assert!(screen.has_row(&["Enter next exercise", "Esc back", "Ctrl-Q quit"]));
+        assert!(!screen.contains("2/2 chunks"));
         assert!(!screen.contains("↑↓ scroll"));
     }
 
@@ -61,7 +61,7 @@ mod exercise_done {
         assert!(!screen.contains("let a = 1;"));
         assert!(screen.has_row(&["Rust", "Ln 1, Col 1"]));
         assert!(screen.has_row(&["[░░░░░░░░░░░░]", "0/1 chunks"]));
-        assert!(!screen.contains("Press Enter for the next exercise"));
+        assert!(!screen.contains(DONE));
     }
 
     #[test]
@@ -73,7 +73,7 @@ mod exercise_done {
 
         assert!(screen.has_row(&["Ingrain", "Rust › Core › Basics"]));
         assert!(screen.has_row(&["↑↓ move", "Enter start", "← back", "Ctrl-Q quit"]));
-        assert!(!screen.contains("Press Enter for the next exercise"));
+        assert!(!screen.contains(DONE));
     }
 }
 
@@ -88,9 +88,8 @@ mod session_done {
 
         let screen = app.screen();
         assert!(screen.has_row(&["Rust · Basics · Many", "session 1/2 · exercise 2/2"]));
-        assert!(screen.contains("Session 1 of 2 complete"));
-        assert!(screen.contains("Press Enter for the next session"));
-        assert!(screen.has_row(&["[▓▓▓▓▓▓▓▓▓▓▓▓]", "1/1 chunks", "Esc back", "Ctrl-Q quit"]));
+        assert!(screen.contains("Next: Session recap"));
+        assert!(screen.has_row(&["Enter session recap", "Esc back", "Ctrl-Q quit"]));
     }
 
     #[test]
@@ -172,7 +171,7 @@ mod module_done {
     pub const LEVEL_UP: &str = "🬨🬕  🬨🬕🬒🬄█ █ 🬨🬕🬒🬄🬨🬕      █ █ 🬨🬕🬨🬓";
 
     #[test]
-    fn the_last_exercise_of_a_module_says_module_complete() {
+    fn the_last_exercise_of_a_module_points_to_the_module_recap() {
         let mut app = TestApp::with_progress("rust-many-session-1-done");
         app.press(KeyCode::Enter); // Continue opens the last exercise of the module
         app.type_chunk("fn main() {\n}");
@@ -180,8 +179,8 @@ mod module_done {
 
         let screen = app.screen();
         assert!(screen.has_row(&["Rust · Basics · Many", "session 2/2 · exercise 1/1"]));
-        assert!(screen.contains("Module complete"));
-        assert!(screen.contains("Press Enter to finish"));
+        assert!(screen.contains("Next: Module recap"));
+        assert!(screen.has_row(&["Enter finish module", "Esc back", "Ctrl-Q quit"]));
     }
 
     #[test]
@@ -286,8 +285,8 @@ mod scroll {
         let screen = app.screen();
         assert!(screen.has_row(&["↑↓ scroll", "Esc back", "Ctrl-Q quit"]));
         assert!(screen.contains("fn main() {"));
-        assert!(screen.contains("let a8 = 8;"));
-        assert!(!screen.contains("let a9 = 9;"));
+        assert!(screen.contains("let a10 = 10;"));
+        assert!(!screen.contains("let a11 = 11;"));
 
         for _ in 0..3 {
             app.press(KeyCode::Down);
@@ -296,15 +295,15 @@ mod scroll {
         assert!(!screen.contains("fn main() {"));
         assert!(!screen.contains("let a2 = 2;"));
         assert!(screen.contains("let a3 = 3;"));
-        assert!(screen.contains("let a11 = 11;"));
-        assert!(!screen.contains("let a12 = 12;"));
+        assert!(screen.contains("let a13 = 13;"));
+        assert!(!screen.contains("let a14 = 14;"));
 
         for _ in 0..3 {
             app.press(KeyCode::Up);
         }
         let screen = app.screen();
         assert!(screen.contains("fn main() {"));
-        assert!(!screen.contains("let a9 = 9;"));
+        assert!(!screen.contains("let a11 = 11;"));
     }
 
     #[test]
@@ -335,7 +334,7 @@ mod no_output {
         app.type_chunk("fn main() {\n}");
 
         let screen = app.screen();
-        assert!(screen.contains("Session 1 of 2 complete"));
+        assert!(screen.contains("Next: Session recap"));
         assert!(screen.contains("● ● ●   main.rs"));
         assert_eq!(screen.column_of("main.rs"), Some(24));
         assert!(screen.has_rows_in_order(&["fn main() {", "}"]));
@@ -352,7 +351,7 @@ mod quit {
         let mut app = TestApp::with_progress("rust-basics-done");
         app.press(KeyCode::Enter); // Continue opens Alone, the first module of Second
         app.type_chunk("fn main() {\n    let a = 1;\n}");
-        assert!(app.screen().contains("Press Enter to finish"));
+        assert!(app.screen().contains("Enter finish module"));
         assert!(!app.has_quit());
 
         app.press_ctrl('q');
