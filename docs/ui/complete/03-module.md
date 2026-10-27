@@ -32,8 +32,8 @@ The hero is a big word, `LEVEL UP`, in the same `Sextant` size of `tui_big_text`
 ╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
 ```
 
-## Last module of the catalog
-There is no next module, so a line with the course is added, and Enter goes to the explorer.
+## The end of a course
+When the module just finished was the last one left in its course, a bold line names the course (`You completed the Syntax course`), the footer says `Enter explorer` and Enter goes to the explorer (the author, 2026-10-27). It is the same whether another course follows or nothing is left in the language. When the module is in the middle of its course, there is no course line, the footer says `Enter next module` and Enter opens the next one.
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -89,7 +89,7 @@ The same parts, with fewer sparkles.
 ╚════════════════════════════════════════════════════╝
 ```
 
-## Narrow, last module of the catalog
+## Narrow, the end of a course
 ```
 ╔════════════════════════════════════════════════════╗
 ║ Rust · Syntax · Loops   session 3/3 · exercise 2/2 ║
@@ -122,8 +122,8 @@ The same parts, with fewer sparkles.
 - **Caption:** `──  module complete  ──`, centered
 - **Module name:** `Loops`, centered, in bold `yellow`. Not in big letters
 - **Numbers line:** `3 sessions · 9 exercises`
-- **Course line:** only on the last module of the catalog: `You completed the Syntax course`
-- **Footer:** `Enter next module` on the left (`Enter explorer` on the last module), `Esc back` and `Ctrl-Q quit` on the right
+- **Course line:** only when the module ends its course: `You completed the Syntax course`, in bold
+- **Footer:** `Enter next module` on the left (`Enter explorer` when the module ends its course), `Esc back` and `Ctrl-Q quit` on the right
 
 ## Borders and colors
 | Part | Border | Color |
@@ -138,6 +138,6 @@ The same parts, with fewer sparkles.
 | Enter in the footer | none | bold, with `Enter` in `sky` |
 
 ## Decisions
-Taken with the author on 2026-10-22 and 2026-10-25: the module has the big word `LEVEL UP` in the same size as the other screens, no card, sparkles, the module name as a colored line, the numbers of the module, and Enter to the next module (to the explorer, with a course line, on the last module of the catalog).
+Taken with the author on 2026-10-22 and 2026-10-25: the module has the big word `LEVEL UP` in the same size as the other screens, no card, sparkles, the module name as a colored line, the numbers of the module, and Enter to the next module. Changed on 2026-10-27: when the module ends its course, whether or not another course follows, the course line shows and Enter goes to the explorer.
 1. **The glyphs:** the sketch uses the real glyphs of `tui_big_text` in `Sextant`, which needs a terminal font with the Unicode legacy computing blocks. If a terminal cannot show them, the fallback is the `Quadrant` size (4 rows), which the app already uses
 2. **The gradient:** the word takes the home title's gradient, which is built (`wave_title` in `ui/explorer/columns/mod.rs` is the same idea). Whether it slides here or stays still belongs to `docs/todos/10-exercise-animations.md`

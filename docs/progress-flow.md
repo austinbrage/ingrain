@@ -50,7 +50,7 @@ Around it, two app files help:
 |---|---|
 | `app/content.rs` | `Content`: the loaded courses of every language, and the questions about a position in them (`catalog`, `course`, `module`, `course_id`, `module_path`) |
 | `app/mod.rs` | `App`: the screens and keys, and nothing else |
-| `app/home.rs` | the Continue button: thin methods that forward to `Progress` (`continue_label`, `continue_target`) |
+| `app/home.rs` | the Continue button: thin methods that forward to `Progress` (`continue_label`), and `ExplorerState::continue_target` in `app/explorer.rs` turns its answer into a position |
 
 The rule of thumb: **`Progress` decides, `App` only translates.** `Progress` never imports `app/` types (`HomeLanguage`, `ExplorerState`), so it answers with plain numbers and `App` turns them into a screen. The content has its own small lookups (`Catalog::course_index`, `Module::session_index`, `Session::exercise_index`) that find an id's position, so nobody searches by hand.
 
@@ -86,7 +86,7 @@ So, to answer "what is recorded": the language and the course go in `last`. The 
 
 ```
 app starts ──► continue_label ──► Home shows "Continue   Rust · Syntax"
-Enter ──► HomeState::continue_target ──► Progress::continue_at ──► ExerciseState::open
+Enter ──► ExplorerState::continue_target ──► Progress::continue_at ──► ExerciseState::open
 ```
 
 ### Does the Continue button exist?
@@ -96,10 +96,10 @@ Enter ──► HomeState::continue_target ──► Progress::continue_at ─�
 - **none** (a new user, or `last` names a course that no longer exists): no Continue button, the home starts on `Choose a language`, and Up and Down do nothing
 
 ### Pressing Enter on Continue
-`handle_buttons_key` (`app/home.rs`) calls `continue_target` (also in `app/home.rs`). It does only two things:
+`handle_buttons_key` (`app/home.rs`) calls `ExplorerState::continue_target` (`app/explorer.rs`, which the module screen also uses to open the next module). It does only two things:
 
 1. **Ask `Progress`.** `Progress::continue_at(library)` works out everything and answers with a `ContinueAt`: five plain numbers (section, course, module, session, exercise). In the review state it answers with the module to review
-2. **Translate.** `HomeState` copies the numbers into an `ExplorerState` and calls `ExerciseState::open`, which gives the exercise screen
+2. **Translate.** `ExplorerState::continue_target` copies the numbers into an `ExplorerState`, and the caller calls `ExerciseState::open`, which gives the exercise screen
 
 The explorer is set to the module list of the course, so Esc from the exercise lands there.
 
@@ -181,7 +181,7 @@ The user finishes session 1 of `first-frame`, opens session 2, finishes its firs
 | ids of a position | `app/content.rs` | `course_id`, `module_path` |
 | the label and the button | `app/home.rs`, `progress/mod.rs`, `ui/home/buttons.rs` | `continue_label`, `Progress::continue_label`, `ContinueLabel`, `render_menu`, `review_text` |
 | marks on module rows | `app/explorer.rs`, `progress/mod.rs`, `ui/explorer/columns/modules.rs` | `module_marks`, `Progress::passed_counts`, `Progress::modules_failed`, `Progress::next_module`, `modules_column` |
-| Enter on Continue | `app/home.rs` | `handle_buttons_key`, `continue_target`, `last_language` |
+| Enter on Continue | `app/home.rs`, `app/explorer.rs` | `handle_buttons_key`, `ExplorerState::continue_target`, `last_language` |
 | Enter on a module row | `app/explorer.rs`, `progress/mod.rs` | `handle_modules_key`, `resume_point` |
 | the sessions column | `app/explorer.rs`, `progress/mod.rs`, `ui/explorer/columns/sessions.rs`, `ui/explorer/hint.rs` | `handle_sessions_key`, `module_marks`, `Progress::sessions_done`, `Progress::sessions_failed`, `Progress::resume_exercise`, `sessions_column`, `render_hint` |
 | a failed exercise and the retake | `progress/mod.rs`, `progress/resume.rs`, `app/exercise/mod.rs`, `app/complete.rs` | `complete_exercise`, `is_retake`, `next_failed_exercise`, `failed_from`, `ExerciseState::open`, `record_completion`, `CompleteState::next` |
