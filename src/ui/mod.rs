@@ -2,6 +2,7 @@ pub mod complete;
 pub mod exercise;
 pub mod explorer;
 pub mod home;
+mod wave;
 
 use crate::app::{App, HomeState, Screen};
 use ratatui::Frame;

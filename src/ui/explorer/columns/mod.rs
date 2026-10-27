@@ -5,23 +5,21 @@ mod sessions;
 
 use crate::app::{Depth, ExplorerState, ModuleMarks};
 use crate::content::{Catalog, Course};
+use crate::ui::wave::wave_line;
 use courses::courses_column;
 use modules::modules_column;
 use sections::sections_column;
 use sessions::sessions_column;
 
-use catppuccin::{PALETTE, Rgb};
+use catppuccin::PALETTE;
 
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
-    style::{Color, Style},
+    style::Style,
     text::{Line, Span},
     widgets::{Block, Borders, HighlightSpacing, List, ListItem, ListState, Paragraph},
 };
-
-// How far the wave moves each tick, 1.0 is a full cycle
-const WAVE_SPEED: f32 = 0.02;
 
 // Rows each column shows more every tick after the explorer opens
 const ROWS_PER_TICK: usize = 2;
@@ -105,7 +103,7 @@ fn render_single_column(frame: &mut Frame, area: Rect, column: &Column, divider:
 
     let title_text = format!(" {}", column.title);
     let title_line = if column.focused {
-        wave_title(&title_text, tick)
+        wave_line(&title_text, tick)
     } else {
         Line::from(title_text).style(Style::new().fg(palette.text.into()).bold())
     };
@@ -183,38 +181,6 @@ fn render_single_column(frame: &mut Frame, area: Rect, column: &Column, divider:
 }
 
 // The text with a color per char, a gradient that slides with the tick
-fn wave_title(text: &str, tick: u64) -> Line<'static> {
-    let phase = tick as f32 * WAVE_SPEED;
-    let palette = PALETTE.mocha.colors;
-    let stops = [palette.blue.rgb, palette.sky.rgb, palette.teal.rgb];
-    let last = text.chars().count().saturating_sub(1).max(1);
-
-    let spans: Vec<Span> = text
-        .chars()
-        .enumerate()
-        .map(|(x, ch)| {
-            let wave = (x as f32 / last as f32 * 0.5 + phase) % 1.0;
-            let position = (1.0 - (2.0 * wave - 1.0).abs()) * (stops.len() - 1) as f32;
-            let stop = (position as usize).min(stops.len() - 2);
-            let color = blend(stops[stop], stops[stop + 1], position - stop as f32);
-
-            Span::styled(ch.to_string(), Style::new().fg(color))
-        })
-        .collect();
-
-    Line::from(spans)
-}
-
-// The color a fraction of the way from one color to another, 0.0 to 1.0
-fn blend(from: Rgb, to: Rgb, amount: f32) -> Color {
-    let channel = |a: u8, b: u8| (a as f32 + (b as f32 - a as f32) * amount).round() as u8;
-
-    Color::Rgb(
-        channel(from.r, to.r),
-        channel(from.g, to.g),
-        channel(from.b, to.b),
-    )
-}
 
 // Each word typed char by char with a cursor, held, and erased, one after the other
 fn typed_text(words: [&str; 2], tick: u64) -> String {
