@@ -1,0 +1,36 @@
+{
+  "id": "kinds",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "moved",
+          "title": "Why does it not compile?",
+          "guide": "Read the code, then pick the cause.",
+          "code": "fn main() {\n    let name = String::from(\"Ana\");\n    let other = name;\n    println!(\"{name}\");\n}",
+          "options": [
+            "`name` was moved to `other`",
+            "`other` is not used",
+            "`String::from` needs a type"
+          ],
+          "answer": 0,
+          "explanation": "`let other = name` moves the String, so `name` cannot be used after it."
+        },
+        {
+          "type": "quiz",
+          "kind": "error",
+          "id": "index",
+          "title": "What kind of error is it?",
+          "guide": "Read the code, then pick the kind of error.",
+          "code": "fn main() {\n    let v = vec![1, 2, 3];\n    let n = v[10];\n    println!(\"{n}\");\n}",
+          "options": ["A compile error", "A panic at run time", "No error"],
+          "answer": 1,
+          "explanation": "It compiles, but indexing past the end panics when it runs."
+        }
+      ]
+    }
+  ]
+}

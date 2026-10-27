@@ -588,6 +588,25 @@ mod quiz {
         assert!(screen.has_row(&["Ingrain", "Rust › Ecosystem › Tools"]));
         assert!(!screen.contains("explanation"));
     }
+
+    #[test]
+    fn the_options_card_names_what_each_kind_asks() {
+        let mut app = TestApp::with_progress("last-rust-tools");
+        app.press(KeyCode::Enter); // Continue opens the purpose quiz
+        assert!(app.screen().has_row(&["╭ purpose"]));
+
+        let mut app = TestApp::with_progress("rust-quiz-exercise-2");
+        app.press(KeyCode::Enter); // Continue opens the output quiz
+        assert!(app.screen().has_row(&["╭ output"]));
+
+        let mut app = TestApp::with_progress("rust-tools-before-kinds");
+        app.press(KeyCode::Enter); // Continue opens the compiler quiz
+        assert!(app.screen().has_row(&["╭ cause"]));
+
+        app.press(KeyCode::Enter); // checks the first option, which is right
+        app.press(KeyCode::Enter); // goes on, to the error quiz
+        assert!(app.screen().has_row(&["╭ error kind"]));
+    }
 }
 
 mod quit {

@@ -8,6 +8,7 @@
       "done": ["session-1"],
       "failed": { "session-1": ["first"] },
       "practiced": 3
-    }
+    },
+    { "id": "rust/tools/kinds", "done": ["session-1"], "practiced": 4 }
   ]
 }
