@@ -25,8 +25,6 @@ const CODE_ONLY_WIDTH: u16 = 72;
 const MIN_CARDS_HEIGHT: u16 = 5;
 const HINT: &str = "Esc back   Ctrl-Q quit ";
 const SCROLL_HINT: &str = "↑↓ scroll   Esc back   Ctrl-Q quit ";
-// Cells of the chunk bar in the footer
-const BAR_WIDTH: usize = 12;
 
 pub fn exercise_done(frame: &mut Frame, breadcrumb: String, state: &ExerciseDone) {
     let palette = PALETTE.mocha.colors;
@@ -43,10 +41,11 @@ pub fn exercise_done(frame: &mut Frame, breadcrumb: String, state: &ExerciseDone
     // 1. Render Header
     render_header(frame, header, breadcrumb, position);
 
-    // 2. Render Body
-    let title = BigText::builder()
-        .pixel_size(PixelSize::Quadrant)
-        .lines(vec!["COMPLETE".into()])
+    // 2. Render Body: the word, the title and the next step, then the cards
+    let word = BigText::builder()
+        .pixel_size(PixelSize::Sextant)
+        .style(Style::new().fg(palette.green.into()))
+        .lines(vec![Line::from("DONE")])
         .centered()
         .build();
 
@@ -63,10 +62,9 @@ pub fn exercise_done(frame: &mut Frame, breadcrumb: String, state: &ExerciseDone
         })
         .collect();
 
-    // Title, name and Enter row on top, and the cards take the rest down to the footer
-    let [title_area, _gap, name_area, _gap2, enter_area, _gap3, cards] = Layout::vertical([
-        Constraint::Length(4),
-        Constraint::Length(1),
+    // The word, the title and the subtitle on top, and the cards take the rest down to the footer
+    let [word_area, _gap, title_area, subtitle_area, _gap2, cards] = Layout::vertical([
+        Constraint::Length(3),
         Constraint::Length(1),
         Constraint::Length(1),
         Constraint::Length(1),
@@ -75,39 +73,35 @@ pub fn exercise_done(frame: &mut Frame, breadcrumb: String, state: &ExerciseDone
     ])
     .areas(body);
 
-    frame.render_widget(title, title_area);
-    // What just finished, and what Enter does, follow the outcome
-    let (summary, action) = match state.next() {
-        Next::Exercise => (
-            format!(
-                "Exercise {} of {} complete",
-                state.exercise + 1,
-                state.exercise_count
-            ),
-            "for the next exercise",
+    frame.render_widget(word, word_area);
+
+    let title = Line::from(vec![
+        Span::styled("✓ ", Style::new().fg(palette.green.into())),
+        Span::styled(
+            state.title.as_str(),
+            Style::new().add_modifier(Modifier::BOLD),
         ),
-        Next::Session => (
-            format!(
-                "Session {} of {} complete",
-                state.session + 1,
-                state.session_count
-            ),
-            "for the next session",
-        ),
-        Next::Finish => ("Module complete".to_string(), "to finish"),
+    ]);
+    frame.render_widget(Paragraph::new(title).centered(), title_area);
+
+    // What comes next, and what Enter does, follow the outcome
+    let (subtitle, label) = match state.next() {
+        Next::Exercise => {
+            let next = state.next_failed.unwrap_or(state.exercise + 1) + 1;
+            (
+                format!("Next: Exercise {next} of {}", state.exercise_count),
+                " next exercise",
+            )
+        }
+        Next::Session => ("Next: Session recap".to_string(), " session recap"),
+        Next::Finish => ("Next: Module recap".to_string(), " finish module"),
     };
-
-    frame.render_widget(Paragraph::new(summary).centered(), name_area);
-
-    // The Enter row is bold, with the key in sky, so the next step is seen right away
-    let enter = Line::from(vec![
-        Span::raw("Press "),
-        Span::styled("Enter", Style::new().fg(palette.sky.into())),
-        Span::raw(format!(" {action}")),
-    ])
-    .style(Style::new().add_modifier(Modifier::BOLD));
-
-    frame.render_widget(Paragraph::new(enter).centered(), enter_area);
+    frame.render_widget(
+        Paragraph::new(subtitle)
+            .style(Style::new().fg(palette.overlay0.into()))
+            .centered(),
+        subtitle_area,
+    );
 
     let scrollable = if state.output.is_some() {
         // The output card fits its longest line (plus border and padding), so it never wraps
@@ -135,18 +129,16 @@ pub fn exercise_done(frame: &mut Frame, breadcrumb: String, state: &ExerciseDone
     };
 
     // 3. Render Footer
-    // A typing exercise is finished, so its chunk bar is full; a quiz fills the bar by exercises
-    let filled = state.bar_done * BAR_WIDTH / state.bar_total;
-    let bar = Line::from(vec![
-        Span::raw(" ["),
-        Span::styled("▓".repeat(filled), Style::new().fg(palette.sky.into())),
-        Span::raw("░".repeat(BAR_WIDTH - filled)),
-        Span::raw(format!(
-            "] {}/{} {}",
-            state.bar_done, state.bar_total, state.bar_unit
-        )),
+    let enter = Line::from(vec![
+        Span::styled(
+            " Enter",
+            Style::new()
+                .fg(palette.sky.into())
+                .add_modifier(Modifier::BOLD),
+        ),
+        Span::styled(label, Style::new().add_modifier(Modifier::BOLD)),
     ]);
     let hint = if scrollable { SCROLL_HINT } else { HINT };
 
-    render_footer(frame, footer, bar, hint);
+    render_footer(frame, footer, enter, hint);
 }
