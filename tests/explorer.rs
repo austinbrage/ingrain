@@ -451,7 +451,7 @@ mod marks {
         app.press(KeyCode::Enter); // Continue opens the first quiz
         app.press(KeyCode::Down); // a wrong option
         app.press(KeyCode::Enter); // checks it
-        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
+        app.press(KeyCode::Enter); // goes on, to the next quiz
         app.press(KeyCode::Esc); // back to the explorer
 
         let mut saw_cross = false;
@@ -468,7 +468,7 @@ mod marks {
         let mut app = TestApp::with_progress("last-rust-tools");
         app.press(KeyCode::Enter); // Continue opens the first quiz
         app.press(KeyCode::Enter); // checks the first option, which is right
-        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
+        app.press(KeyCode::Enter); // goes on, to the next quiz
         app.press(KeyCode::Esc); // back to the explorer
 
         let mut saw_count = false;

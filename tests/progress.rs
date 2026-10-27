@@ -123,7 +123,7 @@ mod saved {
         app.press(KeyCode::Enter); // checks the first option
         assert!(app.saved_progress().modules.is_empty());
 
-        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
+        app.press(KeyCode::Enter); // goes on, to the second quiz
         let saved = app.saved_progress();
         let quiz = saved
             .modules
@@ -137,7 +137,6 @@ mod saved {
         assert!(quiz.done.is_empty());
         assert!(quiz.practiced > 0);
 
-        app.press(KeyCode::Enter); // the complete screen opens the second quiz
         app.press(KeyCode::Down); // the output 3
         app.press(KeyCode::Enter); // checks it
         app.press(KeyCode::Enter); // goes on
@@ -324,17 +323,14 @@ mod retake {
         assert!(screen.contains("exercise 1/2"));
 
         app.press(KeyCode::Enter); // checks the first option, which is right
-        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
-        assert!(app.screen().contains("Next: Exercise 2 of 2"));
-        app.press(KeyCode::Enter); // the complete screen opens the next failed exercise
+        app.press(KeyCode::Enter); // goes on, to the next failed exercise
         let screen = app.screen();
         assert!(screen.contains("What does it print?"));
         assert!(screen.contains("exercise 2/2"));
 
         app.press(KeyCode::Down); // the output 3
         app.press(KeyCode::Enter); // checks it
-        app.press(KeyCode::Enter); // goes on
-        app.press(KeyCode::Enter); // the complete screen ends the retake
+        app.press(KeyCode::Enter); // goes on, which ends the retake
         assert!(app.screen().contains("module complete"));
         app.press(KeyCode::Esc); // the celebration goes back to the explorer
         app.wait(5); // all rows appear
@@ -351,16 +347,14 @@ mod retake {
         assert!(screen.contains("exercise 1/3"));
 
         app.press(KeyCode::Enter); // checks the first option, which is right
-        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
-        app.press(KeyCode::Enter); // the complete screen opens the next failed exercise
+        app.press(KeyCode::Enter); // goes on, to the next failed exercise
         let screen = app.screen();
         assert!(screen.contains("Third question"));
         assert!(!screen.contains("Second question"));
         assert!(screen.contains("exercise 3/3"));
 
         app.press(KeyCode::Enter); // checks the first option, which is right
-        app.press(KeyCode::Enter); // goes on
-        app.press(KeyCode::Enter); // the complete screen ends the retake
+        app.press(KeyCode::Enter); // goes on, which ends the retake
         assert!(app.screen().contains("module complete"));
         app.press(KeyCode::Esc); // the celebration goes back to the explorer
         app.wait(5); // all rows appear
@@ -375,8 +369,7 @@ mod retake {
         assert!(app.screen().contains("What does total do?"));
 
         app.press(KeyCode::Enter); // checks the first option, which is right
-        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
-        app.press(KeyCode::Enter); // the complete screen ends the retake
+        app.press(KeyCode::Enter); // goes on, which ends the retake
         assert!(app.screen().contains("module complete"));
         app.press(KeyCode::Esc); // the celebration goes back to the explorer
         app.wait(5); // all rows appear
@@ -392,8 +385,7 @@ mod retake {
         app.press(KeyCode::Enter); // Continue opens the first quiz
         app.press(KeyCode::Down); // a wrong option
         app.press(KeyCode::Enter); // checks it
-        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
-        app.press(KeyCode::Enter); // the complete screen opens the next exercise
+        app.press(KeyCode::Enter); // goes on, to the next exercise
 
         let screen = app.screen();
         assert!(screen.contains("What does it print?"));

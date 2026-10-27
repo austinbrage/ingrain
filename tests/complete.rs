@@ -116,11 +116,9 @@ mod session_done {
         app.press(KeyCode::Enter); // Continue opens the first quiz of Recap
         app.press(KeyCode::Down); // a wrong option
         app.press(KeyCode::Enter); // checks it
-        app.press(KeyCode::Enter); // goes on, which today opens the complete screen
-        app.press(KeyCode::Enter); // the complete screen opens the second quiz
+        app.press(KeyCode::Enter); // goes on, to the second quiz
         app.press(KeyCode::Enter); // checks the first option, which is right
-        app.press(KeyCode::Enter); // goes on, to the complete screen
-        app.press(KeyCode::Enter); // the complete screen goes on, to the session screen
+        app.press(KeyCode::Enter); // goes on, to the session screen
 
         let screen = app.screen();
         assert!(screen.has_row(&["1  ✗  Recap one", "quiz   failed"]));
@@ -373,8 +371,7 @@ mod module_failed {
         let mut app = TestApp::with_progress("rust-recap-session-1-failed");
         app.press(KeyCode::Enter); // Continue opens the quiz of the second session
         app.press(KeyCode::Enter); // checks the first option, which is right
-        app.press(KeyCode::Enter); // goes on, to the complete screen
-        app.press(KeyCode::Enter); // the complete screen goes on, to the failed module screen
+        app.press(KeyCode::Enter); // goes on, to the failed module screen
 
         app
     }
@@ -425,8 +422,7 @@ mod module_failed {
         let mut app = finished_the_module_with_a_failed_session();
         app.press(KeyCode::Enter); // retakes the failed quiz
         app.press(KeyCode::Enter); // checks the first option, which is right
-        app.press(KeyCode::Enter); // goes on, to the complete screen
-        app.press(KeyCode::Enter); // the retake ends: the module passes now
+        app.press(KeyCode::Enter); // goes on, which ends the retake: the module passes now
 
         let screen = app.screen();
         assert!(screen.contains(LEVEL_UP));
@@ -440,8 +436,7 @@ mod module_failed {
         app.press(KeyCode::Enter); // retakes the failed quiz
         app.press(KeyCode::Down); // a wrong option
         app.press(KeyCode::Enter); // checks it
-        app.press(KeyCode::Enter); // goes on, to the complete screen
-        app.press(KeyCode::Enter); // the retake ends: the module still has a failed session
+        app.press(KeyCode::Enter); // goes on, which ends the retake: the module still has a failed session
 
         let screen = app.screen();
         assert!(screen.contains(ALMOST_THERE));
