@@ -46,6 +46,20 @@ impl ExplorerState {
         }
     }
 
+    // Where Continue opens: the module of the last course, with its session and exercise
+    pub fn continue_target(progress: &Progress, content: &Content) -> Option<(Self, usize, usize)> {
+        let language = HomeState::last_language(progress)?;
+        let at = progress.continue_at(content.library(language))?;
+
+        let mut explorer = Self::new(language);
+        explorer.depth = Depth::Modules;
+        explorer.section = at.section;
+        explorer.course = at.course;
+        explorer.module = at.module;
+
+        Some((explorer, at.session, at.exercise))
+    }
+
     // What the explorer marks on the modules of the course on screen
     pub fn module_marks(self, app: &App) -> ModuleMarks {
         let Some(course) = app.content.course(self) else {

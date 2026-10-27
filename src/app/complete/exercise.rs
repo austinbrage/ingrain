@@ -1,5 +1,5 @@
 use crate::app::{
-    Action, CompleteState, Content, ExerciseState, ExplorerState, Screen, SessionDone,
+    Action, CompleteState, Content, ExerciseState, ExplorerState, ModuleDone, Screen, SessionDone,
 };
 use crate::content::{Output, Quiz, Typing};
 use crate::progress::Progress;
@@ -29,6 +29,18 @@ pub struct ExerciseDone {
 }
 
 impl ExerciseDone {
+    // Whether a session of the finished module has failed exercises
+    fn module_failed(&self, content: &Content, progress: &Progress) -> bool {
+        let (Some(path), Some(module)) = (
+            content.module_path(self.explorer),
+            content.module(self.explorer),
+        ) else {
+            return false;
+        };
+
+        progress.sessions_failed(&path, &module).contains(&true)
+    }
+
     pub fn new(state: &ExerciseState, typing: &Typing, code: Vec<String>) -> Self {
         Self {
             explorer: state.explorer,
@@ -109,6 +121,12 @@ impl ExerciseDone {
             (Action::Select, Next::Session) => {
                 return SessionDone::new(explorer, self.session, content, progress)
                     .map(|done| Screen::Complete(CompleteState::Session(done)));
+            }
+            (Action::Select, Next::Finish)
+                if !self.retake && !self.module_failed(content, progress) =>
+            {
+                return ModuleDone::new(explorer, content, progress)
+                    .map(|done| Screen::Complete(CompleteState::Module(done)));
             }
             (Action::Select | Action::Back, _) => return Some(Screen::Explorer(explorer)),
             _ => {}

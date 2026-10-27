@@ -1,6 +1,6 @@
 use crate::app::{
     App, Body, CompleteState, Depth, DoneRow, ExerciseDone, ExerciseState, ExplorerState,
-    HomeLanguage, Screen, SessionDone,
+    HomeLanguage, ModuleDone, Screen, SessionDone,
 };
 use crate::content::{Exercise, Mode, Output};
 
@@ -80,6 +80,18 @@ pub fn start_at(app: &mut App, screen: &str, target: Option<&str>) {
             };
 
             app.screen = complete(explorer, &code, output);
+        }
+        // The module celebration, at the end of a course
+        "module-done" => {
+            app.screen = Screen::Complete(CompleteState::Module(ModuleDone {
+                explorer,
+                name: "Loops".to_string(),
+                session_count: 3,
+                exercise_count: 9,
+                last_exercises: 2,
+                finished_course: Some("Syntax".to_string()),
+                // finished_course: None,
+            }));
         }
         // The session recap, with one failed exercise
         "session-done" => {

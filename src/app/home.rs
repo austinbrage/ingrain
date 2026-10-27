@@ -1,5 +1,5 @@
 use super::content::Content;
-use super::{Action, ContinueLabel, Depth, ExerciseState, ExplorerState, Screen};
+use super::{Action, ContinueLabel, ExerciseState, ExplorerState, Screen};
 use crate::progress::Progress;
 
 #[derive(Clone, Copy, PartialEq)]
@@ -87,22 +87,6 @@ impl HomeState {
         progress.continue_label(content.library(language))
     }
 
-    fn continue_target(
-        progress: &Progress,
-        content: &Content,
-    ) -> Option<(ExplorerState, usize, usize)> {
-        let language = Self::last_language(progress)?;
-        let at = progress.continue_at(content.library(language))?;
-
-        let mut explorer = ExplorerState::new(language);
-        explorer.depth = Depth::Modules;
-        explorer.section = at.section;
-        explorer.course = at.course;
-        explorer.module = at.module;
-
-        Some((explorer, at.session, at.exercise))
-    }
-
     // None means the screen stays. It changes itself when the buttons or the cards move
     pub fn handle_key(
         &mut self,
@@ -128,7 +112,8 @@ impl HomeState {
                 *self = Self::Buttons(selected.toggle());
             }
             Action::Select if selected == HomeButton::Continue => {
-                let (explorer, session, exercise) = Self::continue_target(progress, content)?;
+                let (explorer, session, exercise) =
+                    ExplorerState::continue_target(progress, content)?;
                 return ExerciseState::open(explorer, session, exercise, content, progress);
             }
             Action::Select if selected == HomeButton::ChooseLanguage => {
