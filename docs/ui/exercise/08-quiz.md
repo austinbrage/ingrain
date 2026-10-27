@@ -37,7 +37,7 @@ The first option is selected when the exercise opens. The selected row has the g
 ```
 
 ## Right answer
-Enter checks. The guide card becomes the `explanation` card, the options card badge becomes `right`, and the picked option gets a `✓`. Up and Down do nothing now. Enter goes on. Today that opens the complete screen (`docs/ui/complete/01-exercise.md`); `docs/todos/11-complete-screens.md` removes it for quizzes, so Enter will go straight to the next exercise.
+Enter checks. The guide card becomes the `explanation` card, the options card badge becomes `right`, and the picked option gets a `✓`. Up and Down do nothing now. Enter goes on, straight to what follows: the next exercise, the session recap (`docs/ui/complete/02-session.md`), the module screen (`03-module.md`, `04-module-failed.md`) or the explorer. A quiz has no complete screen of its own.
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -132,7 +132,7 @@ An option is at most about 50 characters, so it takes two rows at most. Under th
 | Key | Choosing | Answered |
 | --- | --- | --- |
 | Up, Down | move the selected option | nothing |
-| Enter | check the selected option | go to the complete screen |
+| Enter | check the selected option | go on, to what follows |
 | Esc | back to the explorer | back to the explorer |
 
 ## The pieces

@@ -101,7 +101,6 @@ A `"quiz"` exercise shows code and the user picks one option. It sits in the sam
 | `options` | the choices, between 2 and 4, all different |
 | `answer` | the index of the right option in `options`, counted from 0 |
 | `explanation` | markdown (the same subset): why the answer is right. It shows after the user checks |
-| `output` | optional: `command` and the `text` it prints, the same type as in a typing exercise |
 
 - **`kind` and its options:**
   - `purpose`: "what does this code do?". Each option says what the code is **for** ("Adds up all the prices in a list"), never what it prints
@@ -111,7 +110,7 @@ A `"quiz"` exercise shows code and the user picks one option. It sits in the sam
   - without `kind`, the exercise is a plain quiz and the title says what it asks
 - **Options:** at most about 50 characters each, so an option takes two rows at most in the options card. Wrong options must be plausible: a mistake someone could really make reading the code, not a joke or an obvious absurdity. Vary the index of the right one (`answer`) across a module, not always the first
 - **Code width:** the same rule as typing (40 columns or less, never over 50), and short: the code window does not scroll while the user chooses, so it should fit about 14 lines
-- **`output` is checked by running:** when it is there, the author runs the code once while writing the exercise. The same for the `answer` of an `output` quiz
+- **`output` is checked by running:** when a typing exercise has it, the author runs the code once while writing the exercise. The same for the `answer` of an `output` quiz. A quiz has no `output` field of its own (it was dropped on 2026-10-28, and a file that has it fails at load)
 - No score, and no retry inside the exercise. A wrong answer is saved in the `failed` list of its session, and the failed exercises can be retaken (`docs/progress-flow.md`)
 - The rules about options and `answer` are not checked when the module loads, because a panic there would take the app down with its own data. They belong to the content validation (see Open)
 
