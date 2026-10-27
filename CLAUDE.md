@@ -20,6 +20,10 @@ Rust terminal app (ratatui) that teaches a programming language, and keeps it fr
 - A screen is coded only from an Approved file; only the author sets Approved
 - How screens map to `src/ui/` files, the explorer view modes and the app state: `docs/ui-structure.md`
 
+## Tests
+- The end-to-end tests (`tests/`) drive the app with keys and read the screen. They check the flow: navigation, keys, the content on screen (titles, rows, texts, counts), and what happens when an exercise, a session or a module ends
+- They do not check the look: no colors, sizes, positions or layout. A change of look gets no test, and its diff is shown directly
+
 ## Commands
 - Ask before running any command. Exceptions: `cargo check`, `cargo test`, `cargo clippy` (never `--fix`), `cargo fmt --check`, and read-only inspection (`ls`, `git status`, `git log`, `grep`)
 - Never run `cargo run` or any long-running process; the author runs the app
