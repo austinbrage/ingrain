@@ -64,10 +64,10 @@ finish an exercise ───────────► record_completion ─►
 All of it is in `src/app/exercise/mod.rs`.
 
 ### Opening an exercise
-`ExerciseState::open` loads the module file and then calls `remember_course`, which writes the **language and course** into `last` and saves. This runs for every opened exercise, including the next one reached from the Complete screen.
+`ExerciseState::open` loads the module file and then calls `remember_course`, which writes the **language and course** into `last` and saves. This runs for every opened exercise, including the next one reached from an end screen or straight from a quiz.
 
 ### Finishing an exercise
-An exercise ends when the last character of a typing exercise is typed (`handle_typing_key`), or when Enter is pressed on a quiz that was already checked (`handle_quiz_action`). Either one builds the Complete screen and, just before switching to it, calls `record_completion`. It has to run while the screen is still the exercise, because it reads the exercise from there. It only needs the id of the next exercise (`Exercise::id()`), so progress works the same for every exercise type.
+An exercise ends when the last character of a typing exercise is typed (`handle_typing_key`), or when Enter is pressed on a quiz that was already checked (`handle_quiz_action`). A typing exercise builds its complete screen and, just before switching to it, calls `record_completion`. A quiz has no complete screen: it calls `record_completion` and goes straight to what follows (the next exercise, the session recap, the module screen or the explorer). `record_completion` has to run while the screen is still the exercise, because it reads the exercise from there. It only needs the id of the next exercise (`Exercise::id()`), so progress works the same for every exercise type.
 
 A quiz is finished whatever the answer, but the answer is remembered. `handle_quiz_action` passes `selected == answer` as `passed`, and typing passes `true`, because a typing exercise cannot fail. An exercise left with Esc writes nothing: it is not failed, only not visited.
 
@@ -184,7 +184,7 @@ The user finishes session 1 of `first-frame`, opens session 2, finishes its firs
 | Enter on Continue | `app/home.rs`, `app/explorer.rs` | `handle_buttons_key`, `ExplorerState::continue_target`, `last_language` |
 | Enter on a module row | `app/explorer.rs`, `progress/mod.rs` | `handle_modules_key`, `resume_point` |
 | the sessions column | `app/explorer.rs`, `progress/mod.rs`, `ui/explorer/columns/sessions.rs`, `ui/explorer/hint.rs` | `handle_sessions_key`, `module_marks`, `Progress::sessions_done`, `Progress::sessions_failed`, `Progress::resume_exercise`, `sessions_column`, `render_hint` |
-| a failed exercise and the retake | `progress/mod.rs`, `progress/resume.rs`, `app/exercise/mod.rs`, `app/complete.rs` | `complete_exercise`, `is_retake`, `next_failed_exercise`, `failed_from`, `ExerciseState::open`, `record_completion`, `CompleteState::next` |
+| a failed exercise and the retake | `progress/mod.rs`, `progress/resume.rs`, `app/exercise/mod.rs`, `app/complete/` | `complete_exercise`, `is_retake`, `next_failed_exercise`, `failed_from`, `ExerciseState::open`, `record_completion`, `CompleteState::next` |
 | the file | `progress/mod.rs`, `progress/storage.rs` | `load`, `save`, `read`, `write`, `set_last`, `complete_exercise` |
 | the decisions | `progress/mod.rs`, `progress/resume.rs` | `continue_at`, `resume_point`, `next_course`, `next_module`, `next_session`, `next_exercise`, `failed_from`, `next_review` |
 | finding an id's position | `content/` | `Catalog::course_index`, `Module::session_index`, `Session::exercise_index` |
