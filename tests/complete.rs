@@ -169,7 +169,7 @@ mod module_done {
     use super::*;
 
     // The first row of the word LEVEL UP, as `tui_big_text` draws it in `Sextant`
-    const LEVEL_UP: &str = "🬨🬕  🬨🬕🬒🬄█ █ 🬨🬕🬒🬄🬨🬕      █ █ 🬨🬕🬨🬓";
+    pub const LEVEL_UP: &str = "🬨🬕  🬨🬕🬒🬄█ █ 🬨🬕🬒🬄🬨🬕      █ █ 🬨🬕🬨🬓";
 
     #[test]
     fn the_last_exercise_of_a_module_says_module_complete() {
@@ -358,5 +358,95 @@ mod quit {
         app.press_ctrl('q');
 
         assert!(app.has_quit());
+    }
+}
+
+mod module_failed {
+    use super::*;
+
+    use super::module_done::LEVEL_UP;
+
+    // The first row of the word ALMOST THERE, as `tui_big_text` draws it in `Sextant`
+    const ALMOST_THERE: &str = "🬵🬎🬱 🬨🬕  █🬱🬻▌🬵🬆🬪🬏🬻🬒🬌 🬆█🬊     🬆█🬊 █ █ 🬨🬕🬒🬄🬨🬕🬨🬓🬨🬕🬒🬄";
+
+    // Recap with its first session failed: finishing the second session shows the failed module
+    fn finished_the_module_with_a_failed_session() -> TestApp {
+        let mut app = TestApp::with_progress("rust-recap-session-1-failed");
+        app.press(KeyCode::Enter); // Continue opens the quiz of the second session
+        app.press(KeyCode::Enter); // checks the first option, which is right
+        app.press(KeyCode::Enter); // goes on, to the complete screen
+        app.press(KeyCode::Enter); // the complete screen goes on, to the failed module screen
+
+        app
+    }
+
+    #[test]
+    fn shows_the_sessions_of_a_module_with_a_failed_one() {
+        let app = finished_the_module_with_a_failed_session();
+
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust · Tools · Recap", "session 2/2 · exercise 1/1"]));
+        assert!(screen.contains(ALMOST_THERE));
+        assert!(screen.has_row(&["╭", "Recap"]));
+        assert!(screen.has_row(&["1  ✗  Session 1", "1 of 2   failed"]));
+        assert!(screen.has_row(&["2  ✓  Session 2", "1 of 1   passed"]));
+        assert!(screen.contains("1 of 2 sessions passed"));
+        assert!(screen.has_row(&["[▓▓▓▓▓▓░░░░░░] 1/2"]));
+        assert!(screen.has_row(&["Enter retake failed", "Esc back", "Ctrl-Q quit"]));
+        assert!(!screen.contains("You completed"));
+    }
+
+    #[test]
+    fn enter_retakes_the_failed_exercise() {
+        let mut app = finished_the_module_with_a_failed_session();
+        assert!(app.screen().contains(ALMOST_THERE));
+
+        app.press(KeyCode::Enter);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust · Tools · Recap", "session 1/2 · exercise 1/2"]));
+        assert!(screen.contains("Recap one"));
+        assert!(!screen.contains(ALMOST_THERE));
+    }
+
+    #[test]
+    fn esc_goes_back_to_the_explorer() {
+        let mut app = finished_the_module_with_a_failed_session();
+        assert!(app.screen().contains(ALMOST_THERE));
+
+        app.press(KeyCode::Esc);
+        app.wait(5); // all rows appear
+        let screen = app.screen();
+        assert!(screen.has_row(&["Ingrain", "Rust › Ecosystem › Tools"]));
+        assert!(screen.has_row(&["↑↓ move", "Enter start", "← back", "Ctrl-Q quit"]));
+        assert!(!screen.contains(ALMOST_THERE));
+    }
+
+    #[test]
+    fn passing_the_retake_shows_the_celebration() {
+        let mut app = finished_the_module_with_a_failed_session();
+        app.press(KeyCode::Enter); // retakes the failed quiz
+        app.press(KeyCode::Enter); // checks the first option, which is right
+        app.press(KeyCode::Enter); // goes on, to the complete screen
+        app.press(KeyCode::Enter); // the retake ends: the module passes now
+
+        let screen = app.screen();
+        assert!(screen.contains(LEVEL_UP));
+        assert!(screen.contains("You completed the Tools course"));
+        assert!(!screen.contains(ALMOST_THERE));
+    }
+
+    #[test]
+    fn failing_the_retake_again_shows_the_failed_module_again() {
+        let mut app = finished_the_module_with_a_failed_session();
+        app.press(KeyCode::Enter); // retakes the failed quiz
+        app.press(KeyCode::Down); // a wrong option
+        app.press(KeyCode::Enter); // checks it
+        app.press(KeyCode::Enter); // goes on, to the complete screen
+        app.press(KeyCode::Enter); // the retake ends: the module still has a failed session
+
+        let screen = app.screen();
+        assert!(screen.contains(ALMOST_THERE));
+        assert!(screen.contains("1 of 2 sessions passed"));
+        assert!(!screen.contains(LEVEL_UP));
     }
 }

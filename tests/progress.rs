@@ -334,6 +334,8 @@ mod retake {
         app.press(KeyCode::Enter); // checks it
         app.press(KeyCode::Enter); // goes on
         app.press(KeyCode::Enter); // the complete screen ends the retake
+        assert!(app.screen().contains("module complete"));
+        app.press(KeyCode::Esc); // the celebration goes back to the explorer
         app.wait(5); // all rows appear
 
         assert!(app.screen().has_row(&["Quiz", "✓ 1/1"]));
@@ -358,13 +360,15 @@ mod retake {
         app.press(KeyCode::Enter); // checks the first option, which is right
         app.press(KeyCode::Enter); // goes on
         app.press(KeyCode::Enter); // the complete screen ends the retake
+        assert!(app.screen().contains("module complete"));
+        app.press(KeyCode::Esc); // the celebration goes back to the explorer
         app.wait(5); // all rows appear
 
         assert!(app.screen().has_row(&["Retake", "✓ 1/1"]));
     }
 
     #[test]
-    fn a_retake_ends_in_the_explorer_after_its_last_failed_exercise() {
+    fn a_retake_ends_in_the_celebration_when_it_passes_the_module() {
         let mut app = TestApp::with_progress("rust-quiz-done-total-failed");
         app.press(KeyCode::Enter); // Continue opens the failed exercise
         assert!(app.screen().contains("What does total do?"));
@@ -372,6 +376,8 @@ mod retake {
         app.press(KeyCode::Enter); // checks the first option, which is right
         app.press(KeyCode::Enter); // goes on, which today opens the complete screen
         app.press(KeyCode::Enter); // the complete screen ends the retake
+        assert!(app.screen().contains("module complete"));
+        app.press(KeyCode::Esc); // the celebration goes back to the explorer
         app.wait(5); // all rows appear
 
         let screen = app.screen();
@@ -391,5 +397,27 @@ mod retake {
         let screen = app.screen();
         assert!(screen.contains("What does it print?"));
         assert!(screen.contains("exercise 2/2"));
+    }
+
+    #[test]
+    fn a_retake_of_an_unfinished_module_ends_in_the_explorer() {
+        let mut app = TestApp::with_progress("rust-many-session-1-failed");
+        app.press(KeyCode::Down); // selects "Choose a language", Continue is first
+        app.press(KeyCode::Enter); // opens the language cards
+        app.press(KeyCode::Enter); // opens the Rust explorer
+        app.wait(5); // all rows appear
+        app.press(KeyCode::Right); // focus the courses column
+        app.press(KeyCode::Right); // focus the modules column
+        app.press(KeyCode::Down); // Planned
+        app.press(KeyCode::Down); // Many
+        app.press(KeyCode::Enter); // opens its sessions column, on Session 2
+        app.press(KeyCode::Up); // Session 1, the failed one
+        app.press(KeyCode::Enter); // opens its failed exercise
+        app.type_chunk("fn main() {\n}");
+        app.press(KeyCode::Enter); // the complete screen ends the retake
+
+        let screen = app.screen();
+        assert!(screen.has_row(&["Ingrain", "Rust › Core › Basics"]));
+        assert!(!screen.contains("module complete"));
     }
 }
