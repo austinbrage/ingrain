@@ -1,6 +1,6 @@
 use crate::app::{
     App, Body, CompleteState, Depth, DoneRow, ExerciseDone, ExerciseState, ExplorerState,
-    HomeLanguage, ModuleDone, Screen, SessionDone,
+    HomeLanguage, ModuleDone, ModuleFailed, Screen, SessionDone, SessionRow,
 };
 use crate::content::{Exercise, Mode, Output};
 
@@ -91,6 +91,17 @@ pub fn start_at(app: &mut App, screen: &str, target: Option<&str>) {
                 last_exercises: 2,
                 finished_course: Some("Syntax".to_string()),
                 // finished_course: None,
+            }));
+        }
+        // A module with a failed session: the sessions table and the retake
+        "module-failed" => {
+            let row = |passed, total| SessionRow { passed, total };
+
+            app.screen = Screen::Complete(CompleteState::ModuleFailed(ModuleFailed {
+                explorer,
+                name: "Loops".to_string(),
+                rows: vec![row(3, 3), row(2, 3), row(3, 3)],
+                last_exercises: 2,
             }));
         }
         // The session recap, with one failed exercise

@@ -1,9 +1,11 @@
 mod exercise;
 mod module;
+mod module_failed;
 mod session;
 
 pub use exercise::{ExerciseDone, Next};
 pub use module::ModuleDone;
+pub use module_failed::{ModuleFailed, SessionRow};
 pub use session::{DoneRow, SessionDone};
 
 use crate::app::{Action, Content, Screen};
@@ -14,6 +16,7 @@ pub enum CompleteState {
     Exercise(ExerciseDone),
     Session(SessionDone),
     Module(ModuleDone),
+    ModuleFailed(ModuleFailed),
 }
 
 impl CompleteState {
@@ -28,6 +31,7 @@ impl CompleteState {
             Self::Exercise(done) => done.handle_key(action, content, progress),
             Self::Session(done) => done.handle_key(action, content, progress),
             Self::Module(done) => done.handle_key(action, content, progress),
+            Self::ModuleFailed(done) => done.handle_key(action, content, progress),
         }
     }
 }

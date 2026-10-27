@@ -1,5 +1,6 @@
 use crate::app::{
-    Action, CompleteState, Content, ExerciseState, ExplorerState, ModuleDone, Screen, SessionDone,
+    Action, CompleteState, Content, ExerciseState, ExplorerState, ModuleDone, ModuleFailed, Screen,
+    SessionDone,
 };
 use crate::content::{Output, Quiz, Typing};
 use crate::progress::Progress;
@@ -29,6 +30,21 @@ pub struct ExerciseDone {
 }
 
 impl ExerciseDone {
+    // Whether every session of the module has been played through
+    fn module_played_through(&self, content: &Content, progress: &Progress) -> bool {
+        let (Some(path), Some(module)) = (
+            content.module_path(self.explorer),
+            content.module(self.explorer),
+        ) else {
+            return false;
+        };
+
+        progress
+            .sessions_done(&path, &module)
+            .iter()
+            .all(|&done| done)
+    }
+
     // Whether a session of the finished module has failed exercises
     fn module_failed(&self, content: &Content, progress: &Progress) -> bool {
         let (Some(path), Some(module)) = (
@@ -123,10 +139,15 @@ impl ExerciseDone {
                     .map(|done| Screen::Complete(CompleteState::Session(done)));
             }
             (Action::Select, Next::Finish)
-                if !self.retake && !self.module_failed(content, progress) =>
+                if !self.retake || self.module_played_through(content, progress) =>
             {
-                return ModuleDone::new(explorer, content, progress)
-                    .map(|done| Screen::Complete(CompleteState::Module(done)));
+                let state = if self.module_failed(content, progress) {
+                    ModuleFailed::new(explorer, content, progress).map(CompleteState::ModuleFailed)
+                } else {
+                    ModuleDone::new(explorer, content, progress).map(CompleteState::Module)
+                };
+
+                return state.map(Screen::Complete);
             }
             (Action::Select | Action::Back, _) => return Some(Screen::Explorer(explorer)),
             _ => {}

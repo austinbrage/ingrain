@@ -1,5 +1,6 @@
 mod exercise;
 mod module;
+mod module_failed;
 mod session;
 
 use crate::app::{CompleteState, Content};
@@ -23,6 +24,9 @@ pub fn complete(frame: &mut Frame, content: &Content, state: &CompleteState) {
         }
         CompleteState::Module(done) => {
             module::module_done(frame, content.breadcrumb(done.explorer), done)
+        }
+        CompleteState::ModuleFailed(done) => {
+            module_failed::module_failed(frame, content.breadcrumb(done.explorer), done)
         }
     }
 }
