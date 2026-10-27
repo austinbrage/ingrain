@@ -168,11 +168,13 @@ mod session_done {
 mod module_done {
     use super::*;
 
+    // The first row of the word LEVEL UP, as `tui_big_text` draws it in `Sextant`
+    const LEVEL_UP: &str = "🬨🬕  🬨🬕🬒🬄█ █ 🬨🬕🬒🬄🬨🬕      █ █ 🬨🬕🬨🬓";
+
     #[test]
-    fn enter_goes_back_to_the_explorer() {
+    fn the_last_exercise_of_a_module_says_module_complete() {
         let mut app = TestApp::with_progress("rust-many-session-1-done");
         app.press(KeyCode::Enter); // Continue opens the last exercise of the module
-        app.wait(5); // the explorer will show all its rows
         app.type_chunk("fn main() {\n}");
         app.type_chunk("    let a = 1;");
 
@@ -180,14 +182,80 @@ mod module_done {
         assert!(screen.has_row(&["Rust · Basics · Many", "session 2/2 · exercise 1/1"]));
         assert!(screen.contains("Module complete"));
         assert!(screen.contains("Press Enter to finish"));
+    }
+
+    #[test]
+    fn shows_the_celebration_with_the_module_and_its_numbers() {
+        let mut app = TestApp::with_progress("rust-many-session-1-done");
+        app.press(KeyCode::Enter); // Continue opens the last exercise of the module
+        app.type_chunk("fn main() {\n}");
+        app.type_chunk("    let a = 1;");
+        app.press(KeyCode::Enter); // the complete screen goes on, to the module screen
+
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust · Basics · Many", "session 2/2 · exercise 1/1"]));
+        assert!(screen.contains(LEVEL_UP));
+        assert!(screen.has_rows_in_order(&["module complete", "Many", "2 sessions · 3 exercises"]));
+        assert!(screen.has_row(&["Enter explorer", "Esc back", "Ctrl-Q quit"]));
+        assert!(!screen.contains("Press Enter to finish"));
+    }
+
+    #[test]
+    fn the_end_of_a_course_names_it_and_goes_to_the_explorer() {
+        let mut app = TestApp::with_progress("rust-many-session-1-done");
+        app.press(KeyCode::Enter); // Continue opens the last exercise of Many, the end of Basics
+        app.type_chunk("fn main() {\n}");
+        app.type_chunk("    let a = 1;");
+        app.press(KeyCode::Enter); // the complete screen goes on, to the module screen
+
+        let screen = app.screen();
+        assert!(screen.contains(LEVEL_UP));
+        assert!(screen.contains("You completed the Basics course"));
+        assert!(screen.has_row(&["Enter explorer", "Esc back", "Ctrl-Q quit"]));
 
         app.press(KeyCode::Enter);
+        app.wait(5); // all rows appear
+        let screen = app.screen();
+        assert!(screen.has_row(&["Ingrain", "Rust › Core › Basics"]));
+        assert!(screen.has_row(&["Many", "✓ 2/2"]));
+        assert!(!screen.contains(LEVEL_UP));
+    }
+
+    #[test]
+    fn enter_on_the_celebration_opens_the_next_module() {
+        let mut app = TestApp::with_progress("rust-basics-done");
+        app.press(KeyCode::Enter); // Continue opens Alone, the first module of Second
+        app.type_chunk("fn main() {\n    let a = 1;\n}");
+        app.press(KeyCode::Enter); // the complete screen goes on, to the module screen
+        let screen = app.screen();
+        assert!(screen.contains(LEVEL_UP));
+        assert!(!screen.contains("You completed"));
+        assert!(screen.has_row(&["Enter next module", "Esc back", "Ctrl-Q quit"]));
+
+        app.press(KeyCode::Enter);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust · Second · Long", "session 1/1 · exercise 1/1"]));
+        assert!(screen.contains("Long exercise"));
+        assert!(!screen.contains(LEVEL_UP));
+    }
+
+    #[test]
+    fn esc_on_the_celebration_goes_back_to_the_explorer() {
+        let mut app = TestApp::with_progress("rust-many-session-1-done");
+        app.press(KeyCode::Enter); // Continue opens the last exercise of the module
+        app.type_chunk("fn main() {\n}");
+        app.type_chunk("    let a = 1;");
+        app.press(KeyCode::Enter); // the complete screen goes on, to the module screen
+        assert!(app.screen().contains(LEVEL_UP));
+
+        app.press(KeyCode::Esc);
+        app.wait(5); // all rows appear
         let screen = app.screen();
         assert!(screen.has_row(&["Ingrain", "Rust › Core › Basics"]));
         assert!(screen.has_row(&["↑↓ move", "Enter start", "← back", "Ctrl-Q quit"]));
         assert!(screen.has_row(&["One", "✓ 1/1"]));
         assert!(screen.has_row(&["Many", "✓ 2/2"]));
-        assert!(!screen.contains("Press Enter to finish"));
+        assert!(!screen.contains(LEVEL_UP));
     }
 }
 
