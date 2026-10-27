@@ -97,8 +97,9 @@ pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone) {
     );
     frame.render_widget(
         Paragraph::new(format!(
-            "{} sessions · {} exercises",
-            state.session_count, state.exercise_count
+            "{} · {}",
+            pluralize(state.session_count, "session"),
+            pluralize(state.exercise_count, "exercise")
         ))
         .centered(),
         numbers,
@@ -130,4 +131,11 @@ pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone) {
         Span::styled(label, Style::new().add_modifier(Modifier::BOLD)),
     ]);
     render_footer(frame, footer, enter, HINT);
+}
+
+// "1 session", "2 sessions"
+fn pluralize(number: usize, word: &str) -> String {
+    let plural = if number == 1 { "" } else { "s" };
+
+    format!("{number} {word}{plural}")
 }
