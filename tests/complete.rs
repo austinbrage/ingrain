@@ -226,6 +226,7 @@ mod module_done {
         app.press(KeyCode::Enter); // the complete screen goes on, to the module screen
         let screen = app.screen();
         assert!(screen.contains(LEVEL_UP));
+        assert!(screen.contains("1 session · 1 exercise"));
         assert!(!screen.contains("You completed"));
         assert!(screen.has_row(&["Enter next module", "Esc back", "Ctrl-Q quit"]));
 
