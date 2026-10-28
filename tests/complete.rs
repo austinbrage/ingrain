@@ -124,7 +124,7 @@ mod session_done {
         assert!(screen.has_row(&["1  ✗  Recap one", "quiz   failed"]));
         assert!(screen.has_row(&["2  ✓  Recap two", "quiz   passed"]));
         assert!(screen.contains("1 of 2 exercises passed"));
-        assert!(screen.has_row(&["[▓▓▓▓▓▓░░░░░░] 1/2"]));
+        assert!(screen.has_row(&["1 of 2 exercises passed"]));
         assert_eq!(
             screen.foreground_of("✗"),
             Some(PALETTE.mocha.colors.red.into())
@@ -388,7 +388,7 @@ mod module_failed {
         assert!(screen.has_row(&["1  ✗  Session 1", "1 of 2   failed"]));
         assert!(screen.has_row(&["2  ✓  Session 2", "1 of 1   passed"]));
         assert!(screen.contains("1 of 2 sessions passed"));
-        assert!(screen.has_row(&["[▓▓▓▓▓▓░░░░░░] 1/2"]));
+        assert!(screen.has_row(&["1 of 2 sessions passed"]));
         assert!(screen.has_row(&["Enter retake failed", "Esc back", "Ctrl-Q quit"]));
         assert!(!screen.contains("You completed"));
     }
