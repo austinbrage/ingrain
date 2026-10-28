@@ -63,7 +63,7 @@ A big word, `ALMOST THERE`, tops the screen (the `Sextant` size of `tui_big_text
 - **Name:** `Session 1`, `Session 2`
 - **Count:** the exercises passed of the session (`2 of 3`)
 - **Result:** `passed` or `failed`
-- **Status row:** `N of M sessions passed` on the left and a bar of the same count on the right
+- **Status row:** `N of M sessions passed` on the left and a bar of the same count on the right. The drawings show the last frame: on opening, the bar fills one cell every 2 ticks from empty, with the count beside it going `0/3`, `1/3`, `2/3` up to the real value, and then holds
 - **Footer:** `Enter retake failed` on the left, `Esc back` and `Ctrl-Q quit` on the right
 
 ## Borders and colors
