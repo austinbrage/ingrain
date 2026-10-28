@@ -1,3 +1,4 @@
+mod chrome;
 pub mod complete;
 pub mod exercise;
 pub mod explorer;

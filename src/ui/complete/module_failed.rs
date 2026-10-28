@@ -1,5 +1,6 @@
-use super::{fill_bar, render_footer, render_header, split};
+use super::fill_bar;
 use crate::app::ModuleFailed;
+use crate::ui::chrome::{render_footer, render_header, split};
 
 use catppuccin::PALETTE;
 use ratatui::{

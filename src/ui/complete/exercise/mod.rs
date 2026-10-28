@@ -3,8 +3,8 @@ mod output;
 
 use catppuccin::PALETTE;
 
-use super::{render_footer, render_header, split};
 use crate::app::{ExerciseDone, Next};
+use crate::ui::chrome::{render_footer, render_header, split};
 use code::render_code;
 use output::render_output;
 
