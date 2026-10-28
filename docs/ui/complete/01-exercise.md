@@ -2,7 +2,7 @@
 
 Status: Approved
 
-The screen the user sees after the last chunk of a typing exercise. It replaces the old `docs/ui/exercise/05-complete.md`, removed with the move to this folder (git keeps it). A quiz has no complete screen (`docs/todos/11-complete-screens.md`). The decisions are in that todo ("The layouts").
+The screen the user sees after the last chunk of a typing exercise. It replaces the old `docs/ui/exercise/05-complete.md`, removed with the move to this folder (git keeps it). A quiz has no complete screen: after a checked quiz Enter goes straight to the next exercise, or to the session or module screen when it is the last. The decisions are in that todo ("The layouts").
 
 The hero is the code the user built, in an editor window, with its output beside it. A title line (the exercise title with `✓`) and a subtitle with the next step sit above the cards. A big word, `DONE`, tops the screen (the `Sextant` size of `tui_big_text`, 3 rows, in green). There is no Enter row in the body: Enter is on the left of the footer, as on the session and module screens (`02-session.md`, `03-module.md`). It keeps the chrome of the exercise screen (`docs/ui/exercise/03-ghost-wide.md`): double header and footer, no frame around the screen, rounded `sky` cards. The drawings are at 100 columns and cannot show colors; they are below.
 

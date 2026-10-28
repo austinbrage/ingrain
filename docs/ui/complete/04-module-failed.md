@@ -2,7 +2,7 @@
 
 Status: Approved
 
-The screen the user sees after the last exercise of a module when at least one session of the module is failed (`docs/progress-flow.md`: a module is failed when a session is failed). It takes the place of the module celebration (`03-module.md`), which shows only when every session passed. The decisions are in `docs/todos/11-complete-screens.md`.
+The screen the user sees after the last exercise of a module when at least one session of the module is failed (`docs/progress-flow.md`: a module is failed when a session is failed). It takes the place of the module celebration (`03-module.md`), which shows only when every session passed. The decisions are at the bottom of this file.
 
 A big word, `ALMOST THERE`, tops the screen (the `Sextant` size of `tui_big_text`, 3 rows, in `peach`, the color of a pending state, not red). It says the module is not complete yet without calling the user's work a failure. The rest is the session recap (`02-session.md`) one level up: one card, a table with a row per session of the module, and a status row. Enter retakes only the failed exercises, so the user goes on without the explorer, and when the retake passes the module is complete and the celebration shows. Same chrome as the other end screens: double header and footer, no frame around the screen, rounded `sky` card. The drawings are at 100 columns and cannot show colors; they are below.
 

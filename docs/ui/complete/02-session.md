@@ -2,7 +2,7 @@
 
 Status: Approved
 
-The screen the user sees after the last exercise of a session, when more sessions follow in the module. It is new: today the end of a session is the exercise complete screen with another summary line (the old `docs/ui/exercise/05-complete.md`, in git history). The decisions are in `docs/todos/11-complete-screens.md` ("The layouts"); the words that were weighed are in `05-alternatives.md`.
+The screen the user sees after the last exercise of a session, when more sessions follow in the module. It is new: today the end of a session is the exercise complete screen with another summary line (the old `docs/ui/exercise/05-complete.md`, in git history). The decisions are at the bottom of this file; the words that were weighed are in `05-alternatives.md`.
 
 A big word, `SESSION DONE`, tops the screen (the `Sextant` size of `tui_big_text`, 3 rows, in `sky`; on the narrow layout it takes two lines, `SESSION` and `DONE`). The hero is one card, a table with a row per exercise of the session, in order. The code and the output do not show here, they belong to the exercise screen. The card badge is the session name. A rule closes the table with a status row: the count of exercises passed on the left and a bar of the same count on the right, so the bar, the count and the marks of the rows say the same thing. Enter is on the left of the footer. It keeps the chrome of the exercise screen (`docs/ui/exercise/03-ghost-wide.md`): double header and footer, no frame around the screen, rounded `sky` card. The drawings are at 100 columns and cannot show colors; they are below.
 

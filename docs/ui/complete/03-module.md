@@ -2,7 +2,7 @@
 
 Status: Approved
 
-The screen the user sees after the last exercise of a module when every session passed (when one failed, `04-module-failed.md` shows instead). It is new: today the end of a module is the exercise complete screen with `Module complete` as its summary line (the old `docs/ui/exercise/05-complete.md`, in git history). The decisions are in `docs/todos/11-complete-screens.md` ("The layouts").
+The screen the user sees after the last exercise of a module when every session passed (when one failed, `04-module-failed.md` shows instead). It is new: today the end of a module is the exercise complete screen with `Module complete` as its summary line (the old `docs/ui/exercise/05-complete.md`, in git history). The decisions are at the bottom of this file.
 
 The hero is a big word, `LEVEL UP`, in the same `Sextant` size of `tui_big_text` as the other end screens (`01-exercise.md`, `02-session.md`), so the module does not stand out by the size of its letters. It stands out by having no card, by the gradient sliding along the word and the caption, by the bar that fills under them and by the color of the module name. Under the word: a small caption, a bar, the module name, and the numbers of the module. Enter is in the footer. It keeps the chrome of the exercise screen (`docs/ui/exercise/03-ghost-wide.md`): double header and footer. The drawings are at 100 columns and cannot show colors or motion; they show the last frame, with the bar full. The words that were weighed are in `05-alternatives.md`.
 
