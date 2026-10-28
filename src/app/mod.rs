@@ -66,7 +66,7 @@ impl App {
     pub fn animating(&self) -> bool {
         matches!(
             self.screen,
-            Screen::Home(_) | Screen::Explorer(_) | Screen::Complete(CompleteState::Module(_))
+            Screen::Home(_) | Screen::Explorer(_) | Screen::Complete(_)
         )
     }
 
@@ -98,7 +98,7 @@ impl App {
             };
 
             if let Some(screen) = next {
-                self.screen = screen;
+                self.go_to(screen);
             }
             return;
         }
@@ -120,12 +120,21 @@ impl App {
         };
 
         if let Some(screen) = next {
-            // The explorer opens from the language cards: its rows show again from the top
-            if matches!(self.screen, Screen::Home(_)) && matches!(screen, Screen::Explorer(_)) {
-                self.tick = 0;
-            }
-            self.screen = screen;
+            self.go_to(screen);
         }
+    }
+
+    // Changes the screen. A screen whose animation plays once starts it from its first frame
+    fn go_to(&mut self, screen: Screen) {
+        // The explorer opens from the language cards: its rows show again from the top
+        let opens_explorer =
+            matches!(self.screen, Screen::Home(_)) && matches!(screen, Screen::Explorer(_));
+        let opens_end_screen = matches!(screen, Screen::Complete(_));
+
+        if opens_explorer || opens_end_screen {
+            self.tick = 0;
+        }
+        self.screen = screen;
     }
 }
 

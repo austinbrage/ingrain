@@ -1,4 +1,4 @@
-use super::{render_footer, render_header, split};
+use super::{fill_bar, render_footer, render_header, split};
 use crate::app::ModuleDone;
 use crate::ui::wave::wave_line;
 
@@ -12,6 +12,8 @@ use ratatui::{
 };
 
 const HINT: &str = "Esc back   Ctrl-Q quit ";
+// The ticks the bar stays full before it starts over
+const HOLD_TICKS: u64 = 30;
 // The word LEVEL UP, drawn like the home title: three rows, padded to the same width
 const WORD: &str = "\
 🬨🬕  🬨🬕🬒🬄█ █ 🬨🬕🬒🬄🬨🬕      █ █ 🬨🬕🬨🬓
@@ -29,12 +31,24 @@ pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone, ti
     );
     render_header(frame, header, breadcrumb, position);
 
-    // 2. Render Body: the word, the caption, the name and the numbers
-    let [word_area, _gap2, caption, _gap3, name, numbers, course_area] = Layout::vertical([
+    // 2. Render Body: the word, the caption, the bar, the name and the numbers
+    let [
+        word_area,
+        _gap2,
+        caption,
+        _gap3,
+        bar_area,
+        _gap4,
+        name,
+        numbers,
+        course_area,
+    ] = Layout::vertical([
         Constraint::Length(3),
         Constraint::Length(1),
         Constraint::Length(1),
         Constraint::Length(1),
+        Constraint::Length(1),
+        Constraint::Length(2),
         Constraint::Length(1),
         Constraint::Length(1),
         Constraint::Length(1),
@@ -46,9 +60,7 @@ pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone, ti
     frame.render_widget(Paragraph::new(word).centered(), word_area);
 
     frame.render_widget(
-        Paragraph::new("──  module complete  ──")
-            .style(Style::new().fg(palette.overlay1.into()))
-            .centered(),
+        Paragraph::new(wave_line("──  module complete  ──", tick)).centered(),
         caption,
     );
     frame.render_widget(
@@ -70,6 +82,10 @@ pub fn module_done(frame: &mut Frame, breadcrumb: String, state: &ModuleDone, ti
         .centered(),
         numbers,
     );
+
+    // The bar fills from empty to full, holds, and starts over
+    let bar = fill_bar(tick, 100, None, Some(HOLD_TICKS));
+    frame.render_widget(Paragraph::new(bar).centered(), bar_area);
 
     // The line with the course, only when this module ends it
     if let Some(course) = &state.finished_course {

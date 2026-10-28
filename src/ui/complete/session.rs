@@ -1,4 +1,4 @@
-use super::{render_footer, render_header, split};
+use super::{fill_bar, render_footer, render_header, split};
 use crate::app::SessionDone;
 
 use catppuccin::PALETTE;
@@ -15,11 +15,9 @@ use tui_big_text::{BigText, PixelSize};
 const CARD_WIDTH: u16 = 66;
 // Below this width the word takes two lines
 const ONE_LINE_WIDTH: u16 = 56;
-// Cells of the bar in the status row
-const BAR_WIDTH: usize = 12;
 const HINT: &str = "Esc back   Ctrl-Q quit ";
 
-pub fn session_done(frame: &mut Frame, breadcrumb: String, state: &SessionDone) {
+pub fn session_done(frame: &mut Frame, breadcrumb: String, state: &SessionDone, tick: u64) {
     let palette = PALETTE.mocha.colors;
     let [header, body, footer] = split(frame.area());
     let total = state.rows.len();
@@ -124,13 +122,8 @@ pub fn session_done(frame: &mut Frame, breadcrumb: String, state: &SessionDone) 
         Rect::new(card.x, rule_area.y, card.width, 1),
     );
 
-    let filled = passed * BAR_WIDTH / total;
-    let bar = Line::from(vec![
-        Span::raw("["),
-        Span::styled("▓".repeat(filled), Style::new().fg(palette.sky.into())),
-        Span::raw("░".repeat(BAR_WIDTH - filled)),
-        Span::raw(format!("] {passed}/{total}  ")),
-    ]);
+    // The bar fills once, up to the exercises passed, and holds
+    let bar = fill_bar(tick, passed, Some(total), None);
     frame.render_widget(
         Paragraph::new(format!("  {passed} of {total} exercises passed")),
         status_area,
