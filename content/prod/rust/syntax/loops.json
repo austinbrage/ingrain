@@ -1,8 +1,29 @@
 {
   "id": "loops",
+  "intro": {
+    "title": "Loops",
+    "slides": [
+      {
+        "text": "A loop repeats code. Rust has three: `loop`, `while` and `for`.\n\nThis module starts with `for`, the one you will use the most."
+      }
+    ]
+  },
   "sessions": [
     {
       "id": "session-1",
+      "intro": {
+        "title": "Repeat with for",
+        "slides": [
+          {
+            "text": "`for` takes each value of a range in turn and runs its block once for each of them.",
+            "code": "let mut total = 0;\n\nfor n in 1..=4 {\n    total += n;\n}"
+          },
+          {
+            "text": "A range stops **before** its end: `0..3` gives 0, 1 and 2. Write `0..=3` to include the 3.",
+            "code": "for n in 0..3 {\n    // n is 0, then 1, then 2\n}"
+          }
+        ]
+      },
       "exercises": [
         {
           "type": "typing",

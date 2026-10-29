@@ -1,8 +1,37 @@
 {
   "id": "pattern-matching",
+  "intro": {
+    "title": "Pattern matching",
+    "slides": [
+      {
+        "text": "A `match` compares a value against **patterns**, from the first arm to the last. The first arm that fits runs.\n\nIn this module you read patterns the way the compiler does.",
+        "code": "match value {\n    pattern_a => do_this,\n    pattern_b => do_that,\n    _ => do_otherwise,\n}"
+      },
+      {
+        "text": "Two sessions:\n\n- **Session 1:** patterns on values: `Some`, ranges, names and tuples\n- **Session 2:** guards, slices and what the compiler checks\n\nEvery exercise is a quiz: read the code, then pick the answer."
+      }
+    ]
+  },
   "sessions": [
     {
       "id": "session-1",
+      "intro": {
+        "title": "Patterns on values",
+        "slides": [
+          {
+            "text": "A pattern describes the shape of a value. `Some(n)` fits any `Some` and gives its content the name `n`.",
+            "code": "match age {\n    Some(n) => println!(\"{n}\"),\n    None => println!(\"unknown\"),\n}"
+          },
+          {
+            "text": "A range fits a span of values. `@` also names the value that fit.",
+            "code": "match age {\n    0..=17 => println!(\"minor\"),\n    n @ 18..=64 => println!(\"{n}\"),\n    _ => println!(\"senior\"),\n}"
+          },
+          {
+            "text": "A pattern can take a tuple apart, and `_` fits anything you do not need.\n\nIn each exercise, ask which arm fits first.",
+            "code": "match (name, age) {\n    (Some(n), Some(a)) => show(n, a),\n    _ => println!(\"missing\"),\n}"
+          }
+        ]
+      },
       "exercises": [
         {
           "type": "quiz",
@@ -34,6 +63,19 @@
     },
     {
       "id": "session-2",
+      "intro": {
+        "title": "Guards and slices",
+        "slides": [
+          {
+            "text": "A **guard** adds an `if` to an arm. The arm fits only when the pattern fits and the guard is true.",
+            "code": "match n {\n    x if x % 2 == 0 => println!(\"even\"),\n    _ => println!(\"odd\"),\n}"
+          },
+          {
+            "text": "A slice pattern matches the items of a list, and `..` stands for the ones in between.\n\nThe compiler also checks that every case has an arm. A missing one is an error.",
+            "code": "match v {\n    [] => \"empty\",\n    [a, .., b] if a == b => \"same ends\",\n    _ => \"other\",\n}"
+          }
+        ]
+      },
       "exercises": [
         {
           "type": "quiz",
