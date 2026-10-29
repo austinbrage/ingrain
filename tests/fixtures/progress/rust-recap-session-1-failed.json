@@ -9,6 +9,7 @@
       "failed": { "session-1": ["first"] },
       "practiced": 3
     },
-    { "id": "rust/tools/kinds", "done": ["session-1"], "practiced": 4 }
+    { "id": "rust/tools/kinds", "done": ["session-1"], "practiced": 4 },
+    { "id": "rust/tools/intro", "done": ["session-1"], "practiced": 5 }
   ]
 }

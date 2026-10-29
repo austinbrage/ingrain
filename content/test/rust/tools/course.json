@@ -9,7 +9,8 @@
         { "id": "quiz", "name": "Quiz", "sessions": 1 },
         { "id": "retake", "name": "Retake", "sessions": 1 },
         { "id": "recap", "name": "Recap", "sessions": 2 },
-        { "id": "kinds", "name": "Kinds", "sessions": 1 }
+        { "id": "kinds", "name": "Kinds", "sessions": 1 },
+        { "id": "intro", "name": "Intro", "sessions": 1 }
       ]
     }
   ]

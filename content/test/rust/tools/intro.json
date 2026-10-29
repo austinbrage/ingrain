@@ -1,0 +1,46 @@
+{
+  "id": "intro",
+  "intro": {
+    "title": "About intros",
+    "slides": [
+      { "text": "First module slide." },
+      { "text": "Second module slide." }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "About the session",
+        "slides": [
+          { "text": "First session slide.", "code": "let x = 1;" },
+          { "text": "Second session slide.\n\n- item 1\n- item 2\n- item 3\n- item 4\n- item 5\n- item 6\n- item 7\n- item 8\n- item 9\n- item 10\n- item 11\n- item 12\n- item 13\n- item 14\n- item 15\n- item 16\n- item 17\n- item 18\n- item 19\n- item 20\n- item 21\n- item 22\n- item 23\n- item 24\n\nEnd of the long slide.", "code": "let y = 2;" }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "first",
+          "title": "Intro quiz",
+          "guide": "Pick what the function does.",
+          "code": "fn one() -> u32 {\n    1\n}",
+          "options": ["Returns one", "Returns two"],
+          "answer": 0,
+          "explanation": "It returns 1."
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "second",
+          "title": "Another quiz",
+          "guide": "Pick what the function does.",
+          "code": "fn two() -> u32 {\n    2\n}",
+          "options": ["Returns two", "Returns one"],
+          "answer": 0,
+          "explanation": "It returns 2."
+        }
+      ]
+    }
+  ]
+}
