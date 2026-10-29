@@ -137,6 +137,7 @@ A module and a session can each have an optional `intro`, a few slides that teac
 - **When it shows:** on a fresh start, never when a half-finished session is resumed and never on a retake. The module intro shows only at the first exercise of the first session of the module, and then the session intro follows if it has one. Reading an intro saves nothing in the progress file
 - **Slides:** one idea each. The text of a slide is about 8 lines or less once wrapped, because the screen pins the title and scrolls only the text. An intro with more to say uses more slides, and the indicator under the title counts the slides of that intro only
 - **Code width:** the same rule as the quiz: 40 columns or less per line, never over 50, and about 14 lines
+- **The snippet is illustrative:** it may use placeholder names when it only shows the shape of something (`pattern_a => do_this`), but every piece of syntax and every API in it must be real, and a snippet meant as real code must compile
 - **Ids:** an intro and its slides have no id, so nothing in progress points at them and they can change freely
 - **Not checked at load:** the fields are (`deny_unknown_fields`, the same as the rest), but the limits above belong to the content validation (see Open)
 
@@ -186,5 +187,5 @@ A later import script walks the folders and writes the items. The path of the fo
 ## Open
 - `tier` in `course.json` is a free string, not validated. Check the allowed values (and the possible `expert` tier, see `course-structure.md`) once tiers drive behavior
 - Exercise JSON shape for the types still to come (`fill-blank`, `find-error`); the typing and quiz shapes are above
-- A content validation that runs before shipping (the tiers, the anchors of the notes, the quiz rules: 2 to 4 different options, `answer` inside them, options of about 50 characters; the intro slides: 8 lines of text or less, code of 40 columns or less and 14 lines or less). It is a test or script over `content/prod/`, not a check at load. See `docs/todos/03-content-skill.md`, "The validator"
+- A content validation that runs before shipping (the tiers, the anchors of the notes, the quiz rules: 2 to 4 different options, `answer` inside them, options of about 50 characters; the intro slides: 8 lines of text or less once wrapped at 70 columns, code of 40 columns or less and 14 lines or less). It is a test or script over `content/prod/`, not a check at load. See `docs/todos/03-content-skill.md`, "The validator"
 - Content `version` field, so changed exercises do not invalidate saved progress
