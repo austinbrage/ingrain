@@ -1,6 +1,8 @@
+mod intro;
 mod quiz;
 mod typing;
 
+pub use intro::{Intro, Slide};
 pub use quiz::{Quiz, QuizKind};
 pub use typing::{Chunk, Mode, Note, Typing};
 
@@ -12,6 +14,7 @@ use super::{Source, read_content};
 #[serde(deny_unknown_fields)]
 pub struct Module {
     pub id: String,
+    pub intro: Option<Intro>,
     pub sessions: Vec<Session>,
 }
 
@@ -19,6 +22,7 @@ pub struct Module {
 #[serde(deny_unknown_fields)]
 pub struct Session {
     pub id: String,
+    pub intro: Option<Intro>,
     pub exercises: Vec<Exercise>,
 }
 
