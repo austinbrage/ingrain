@@ -66,6 +66,8 @@ All of it is in `src/app/exercise/mod.rs`.
 ### Opening an exercise
 `ExerciseState::open` loads the module file and then calls `remember_course`, which writes the **language and course** into `last` and saves. This runs for every opened exercise, including the next one reached from an end screen or straight from a quiz.
 
+`open` also decides whether an intro comes first (`IntroState::applies`, `app/intro.rs`). It does when the exercise is the first of its session (index 0) and the session is not a retake, and the module or the session has an `intro`: the first time, and again when a finished session or module is started over. It does not when a half-finished session is resumed (the saved exercise is past 0) or when a failed exercise is retaken. An intro saves nothing and adds no fact to the file: the rule is derived from the position. The intro's last slide opens the exercise through `ExerciseState::start`, which skips this check.
+
 ### Finishing an exercise
 An exercise ends when the last character of a typing exercise is typed (`handle_typing_key`), or when Enter is pressed on a quiz that was already checked (`handle_quiz_action`). A typing exercise builds its complete screen and, just before switching to it, calls `record_completion`. A quiz has no complete screen: it calls `record_completion` and goes straight to what follows (the next exercise, the session recap, the module screen or the explorer). `record_completion` has to run while the screen is still the exercise, because it reads the exercise from there. It only needs the id of the next exercise (`Exercise::id()`), so progress works the same for every exercise type.
 
@@ -178,6 +180,7 @@ The user finishes session 1 of `first-frame`, opens session 2, finishes its firs
 |---|---|---|
 | save the course on open | `app/exercise/mod.rs` | `ExerciseState::open`, `remember_course` |
 | save a finished exercise | `app/exercise/mod.rs` | `record_completion` |
+| an intro before an exercise | `app/exercise/mod.rs`, `app/intro.rs` | `ExerciseState::open`, `IntroState::applies`, `ExerciseState::start` |
 | ids of a position | `app/content.rs` | `course_id`, `module_path` |
 | the label and the button | `app/home.rs`, `progress/mod.rs`, `ui/home/buttons.rs` | `continue_label`, `Progress::continue_label`, `ContinueLabel`, `render_menu`, `review_text` |
 | marks on module rows | `app/explorer.rs`, `progress/mod.rs`, `ui/explorer/columns/modules.rs` | `module_marks`, `Progress::passed_counts`, `Progress::modules_failed`, `Progress::next_module`, `modules_column` |

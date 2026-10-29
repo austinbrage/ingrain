@@ -44,7 +44,7 @@ content/
 |---|---|---|
 | `<language>/catalog.json` | language name, course sections, course list | at startup |
 | `<language>/<course>/course.json` | module sections and modules (name, tier, session count) | when the course is selected |
-| `<language>/<course>/<module>.json` | sessions and exercises | when a session of the module starts |
+| `<language>/<course>/<module>.json` | an optional module intro, sessions (each with an optional intro) and exercises | when a session of the module starts |
 
 - The folder name is the course id and the file name is the module id
 - The module ids in `course.json` must match the file names
@@ -114,6 +114,32 @@ A `"quiz"` exercise shows code and the user picks one option. It sits in the sam
 - No score, and no retry inside the exercise. A wrong answer is saved in the `failed` list of its session, and the failed exercises can be retaken (`docs/progress-flow.md`)
 - The rules about options and `answer` are not checked when the module loads, because a panic there would take the app down with its own data. They belong to the content validation (see Open)
 
+## Intro: before a module or a session
+A module and a session can each have an optional `intro`, a few slides that teach a concept before the exercises. It is a field next to `id` and `sessions` (on the module) or next to `id` and `exercises` (on the session), not an exercise: it has no id and never counts in the position of the header, in `done`, in `in_progress` or in `failed`. The screen is `docs/ui/06-intro.md` and the decisions are at the bottom of that file.
+
+```json
+"intro": {
+  "title": "Patterns on values",
+  "slides": [
+    { "text": "A pattern describes the shape of a value.", "code": "match age {\n    Some(n) => println!(\"{n}\"),\n}" },
+    { "text": "A range fits a span of values." }
+  ]
+}
+```
+
+| Field | Where | Meaning |
+|---|---|---|
+| `title` | intro | the concept, shown as the title line of every slide |
+| `slides` | intro | a list of one or more slides, passed with Enter |
+| `text` | slide | markdown, the same subset as the exercise `guide` (paragraphs, **bold**, `inline code`, bullet lists; no headings, tables, images, links or fenced code) |
+| `code` | slide | optional: a read-only snippet shown under the text. The language is the one of the course |
+
+- **When it shows:** on a fresh start, never when a half-finished session is resumed and never on a retake. The module intro shows only at the first exercise of the first session of the module, and then the session intro follows if it has one. Reading an intro saves nothing in the progress file
+- **Slides:** one idea each. The text of a slide is about 8 lines or less once wrapped, because the screen pins the title and scrolls only the text. An intro with more to say uses more slides, and the indicator under the title counts the slides of that intro only
+- **Code width:** the same rule as the quiz: 40 columns or less per line, never over 50, and about 14 lines
+- **Ids:** an intro and its slides have no id, so nothing in progress points at them and they can change freely
+- **Not checked at load:** the fields are (`deny_unknown_fields`, the same as the rest), but the limits above belong to the content validation (see Open)
+
 ## Ids
 - Slugs (`syntax`, `borrow-checker`, `loops`), never array positions
 - An id is never renamed or reused, because progress points at it. This holds for courses, modules, sessions and exercises
@@ -160,5 +186,5 @@ A later import script walks the folders and writes the items. The path of the fo
 ## Open
 - `tier` in `course.json` is a free string, not validated. Check the allowed values (and the possible `expert` tier, see `course-structure.md`) once tiers drive behavior
 - Exercise JSON shape for the types still to come (`fill-blank`, `find-error`); the typing and quiz shapes are above
-- A content validation that runs before shipping (the tiers, the anchors of the notes, the quiz rules: 2 to 4 different options, `answer` inside them, options of about 50 characters). It is a test or script over `content/prod/`, not a check at load. See `docs/todos/03-content-skill.md`, "The validator"
+- A content validation that runs before shipping (the tiers, the anchors of the notes, the quiz rules: 2 to 4 different options, `answer` inside them, options of about 50 characters; the intro slides: 8 lines of text or less, code of 40 columns or less and 14 lines or less). It is a test or script over `content/prod/`, not a check at load. See `docs/todos/03-content-skill.md`, "The validator"
 - Content `version` field, so changed exercises do not invalidate saved progress
