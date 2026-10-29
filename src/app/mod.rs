@@ -4,6 +4,7 @@ mod exercise;
 mod explorer;
 mod home;
 mod input;
+mod intro;
 
 use crate::content::Source;
 pub use crate::progress::ContinueLabel;
@@ -17,6 +18,7 @@ pub use exercise::{Body, EditorView, ExerciseState, Kind, QuizState, Row, Typing
 pub use explorer::{Depth, ExplorerState, ModuleMarks};
 pub use home::{HomeButton, HomeLanguage, HomeState};
 pub use input::{Action, TypingKey, to_action, to_typing_key};
+pub use intro::IntroState;
 
 use ratatui::crossterm::event::KeyEvent;
 
@@ -25,6 +27,7 @@ pub enum Screen {
     Explorer(ExplorerState),
     Exercise(ExerciseState),
     Complete(CompleteState),
+    Intro(IntroState),
 }
 
 pub struct App {
@@ -66,7 +69,7 @@ impl App {
     pub fn animating(&self) -> bool {
         matches!(
             self.screen,
-            Screen::Home(_) | Screen::Explorer(_) | Screen::Complete(_)
+            Screen::Home(_) | Screen::Explorer(_) | Screen::Complete(_) | Screen::Intro(_)
         )
     }
 
@@ -117,6 +120,8 @@ impl App {
             Screen::Exercise(_) => unreachable!("exercise keys are handled above"),
             // Handle Complete Navigation
             Screen::Complete(state) => state.handle_key(action, &self.content, &mut self.progress),
+            // Handle Intro Navigation
+            Screen::Intro(state) => state.handle_key(action, &self.content),
         };
 
         if let Some(screen) = next {

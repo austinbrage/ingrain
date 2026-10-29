@@ -5,7 +5,7 @@ pub use quiz::QuizState;
 pub use typing::{EditorView, Kind, Row, TypingState};
 
 use super::content::Content;
-use super::{Action, CompleteState, ExerciseDone, ExplorerState, Screen, TypingKey};
+use super::{Action, CompleteState, ExerciseDone, ExplorerState, IntroState, Screen, TypingKey};
 use crate::content::{Exercise, Module};
 use crate::progress::Progress;
 
@@ -42,18 +42,46 @@ impl ExerciseState {
         Self::remember_course(explorer, content, progress);
 
         let retake = progress.is_retake(&path, &module.sessions[session].id);
+
+        if IntroState::applies(&module, session, exercise, retake) {
+            return Some(Screen::Intro(IntroState::new(explorer, module, session)));
+        }
+
         let next_failed = if retake {
             progress.next_failed_exercise(&path, &module, session, exercise)
         } else {
             None
         };
 
+        Some(Self::build(
+            explorer,
+            module,
+            session,
+            exercise,
+            retake,
+            next_failed,
+        ))
+    }
+
+    // The first exercise of a session once its intros are read, which is never a retake
+    pub fn start(explorer: ExplorerState, module: Module, session: usize) -> Screen {
+        Self::build(explorer, module, session, 0, false, None)
+    }
+
+    fn build(
+        explorer: ExplorerState,
+        module: Module,
+        session: usize,
+        exercise: usize,
+        retake: bool,
+        next_failed: Option<usize>,
+    ) -> Screen {
         let body = match &module.sessions[session].exercises[exercise] {
             Exercise::Typing(typing) => Body::Typing(TypingState::new(typing)),
             Exercise::Quiz(_) => Body::Quiz(QuizState::default()),
         };
 
-        Some(Screen::Exercise(Self {
+        Screen::Exercise(Self {
             explorer,
             module,
             session,
@@ -61,7 +89,7 @@ impl ExerciseState {
             retake,
             next_failed,
             body,
-        }))
+        })
     }
 
     pub fn session_count(&self) -> usize {

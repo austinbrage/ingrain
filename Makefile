@@ -1,4 +1,4 @@
-.PHONY: dev dev\:watch dev\:fresh test complete-exercise complete-exercise\:watch complete-exercise-long complete-exercise-long\:watch complete-session complete-session\:watch complete-module complete-module\:watch complete-module-failed complete-module-failed\:watch exercise exercise\:watch
+.PHONY: dev dev\:watch dev\:fresh test complete-exercise complete-exercise\:watch complete-exercise-long complete-exercise-long\:watch complete-session complete-session\:watch complete-module complete-module\:watch complete-module-failed complete-module-failed\:watch exercise exercise\:watch intro intro\:watch
 
 dev:
 	@cargo run -q
@@ -48,3 +48,9 @@ exercise:
 
 exercise\:watch:
 	@exec watchexec -r -c -e rs -- cargo run -q -- exercise $(path)
+
+intro:
+	@cargo run -q -- intro
+
+intro\:watch:
+	@exec watchexec -r -c -e rs -- cargo run -q -- intro

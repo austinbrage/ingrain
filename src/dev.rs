@@ -1,8 +1,8 @@
 use crate::app::{
     App, Body, CompleteState, Depth, DoneRow, ExerciseDone, ExerciseState, ExplorerState,
-    HomeLanguage, ModuleDone, ModuleFailed, Screen, SessionDone, SessionRow,
+    HomeLanguage, IntroState, ModuleDone, ModuleFailed, Screen, SessionDone, SessionRow,
 };
-use crate::content::{Exercise, Mode, Output};
+use crate::content::{Exercise, Intro, Mode, Module, Output, Session, Slide};
 
 pub fn start_at(app: &mut App, screen: &str, target: Option<&str>) {
     let mut explorer = ExplorerState::new(HomeLanguage::Rust);
@@ -123,8 +123,80 @@ pub fn start_at(app: &mut App, screen: &str, target: Option<&str>) {
                 ],
             }));
         }
+        // An intro of two slides: a short one, and one whose text overflows next to its snippet
+        "intro" => {
+            let shape = "match value {\n    pattern_a => do_this,\n    pattern_b => do_that,\n    _ => do_otherwise,\n}";
+            let patterns = [
+                "`1`, `'a'`, `true`: a literal fits only itself",
+                "`n`: a name fits anything and binds it",
+                "`_`: fits anything and binds nothing",
+                "`0..=9`: a range fits the values between its ends",
+                "`10..`: an open range fits everything from 10 up",
+                "`1 | 2 | 3`: an alternative fits any of its patterns",
+                "`(x, y)`: a tuple fits a pair and names both",
+                "`(x, _)`: a tuple can ignore one of its parts",
+                "`[a, b, c]`: an array fits exactly three items",
+                "`[first, .., last]`: a slice fits any list and names its ends",
+                "`[head, tail @ ..]`: a slice can name the rest as well",
+                "`None`: a variant with no data fits itself",
+                "`Some(n)`: a variant with data fits and names its content",
+                "`Ok(Some(n))`: variants nest as deep as the type does",
+                "`Point { x, y }`: a struct fits and names its fields",
+                "`Point { x: px, .. }`: a field can be renamed and the rest ignored",
+                "`&n`: a reference fits and names what it points to",
+                "`n @ 1..=9`: a name and a range together",
+                "`Light::Green`: a path fits one variant of an enum",
+                "`n if n > 5`: a guard adds a condition to any arm",
+                "`[]`: an empty slice fits only an empty list",
+                "`[_]`: a slice of one item, whatever it is",
+                "`'a'..='z'`: a range works on chars too",
+                "`1..=5 | 10..=15`: alternatives can be ranges",
+                "`(0, y) | (y, 0)`: alternatives can bind the same name",
+                "`Shape::Circle { r }`: a variant can have named fields",
+                "`x @ Some(_)`: a name can bind the whole value while it is checked inside",
+                "`\"yes\"`: a string literal fits only that text",
+            ];
+            let list = patterns.map(|pattern| format!("- {pattern}")).join("\n\n");
+            let slides = vec![
+                slide(
+                    "A `match` compares a value against **patterns**, from the first arm to the last.\n\nThe first arm that fits runs.",
+                    Some(shape),
+                ),
+                slide(
+                    &list,
+                    Some("if let Some(n) = value {\n    println!(\"{n}\");\n}"),
+                ),
+            ];
+
+            app.screen = intro(explorer, slides);
+        }
         _ => {}
     }
+}
+
+fn slide(text: &str, code: Option<&str>) -> Slide {
+    Slide {
+        text: text.to_string(),
+        code: code.map(str::to_string),
+    }
+}
+
+// A module of one session whose intro is the slides
+fn intro(explorer: ExplorerState, slides: Vec<Slide>) -> Screen {
+    let module = Module {
+        id: "dev".to_string(),
+        intro: Some(Intro {
+            title: "The match expression".to_string(),
+            slides,
+        }),
+        sessions: vec![Session {
+            id: "session-1".to_string(),
+            intro: None,
+            exercises: vec![],
+        }],
+    };
+
+    Screen::Intro(IntroState::new(explorer, module, 0))
 }
 
 // Ids of an exercise (language/course/module[/session[/exercise[/chunk]]]) as positions

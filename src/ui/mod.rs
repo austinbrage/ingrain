@@ -3,6 +3,7 @@ pub mod complete;
 pub mod exercise;
 pub mod explorer;
 pub mod home;
+pub mod intro;
 mod wave;
 
 use crate::app::{App, HomeState, Screen};
@@ -28,5 +29,16 @@ pub fn draw(frame: &mut Frame, app: &App) {
             exercise::exercise(frame, app.content.breadcrumb(state.explorer), state)
         }
         Screen::Complete(ref state) => complete::complete(frame, &app.content, state, app.tick),
+        Screen::Intro(ref state) => {
+            let language = &app.content.catalog(state.explorer.language).name;
+
+            intro::intro(
+                frame,
+                app.content.breadcrumb(state.explorer),
+                state,
+                language,
+                app.tick,
+            )
+        }
     }
 }
