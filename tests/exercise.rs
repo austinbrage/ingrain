@@ -180,6 +180,171 @@ mod auto {
     }
 }
 
+mod finish {
+    use super::*;
+
+    fn long_exercise() -> TestApp {
+        let mut app = TestApp::with_progress("rust-alone-done");
+        app.press(KeyCode::Enter); // Continue opens Long, the next module of Second
+
+        app
+    }
+
+    // One use of the shortcut, waiting for the animation to end
+    fn finish_chunk(app: &mut TestApp) {
+        app.press_ctrl('f');
+        app.wait(40);
+    }
+
+    #[test]
+    fn ctrl_f_types_the_rest_of_the_chunk_and_drops_a_wrong_tail_first() {
+        let mut app = many_exercise();
+        assert!(
+            app.screen()
+                .has_row(&["Ctrl-F finish", "Esc back", "Ctrl-Q quit"])
+        );
+
+        app.type_chunk("fn ma");
+        app.press(KeyCode::Char('x')); // a wrong key, which blocks typing
+        app.press_ctrl('f');
+        app.wait(40); // the animation types it
+        let screen = app.screen();
+        assert!(screen.has_row(&["[▓▓▓▓▓▓░░░░░░]", "1/2 chunks"])); // the first chunk is done
+        assert!(screen.has_rows_in_order(&["fn main() {", "let a = 1;", "}"]));
+        assert!(!screen.contains("fn max"));
+        assert!(!screen.contains("expected"));
+
+        app.press_ctrl('f'); // the last chunk finishes the exercise
+        app.wait(40);
+        let screen = app.screen();
+        assert!(screen.contains("Next: Exercise 2 of 2"));
+        assert!(screen.has_row(&["2      let a = 1;"]));
+        assert!(!app.saved_progress().modules.is_empty()); // passed, as when typed
+    }
+
+    #[test]
+    fn ctrl_f_types_a_char_per_tick_and_a_key_interrupts_it_where_it_reached() {
+        let mut app = many_exercise();
+
+        app.press_ctrl('f');
+        assert!(app.screen().has_row(&["Rust", "Ln 1, Col 1"])); // nothing is typed yet
+
+        app.wait(3);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust", "Ln 1, Col 4"])); // a char per tick
+        assert!(screen.contains("0/2 chunks"));
+
+        app.press(KeyCode::Char('x')); // interrupts it, and is not typed
+        app.wait(40);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust", "Ln 1, Col 4"])); // it stays where it reached
+        assert!(screen.contains("0/2 chunks"));
+        assert!(!screen.contains("expected"));
+
+        app.type_chunk("main() {\n}"); // the user goes on by hand
+        assert!(app.screen().contains("1/2 chunks"));
+
+        let mut app = many_exercise();
+        app.press_ctrl('f');
+        app.press(KeyCode::Esc); // keeps its usual meaning
+        assert!(app.screen().has_row(&["Ingrain", "Rust › Core › Basics"]));
+    }
+
+    #[test]
+    fn a_long_chunk_takes_about_two_seconds_at_most() {
+        let mut app = TestApp::with_progress("rust-alone-done");
+        app.press(KeyCode::Enter); // Continue opens Long, the next module of Second
+        app.type_chunk("fn main() {\n}");
+        assert!(app.screen().contains("1/4 chunks"));
+
+        app.press_ctrl('f'); // the second chunk has 95 chars
+        app.wait(10);
+        assert!(app.screen().contains("1/4 chunks")); // still typing
+
+        app.wait(30); // 40 ticks in all, that is 2 seconds
+        assert!(app.screen().contains("2/4 chunks"));
+    }
+
+    #[test]
+    fn the_fourth_use_in_a_row_shows_the_modal_before_typing_and_the_answer_decides() {
+        let mut app = long_exercise();
+        for _ in 0..3 {
+            finish_chunk(&mut app);
+        }
+        assert!(app.screen().contains("3/4 chunks"));
+        assert!(!app.screen().contains("Finish it?"));
+
+        app.press_ctrl('f'); // the fourth use shows the modal
+        let screen = app.screen();
+        assert!(screen.contains("Finish it?"));
+        assert!(screen.contains("Typing is what makes it stick."));
+        app.wait(40);
+        assert!(app.screen().contains("3/4 chunks")); // nothing types until the user answers
+
+        app.press(KeyCode::Char('x')); // the typing keys do nothing meanwhile
+        let screen = app.screen();
+        assert!(screen.contains("Finish it?"));
+        assert!(!screen.contains("expected"));
+
+        app.press(KeyCode::Esc); // I'll type it
+        let screen = app.screen();
+        assert!(!screen.contains("Finish it?"));
+        assert!(screen.has_row(&["Rust · Second · Long"])); // still in the exercise
+        assert!(screen.contains("3/4 chunks")); // at the same chunk
+
+        let mut app = long_exercise();
+        for _ in 0..3 {
+            finish_chunk(&mut app);
+        }
+        app.press_ctrl('f');
+        app.press(KeyCode::Enter); // finish it
+        app.wait(40);
+        let screen = app.screen();
+        assert!(!screen.contains("Finish it?"));
+        assert!(!screen.contains("3/4 chunks")); // the last chunk ended the exercise
+    }
+
+    #[test]
+    fn the_modal_shows_again_after_more_uses() {
+        let mut app = long_exercise();
+        for _ in 0..3 {
+            finish_chunk(&mut app); // uses 1 to 3
+        }
+        app.press_ctrl('f'); // use 4 shows the modal
+        app.press(KeyCode::Esc);
+        app.press(KeyCode::Esc); // back to the explorer
+
+        app.press(KeyCode::Enter); // opens the exercise again, at its first chunk
+        for _ in 0..3 {
+            finish_chunk(&mut app); // uses 5 to 7
+        }
+        assert!(!app.screen().contains("Finish it?"));
+        app.press(KeyCode::Esc);
+
+        app.press(KeyCode::Enter);
+        finish_chunk(&mut app); // use 8
+        assert!(!app.screen().contains("Finish it?"));
+        app.press_ctrl('f'); // use 9 shows the modal again
+        assert!(app.screen().contains("Finish it?"));
+    }
+
+    #[test]
+    fn a_chunk_typed_by_hand_starts_the_count_over() {
+        let mut app = long_exercise();
+        for _ in 0..3 {
+            finish_chunk(&mut app); // uses 1 to 3
+        }
+        app.press(KeyCode::Esc);
+        app.press(KeyCode::Enter); // opens the exercise again
+
+        app.type_chunk("fn main() {\n}"); // by hand
+        finish_chunk(&mut app); // the fourth use without it
+        let screen = app.screen();
+        assert!(!screen.contains("Finish it?"));
+        assert!(screen.contains("2/4 chunks"));
+    }
+}
+
 mod copy {
     use super::*;
 
@@ -480,6 +645,16 @@ mod quiz {
         app.press(KeyCode::Enter); // opens its first exercise
 
         app
+    }
+
+    #[test]
+    fn a_quiz_has_no_finish_shortcut() {
+        let mut app = quiz_exercise();
+        let before = app.screen().text();
+        assert!(!before.contains("Ctrl-F"));
+
+        app.press_ctrl('f');
+        assert_eq!(app.screen().text(), before);
     }
 
     #[test]
