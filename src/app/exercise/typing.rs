@@ -143,6 +143,40 @@ impl TypingState {
         self.typed.pop();
     }
 
+    // Goes back to the last chunk the user typed before this one: what is typed of this chunk is
+    // dropped, every chunk from there on comes out of the file, and that chunk comes back
+    // without its last char
+    pub fn go_back(&mut self, typing: &Typing) {
+        let Some(target) = self.previous_typed(typing) else {
+            return;
+        };
+
+        // The latest first, so each chunk comes out of the file just as it went in
+        for chunk in typing.chunks[target..self.chunk].iter().rev() {
+            let at = chunk.line - 1;
+            let lines = chunk.text.split('\n').count();
+
+            self.file.drain(at..at + lines);
+        }
+
+        self.chunk = target;
+        self.typed = typing.chunks[target].text.clone();
+        self.typed.pop();
+        self.indent(typing);
+    }
+
+    // Whether there is a chunk before this one to go back to
+    pub fn can_go_back(&self, typing: &Typing) -> bool {
+        self.previous_typed(typing).is_some()
+    }
+
+    // The last chunk before this one that the user types, so not an `auto` one
+    fn previous_typed(&self, typing: &Typing) -> Option<usize> {
+        typing.chunks[..self.chunk]
+            .iter()
+            .rposition(|chunk| !matches!(chunk.mode, Mode::Auto))
+    }
+
     // Starts typing the rest of the chunk, a few chars on each tick. A wrong tail goes first
     pub fn start_autotype(&mut self, typing: &Typing) {
         let Some(chunk) = self.current(typing) else {

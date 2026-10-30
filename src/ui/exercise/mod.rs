@@ -17,6 +17,7 @@ use ratatui::{
 };
 
 const HINT: &str = "Ctrl-F finish   Esc back   Ctrl-Q quit ";
+const PREVIOUS_HINT: &str = "Ctrl-P previous   Ctrl-F finish   Esc back   Ctrl-Q quit ";
 const CHOOSE_HINT: &str = "↑↓ choose   Enter check   Esc back   Ctrl-Q quit ";
 const ANSWERED_HINT: &str = "Enter continue   Esc back   Ctrl-Q quit ";
 const BAR_WIDTH: usize = 12; // Cells of the chunk bar in the footer
@@ -62,8 +63,13 @@ pub fn exercise(frame: &mut Frame, breadcrumb: String, state: &ExerciseState) {
             render_typing(frame, body, language, typing_state, typing);
 
             let bar = bar(typing_state.chunk, typing.chunks.len(), "chunks");
+            let hint = if typing_state.can_go_back(typing) {
+                PREVIOUS_HINT
+            } else {
+                HINT
+            };
 
-            (bar, HINT)
+            (bar, hint)
         }
         (Exercise::Quiz(quiz), Body::Quiz(quiz_state)) => {
             render_quiz(frame, body, language, quiz_state, quiz);

@@ -18,6 +18,7 @@ pub enum TypingKey {
     Tab,
     Backspace,
     Finish,
+    Previous,
     Back,
 }
 
@@ -41,6 +42,7 @@ pub fn to_typing_key(key: KeyEvent) -> Option<TypingKey> {
 
     match key.code {
         KeyCode::Char('f') if ctrl => Some(TypingKey::Finish),
+        KeyCode::Char('p') if ctrl => Some(TypingKey::Previous),
         KeyCode::Char(c) if !ctrl => Some(TypingKey::Char(c)),
         KeyCode::Enter => Some(TypingKey::Enter),
         KeyCode::Tab => Some(TypingKey::Tab),

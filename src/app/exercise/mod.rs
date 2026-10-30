@@ -161,6 +161,7 @@ impl ExerciseState {
             // While the shortcut types, any other key stops it where it reached and is not typed
             _ if typing_state.autotype.is_some() => typing_state.autotype = None,
             TypingKey::Backspace => typing_state.backspace(),
+            TypingKey::Previous => typing_state.go_back(typing),
             TypingKey::Finish => {
                 shortcut_uses.add();
                 if shortcut_uses.shows_modal() {
