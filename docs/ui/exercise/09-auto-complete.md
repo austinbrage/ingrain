@@ -5,7 +5,7 @@ Status: Approved
 A shortcut for the moment the user is tired of typing: `Ctrl-F` types the rest of the current chunk by itself, character by character, as if the user had typed it. It is on the typing exercise only (a quiz has no chunks), and it is listed in the footer. After a few uses in a row, a small modal reminds the user that typing is the point and asks whether to finish it anyway. It is built (2026-10-30): `app/exercise/typing.rs` (`Autotype`, `ShortcutUses`), `app/exercise/mod.rs` (the keys, `tick`) and `ui/exercise/typing/finish_modal.rs`. The decisions are at the bottom of this file. The drawings are at 100 columns and cannot show colors or motion; they are below, on top of the look of `03-ghost-wide.md`.
 
 ## The footer
-`Ctrl-F finish` joins the hints on the right, before `Esc back`. It is plain text like the other hints. A quiz footer does not have it.
+`Ctrl-F finish` joins the hints on the right, before `Esc back`. It is plain text like the other hints. A quiz footer does not have it. From the second chunk on, `Ctrl-P previous` goes before it (see "Going back" in `03-ghost-wide.md`), and the sketch below is a first chunk, so it does not show it.
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
