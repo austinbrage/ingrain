@@ -345,6 +345,91 @@ mod finish {
     }
 }
 
+mod previous {
+    use super::*;
+
+    #[test]
+    fn the_footer_lists_ctrl_p_only_when_there_is_a_chunk_to_go_back_to() {
+        let mut app = many_exercise();
+        assert!(!app.screen().contains("Ctrl-P previous")); // the first chunk has none before it
+
+        app.type_chunk("fn main() {\n}");
+        let screen = app.screen();
+        assert!(screen.has_row(&[
+            "Ctrl-P previous",
+            "Ctrl-F finish",
+            "Esc back",
+            "Ctrl-Q quit"
+        ]));
+
+        app.press_ctrl('p'); // back at the first chunk
+        assert!(!app.screen().contains("Ctrl-P previous"));
+
+        let mut app = TestApp::with_progress("rust-many-session-1-done");
+        app.press(KeyCode::Enter); // Continue opens session 2, whose chunk before the first is auto
+        assert!(!app.screen().contains("Ctrl-P previous"));
+
+        app.type_chunk("fn main() {\n}");
+        assert!(app.screen().contains("Ctrl-P previous"));
+    }
+
+    #[test]
+    fn ctrl_p_brings_the_previous_chunk_back_without_its_last_char() {
+        let mut app = many_exercise();
+        app.type_chunk("fn main() {\n}");
+        assert!(app.screen().has_row(&["[▓▓▓▓▓▓░░░░░░]", "1/2 chunks"])); // the first chunk is finished
+        app.type_chunk("let a"); // part of the second chunk
+
+        app.press_ctrl('p');
+        let screen = app.screen();
+        assert!(screen.has_row(&["[░░░░░░░░░░░░]", "0/2 chunks"]));
+        assert!(screen.contains("Start with main.")); // its guide is back
+        assert!(!screen.contains("let names a value."));
+        assert!(screen.has_row(&["╰─ ", "main is where the program starts."])); // and its note
+        assert!(screen.has_row(&["Rust", "Ln 2, Col 1"])); // the cursor is at its last char
+        assert!(!screen.contains("let a")); // what was typed of the second chunk is gone
+
+        app.press(KeyCode::Char('}')); // typing that char finishes the chunk again
+        let screen = app.screen();
+        assert!(screen.has_row(&["[▓▓▓▓▓▓░░░░░░]", "1/2 chunks"]));
+        assert!(screen.contains("let names a value."));
+    }
+
+    #[test]
+    fn ctrl_p_does_nothing_on_the_first_chunk() {
+        let mut app = many_exercise();
+        app.type_chunk("fn ma");
+
+        app.press_ctrl('p');
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust", "Ln 1, Col 6"])); // what was typed stays
+        assert!(screen.contains("0/2 chunks"));
+    }
+
+    // The app writes the `auto` chunks by itself. The one written after the chunk we go back to
+    // must come out of the file too, or it would be there twice when the chunk is finished again
+    #[test]
+    fn ctrl_p_skips_an_auto_chunk_and_takes_it_out_of_the_file() {
+        let mut app = TestApp::with_progress("rust-many-session-1-done");
+        app.press(KeyCode::Enter); // Continue opens session 2
+        app.type_chunk("fn main() {\n}"); // the auto chunk after it appears
+        assert!(app.screen().contains("println!(\"hi\");"));
+
+        app.press_ctrl('p');
+        let screen = app.screen();
+        assert!(screen.contains("use std::io;")); // the auto chunk before it stays
+        assert!(!screen.contains("println!")); // the one after it goes
+        assert!(screen.contains("Start with main."));
+        assert!(screen.has_row(&["[▓▓▓░░░░░░░░░]", "1/4 chunks"]));
+        assert!(screen.has_row(&["Rust", "Ln 3, Col 1"]));
+
+        app.press(KeyCode::Char('}')); // finishing the chunk again brings the auto chunk back
+        let screen = app.screen();
+        assert!(screen.contains("println!(\"hi\");"));
+        assert!(screen.has_row(&["[▓▓▓▓▓▓▓▓▓░░░]", "3/4 chunks"]));
+    }
+}
+
 mod copy {
     use super::*;
 
