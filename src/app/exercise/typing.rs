@@ -1,10 +1,43 @@
 use crate::content::{Chunk, Mode, Note, Typing};
 
+// The most ticks the shortcut takes to type the rest of a chunk: 2 seconds
+const AUTOTYPE_TICKS: usize = 40;
+
+// How many times in a row the shortcut was used. The modal shows at the 4th use, then at the
+// 9th, the 16th...: the perfect squares from 4 up
+#[derive(Default)]
+pub struct ShortcutUses(usize);
+
+impl ShortcutUses {
+    pub fn add(&mut self) {
+        self.0 += 1;
+    }
+
+    pub fn shows_modal(&self) -> bool {
+        self.0 >= 4 && self.0.isqrt().pow(2) == self.0
+    }
+
+    // A chunk typed by hand starts the count over
+    pub fn reset(&mut self) {
+        *self = Self::default();
+    }
+}
+
 // Progress: the current chunk, what was typed of it (auto-indent included), the finished file
 pub struct TypingState {
     pub chunk: usize,
     pub typed: String,
     pub file: Vec<String>,
+    pub autotype: Option<Autotype>,
+    // The modal is open and takes the keys until it is answered
+    pub modal_open: bool,
+}
+
+// The shortcut is typing the rest of a chunk: which one, and how many chars it types per tick
+#[derive(Clone, Copy)]
+pub struct Autotype {
+    pub chunk: usize,
+    pub per_tick: usize,
 }
 
 // What a piece is: typed right, wrong key, cursor (next char) or ghost (not typed yet)
@@ -46,6 +79,8 @@ impl TypingState {
             chunk: 0,
             typed: String::new(),
             file: Vec::new(),
+            autotype: None,
+            modal_open: false,
         };
 
         state.skip_auto(typing);
@@ -106,6 +141,56 @@ impl TypingState {
 
     pub fn backspace(&mut self) {
         self.typed.pop();
+    }
+
+    // Starts typing the rest of the chunk, a few chars on each tick. A wrong tail goes first
+    pub fn start_autotype(&mut self, typing: &Typing) {
+        let Some(chunk) = self.current(typing) else {
+            return;
+        };
+
+        // Back to the last right char: next_at is the first wrong char, or the typed length
+        self.typed = self.typed.chars().take(self.next_at(chunk)).collect();
+        self.indent(typing);
+
+        let remaining = chunk.text.chars().count() - self.typed.chars().count();
+        self.autotype = Some(Autotype {
+            chunk: self.chunk,
+            // One char per tick, or more when the rest would take over 40 ticks
+            per_tick: remaining.div_ceil(AUTOTYPE_TICKS).max(1),
+        });
+    }
+
+    // One tick of the shortcut: types its chars, and stops when the chunk is finished
+    pub fn tick_autotype(&mut self, typing: &Typing) {
+        let Some(autotype) = self.autotype else {
+            return;
+        };
+
+        for _ in 0..autotype.per_tick {
+            // The last char finishes the chunk and moves `chunk` on, so stop there
+            if self.chunk != autotype.chunk {
+                break;
+            }
+            self.type_next(typing);
+        }
+
+        // The chunk is done, so the shortcut is done with it
+        if self.chunk != autotype.chunk {
+            self.autotype = None;
+        }
+    }
+
+    // Types the char the chunk expects next, as the user would
+    fn type_next(&mut self, typing: &Typing) {
+        let Some(chunk) = self.current(typing) else {
+            return;
+        };
+
+        // `typed` already holds the indentation `type_char` fills, so its length is the next char
+        if let Some(c) = chunk.text.chars().nth(self.typed.chars().count()) {
+            self.type_char(typing, c);
+        }
     }
 
     // Fill the indentation at a line start, as if typed

@@ -14,7 +14,9 @@ pub use content::Content;
 pub use complete::{
     CompleteState, DoneRow, ExerciseDone, ModuleDone, ModuleFailed, Next, SessionDone, SessionRow,
 };
-pub use exercise::{Body, EditorView, ExerciseState, Kind, QuizState, Row, TypingState};
+pub use exercise::{
+    Body, EditorView, ExerciseState, Kind, QuizState, Row, ShortcutUses, TypingState,
+};
 pub use explorer::{Depth, ExplorerState, ModuleMarks};
 pub use home::{HomeButton, HomeLanguage, HomeState};
 pub use input::{Action, TypingKey, to_action, to_typing_key};
@@ -36,6 +38,8 @@ pub struct App {
     pub quit: bool,
     pub progress: Progress,
     pub content: Content,
+    // The uses of the shortcut in a row, which outlive each exercise
+    pub shortcut_uses: ShortcutUses,
 }
 
 impl App {
@@ -59,6 +63,7 @@ impl App {
             quit: false,
             progress,
             content,
+            shortcut_uses: ShortcutUses::default(),
         }
     }
 
@@ -67,14 +72,22 @@ impl App {
     // ------------------------------------------------------------
 
     pub fn animating(&self) -> bool {
-        matches!(
-            self.screen,
-            Screen::Home(_) | Screen::Explorer(_) | Screen::Complete(_) | Screen::Intro(_)
-        )
+        match &self.screen {
+            Screen::Home(_) | Screen::Explorer(_) | Screen::Complete(_) | Screen::Intro(_) => true,
+            // Only while the shortcut types, so an idle exercise does not redraw
+            Screen::Exercise(state) => state.autotyping(),
+        }
     }
 
     pub fn tick(&mut self) {
         self.tick += 1;
+
+        // The shortcut types on the tick, and the last char of an exercise opens its complete screen
+        if let Screen::Exercise(state) = &mut self.screen
+            && let Some(screen) = state.tick(&self.content, &mut self.progress)
+        {
+            self.go_to(screen);
+        }
     }
 
     // ------------------------------------------------------------
@@ -93,7 +106,12 @@ impl App {
         if let Screen::Exercise(state) = &mut self.screen {
             let next = match state.body {
                 Body::Typing(_) => to_typing_key(key).and_then(|typing_key| {
-                    state.handle_typing_key(typing_key, &self.content, &mut self.progress)
+                    state.handle_typing_key(
+                        typing_key,
+                        &self.content,
+                        &mut self.progress,
+                        &mut self.shortcut_uses,
+                    )
                 }),
                 Body::Quiz(_) => action.and_then(|action| {
                     state.handle_quiz_action(action, &self.content, &mut self.progress)

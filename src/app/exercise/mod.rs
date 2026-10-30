@@ -2,7 +2,7 @@ mod quiz;
 mod typing;
 
 pub use quiz::QuizState;
-pub use typing::{EditorView, Kind, Row, TypingState};
+pub use typing::{EditorView, Kind, Row, ShortcutUses, TypingState};
 
 use super::content::Content;
 use super::{Action, CompleteState, ExerciseDone, ExplorerState, IntroState, Screen, TypingKey};
@@ -130,6 +130,7 @@ impl ExerciseState {
         key: TypingKey,
         content: &Content,
         progress: &mut Progress,
+        shortcut_uses: &mut ShortcutUses,
     ) -> Option<Screen> {
         let (Exercise::Typing(typing), Body::Typing(typing_state)) = (
             &self.module.sessions[self.session].exercises[self.exercise],
@@ -138,9 +139,36 @@ impl ExerciseState {
             return None;
         };
 
+        // The modal takes the keys: Enter finishes the chunk, Esc leaves it to the user
+        if typing_state.modal_open {
+            match key {
+                TypingKey::Enter => {
+                    typing_state.modal_open = false;
+                    typing_state.start_autotype(typing);
+                }
+                TypingKey::Back => typing_state.modal_open = false,
+                _ => {}
+            }
+            return None;
+        }
+
+        // A chunk finished with the keys, and not with the shortcut, starts the count over
+        let by_hand = typing_state.autotype.is_none() && key != TypingKey::Finish;
+        let chunk = typing_state.chunk;
+
         match key {
             TypingKey::Back => return Some(Screen::Explorer(self.explorer)),
+            // While the shortcut types, any other key stops it where it reached and is not typed
+            _ if typing_state.autotype.is_some() => typing_state.autotype = None,
             TypingKey::Backspace => typing_state.backspace(),
+            TypingKey::Finish => {
+                shortcut_uses.add();
+                if shortcut_uses.shows_modal() {
+                    typing_state.modal_open = true;
+                } else {
+                    typing_state.start_autotype(typing);
+                }
+            }
             TypingKey::Enter => typing_state.type_char(typing, '\n'),
             TypingKey::Tab => {
                 for _ in 0..4 {
@@ -150,14 +178,51 @@ impl ExerciseState {
             TypingKey::Char(c) => typing_state.type_char(typing, c),
         }
 
-        if typing_state.current(typing).is_none() {
-            let code = typing_state.file.clone();
-            let complete = CompleteState::Exercise(ExerciseDone::new(self, typing, code));
-            self.record_completion(content, progress, true);
-            return Some(Screen::Complete(complete));
+        if by_hand && typing_state.chunk > chunk {
+            shortcut_uses.reset();
         }
 
-        None
+        self.complete_if_finished(content, progress)
+    }
+
+    // One tick of the shortcut, which may type the last char of the exercise
+    pub fn tick(&mut self, content: &Content, progress: &mut Progress) -> Option<Screen> {
+        if let (Exercise::Typing(typing), Body::Typing(typing_state)) = (
+            &self.module.sessions[self.session].exercises[self.exercise],
+            &mut self.body,
+        ) {
+            typing_state.tick_autotype(typing);
+        }
+
+        self.complete_if_finished(content, progress)
+    }
+
+    // Whether the shortcut is typing, so the screen needs the tick
+    pub fn autotyping(&self) -> bool {
+        matches!(&self.body, Body::Typing(typing_state) if typing_state.autotype.is_some())
+    }
+
+    // The complete screen when the last chunk of a typing exercise is done
+    fn complete_if_finished(
+        &mut self,
+        content: &Content,
+        progress: &mut Progress,
+    ) -> Option<Screen> {
+        let (Exercise::Typing(typing), Body::Typing(typing_state)) = (
+            &self.module.sessions[self.session].exercises[self.exercise],
+            &self.body,
+        ) else {
+            return None;
+        };
+
+        if typing_state.current(typing).is_some() {
+            return None;
+        }
+
+        let code = typing_state.file.clone();
+        let complete = CompleteState::Exercise(ExerciseDone::new(self, typing, code));
+        self.record_completion(content, progress, true);
+        Some(Screen::Complete(complete))
     }
 
     // Actions: a quiz moves with Up and Down, Enter checks the option and then goes on

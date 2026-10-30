@@ -1,10 +1,13 @@
 mod editor;
+mod finish_modal;
 mod guide;
 
 use crate::app::TypingState;
 use crate::content::Typing;
 use editor::render_editor;
 use guide::render_guide;
+
+pub use finish_modal::render_finish_modal;
 
 use ratatui::{
     Frame,

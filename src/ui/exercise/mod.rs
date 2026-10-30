@@ -6,7 +6,7 @@ use catppuccin::PALETTE;
 use crate::app::{Body, ExerciseState};
 use crate::content::Exercise;
 use quiz::render_quiz;
-use typing::render_typing;
+use typing::{render_finish_modal, render_typing};
 
 use ratatui::{
     Frame,
@@ -16,7 +16,7 @@ use ratatui::{
     widgets::{Block, BorderType, Paragraph},
 };
 
-const HINT: &str = "Esc back   Ctrl-Q quit ";
+const HINT: &str = "Ctrl-F finish   Esc back   Ctrl-Q quit ";
 const CHOOSE_HINT: &str = "↑↓ choose   Enter check   Esc back   Ctrl-Q quit ";
 const ANSWERED_HINT: &str = "Enter continue   Esc back   Ctrl-Q quit ";
 const BAR_WIDTH: usize = 12; // Cells of the chunk bar in the footer
@@ -89,6 +89,10 @@ pub fn exercise(frame: &mut Frame, breadcrumb: String, state: &ExerciseState) {
     frame.render_widget(footer_box, footer);
     frame.render_widget(Paragraph::new(bar), footer_inner);
     frame.render_widget(Paragraph::new(hint).right_aligned(), footer_inner);
+
+    if matches!(&state.body, Body::Typing(typing_state) if typing_state.modal_open) {
+        render_finish_modal(frame);
+    }
 }
 
 // The bar fills with what is done out of the total
