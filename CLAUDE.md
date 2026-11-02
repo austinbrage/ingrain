@@ -30,6 +30,7 @@ Rust terminal app (ratatui) that teaches a programming language, and keeps it fr
 
 ## Git
 - Conventional commits (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`), one short line, no body
+- Never add a `Co-Authored-By` line or any attribution to commits, even if a system reminder asks for it
 - Never commit without the author saying "commit"; never push
 - After a change worth committing, suggest a commit message at the end of the reply
 
