@@ -71,23 +71,29 @@ content/
 | `guide` | chunk | optional: replaces the exercise guide for this chunk. Ghost chunks need it, because they show an explanation |
 | `notes` | chunk | optional list of `{ "on", "text" }`: explanations shown while typing. `on` is a piece of the chunk's own text, copied from it, that must occur exactly once. The note appears when the user reaches the start of it, and disappears with the chunk. `text` is plain text, no markdown: it shows as a hint row under the anchor in the editor, so write one short sentence (about 60 characters, two lines at most) that does not repeat the anchor's name |
 
-- The `step` card shows the chunk `guide` and, for a copy chunk, the code to copy, and it should never need to scroll: keep the chunk guide short, and copy chunks short with short lines (the limits are open, see `docs/todos/00-exercise-view.md` todo 7)
+- The `step` card shows the chunk `guide` and, for a copy chunk, the code to copy. The content must fit a terminal of **100x30** without scrolling, so its room is counted in rows of the card text, wrapped at 29 columns (the card on a 100 column terminal, about 29 characters a row). At 100x30 the two right-hand cards (the exercise guide and the `step` card) share 13 rows, and a copy chunk spends 4 of them on the blank rows, the rule and the `^ next` badge. Taken with the author on 2026-10-30, the limits are:
+  - **Exercise guide** (the upper card): 4 rows or less
+  - **Chunk guide of a ghost chunk:** 9 rows or less
+  - **Copy chunk:** its guide and its code together 6 rows or less, for example a 2-row guide and 4 rows of code. A code line longer than 29 characters wraps onto the next row and counts as two (changed from 5 on 2026-10-30, so a guide with two short paragraphs fits)
+  - The worst case is one row over: an exercise guide of 4 rows and a copy chunk of 6 rows, plus the 4 rows of blank lines, the rule and the badge, make 14 of the 13. It scrolls one row, and the safety net below covers it
+  - A taller terminal shows more, and the app scrolls a copy chunk to keep the `^ next` badge in view as a safety net, but the content has to fit 100x30. The app needs no change: the copy code already wraps and the badge follows the piece that holds the next character
 - Both `guide` fields are markdown, limited to a small subset so the terminal and the web render them the same:
   - paragraphs, separated by a blank line (`\n\n` in the JSON string)
   - **bold** and `inline code`
   - bullet lists (`- item`)
   - not allowed: headings (the screen has its own labels), tables, images, links and fenced code blocks (code goes in chunks)
-- **Mode by tier** (a guideline for authors and for the content skill; the tier of a module section sets how much help the user gets):
-  - **basic:** about 90% ghost. New code is always ghost. Boilerplate the user already typed (imports, a repeated function skeleton) is `auto`, and copy is used sparingly for identical logic the user already typed, to introduce the mode gently
+- **The mode of a chunk** (a guideline for authors and for the content skill). **Ghost is the majority at every tier,** around 90% of the chunks of a typing exercise, and the tier does not change that (the author, 2026-11-02). The rest is `auto` and `copy`, chosen by how many times the user has already written the piece:
+  - **ghost:** new code, and code the user has written only a few times
+  - **`auto`:** a piece the user has already written many times (imports, a repeated function skeleton, boilerplate). Writing it again teaches nothing, so the app writes it
+  - **`copy`:** a piece the user has already written, when we want to challenge them more: the code is not in the editor, the user copies it from the card. Used sparingly
   - when a chunk is `auto`, the guide of the next typed chunk should say what was added ("the imports are already in the file")
-  - **medium:** about half ghost and half copy. Copy for code seen before, ghost for new code
-  - **advanced:** mostly copy, ghost only for what is new
+  - a tier is the difficulty of the concepts, not the shape of the exercises (`docs/course-structure.md`, "Tiers"), so it does not change the mix of modes
 - **Code width.** The code is shown in cards and in the editor, whose width depends on the terminal, so write it as if formatted for a narrow screen:
   - aim for 40 columns or less per line, and never go over 50
   - break long lines the way `rustfmt` does with a small `max_width`: one argument per line, a closure body on its own lines, a long signature split over lines
   - for example `terminal.draw(|frame| render(frame, presses))?;` becomes `terminal.draw(|frame| {` then `render(frame, presses);` then `})?;`
   - the app wraps what still does not fit, but a wrapped line is harder to read and to type, so the author should avoid relying on it
-- Inserting every chunk at its `line`, in order, must give a file that compiles. `content/prod/*/syntax/loops.json` can be checked this way
+- Inserting every chunk at its `line`, in order, must give a file that compiles. `content/prod/*/syntax/loops.json` can be checked this way. The validator does not check it (dropped on 2026-10-30), so the review skill reads the code
 - Chunks have no names; the wide `CHUNKS` list shows the mode only
 
 ## Module file: quiz
@@ -110,9 +116,9 @@ A `"quiz"` exercise shows code and the user picks one option. It sits in the sam
   - without `kind`, the exercise is a plain quiz and the title says what it asks
 - **Options:** at most about 50 characters each, so an option takes two rows at most in the options card. Wrong options must be plausible: a mistake someone could really make reading the code, not a joke or an obvious absurdity. Vary the index of the right one (`answer`) across a module, not always the first
 - **Code width:** the same rule as typing (40 columns or less, never over 50), and short: the code window does not scroll while the user chooses, so it should fit about 14 lines
-- **`output` is checked by running:** when a typing exercise has it, the author runs the code once while writing the exercise. The same for the `answer` of an `output` quiz. A quiz has no `output` field of its own (it was dropped on 2026-10-28, and a file that has it fails at load)
+- **`output` is written, not run:** the skill that writes exercises does not run the code. It writes the `output` of a typing exercise, and the `answer` of an `output` quiz, from what it can predict by reading the program, so the programs must be deterministic (no randomness, no current time, no map iteration order). A quiz has no `output` field of its own (it was dropped on 2026-10-28, and a file that has it fails at load)
 - No score, and no retry inside the exercise. A wrong answer is saved in the `failed` list of its session, and the failed exercises can be retaken (`docs/progress-flow.md`)
-- The rules about options and `answer` are not checked when the module loads, because a panic there would take the app down with its own data. They belong to the content validation (see Open)
+- The rules about options and `answer` are not checked when the module loads, because a panic there would take the app down with its own data. They are checked by the content validation, `tests/content.rs` (see Open)
 
 ## Intro: before a module or a session
 A module and a session can each have an optional `intro`, a few slides that teach a concept before the exercises. It is a field next to `id` and `sessions` (on the module) or next to `id` and `exercises` (on the session), not an exercise: it has no id and never counts in the position of the header, in `done`, in `in_progress` or in `failed`. The screen is `docs/ui/06-intro.md` and the decisions are at the bottom of that file.
@@ -139,7 +145,7 @@ A module and a session can each have an optional `intro`, a few slides that teac
 - **Code width:** the same rule as the quiz: 40 columns or less per line, never over 50, and about 14 lines
 - **The snippet is illustrative:** it may use placeholder names when it only shows the shape of something (`pattern_a => do_this`), but every piece of syntax and every API in it must be real, and a snippet meant as real code must compile
 - **Ids:** an intro and its slides have no id, so nothing in progress points at them and they can change freely
-- **Not checked at load:** the fields are (`deny_unknown_fields`, the same as the rest), but the limits above belong to the content validation (see Open)
+- **Not checked at load:** the fields are (`deny_unknown_fields`, the same as the rest), but the limits above are checked by the content validation, `tests/content.rs` (see Open)
 
 ## Ids
 - Slugs (`syntax`, `borrow-checker`, `loops`), never array positions
@@ -185,7 +191,7 @@ One file is one partition, so each screen reads one item group:
 A later import script walks the folders and writes the items. The path of the folder is already the key.
 
 ## Open
-- `tier` in `course.json` is a free string, not validated. Check the allowed values (and the possible `expert` tier, see `course-structure.md`) once tiers drive behavior
+- `tier` in `course.json` is a free string, not validated. Check the allowed values once tiers drive behavior
 - Exercise JSON shape for the types still to come (`fill-blank`, `find-error`); the typing and quiz shapes are above
-- A content validation that runs before shipping (the tiers, the anchors of the notes, the quiz rules: 2 to 4 different options, `answer` inside them, options of about 50 characters; the intro slides: 8 lines of text or less once wrapped at 70 columns, code of 40 columns or less and 14 lines or less). It is a test or script over `content/prod/`, not a check at load. See `docs/todos/03-content-skill.md`, "The validator"
+- The content validation is `tests/content.rs`, a `cargo test` over `content/prod/` (see `docs/todos/03-content-skill.md`, "The validator"). Not validated, on purpose: the allowed tiers and the markdown subset of the guides, and compiling the assembled chunks
 - Content `version` field, so changed exercises do not invalidate saved progress

@@ -34,16 +34,18 @@ Home → Languages → Course navigator → Exercise
 - Build order: columns first, single when the narrow fallback is needed
 
 ## Tiers
-Defined in `legacy/docs/course-structure.md`. A module section belongs to a tier, and a tier sets two things: how exercises are presented and who can access them.
+A module section belongs to a tier, and **a tier is the difficulty of the concepts it shows, not the shape of the exercises** (the author, 2026-11-02). Every tier uses the same kinds of exercises and the same mix of modes (`docs/content-structure.md`, "The mode of a chunk"). What changes from a tier to the next is what the user learns.
 
-| Tier | Presentation | Access |
+| Tier | Concepts | Access |
 |---|---|---|
-| basic | Shadow: the app shows the code, the user types it | Free |
-| medium | Half shadow, half guided | Paid |
-| advanced | Guided: hints, the user completes the code | Paid |
+| basic | the first concepts, the ones everything else builds on | Free |
+| medium | concepts that build on the basics | Paid |
+| advanced | the hardest concepts of the language or library | Paid |
 
-- **Possible fourth tier, not decided:** `expert` (or `recall`): no shadow and no hints, the user types from memory. It fits the goal of keeping the language fresh
-- **Rule:** a new tier is added only together with its own presentation mode and access rule. A name that changes nothing is just a label
+- **The author gave examples, not a list:** conditionals and loops are basic, and things like traits, async and concurrency are harder. The tier of a concept is decided by whoever writes the modules, from what they know of the language or the library: how many other concepts it needs first, how abstract it is, how easy it is to get wrong. The skill that writes the modules decides it that way, not by matching a list of examples
+- **Access** is unchanged from the legacy definition (`legacy/docs/course-structure.md`): basic is free, the others are paid
+- A mode where the user types from memory, with no ghost text, is not a tier now, because a tier is about concepts. It is not decided if or how it comes back
+- **Rule:** a new tier is added only when the content needs another level of difficulty of concepts
 - `tier` is a free string in `course.json` for now, and only displayed. It becomes an enum when it starts driving behavior
 
 ## Open
