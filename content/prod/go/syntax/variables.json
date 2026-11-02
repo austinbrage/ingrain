@@ -1,0 +1,178 @@
+{
+  "id": "variables",
+  "intro": {
+    "title": "Variables",
+    "slides": [
+      {
+        "text": "A variable is a named place that holds a value. Here you declare variables with `var` and with `:=`, see which value they start with, change them, and meet two errors Go reports before the program runs."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "A named box for a value",
+        "slides": [
+          {
+            "text": "Think of a variable as a labeled box: a **name**, a **type** that says what can go inside, and a **value**. Go checks the type, so a box for numbers never holds text.\n\nThe snippet is pseudo code, not Go.",
+            "code": "box age holds a whole number\nput 30 in age        ok\nput \"thirty\" in age  error"
+          },
+          {
+            "text": "Go has two ways to declare one. `var` is explicit and works everywhere. `:=` is the short form: it works inside functions and takes the type from the value.",
+            "code": "var age int = 30\ncity := \"Lima\""
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "var-declaration",
+          "title": "Declare with var",
+          "guide": "Inside `main`, declare two variables with `var` and print them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`var` declares a variable: its name, then its type, then its value.", "notes": [{"on": "string", "text": "The type goes after the name."}], "text": "    var name string = \"Ana\""},
+            {"mode": "ghost", "line": 7, "guide": "`int` is a whole number.", "text": "    var age int = 30"},
+            {"mode": "ghost", "line": 8, "guide": "`Println` prints its values, separated by a space.", "text": "    fmt.Println(name, age)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Ana 30"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "type-mismatch",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:6:19: cannot use \"thirty\"\n  (untyped string constant) as int value\n  in variable declaration",
+          "options": [
+            "`age` was declared and never used",
+            "A text value was put in an int variable",
+            "`var` cannot be used inside main",
+            "The variable needs `:=` instead of `var`"
+          ],
+          "answer": 1,
+          "explanation": "`age` is an `int`, and `\"thirty\"` is text. Go checks types and does not convert for you."
+        },
+        {
+          "type": "typing",
+          "id": "zero-values",
+          "title": "Zero values",
+          "guide": "Declare three variables without a value, then print them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Without a value, a variable starts with the **zero value** of its type: 0, empty text or false.", "text": "    var count int\n    var name string\n    var ok bool"},
+            {"mode": "ghost", "line": 9, "guide": "The empty text prints as nothing, so there are two spaces in the output.", "text": "    fmt.Println(count, name, ok)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0  false"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "zero-value-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var total int\n    fmt.Println(total)\n}",
+          "options": [
+            "it does not compile",
+            "nil",
+            "an empty line",
+            "0"
+          ],
+          "answer": 3,
+          "explanation": "`total` has no value, so it starts as the zero value of `int`, which is 0."
+        },
+        {
+          "type": "typing",
+          "id": "short-declaration",
+          "title": "The short form",
+          "guide": "Declare two variables with `:=` and print them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`:=` declares a variable and takes its type from the value. It only works inside a function.", "notes": [{"on": ":=", "text": "Declares and assigns in one step."}], "text": "    city := \"Lima\""},
+            {"mode": "ghost", "line": 7, "guide": "`2024` is a whole number, so `year` is an `int`.", "text": "    year := 2024"},
+            {"mode": "copy", "line": 8, "guide": "Print them, as before.", "text": "    fmt.Println(city, year)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Lima 2024"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "reassign",
+          "title": "Change a value",
+          "guide": "Declare a variable, then change its value.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Declare `score` once.", "text": "    score := 10"},
+            {"mode": "ghost", "line": 7, "guide": "To change it later, use `=` with no colon: `score` already exists.", "notes": [{"on": "=", "text": "Assigns to an existing variable."}], "text": "    score = 25"},
+            {"mode": "copy", "line": 8, "guide": "Print the new value.", "text": "    fmt.Println(score)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "25"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "no-new-variables",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:7:11: no new variables\n  on left side of :=",
+          "options": [
+            "`:=` was used on a variable that already exists",
+            "The variable was declared and never used",
+            "The value has the wrong type",
+            "`var` was written twice for one variable"
+          ],
+          "answer": 0,
+          "explanation": "`:=` needs at least one new variable on its left side. To change an existing one, use `=`."
+        },
+        {
+          "type": "typing",
+          "id": "swap",
+          "title": "Swap two values",
+          "guide": "Declare two variables and swap them in one line.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "You can declare several variables on one line.", "text": "    a, b := 1, 2"},
+            {"mode": "ghost", "line": 7, "guide": "Both sides are worked out before the assignment, so this swaps the values.", "notes": [{"on": "b, a", "text": "The right side is read first."}], "text": "    a, b = b, a"},
+            {"mode": "copy", "line": 8, "guide": "Print them.", "text": "    fmt.Println(a, b)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "error",
+          "id": "unused-variable",
+          "title": "What kind of error is it?",
+          "guide": "Read the code, then pick the kind of error.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    count := 10\n    fmt.Println(\"hello\")\n}",
+          "options": [
+            "A panic at run time",
+            "No error",
+            "A compile error"
+          ],
+          "answer": 2,
+          "explanation": "Go refuses to compile a variable that is declared and never used."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "id": "conditionals",
+  "intro": {
+    "title": "Conditionals",
+    "slides": [
+      {
+        "text": "A conditional runs code only when a condition is true. In Go the condition must be a `bool`, it has no parentheses, and the braces are always required.\n\nThe snippet is pseudo code, not Go.",
+        "code": "if the condition is true\n    do this\notherwise if another is true\n    do that\notherwise\n    do the other"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "if-else",
+          "title": "If and else",
+          "guide": "Choose between two paths with `if` and `else`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to test.", "text": "    score := 72"},
+            {"mode": "ghost", "line": 7, "guide": "The block after `if` runs when the condition is true. Otherwise the block after `else` runs.", "notes": [{"on": "score >= 50", "text": "No parentheses around the condition."}], "text": "    if score >= 50 {\n        fmt.Println(\"pass\")\n    } else {\n        fmt.Println(\"fail\")\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "This line runs after the `if`, whichever path was taken.", "text": "    fmt.Println(\"done\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "pass\ndone"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "brace-position",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:7:17: syntax error:\n  unexpected newline, expected { after\n  if clause",
+          "options": [
+            "An `if` condition needs parentheses",
+            "`score` was declared and never used",
+            "The `{` must stay on the `if` line",
+            "`else` is missing after the `if`"
+          ],
+          "answer": 2,
+          "explanation": "Go ends a line without a `{` as a complete statement. The opening brace goes on the same line as the `if`."
+        },
+        {
+          "type": "typing",
+          "id": "else-if-chain",
+          "title": "Several choices",
+          "guide": "Pick one of three paths with an `else if` chain.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to test.", "text": "    temp := 25"},
+            {"mode": "ghost", "line": 7, "guide": "The conditions are checked from the top. The first true one runs its block, and the rest are skipped. `else` catches what is left.", "notes": [{"on": "else if", "text": "Tried only if the checks above were false."}], "text": "    if temp >= 30 {\n        fmt.Println(\"hot\")\n    } else if temp >= 20 {\n        fmt.Println(\"warm\")\n    } else {\n        fmt.Println(\"cold\")\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "Print the temperature.", "text": "    fmt.Println(temp)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "warm\n25"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "first-match",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    n := 15\n    if n > 5 {\n        fmt.Println(\"big\")\n    } else if n > 10 {\n        fmt.Println(\"huge\")\n    } else {\n        fmt.Println(\"small\")\n    }\n}",
+          "options": [
+            "huge",
+            "big",
+            "big\nhuge",
+            "small"
+          ],
+          "answer": 1,
+          "explanation": "`n > 5` is true, so its block runs and the chain stops there. `n > 10` is never checked."
+        },
+        {
+          "type": "typing",
+          "id": "init-statement",
+          "title": "A variable for the if",
+          "guide": "Declare a variable inside the `if` line itself.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to test.", "text": "    total := 17"},
+            {"mode": "ghost", "line": 7, "guide": "An `if` can start with a short statement, then a `;`, then the condition. `rem` exists only inside the `if` and its `else`.", "notes": [{"on": "rem := total % 2;", "text": "Runs first, before the condition is checked."}], "text": "    if rem := total % 2; rem == 0 {\n        fmt.Println(\"even\")\n    } else {\n        fmt.Println(\"odd\", rem)\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "`rem` is gone here, but `total` is still in scope.", "text": "    fmt.Println(total)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "odd 1\n17"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "error",
+          "id": "non-bool-condition",
+          "title": "What kind of error is it?",
+          "guide": "Read the code, then pick the kind of error.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    count := 1\n    if count {\n        fmt.Println(\"some\")\n    }\n}",
+          "options": [
+            "No error",
+            "A compile error",
+            "A panic at run time"
+          ],
+          "answer": 1,
+          "explanation": "An `if` needs a `bool`. Go has no truthy numbers, so write `count != 0` or `count > 0`."
+        }
+      ]
+    }
+  ]
+}

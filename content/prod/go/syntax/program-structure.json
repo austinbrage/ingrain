@@ -1,0 +1,180 @@
+{
+  "id": "program-structure",
+  "intro": {
+    "title": "Program structure",
+    "slides": [
+      {
+        "text": "A Go program is a text file with three parts: a package line, the packages it imports, and `func main`, where it starts. Here you type that skeleton, print your first lines, and meet the errors Go reports when a part is wrong.",
+        "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "The shape of a Go file",
+        "slides": [
+          {
+            "text": "Every Go program answers three questions, always in this order. The snippet is pseudo code, not Go.",
+            "code": "package    who am I?\nimport     what do I use?\nfunc main  where do I start?"
+          },
+          {
+            "text": "You will type the code and run it with `go run main.go`. At the end of each exercise you see what the program prints."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "hello-go",
+          "title": "Your first program",
+          "guide": "Type the smallest Go program: it prints one line of text.",
+          "chunks": [
+            {"mode": "ghost", "line": 1, "guide": "Every Go file starts with its **package**. `main` is the package of a program you can run.", "notes": [{"on": "main", "text": "A program you can run is always in package main."}], "text": "package main\n"},
+            {"mode": "ghost", "line": 3, "guide": "`import` brings in another package. `fmt` can print text.", "notes": [{"on": "fmt", "text": "Short for format: it prints and formats text."}], "text": "import \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "`func main` is where the program starts. The braces hold what it does.", "notes": [{"on": "main", "text": "The program starts running here."}], "text": "func main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`Println` prints one line. The text goes between double quotes.", "notes": [{"on": "fmt.Println", "text": "Calls Println from the fmt package."}], "text": "    fmt.Println(\"Hello, Go!\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello, Go!"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "missing-import",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:4:5: undefined: fmt",
+          "options": [
+            "`main` is spelled wrong",
+            "`Println` needs a capital letter",
+            "The `fmt` package was not imported",
+            "The file must be named `fmt.go`"
+          ],
+          "answer": 2,
+          "explanation": "`fmt` is a package. Using it without `import \"fmt\"` leaves the name undefined."
+        },
+        {
+          "type": "typing",
+          "id": "print-and-println",
+          "title": "Print without a new line",
+          "guide": "`Print` stays on the line and `Println` moves to the next. Use both.",
+          "chunks": [
+            {"mode": "copy", "line": 1, "guide": "Type the start again.", "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `main` again.", "text": "func main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`Print` writes the text and stays on the same line.", "text": "    fmt.Print(\"Hello, \")"},
+            {"mode": "ghost", "line": 7, "guide": "`Println` writes the text and then moves to the next line.", "text": "    fmt.Println(\"Go!\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello, Go!"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "brace-on-the-same-line",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:5:12: syntax error:\n  unexpected semicolon or newline\n  before {",
+          "options": [
+            "The opening brace must be on the same line",
+            "`main` must have parameters",
+            "`func` must be written with a capital",
+            "The braces must end with a semicolon"
+          ],
+          "answer": 0,
+          "explanation": "Go ends a line with an implicit semicolon, so a brace on its own line closes `func main()` too early. The opening brace stays on the same line."
+        },
+        {
+          "type": "typing",
+          "id": "comments",
+          "title": "Comments",
+          "guide": "Add a comment, then print. Go ignores comments when it runs the program.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Type `main`.", "text": "func main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`//` starts a comment: the rest of the line is ignored. Go also has `/* ... */` for several lines.", "notes": [{"on": "//", "text": "Go ignores everything after this on the line."}], "text": "    // A comment explains the code"},
+            {"mode": "ghost", "line": 7, "guide": "The comment changes nothing: the program prints as usual.", "text": "    fmt.Println(\"Comments are ignored.\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Comments are ignored."
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "two-packages",
+          "title": "Two imports",
+          "guide": "Import two packages in a block, and use both.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n"},
+            {"mode": "ghost", "line": 3, "guide": "With several packages, group them in parentheses, one per line. `strings` works with text.", "notes": [{"on": "strings", "text": "A package of functions for working with text."}], "text": "import (\n    \"fmt\"\n    \"strings\"\n)\n"},
+            {"mode": "auto", "line": 8, "text": "func main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "`strings.ToUpper` turns text into capitals. It reads like `fmt.Println`: package, dot, function.", "notes": [{"on": "strings.ToUpper", "text": "Calls ToUpper from the strings package."}], "text": "    fmt.Println(strings.ToUpper(\"go\"))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "GO"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "error",
+          "id": "unused-import",
+          "title": "What kind of error is it?",
+          "guide": "Read the code, then pick the kind of error.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    fmt.Println(\"hello\")\n}",
+          "options": [
+            "No error",
+            "A compile error",
+            "A panic at run time"
+          ],
+          "answer": 1,
+          "explanation": "Go does not allow an import that the file never uses: it is a compile error."
+        },
+        {
+          "type": "typing",
+          "id": "first-program",
+          "title": "Put it together",
+          "guide": "Greet in three lines, with a comment. Statements run from top to bottom.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The skeleton is already in the file. Start with a comment.", "text": "    // Three lines, one after another"},
+            {"mode": "ghost", "line": 7, "guide": "Each `Println` prints its own line.", "text": "    fmt.Println(\"Hello!\")"},
+            {"mode": "ghost", "line": 8, "guide": "Lines run in the order they are written.", "text": "    fmt.Println(\"This is my first Go program.\")"},
+            {"mode": "ghost", "line": 9, "guide": "The last statement runs last.", "text": "    fmt.Println(\"It runs top to bottom.\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello!\nThis is my first Go program.\nIt runs top to bottom."
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "output-order",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Print(\"a\")\n    fmt.Print(\"b\")\n    fmt.Println(\"c\")\n}",
+          "options": [
+            "cba",
+            "a b c",
+            "abc on three lines",
+            "abc"
+          ],
+          "answer": 3,
+          "explanation": "`Print` does not add a new line, so `a` and `b` stay on the line. `Println` adds `c` and then moves on."
+        }
+      ]
+    }
+  ]
+}

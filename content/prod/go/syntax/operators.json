@@ -1,0 +1,118 @@
+{
+  "id": "operators",
+  "intro": {
+    "title": "Operators",
+    "slides": [
+      {
+        "text": "Operators combine values into new ones. Here you do arithmetic, update a variable in place, compare values and join conditions with logic. The snippet is a map of the operators, not Go.",
+        "code": "arithmetic  + - * / %\ncompare     == != < <= > >=\nlogic       && || !\nupdate      += -= *= /= ++ --"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "arithmetic",
+          "title": "Arithmetic",
+          "guide": "Combine two whole numbers with the five arithmetic operators.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two whole numbers to work with.", "text": "    a := 17\n    b := 5"},
+            {"mode": "ghost", "line": 8, "guide": "`+`, `-` and `*` work as in maths. `a` and `b` themselves do not change.", "text": "    fmt.Println(a+b, a-b, a*b)"},
+            {"mode": "ghost", "line": 9, "guide": "`/` on two whole numbers gives a whole number: the decimals are cut off. `%` gives the remainder of the division.", "notes": [{"on": "%", "text": "What is left over after dividing."}], "text": "    fmt.Println(a/b, a%b)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "22 12 85\n3 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "integer-division",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := 7\n    fmt.Println(a/2, float64(a)/2, -a/2)\n}",
+          "options": [
+            "3.5 3.5 -3.5",
+            "3 3 -3",
+            "3 3.5 -4",
+            "3 3.5 -3"
+          ],
+          "answer": 3,
+          "explanation": "Two ints divide into an int, cut toward zero: 3 and -3. Converting `a` to `float64` first makes the division exact: 3.5."
+        },
+        {
+          "type": "typing",
+          "id": "update-in-place",
+          "title": "Update a variable",
+          "guide": "Change a variable with shorthand operators and print the result.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to update.", "text": "    count := 10"},
+            {"mode": "ghost", "line": 7, "guide": "`+=` adds to the variable itself, and `*=` multiplies it. `count += 5` means `count = count + 5`.", "text": "    count += 5\n    count *= 2"},
+            {"mode": "ghost", "line": 9, "guide": "`++` adds 1. In Go it is a statement on its own line.", "text": "    count++"},
+            {"mode": "ghost", "line": 10, "guide": "Print the final value.", "text": "    fmt.Println(count)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "31"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "increment-as-value",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:7:18: syntax error:\n  unexpected ++ at end of statement",
+          "options": [
+            "`++` only works on decimal numbers",
+            "`count` was never declared",
+            "`++` is a statement, not a value to use",
+            "`:=` cannot store a number"
+          ],
+          "answer": 2,
+          "explanation": "In Go, `count++` stands alone on its line. It gives no value, so `next := count++` is a syntax error."
+        },
+        {
+          "type": "typing",
+          "id": "compare-and-combine",
+          "title": "Compare and combine",
+          "guide": "Compare a number, then join the results with logic.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to compare.", "text": "    age := 25"},
+            {"mode": "ghost", "line": 7, "guide": "A comparison gives a `bool`: `>=` is true when the left side is bigger or equal.", "text": "    adult := age >= 18"},
+            {"mode": "ghost", "line": 8, "guide": "`||` is true when either side is true.", "text": "    free := age < 12 || age > 65"},
+            {"mode": "ghost", "line": 9, "guide": "`&&` needs both sides true, and `!` flips a bool.", "notes": [{"on": "!free", "text": "True when free is false."}], "text": "    paid := adult && !free"},
+            {"mode": "ghost", "line": 10, "guide": "Print the three bools.", "text": "    fmt.Println(adult, free, paid)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true false true"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "logic-precedence",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    open := true\n    broken := false\n    ready := false\n    fmt.Println(open || broken && ready)\n    fmt.Println((open || broken) && ready)\n}",
+          "options": [
+            "true\ntrue",
+            "true\nfalse",
+            "false\nfalse",
+            "false\ntrue"
+          ],
+          "answer": 1,
+          "explanation": "`&&` binds tighter than `||`, so the first line is `open || (broken && ready)`: true. The parentheses in the second change the grouping: `true && false` is false."
+        }
+      ]
+    }
+  ]
+}

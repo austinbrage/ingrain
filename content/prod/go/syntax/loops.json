@@ -1,0 +1,210 @@
+{
+  "id": "loops",
+  "intro": {
+    "title": "Loops",
+    "slides": [
+      {
+        "text": "A loop repeats a block of code. Go has a single loop keyword, `for`, and it takes several shapes: a counter, a condition, nothing at all, or a walk over a value.\n\nThe snippet is pseudo code, not Go.",
+        "code": "repeat while the condition holds\n    do this\n    maybe skip to the next lap\n    maybe stop the loop early"
+      },
+      {
+        "text": "Two sessions:\n\n- **Session 1:** the counter, the condition, the loop with no end and `break`\n- **Session 2:** `range`, `continue` and loops inside loops"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Counting and stopping",
+        "slides": [
+          {
+            "text": "The classic `for` has three parts. The first runs once before the loop, the second is checked before every lap, and the third runs after every lap.\n\nThe snippet is pseudo code, not Go.",
+            "code": "for (setup; condition; after) {\n    the body\n}"
+          },
+          {
+            "text": "Keep only the condition and the loop runs while it is true. Keep nothing and it runs until a `break` stops it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "counting-loop",
+          "title": "Count with for",
+          "guide": "Repeat a block while a counter climbs.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A running total.", "text": "    sum := 0"},
+            {"mode": "ghost", "line": 7, "guide": "`for` has three parts: the setup, the condition and the step. The block repeats while the condition is true.", "notes": [{"on": "i <= 4", "text": "Checked before every lap."}, {"on": "i++", "text": "Runs after every lap."}], "text": "    for i := 1; i <= 4; i++ {\n        sum += i\n        fmt.Println(i, sum)\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "This line runs once, after the loop ends.", "text": "    fmt.Println(\"total\", sum)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1 1\n2 3\n3 6\n4 10\ntotal 10"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "loop-scope",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:9:17: undefined: i",
+          "options": [
+            "`i` was declared and not used",
+            "A `for` loop cannot be followed by code",
+            "`i` only exists inside the loop",
+            "`i` needs a type before the loop"
+          ],
+          "answer": 2,
+          "explanation": "A variable declared in the setup of a `for` lives only in the loop. After the closing brace it is gone."
+        },
+        {
+          "type": "typing",
+          "id": "condition-only",
+          "title": "Loop on a condition",
+          "guide": "Keep only the condition, and loop while it holds.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to grow.", "text": "    n := 1"},
+            {"mode": "ghost", "line": 7, "guide": "With just a condition, `for` works like a `while` loop. You change the variable yourself inside the block.", "notes": [{"on": "n < 20", "text": "No setup and no step, only the check."}], "text": "    for n < 20 {\n        n *= 2\n        fmt.Println(n)\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "The loop ended because the condition became false.", "text": "    fmt.Println(\"stopped at\", n)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2\n4\n8\n16\n32\nstopped at 32"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "infinite-break",
+          "title": "A loop with no end",
+          "guide": "Write a loop with no condition and stop it with `break`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A counter for the laps.", "text": "    count := 0"},
+            {"mode": "ghost", "line": 7, "guide": "A `for` with nothing after it repeats forever. `break` leaves the loop at once, and the code after it runs.", "notes": [{"on": "break", "text": "Jumps out of the nearest loop."}], "text": "    for {\n        count++\n        fmt.Println(\"tick\", count)\n        if count == 3 {\n            break\n        }\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "This line runs after the `break`.", "text": "    fmt.Println(\"out of the loop\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "tick 1\ntick 2\ntick 3\nout of the loop"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "break-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    for i := 1; i <= 5; i++ {\n        if i == 3 {\n            break\n        }\n        fmt.Println(i)\n    }\n    fmt.Println(\"end\")\n}",
+          "options": [
+            "1\n2\nend",
+            "1\n2\n3\nend",
+            "1\n2\n4\n5\nend",
+            "end"
+          ],
+          "answer": 0,
+          "explanation": "When `i` is 3 the `break` ends the loop before the print, so only 1 and 2 appear. Then the line after the loop runs."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Range and skipping",
+        "slides": [
+          {
+            "text": "`range` walks over a value. Over a number it counts from 0 up to one less than that number. Over a string it gives each character with its position.\n\nThe snippet is pseudo code, not Go.",
+            "code": "for each position and character\n    of the text\n        use them"
+          },
+          {
+            "text": "`continue` skips the rest of the current lap and starts the next one. `break` ends the whole loop, but only the innermost one when loops are nested."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "range-count",
+          "title": "Range over a number",
+          "guide": "Repeat a block a fixed number of times with `range`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`range 3` gives 0, 1 and 2, one value per lap.", "notes": [{"on": "range 3", "text": "Counts up from 0, stopping before 3."}], "text": "    for i := range 3 {\n        fmt.Println(\"round\", i)\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "When you do not need the number, leave the variable out.", "text": "    for range 2 {\n        fmt.Println(\"hi\")\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Print a last line.", "text": "    fmt.Println(\"done\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "round 0\nround 1\nround 2\nhi\nhi\ndone"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "range-string",
+          "title": "Range over a string",
+          "guide": "Walk a string one character at a time.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`range` over a string gives the position and the character, as a `rune`. `string(r)` turns it back into text.", "notes": [{"on": "i, r", "text": "Position first, then the character."}], "text": "    for i, r := range \"go\" {\n        fmt.Println(i, string(r))\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "Use `_` for a value you do not need. Go would reject an unused variable.", "notes": [{"on": "_", "text": "Throws the position away."}], "text": "    for _, r := range \"hi\" {\n        fmt.Println(string(r))\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Print a last line.", "text": "    fmt.Println(\"done\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 g\n1 o\nh\ni\ndone"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "error",
+          "id": "unused-index",
+          "title": "What kind of error is it?",
+          "guide": "Read the code, then pick the kind of error.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    for i, r := range \"go\" {\n        fmt.Println(string(r))\n    }\n}",
+          "options": [
+            "A panic at run time",
+            "No error",
+            "A compile error"
+          ],
+          "answer": 2,
+          "explanation": "`i` is declared by the loop and never used. Go refuses that, so write `_` in its place."
+        },
+        {
+          "type": "typing",
+          "id": "skip-with-continue",
+          "title": "Skip a lap",
+          "guide": "Skip some laps with `continue`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A counter for the skipped laps.", "text": "    skipped := 0"},
+            {"mode": "ghost", "line": 7, "guide": "`continue` ends the current lap and jumps to the next one. The print below it runs only for odd numbers.", "notes": [{"on": "continue", "text": "Goes straight to the next lap."}], "text": "    for i := 1; i <= 5; i++ {\n        if i%2 == 0 {\n            skipped++\n            continue\n        }\n        fmt.Println(i)\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "Show how many laps were skipped.", "text": "    fmt.Println(\"skipped\", skipped)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1\n3\n5\nskipped 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "nested-break",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    for i := 1; i <= 2; i++ {\n        for j := 1; j <= 3; j++ {\n            if j == 2 {\n                break\n            }\n            fmt.Println(i, j)\n        }\n    }\n}",
+          "options": [
+            "1 1\n2 1",
+            "1 1",
+            "1 1\n1 2\n2 1\n2 2",
+            "1 1\n1 3\n2 1\n2 3"
+          ],
+          "answer": 0,
+          "explanation": "`break` leaves only the inner loop. The outer loop goes on, so each `i` prints once, with `j` equal to 1."
+        }
+      ]
+    }
+  ]
+}

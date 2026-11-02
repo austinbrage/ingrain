@@ -1,0 +1,114 @@
+{
+  "id": "printing-values",
+  "intro": {
+    "title": "Printing values",
+    "slides": [
+      {
+        "text": "`Println` prints values as they are. To place values inside a sentence, Go uses `Printf` with **verbs**: placeholders that start with `%`. Here you use the three you will meet every day, and `Sprintf`, which builds the text without printing it. All the verbs come later, in Strings and text.\n\nThe snippet is pseudo code, not Go.",
+        "code": "template  \"<name> is <age> years old\"\nvalues    \"Ana\", 30\nresult    Ana is 30 years old"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "fill-a-sentence",
+          "title": "Fill in a sentence",
+          "guide": "Print a sentence with a name and an age inside it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The skeleton is already in the file. Start with the name.", "text": "    name := \"Ana\""},
+            {"mode": "ghost", "line": 7, "guide": "And a whole number for the age.", "text": "    age := 30"},
+            {"mode": "ghost", "line": 8, "guide": "`Printf` fills each `%` verb with the next value. `%s` is for text and `%d` for whole numbers.", "notes": [{"on": "\\n", "text": "Printf adds no new line, so you add one."}], "text": "    fmt.Printf(\"%s is %d years old\\n\", name, age)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Ana is 30 years old"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "printf-no-newline",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    name := \"Go\"\n    fmt.Printf(\"Hello, %s!\", name)\n    fmt.Println(\"Bye\")\n}",
+          "options": [
+            "Hello, Go! Bye",
+            "Hello, Go!Bye",
+            "Hello, %s!Bye",
+            "Hello, Go!"
+          ],
+          "answer": 1,
+          "explanation": "`Printf` adds no new line, so `Bye` follows on the same line. `%s` is replaced by `Go`."
+        },
+        {
+          "type": "typing",
+          "id": "one-verb-for-any-value",
+          "title": "One verb for any value",
+          "guide": "`%v` prints any value. Use it for a number and a bool.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to print.", "text": "    score := 98"},
+            {"mode": "ghost", "line": 7, "guide": "And a bool: `true` or `false`.", "text": "    passed := true"},
+            {"mode": "ghost", "line": 8, "guide": "`%v` prints a value in its default form, whatever its type. It is the verb to use when you just want to see a value.", "notes": [{"on": "%v and", "text": "The same verb works for a number and a bool."}], "text": "    fmt.Printf(\"%v and %v\\n\", score, passed)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "98 and true"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "error",
+          "id": "wrong-verb",
+          "title": "What kind of error is it?",
+          "guide": "Read the code, then pick the kind of error.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Printf(\"%d\\n\", \"Ana\")\n}",
+          "options": [
+            "No error",
+            "A compile error",
+            "A panic at run time"
+          ],
+          "answer": 0,
+          "explanation": "It compiles and runs. With the wrong verb, `Printf` does not fail: it prints a marker like `%!d(string=Ana)`."
+        },
+        {
+          "type": "typing",
+          "id": "build-the-text-first",
+          "title": "Build the text first",
+          "guide": "`Sprintf` builds the text and returns it, so you can use it later.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Start with the name.", "text": "    name := \"Ana\""},
+            {"mode": "ghost", "line": 7, "guide": "`Sprintf` works like `Printf`, but it returns the text instead of printing it.", "notes": [{"on": "Sprintf", "text": "Returns the text instead of printing it."}], "text": "    greeting := fmt.Sprintf(\"Hello, %s!\", name)"},
+            {"mode": "ghost", "line": 8, "guide": "Print the text you built.", "text": "    fmt.Println(greeting)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello, Ana!"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "single-quotes",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:6:17: more than one character\n  in rune literal",
+          "options": [
+            "`fmt` was not imported",
+            "`Println` takes only one value",
+            "Text needs double quotes, not single quotes",
+            "The text is too long"
+          ],
+          "answer": 2,
+          "explanation": "Single quotes make one character, not text. Text goes between double quotes."
+        }
+      ]
+    }
+  ]
+}

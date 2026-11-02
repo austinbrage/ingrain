@@ -1,0 +1,115 @@
+{
+  "id": "switch",
+  "intro": {
+    "title": "Switch",
+    "slides": [
+      {
+        "text": "A `switch` compares one value against several cases and runs the first one that matches. It replaces a long `else if` chain. In Go a case ends by itself, with no `break`.\n\nThe snippet is pseudo code, not Go.",
+        "code": "look at a value\n    if it is A, do this\n    if it is B or C, do that\n    if nothing matches, do the other"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "value-switch",
+          "title": "Switch on a value",
+          "guide": "Pick a path by comparing one value against several cases.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to test.", "text": "    day := 3"},
+            {"mode": "ghost", "line": 7, "guide": "`switch` compares `day` with each `case`, from the top. The first match runs its block and the switch ends. `default` runs when nothing matches.", "notes": [{"on": "default", "text": "Runs when no case matches."}], "text": "    switch day {\n    case 1:\n        fmt.Println(\"Monday\")\n    case 2:\n        fmt.Println(\"Tuesday\")\n    case 3:\n        fmt.Println(\"Wednesday\")\n    default:\n        fmt.Println(\"Another day\")\n    }"},
+            {"mode": "ghost", "line": 17, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"done\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Wednesday\ndone"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "no-fall-through",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    level := 1\n    switch level {\n    case 1:\n        fmt.Println(\"low\")\n    case 2:\n        fmt.Println(\"mid\")\n    }\n    fmt.Println(\"end\")\n}",
+          "options": [
+            "low",
+            "low\nmid\nend",
+            "low\nend",
+            "mid\nend"
+          ],
+          "answer": 2,
+          "explanation": "Only the matching case runs, and the switch ends there. Go never continues into the next case on its own."
+        },
+        {
+          "type": "typing",
+          "id": "case-lists",
+          "title": "Several values in a case",
+          "guide": "Let one case match a list of values.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A letter to test.", "text": "    letter := \"e\""},
+            {"mode": "ghost", "line": 7, "guide": "A `case` can list values separated by commas. It matches when the switched value equals any of them.", "notes": [{"on": "\"a\", \"e\"", "text": "One match is enough to run the block."}], "text": "    switch letter {\n    case \"a\", \"e\", \"i\", \"o\", \"u\":\n        fmt.Println(\"vowel\")\n    case \"y\":\n        fmt.Println(\"sometimes\")\n    default:\n        fmt.Println(\"consonant\")\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "Print the letter.", "text": "    fmt.Println(letter)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "vowel\ne"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "mismatched-case",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:9:7: invalid case \"two\" in\n  switch on n (mismatched types\n  untyped string and int)",
+          "options": [
+            "Strings cannot be used in a `case`",
+            "A `case` value must match the type of the switch",
+            "`default` is missing from the switch",
+            "Each `case` needs a `break` to end it"
+          ],
+          "answer": 1,
+          "explanation": "Every case is compared with the switched value, so it must have the same type. `n` is an `int`, and `\"two\"` is a string."
+        },
+        {
+          "type": "typing",
+          "id": "tagless-switch",
+          "title": "Switch with no value",
+          "guide": "Drop the value after `switch` and write a condition in each case.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "An hour of the day.", "text": "    hour := 14"},
+            {"mode": "ghost", "line": 7, "guide": "With no value, each `case` holds a `bool` condition. The first true one runs, like an `else if` chain that reads flatter.", "notes": [{"on": "switch {", "text": "Nothing to compare: the cases are conditions."}], "text": "    switch {\n    case hour < 12:\n        fmt.Println(\"morning\")\n    case hour < 18:\n        fmt.Println(\"afternoon\")\n    default:\n        fmt.Println(\"evening\")\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "Print the hour.", "text": "    fmt.Println(hour)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "afternoon\n14"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "fallthrough",
+          "title": "Fall through",
+          "guide": "Ask a case to continue into the next one with `fallthrough`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to test.", "text": "    stars := 2"},
+            {"mode": "ghost", "line": 7, "guide": "`fallthrough` runs the block of the next case too, without checking its value. It must be the last statement of its case.", "notes": [{"on": "fallthrough", "text": "Jumps into the next case, whatever its value."}], "text": "    switch stars {\n    case 2:\n        fmt.Println(\"good\")\n        fallthrough\n    case 1:\n        fmt.Println(\"rated\")\n    default:\n        fmt.Println(\"none\")\n    }"},
+            {"mode": "ghost", "line": 16, "guide": "Print the number.", "text": "    fmt.Println(stars)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "good\nrated\n2"
+          }
+        }
+      ]
+    }
+  ]
+}

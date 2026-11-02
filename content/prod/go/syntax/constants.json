@@ -1,0 +1,130 @@
+{
+  "id": "constants",
+  "intro": {
+    "title": "Constants",
+    "slides": [
+      {
+        "text": "A constant is a named value that never changes. Here you declare constants with `const`, see why Go refuses to change them, and count with `iota`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Values fixed before running",
+        "slides": [
+          {
+            "text": "A variable can change while the program runs. A constant is fixed when the program is **compiled**, so Go rejects any line that tries to change it.",
+            "code": "const limit = 10\nlimit = 20  // does not compile"
+          },
+          {
+            "text": "Constants can be **untyped**: `const factor = 3` is just the number 3, and it fits wherever a number of any kind is needed.",
+            "code": "const factor = 3"
+          },
+          {
+            "text": "Related constants can be grouped, and `iota` numbers them for you. The snippet is pseudo code, not Go.",
+            "code": "group starts, counter = 0\n  first   -> counter, 0\n  second  -> counter, 1\n  third   -> counter, 2"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "const-declaration",
+          "title": "Declare with const",
+          "guide": "Declare two constants and print them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`const` works like `var`, but the value is required and can never change.", "notes": [{"on": "const", "text": "Fixed for the whole program."}], "text": "    const language = \"Go\""},
+            {"mode": "ghost", "line": 7, "guide": "A constant holds a number too.", "text": "    const version = 1"},
+            {"mode": "ghost", "line": 8, "guide": "Print them like any value.", "text": "    fmt.Println(language, version)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Go 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "error",
+          "id": "assign-to-constant",
+          "title": "What kind of error is it?",
+          "guide": "Read the code, then pick the kind of error.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    const limit = 10\n    limit = 20\n    fmt.Println(limit)\n}",
+          "options": [
+            "No error",
+            "A compile error",
+            "A panic at run time"
+          ],
+          "answer": 1,
+          "explanation": "A constant cannot be assigned again. Go reports it before the program runs."
+        },
+        {
+          "type": "typing",
+          "id": "untyped-constant",
+          "title": "One constant, two types",
+          "guide": "Use one untyped constant for an `int` and for a `float64`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "No type is written, so `factor` is an untyped constant: just the number 3.", "text": "    const factor = 3"},
+            {"mode": "ghost", "line": 7, "guide": "It fits an `int`...", "text": "    var count int = factor"},
+            {"mode": "ghost", "line": 8, "guide": "...and a `float64`, a number with decimals. A variable could not do this.", "text": "    var ratio float64 = factor"},
+            {"mode": "ghost", "line": 9, "guide": "Both hold 3.", "text": "    fmt.Println(count, ratio)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "missing-value",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:6:11: missing init expr\n  for const declaration",
+          "options": [
+            "`const` cannot be used inside main",
+            "A constant cannot hold text",
+            "A constant needs a value when declared",
+            "The constant was never used"
+          ],
+          "answer": 2,
+          "explanation": "A constant is fixed, so it must get its value in the declaration. There is no zero value like with `var`."
+        },
+        {
+          "type": "typing",
+          "id": "iota-counter",
+          "title": "Count with iota",
+          "guide": "Group three constants and let `iota` number them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`const` with parentheses groups constants. `iota` is 0 on the first line, and a line with no value repeats the one above, so `iota` gives 1, then 2.", "notes": [{"on": "iota", "text": "A counter that grows by one per line."}], "text": "    const (\n        Low = iota\n        Medium\n        High\n    )"},
+            {"mode": "ghost", "line": 11, "guide": "Print the three numbers.", "text": "    fmt.Println(Low, Medium, High)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 1 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "iota-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    const (\n        A = iota\n        B\n        C = 10\n        D\n    )\n    fmt.Println(A, B, C, D)\n}",
+          "options": [
+            "0 1 10 11",
+            "0 1 2 3",
+            "0 1 10 3",
+            "0 1 10 10"
+          ],
+          "answer": 3,
+          "explanation": "`C` sets its own value, and `D` repeats it: 10. Only an `iota` line gets the counter."
+        }
+      ]
+    }
+  ]
+}

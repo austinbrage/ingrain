@@ -1,0 +1,314 @@
+{
+  "id": "basic-types",
+  "intro": {
+    "title": "Basic types",
+    "slides": [
+      {
+        "text": "Every value in Go has a type, and Go checks it before the program runs. Here you use whole numbers, decimals, text and bools, convert between them by hand, and read the errors Go reports when types do not fit. The snippet is a map of the types, not Go.",
+        "code": "whole numbers  int, int8, int64, uint8\ndecimals       float64\ntext           string\ntrue or false  bool"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "whole-numbers",
+          "title": "Whole numbers",
+          "guide": "Declare two whole numbers of different types and print them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "`int` is the usual type for whole numbers.",
+              "text": "    var views int = 1200"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Other types have a fixed size and range. `uint8` holds 0 to 255: the `u` means unsigned, so no negatives.",
+              "notes": [
+                {
+                  "on": "uint8",
+                  "text": "A small number that is never negative."
+                }
+              ],
+              "text": "    var level uint8 = 255"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Print both.",
+              "text": "    fmt.Println(views, level)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1200 255"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "value-too-big",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:6:23: cannot use 200\n  (untyped int constant) as int8\n  value in variable declaration\n  (overflows)",
+          "options": [
+            "`int8` cannot be used with `var`",
+            "200 is text, not a number",
+            "The variable was never used",
+            "The value 200 is too big for an int8"
+          ],
+          "answer": 3,
+          "explanation": "An `int8` holds -128 to 127, so 200 does not fit. Go reports it before the program runs."
+        },
+        {
+          "type": "typing",
+          "id": "decimals",
+          "title": "Decimal numbers",
+          "guide": "Declare two decimal numbers and print them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A number with a decimal point is a `float64`, the usual type for decimals.",
+              "text": "    price := 9.5"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "A whole number also fits a `float64`: it is a decimal with nothing after the point.",
+              "text": "    var ratio float64 = 2"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A decimal that is whole prints without the point.",
+              "text": "    fmt.Println(price, ratio)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "9.5 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "mixed-numbers",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:8:14: invalid operation:\n  count + price (mismatched types\n  int and float64)",
+          "options": [
+            "An int and a float64 cannot be added directly",
+            "`price` was never declared",
+            "`+` only works on text",
+            "`price` must be written as `9`"
+          ],
+          "answer": 0,
+          "explanation": "Go never mixes number types on its own. Convert one side so both have the same type."
+        },
+        {
+          "type": "typing",
+          "id": "convert-numbers",
+          "title": "Convert a number",
+          "guide": "Turn an `int` into a `float64`, and a `float64` into an `int`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A type used like a function converts the value. `count` itself stays an `int`.",
+              "notes": [
+                {
+                  "on": "float64(",
+                  "text": "Makes a decimal copy of the value."
+                }
+              ],
+              "text": "    count := 7\n    total := float64(count)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A decimal to convert.",
+              "text": "    price := 9.99"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Going back to `int` cuts off the decimals. It does not round.",
+              "text": "    whole := int(price)"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Print both results.",
+              "text": "    fmt.Println(total, whole)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "7 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "wrap-around",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    big := 300\n    fmt.Println(uint8(big))\n}",
+          "options": [
+            "300",
+            "255",
+            "44",
+            "it does not compile"
+          ],
+          "answer": 2,
+          "explanation": "`uint8` holds 0 to 255. `big` is a variable, so Go does not stop it: 300 wraps around to 300 - 256 = 44."
+        },
+        {
+          "type": "typing",
+          "id": "text-and-bool",
+          "title": "Text and bools",
+          "guide": "Declare a string and a bool, and ask the string for its length.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Text is a `string`, written between double quotes.",
+              "text": "    word := \"gopher\""
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "`len` gives the length of a string, counted in bytes. Each of these letters is one byte.",
+              "notes": [
+                {
+                  "on": "len",
+                  "text": "Built into Go, so it needs no import."
+                }
+              ],
+              "text": "    size := len(word)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A `bool` is `true` or `false`, and nothing else.",
+              "text": "    open := false"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Print the three values.",
+              "text": "    fmt.Println(word, size, open)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "gopher 6 false"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "string-length",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    word := \"héllo\"\n    fmt.Println(len(word))\n}",
+          "options": [
+            "6",
+            "5",
+            "7",
+            "4"
+          ],
+          "answer": 0,
+          "explanation": "`len` counts bytes, not letters. The letter `é` takes two bytes, so the five letters make 6 bytes."
+        },
+        {
+          "type": "typing",
+          "id": "runes",
+          "title": "A single character",
+          "guide": "Store one character and print it in two ways.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Single quotes make a **rune**: one character, kept as its Unicode number.",
+              "notes": [
+                {
+                  "on": "'G'",
+                  "text": "One character, not a string."
+                }
+              ],
+              "text": "    letter := 'G'"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "A rune prints as its number. `G` is 71.",
+              "text": "    fmt.Println(letter)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Converting the rune to a `string` gives the character back as text.",
+              "text": "    fmt.Println(string(letter))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "71\nG"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "error",
+          "id": "number-as-bool",
+          "title": "What kind of error is it?",
+          "guide": "Read the code, then pick the kind of error.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var open bool = 1\n    fmt.Println(open)\n}",
+          "options": [
+            "No error",
+            "A compile error",
+            "A panic at run time"
+          ],
+          "answer": 1,
+          "explanation": "A `bool` holds only `true` or `false`. Go does not treat 1 as true, so the types do not match."
+        }
+      ]
+    }
+  ]
+}
