@@ -1,0 +1,29 @@
+{
+  "id": "tooling",
+  "module_sections": [
+    {
+      "name": "Everyday commands",
+      "tier": "basic",
+      "modules": [
+        { "id": "run-and-build", "name": "Run and build", "sessions": 1 },
+        { "id": "format-and-vet", "name": "Format and vet", "sessions": 1 },
+        { "id": "documentation", "name": "Documentation", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Building",
+      "tier": "medium",
+      "modules": [
+        { "id": "cross-compilation", "name": "Cross compilation", "sessions": 1 },
+        { "id": "build-tags-and-generate", "name": "Build tags and generate", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Performance",
+      "tier": "advanced",
+      "modules": [
+        { "id": "profiling", "name": "Profiling", "sessions": 1 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "standard-library",
+  "module_sections": [
+    {
+      "name": "Input and output",
+      "tier": "medium",
+      "modules": [
+        { "id": "readers-and-writers", "name": "Readers and writers", "sessions": 1 },
+        { "id": "files-and-directories", "name": "Files and directories", "sessions": 1 },
+        { "id": "command-line", "name": "Command line", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Data formats",
+      "tier": "medium",
+      "modules": [
+        { "id": "json", "name": "JSON", "sessions": 1 },
+        { "id": "time-and-dates", "name": "Time and dates", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Networking",
+      "tier": "medium",
+      "modules": [
+        { "id": "http-clients", "name": "HTTP clients", "sessions": 1 },
+        { "id": "http-servers", "name": "HTTP servers", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Everyday tools",
+      "tier": "medium",
+      "modules": [
+        { "id": "logging", "name": "Logging", "sessions": 1 }
+      ]
+    }
+  ]
+}

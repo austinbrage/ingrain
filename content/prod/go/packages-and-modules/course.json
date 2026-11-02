@@ -1,0 +1,23 @@
+{
+  "id": "packages-and-modules",
+  "module_sections": [
+    {
+      "name": "Packages",
+      "tier": "basic",
+      "modules": [
+        { "id": "packages", "name": "Packages", "sessions": 1 },
+        { "id": "imports-and-visibility", "name": "Imports and visibility", "sessions": 1 },
+        { "id": "init-and-package-state", "name": "Init and package state", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Modules",
+      "tier": "medium",
+      "modules": [
+        { "id": "go-modules", "name": "Go modules", "sessions": 1 },
+        { "id": "dependencies", "name": "Dependencies", "sessions": 1 },
+        { "id": "project-layout", "name": "Project layout", "sessions": 1 }
+      ]
+    }
+  ]
+}

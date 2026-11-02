@@ -1,0 +1,30 @@
+{
+  "id": "collections",
+  "module_sections": [
+    {
+      "name": "Arrays and slices",
+      "tier": "basic",
+      "modules": [
+        { "id": "arrays", "name": "Arrays", "sessions": 1 },
+        { "id": "slices", "name": "Slices", "sessions": 1 },
+        { "id": "append-and-copy", "name": "Append and copy", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Maps",
+      "tier": "basic",
+      "modules": [
+        { "id": "maps", "name": "Maps", "sessions": 1 },
+        { "id": "map-patterns", "name": "Map patterns", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Going deeper",
+      "tier": "medium",
+      "modules": [
+        { "id": "slice-capacity", "name": "Slice capacity", "sessions": 1 },
+        { "id": "slices-and-maps-packages", "name": "The slices and maps packages", "sessions": 1 }
+      ]
+    }
+  ]
+}

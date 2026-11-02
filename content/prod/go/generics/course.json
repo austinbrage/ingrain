@@ -1,0 +1,22 @@
+{
+  "id": "generics",
+  "module_sections": [
+    {
+      "name": "Type parameters",
+      "tier": "medium",
+      "modules": [
+        { "id": "generic-functions", "name": "Generic functions", "sessions": 1 },
+        { "id": "constraints", "name": "Constraints", "sessions": 1 },
+        { "id": "type-inference", "name": "Type inference", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Generic types",
+      "tier": "advanced",
+      "modules": [
+        { "id": "generic-types", "name": "Generic types", "sessions": 1 },
+        { "id": "generics-in-practice", "name": "Generics in practice", "sessions": 1 }
+      ]
+    }
+  ]
+}

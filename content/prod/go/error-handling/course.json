@@ -1,0 +1,30 @@
+{
+  "id": "error-handling",
+  "module_sections": [
+    {
+      "name": "Errors as values",
+      "tier": "basic",
+      "modules": [
+        { "id": "errors-as-values", "name": "Errors as values", "sessions": 1 },
+        { "id": "creating-errors", "name": "Creating errors", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Wrapping and inspecting",
+      "tier": "medium",
+      "modules": [
+        { "id": "wrapping-errors", "name": "Wrapping errors", "sessions": 1 },
+        { "id": "errors-is-and-as", "name": "Errors Is and As", "sessions": 1 },
+        { "id": "custom-errors", "name": "Custom errors", "sessions": 1 },
+        { "id": "sentinel-errors", "name": "Sentinel errors", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Panics",
+      "tier": "medium",
+      "modules": [
+        { "id": "panic-and-recover", "name": "Panic and recover", "sessions": 1 }
+      ]
+    }
+  ]
+}

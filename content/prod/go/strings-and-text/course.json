@@ -1,0 +1,31 @@
+{
+  "id": "strings-and-text",
+  "module_sections": [
+    {
+      "name": "Strings",
+      "tier": "basic",
+      "modules": [
+        { "id": "strings", "name": "Strings", "sessions": 1 },
+        { "id": "runes-and-utf8", "name": "Runes and UTF-8", "sessions": 1 },
+        { "id": "strings-package", "name": "The strings package", "sessions": 1 },
+        { "id": "string-builder", "name": "String builder", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Formatting",
+      "tier": "basic",
+      "modules": [
+        { "id": "printing", "name": "Printing", "sessions": 1 },
+        { "id": "formatting-verbs", "name": "Formatting verbs", "sessions": 1 },
+        { "id": "strconv", "name": "Conversions", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Patterns",
+      "tier": "medium",
+      "modules": [
+        { "id": "regular-expressions", "name": "Regular expressions", "sessions": 1 }
+      ]
+    }
+  ]
+}

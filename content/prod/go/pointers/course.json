@@ -1,0 +1,23 @@
+{
+  "id": "pointers",
+  "module_sections": [
+    {
+      "name": "Basics",
+      "tier": "basic",
+      "modules": [
+        { "id": "pointer-basics", "name": "Pointer basics", "sessions": 1 },
+        { "id": "pointers-and-functions", "name": "Pointers and functions", "sessions": 1 },
+        { "id": "pointers-to-structs", "name": "Pointers to structs", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Semantics",
+      "tier": "medium",
+      "modules": [
+        { "id": "value-vs-pointer", "name": "Value or pointer", "sessions": 1 },
+        { "id": "nil-pointers", "name": "Nil pointers", "sessions": 1 },
+        { "id": "slices-maps-and-pointers", "name": "Slices, maps and pointers", "sessions": 1 }
+      ]
+    }
+  ]
+}

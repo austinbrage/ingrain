@@ -6,11 +6,19 @@
       "name": "Core",
       "courses": [
         { "id": "syntax", "name": "Syntax" },
-        { "id": "structs-and-interfaces", "name": "Structs and interfaces" },
+        { "id": "functions", "name": "Functions" },
+        { "id": "collections", "name": "Collections" },
+        { "id": "strings-and-text", "name": "Strings and text" },
         { "id": "pointers", "name": "Pointers" },
+        { "id": "structs-and-methods", "name": "Structs and methods" },
+        { "id": "interfaces", "name": "Interfaces" },
         { "id": "error-handling", "name": "Error handling" },
+        { "id": "packages-and-modules", "name": "Packages and modules" },
+        { "id": "generics", "name": "Generics" },
         { "id": "concurrency", "name": "Concurrency" },
-        { "id": "testing", "name": "Testing" }
+        { "id": "standard-library", "name": "Standard library" },
+        { "id": "testing", "name": "Testing" },
+        { "id": "tooling", "name": "Tooling" }
       ]
     },
     {

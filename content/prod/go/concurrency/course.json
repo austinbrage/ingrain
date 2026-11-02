@@ -1,0 +1,35 @@
+{
+  "id": "concurrency",
+  "module_sections": [
+    {
+      "name": "Goroutines and channels",
+      "tier": "medium",
+      "modules": [
+        { "id": "goroutines", "name": "Goroutines", "sessions": 1 },
+        { "id": "channels", "name": "Channels", "sessions": 1 },
+        { "id": "buffered-channels", "name": "Buffered channels", "sessions": 1 },
+        { "id": "closing-channels", "name": "Closing channels", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Coordination",
+      "tier": "medium",
+      "modules": [
+        { "id": "select", "name": "Select", "sessions": 1 },
+        { "id": "waitgroups", "name": "Wait groups", "sessions": 1 },
+        { "id": "mutexes", "name": "Mutexes", "sessions": 1 },
+        { "id": "once-and-atomics", "name": "Once and atomics", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Patterns",
+      "tier": "advanced",
+      "modules": [
+        { "id": "context", "name": "Context", "sessions": 1 },
+        { "id": "worker-pools", "name": "Worker pools", "sessions": 1 },
+        { "id": "pipelines", "name": "Pipelines", "sessions": 1 },
+        { "id": "races-and-leaks", "name": "Races and leaks", "sessions": 1 }
+      ]
+    }
+  ]
+}
