@@ -70,7 +70,7 @@
           "type": "typing",
           "id": "paragraph",
           "title": "A Paragraph",
-          "guide": "A plain string works, but most of the time you draw a **widget** from `ratatui::widgets`. `Paragraph` is the simplest one: it shows text and can align it. The output is drawn for a 30-column terminal.",
+          "guide": "A **widget** like `Paragraph` shows text and can align it. The output is drawn for a 30-column terminal.",
           "chunks": [
             {
               "mode": "auto",
@@ -111,7 +111,7 @@
           "type": "typing",
           "id": "frame-area",
           "title": "The frame area",
-          "guide": "`frame.area()` is a `Rect`: the position and size of the whole terminal. Widgets draw **inside** a `Rect`, so knowing the area is the first step to placing anything. The output is drawn for an 80 by 24 terminal.",
+          "guide": "`frame.area()` is the terminal's `Rect`, and widgets draw **inside** a `Rect`. The output is 80 by 24.",
           "chunks": [
             {
               "mode": "auto",
@@ -148,7 +148,7 @@
           "type": "typing",
           "id": "two-widgets",
           "title": "Two widgets",
-          "guide": "One frame can hold many widgets. Each one gets its own `Rect`, built with `Rect::new(x, y, width, height)`, where `x` and `y` count cells from the top-left corner.",
+          "guide": "Each widget gets its own `Rect::new(x, y, width, height)`, with `x` and `y` counted from the top-left corner.",
           "chunks": [
             {
               "mode": "auto",
@@ -199,7 +199,7 @@
           "type": "typing",
           "id": "draw-on-every-key",
           "title": "Draw again on every key",
-          "guide": "`app` draws, waits for a key, and loops, so it draws **again after every event**. What `render` shows can change between frames. Here the screen counts key presses, and `q` quits. The output is the screen after three key presses.",
+          "guide": "`app` draws **again after every event**: `render` counts key presses. The output is after three presses.",
           "chunks": [
             {
               "mode": "ghost",
