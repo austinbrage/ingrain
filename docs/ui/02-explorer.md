@@ -2,7 +2,7 @@
 
 Status: Draft
 
-The course tree as Miller columns, in the home's frame: the four thick corners around the whole screen, and three columns inside, separated by a thin line. One screen drawn at four depths (course sections, courses, modules, sessions). The drilldown mode (one level per screen) has its own drafts, `03` to `05`.
+The course tree as Miller columns, in the home's frame: the four thick corners around the whole screen, and three columns inside, separated by a thin line. One screen drawn at four depths (layers, courses, modules, sessions). The drilldown mode (one level per screen) has its own drafts, `03` to `05`.
 
 The courses depth, with the courses column focused and the modules of Syntax as the preview:
 
@@ -76,12 +76,12 @@ Drawn at 100x24. The sketch shows the selected row of the focused column as `▌
 - A thin `│` in `overlay0` between columns. It runs from the title row to the last list row and touches neither the header, the hint nor the corners
 - Each column: a title row (the parent of the list), one blank row, then the list
 - A row has the text on the left and, on the right edge, a chevron `›`, a count (`4/4`) or a tier (`basic`)
-- The third column shows the preview of the selected item's children. At the sections depth the selected section's courses, at the courses depth the selected course's modules. At the sessions depth it is the sessions of the selected module, in place of the modules
+- The third column shows the preview of the selected item's children. At the layers depth the selected layer's courses, at the courses depth the selected course's modules. At the sessions depth it is the sessions of the selected module, in place of the modules
 - The modules column groups the modules under section labels (`FOUNDATIONS`, with its tier on the right), with a blank row between groups
 
 ## Breadcrumb and hint
-- **Breadcrumb:** the path down to the focused column: `Rust` at the sections depth, `Rust › Core` at the courses depth and `Rust › Core › Syntax` at the modules depth and `Rust › Core › Syntax › Variables` at the sessions depth
-- **Hint:** the same style as the home, keys in `text` and labels in `overlay1`. `↑↓ move   → open   ← back   Ctrl-Q quit` at the sections and courses depths, and `↑↓ move   Enter start   ← back   Ctrl-Q quit` at the modules and sessions depths
+- **Breadcrumb:** the path down to the focused column: `Rust` at the layers depth, `Rust › Core` at the courses depth and `Rust › Core › Syntax` at the modules depth and `Rust › Core › Syntax › Variables` at the sessions depth
+- **Hint:** the same style as the home, keys in `text` and labels in `overlay1`. `↑↓ move   → open   ← back   Ctrl-Q quit` at the layers and courses depths, and `↑↓ move   Enter start   ← back   Ctrl-Q quit` at the modules and sessions depths
 - Esc and ← at the first column go back to the home, with that language's card selected
 
 ## Color
@@ -100,7 +100,7 @@ The explorer ticks every 50 ms, like the home, and the tick only advances when n
 - **Cascade**: when Enter on a language card opens the explorer, the three columns show their rows from the top, 2 rows per tick, so the longest column takes about 0.35 seconds. The corners, the header, the titles and the hint are there from the first frame. It does not replay when coming back from an exercise
 
 ## Sessions
-Sessions are a fourth level. They appear only when the module has a session completed and more than one session (see `docs/progress-flow.md`): any other module opens the exercise directly. The sessions column **replaces the modules column**, so the sections and courses columns stay where they are, with their selected row marked `▸`, and the focus is on the sessions column. The sketch shows the module Variables, with its first session done and the second one as the next (its right side is typed, so it shows `next█`). A first version slid the window one column left instead, and it was dropped because the eye had to follow every column:
+Sessions are a fourth level. They appear only when the module has a session completed and more than one session (see `docs/progress-flow.md`): any other module opens the exercise directly. The sessions column **replaces the modules column**, so the layers and courses columns stay where they are, with their selected row marked `▸`, and the focus is on the sessions column. The sketch shows the module Variables, with its first session done and the second one as the next (its right side is typed, so it shows `next█`). A first version slid the window one column left instead, and it was dropped because the eye had to follow every column:
 
 ```
 ┏━━━━━━━                                                                                    ━━━━━━━┓
@@ -131,10 +131,10 @@ Sessions are a fourth level. They appear only when the module has a session comp
 
 | Depth | Column 1 | Column 2 | Column 3 |
 |---|---|---|---|
-| Sections | sections | courses (preview) | modules (preview) |
-| Courses | sections | courses | modules (preview) |
-| Modules | sections | courses | modules |
-| Sessions | sections | courses | sessions (replaces modules) |
+| Layers | layers | courses (preview) | modules (preview) |
+| Courses | layers | courses | modules (preview) |
+| Modules | layers | courses | modules |
+| Sessions | layers | courses | sessions (replaces modules) |
 
 - The sessions column shows `Session N`, with `✓` in `green` on the completed sessions and `○` on the rest. A failed session shows a red `✗` instead (see Failed) The first session not done is the next one, in the accent color with the typed `next`, like the next module
 - The title of the column is the module, and the breadcrumb adds it too (`Rust › Core › Syntax › Loops`). The hint is the modules one

@@ -389,15 +389,15 @@ mod real_content {
         for folder in folders(&content) {
             let language = folder.file_name().unwrap().to_str().unwrap();
             let catalog = Catalog::load(Source::Prod, language);
-            let sections: Vec<&str> = catalog.sections.iter().map(|s| s.id.as_str()).collect();
+            let layers: Vec<&str> = catalog.layers.iter().map(|l| l.id.as_str()).collect();
             let courses: Vec<&str> = catalog
-                .sections
+                .layers
                 .iter()
-                .flat_map(|section| &section.courses)
+                .flat_map(|layer| &layer.courses)
                 .map(|course| course.id.as_str())
                 .collect();
 
-            problems.extend(slug_problems(language, &sections));
+            problems.extend(slug_problems(language, &layers));
             problems.extend(slug_problems(language, &courses));
             problems.extend(unlisted_problems(
                 language,

@@ -18,7 +18,7 @@ fn rust_explorer() -> TestApp {
     app
 }
 
-mod sections {
+mod layers {
     use super::*;
 
     #[test]
@@ -54,12 +54,12 @@ mod sections {
         assert!(!screen.contains("Tools"));
         assert!(!screen.contains("Helpers"));
 
-        app.press(KeyCode::Up); // already at the first section
+        app.press(KeyCode::Up); // already at the first layer
         let screen = app.screen();
         assert_eq!(screen.background_of("Core"), Some(highlighted()));
 
         app.press(KeyCode::Down);
-        app.press(KeyCode::Down); // already at the last section
+        app.press(KeyCode::Down); // already at the last layer
         let screen = app.screen();
         assert_eq!(screen.background_of("Ecosystem"), Some(highlighted()));
         assert_ne!(screen.background_of("Core"), Some(highlighted()));

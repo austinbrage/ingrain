@@ -1,6 +1,6 @@
 {
   "name": "Rust",
-  "sections": [
+  "layers": [
     {
       "id": "core",
       "name": "Core",

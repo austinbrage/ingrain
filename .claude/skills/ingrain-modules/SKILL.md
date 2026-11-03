@@ -5,9 +5,9 @@ description: Create or modify the modules of one course of a language in Ingrain
 
 # ingrain-modules
 
-Writes the modules of one course, in `content/prod/<language>/<course>/course.json`. It is the second of three skills: `ingrain-courses` (the courses of a section), this one, and `ingrain-exercises` (the exercises of each module). `ingrain-courses` calls this skill once for every course it creates, and the user can call it on its own.
+Writes the modules of one course, in `content/prod/<language>/<course>/course.json`. It is the second of three skills: `ingrain-courses` (the courses of a layer), this one, and `ingrain-exercises` (the exercises of each module). `ingrain-courses` calls this skill once for every course it creates, and the user can call it on its own.
 
-Arguments: `$ARGUMENTS` is `<language> <section> <course> [request]`. The course must already be in `content/prod/<language>/catalog.json`, inside that section. Without a request, draw all the modules of the course. With a request, change them as it says.
+Arguments: `$ARGUMENTS` is `<language> <layer> <course> [request]`. The course must already be in `content/prod/<language>/catalog.json`, inside that layer. Without a request, draw all the modules of the course. With a request, change them as it says.
 
 When `ingrain-courses` calls this skill, the request carries the **scope** of the course (what it must cover) and the scopes of the courses around it. Stay inside the scope, and do not cover a topic that a neighbor course covers. The scope is not stored anywhere else: after this run, the modules themselves are what remembers it.
 

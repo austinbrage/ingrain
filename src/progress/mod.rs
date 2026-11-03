@@ -44,7 +44,7 @@ pub struct ModuleProgress {
 
 // Where Continue opens, as positions in the catalog and in the module file
 pub struct ContinueAt {
-    pub section: usize,
+    pub layer: usize,
     pub course: usize,
     pub module: usize,
     pub session: usize,
@@ -248,9 +248,9 @@ impl Progress {
 
         Some(
             match next_course(self, &last.language, library, &last.course) {
-                Some((section, course, _)) => ContinueLabel::Course(format!(
+                Some((layer, course, _)) => ContinueLabel::Course(format!(
                     "{} · {}",
-                    catalog.name, catalog.sections[section].courses[course].name
+                    catalog.name, catalog.layers[layer].courses[course].name
                 )),
                 None => ContinueLabel::Review(catalog.name.clone()),
             },
@@ -261,10 +261,10 @@ impl Progress {
     pub fn continue_at(&self, library: &Library) -> Option<ContinueAt> {
         let last = self.last.as_ref()?;
         // With nothing left to study, review the module practiced longest ago
-        let (section, course, module) = next_course(self, &last.language, library, &last.course)
+        let (layer, course, module) = next_course(self, &last.language, library, &last.course)
             .or_else(|| next_review(self, &last.language, library))?;
 
-        let course_id = &library.catalog.sections[section].courses[course].id;
+        let course_id = &library.catalog.layers[layer].courses[course].id;
         let module_id = &library.courses.get(course_id)?.module_at(module)?.id;
         let module_path = format!("{}/{course_id}/{module_id}", last.language);
         let data = Module::load(library.source, &last.language, course_id, module_id)?;
@@ -272,7 +272,7 @@ impl Progress {
         let (session, exercise) = self.resume_point(&module_path, &data);
 
         Some(ContinueAt {
-            section,
+            layer,
             course,
             module,
             session,

@@ -5,7 +5,7 @@ description: Create or change the exercises of a module of a language in Ingrain
 
 # ingrain-exercises
 
-Writes the exercises of one module, in `content/prod/<language>/<course>/<module>.json`. It is the third of three skills: `ingrain-courses` (the courses of a section), `ingrain-modules` (the modules of a course) and this one. The module must already be in the `course.json` of its course.
+Writes the exercises of one module, in `content/prod/<language>/<course>/<module>.json`. It is the third of three skills: `ingrain-courses` (the courses of a layer), `ingrain-modules` (the modules of a course) and this one. The module must already be in the `course.json` of its course.
 
 Arguments: `$ARGUMENTS` is `<language> <course> <module> [exercise] [prompt]`. It has two modes.
 

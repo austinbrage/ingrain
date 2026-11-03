@@ -2,19 +2,19 @@ use super::{Column, Item};
 use crate::app::{Depth, ExplorerState};
 use crate::content::Catalog;
 
-pub fn sections_column(catalog: &Catalog, state: ExplorerState) -> Column {
+pub fn layers_column(catalog: &Catalog, state: ExplorerState) -> Column {
     Column {
         title: catalog.name.to_uppercase(),
         items: catalog
-            .sections
+            .layers
             .iter()
-            .map(|section| Item {
-                text: section.name.clone(),
+            .map(|layer| Item {
+                text: layer.name.clone(),
                 right: "›".to_string(),
                 ..Item::default()
             })
             .collect(),
-        selected: Some(state.section),
-        focused: state.depth == Depth::Sections,
+        selected: Some(state.layer),
+        focused: state.depth == Depth::Layers,
     }
 }

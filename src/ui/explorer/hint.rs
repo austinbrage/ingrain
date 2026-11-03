@@ -36,7 +36,7 @@ pub fn render_hint(frame: &mut Frame, area: Rect, state: ExplorerState, marks: &
         .copied()
         .unwrap_or(false);
     let keys = match state.depth {
-        Depth::Sections | Depth::Courses => OPEN_HINT,
+        Depth::Layers | Depth::Courses => OPEN_HINT,
         Depth::Modules => START_HINT,
         Depth::Sessions if failed => RETAKE_HINT,
         Depth::Sessions => START_HINT,

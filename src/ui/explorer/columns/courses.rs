@@ -3,11 +3,11 @@ use crate::app::{Depth, ExplorerState};
 use crate::content::Catalog;
 
 pub fn courses_column(catalog: &Catalog, state: ExplorerState) -> Column {
-    let section = &catalog.sections[state.section];
+    let layer = &catalog.layers[state.layer];
 
     Column {
-        title: section.name.to_uppercase(),
-        items: section
+        title: layer.name.to_uppercase(),
+        items: layer
             .courses
             .iter()
             .map(|course| Item {
@@ -16,7 +16,7 @@ pub fn courses_column(catalog: &Catalog, state: ExplorerState) -> Column {
                 ..Item::default()
             })
             .collect(),
-        selected: if state.depth == Depth::Sections {
+        selected: if state.depth == Depth::Layers {
             None
         } else {
             Some(state.course)

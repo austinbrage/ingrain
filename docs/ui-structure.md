@@ -14,7 +14,7 @@ The home has two views: the buttons and the language cards, so there is no separ
 | Draft | File | Notes |
 |---|---|---|
 | `01-home.md` | `ui/home/` | splash: gradient title with a wave, tagline, typing demo. Two views: the buttons, or one card per language. The Continue button has three states: hidden for a new user, a course (`Continue   Rust · Syntax`), and a finished language (`Rust completed · Let's review`, with slow dots). The demo types the language of the last course practiced |
-| `02-explorer.md` | `ui/explorer/` | one screen drawn at three depths (course sections, courses, modules), in the home's corner frame. The module rows show progress: `done/total`, a green `✓` when complete, and the next module in the accent color with a typed `next`. At the sessions depth, a fourth level, the sessions column replaces the modules column (`✓`, `✗` and `○`, and the next session typed like the next module). A module or a session with failed exercises shows a red `✗` (`✗ 1/4` on the module row), and the hint says `Enter retake` on a failed session row |
+| `02-explorer.md` | `ui/explorer/` | one screen drawn at three depths (layers, courses, modules), in the home's corner frame. The module rows show progress: `done/total`, a green `✓` when complete, and the next module in the accent color with a typed `next`. At the sessions depth, a fourth level, the sessions column replaces the modules column (`✓`, `✗` and `○`, and the next session typed like the next module). A module or a session with failed exercises shows a red `✗` (`✗ 1/4` on the module row), and the hint says `Enter retake` on a failed session row |
 | `exercise/01` to `04` | `ui/exercise/` (`mod.rs` header and footer, `typing/mod.rs` the 2:1 layout, `typing/guide/` the two guide cards and the copy box, `typing/editor/` the window, the code rows and the hints) | the definitive look in two layouts and two chunk modes: `03` ghost wide (built), `04` copy wide (built), `01` and `02` narrow (decided, not built). Boxed header and footer, the editor window and the guide cards flush to the screen edges. See `docs/todos/00-exercise-view.md` |
 | `exercise/08-quiz` | `ui/exercise/quiz/` (`mod.rs` the layout by `kind` and the guide card, `code.rs` the code window, `options.rs` the options card with its wrapping, markers and scroll) | the quiz exercise: the code in a read only window on the left, the guide card (the explanation once answered) and the options card on the right. The right column is 2:1 of the code, 3:2 wider for the `purpose` kind. It repeats a few pieces of `typing/guide/` and `typing/editor/` on purpose (the guide card, the rule, the language label, the title bar), to merge in `todos/05-deep-refactor.md` (6.7 and 6.8) |
 | `exercise/09-auto-complete` | `ui/exercise/typing/finish_modal.rs` (the modal), and the hint in `ui/exercise/mod.rs` | the `Ctrl-F` shortcut of the typing exercise: it types the rest of the chunk by itself, a char per tick and 2 seconds at most, and a key interrupts it. The footer lists `Ctrl-F finish`. On the 4th use in a row, then the 9th and the 16th, a `Finish it?` modal over the dimmed screen asks before typing: `Enter` finishes the chunk, `Esc` leaves it to the user |
@@ -32,7 +32,7 @@ The header and footer of the end screens and of the intro are drawn by `ui/chrom
 - Named after the content (the course tree), not the mechanism (`navigator` was rejected)
 - Two view modes share one state, the path through the tree (one selected index per level), and the same keys
   - **Columns (default):** Miller columns, three levels visible, preview of the selected item's children. One screen drawn at different depths. Built first
-  - **Drilldown:** a mode, not a screen. One level per screen, so it contains three screens with different looks: course sections (buttons), courses (list with progress), modules (stacked sections). Taken from the drafts in `docs/ui/` (`03` to `05`). Built later
+  - **Drilldown:** a mode, not a screen. One level per screen, so it contains three screens with different looks: layers (buttons), courses (list with progress), modules (stacked sections). Taken from the drafts in `docs/ui/` (`03` to `05`). Built later
 - The language is not a column: it shows in the breadcrumb and as the accent color
 - The mode is a setting: `auto` (columns when wide enough, drilldown when narrow), `columns` or `drilldown`
 
@@ -45,7 +45,7 @@ The header and footer of the end screens and of the intro are drawn by `ui/chrom
 | `explorer/corners.rs` | the four thick corners, a copy of the home's |
 | `explorer/hint.rs` | the hint line, one key list per depth, and `Enter retake` on a failed row of the sessions column |
 | `explorer/columns/mod.rs` | `render_columns` (builds, lays out and renders the three columns, with the sessions column in place of the modules column at its depth), `render_single_column`, `Column` and `Item`, the title wave and the cascade, and the typed `next` (`typed_text`) that the modules and sessions columns share. Any `✗` in the right-hand text is drawn red |
-| `explorer/columns/sections.rs` | builds the sections column |
+| `explorer/columns/layers.rs` | builds the layers column |
 | `explorer/columns/courses.rs` | builds the courses column |
 | `explorer/columns/modules.rs` | builds the modules column |
 | `explorer/columns/sessions.rs` | builds the sessions column of the selected module |
@@ -54,7 +54,7 @@ A new level adds a file under `columns/`. When drilldown arrives, `mod.rs` picks
 
 | File | Draws |
 |---|---|
-| `explorer/drilldown_sections.rs` | drilldown: course sections screen |
+| `explorer/drilldown_layers.rs` | drilldown: layers screen |
 | `explorer/drilldown_courses.rs` | drilldown: courses screen |
 | `explorer/drilldown_modules.rs` | drilldown: modules screen |
 
@@ -75,7 +75,7 @@ One file per screen in `src/app/`, with the screen's state type and its key hand
 | `app/intro.rs` | `IntroState` (the explorer position, the module, the session, which intro it is on, the slide and the scroll), `applies` (the one decision: a fresh start of a session, never a retake), `new`, and its keys: Enter and Right go to the next slide, and Enter on the last one goes on (the session intro after the module's, or `ExerciseState::start`), Left goes back, Up and Down scroll the text, Esc goes to the explorer |
 | `src/dev.rs` (outside `app/`) | opens a screen from command line arguments, for development. Called by `main.rs` |
 
-- `Screen::Explorer(ExplorerState)` carries the language and the path (depth, section, course)
+- `Screen::Explorer(ExplorerState)` carries the language and the path (depth, layer, course)
 - `mod.rs` re-exports the types, so `ui/` imports them from `crate::app`
 - `Screen` is not `Copy`: the exercise and complete screens own their data (the loaded module, the typed code)
 - `App` owns one `Progress` and one `Content`. Both are plain data with methods: `Progress` never imports `app/` types, so it answers with plain numbers and `App` translates them into screens. `ui/` reads progress only through the `App` methods above

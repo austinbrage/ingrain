@@ -4,7 +4,7 @@ use crate::progress::Progress;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum Depth {
-    Sections,
+    Layers,
     Courses,
     Modules,
     Sessions,
@@ -15,7 +15,7 @@ pub enum Depth {
 pub struct ExplorerState {
     pub language: HomeLanguage,
     pub depth: Depth,
-    pub section: usize,
+    pub layer: usize,
     pub course: usize,
     pub module: usize,
     pub session: usize,
@@ -38,8 +38,8 @@ impl ExplorerState {
     pub fn new(language: HomeLanguage) -> Self {
         Self {
             language,
-            depth: Depth::Sections,
-            section: 0,
+            depth: Depth::Layers,
+            layer: 0,
             course: 0,
             module: 0,
             session: 0,
@@ -53,7 +53,7 @@ impl ExplorerState {
 
         let mut explorer = Self::new(language);
         explorer.depth = Depth::Modules;
-        explorer.section = at.section;
+        explorer.layer = at.layer;
         explorer.course = at.course;
         explorer.module = at.module;
 
@@ -91,8 +91,8 @@ impl ExplorerState {
     // "Rust", "Rust › Core", "Rust › Core › Syntax" or with the module: the path down to the focused column
     pub fn explorer_breadcrumb(self, app: &App) -> String {
         let catalog = app.content.catalog(self.language);
-        let section = &catalog.sections[self.section];
-        let course = &section.courses[self.course];
+        let layer = &catalog.layers[self.layer];
+        let course = &layer.courses[self.course];
         let module = app
             .content
             .course(self)
@@ -100,12 +100,12 @@ impl ExplorerState {
             .map_or("", |module| module.name.as_str());
 
         match self.depth {
-            Depth::Sections => catalog.name.clone(),
-            Depth::Courses => format!("{} › {}", catalog.name, section.name),
-            Depth::Modules => format!("{} › {} › {}", catalog.name, section.name, course.name),
+            Depth::Layers => catalog.name.clone(),
+            Depth::Courses => format!("{} › {}", catalog.name, layer.name),
+            Depth::Modules => format!("{} › {} › {}", catalog.name, layer.name, course.name),
             Depth::Sessions => format!(
                 "{} › {} › {} › {module}",
-                catalog.name, section.name, course.name
+                catalog.name, layer.name, course.name
             ),
         }
     }
@@ -126,7 +126,7 @@ impl ExplorerState {
         progress: &mut Progress,
     ) -> Option<Screen> {
         match self.depth {
-            Depth::Sections => self.handle_sections_key(action, content),
+            Depth::Layers => self.handle_layers_key(action, content),
             Depth::Courses => self.handle_courses_key(action, content),
             Depth::Modules => self.handle_modules_key(action, content, progress),
             Depth::Sessions => self.handle_sessions_key(action, content, progress),
@@ -134,12 +134,12 @@ impl ExplorerState {
     }
 
     // Handle 2nd Column on Explorer
-    fn handle_sections_key(&mut self, action: Action, content: &Content) -> Option<Screen> {
-        let section_count = content.catalog(self.language).sections.len();
+    fn handle_layers_key(&mut self, action: Action, content: &Content) -> Option<Screen> {
+        let layer_count = content.catalog(self.language).layers.len();
 
         match action {
             Action::Up | Action::Down => {
-                self.section = Self::step(self.section, section_count, action);
+                self.layer = Self::step(self.layer, layer_count, action);
                 self.course = 0;
                 self.module = 0;
             }
@@ -155,7 +155,7 @@ impl ExplorerState {
 
     // Handle 3nd Column on Explorer
     fn handle_courses_key(&mut self, action: Action, content: &Content) -> Option<Screen> {
-        let course_count = content.catalog(self.language).sections[self.section]
+        let course_count = content.catalog(self.language).layers[self.layer]
             .courses
             .len();
         let module_count = content
@@ -168,7 +168,7 @@ impl ExplorerState {
                 self.module = 0;
             }
             Action::Right | Action::Select if module_count > 0 => self.depth = Depth::Modules,
-            Action::Left | Action::Back => self.depth = Depth::Sections,
+            Action::Left | Action::Back => self.depth = Depth::Layers,
             _ => {}
         }
 

@@ -28,7 +28,7 @@ impl Content {
 
     pub fn course(&self, state: ExplorerState) -> Option<&Course> {
         let library = self.library(state.language);
-        let id = &library.catalog.sections[state.section].courses[state.course].id;
+        let id = &library.catalog.layers[state.layer].courses[state.course].id;
 
         library.courses.get(id)
     }
@@ -45,7 +45,7 @@ impl Content {
     }
 
     pub fn course_id(&self, state: ExplorerState) -> &str {
-        &self.catalog(state.language).sections[state.section].courses[state.course].id
+        &self.catalog(state.language).layers[state.layer].courses[state.course].id
     }
 
     // "rust/syntax/loops": the id that progress uses for a module
@@ -62,7 +62,7 @@ impl Content {
     // " Rust · Syntax · Loops": the language, course and module of an explorer position
     pub fn breadcrumb(&self, state: ExplorerState) -> String {
         let catalog = self.catalog(state.language);
-        let course_name = &catalog.sections[state.section].courses[state.course].name;
+        let course_name = &catalog.layers[state.layer].courses[state.course].name;
         let module_name = self
             .course(state)
             .and_then(|course| course.module_at(state.module))

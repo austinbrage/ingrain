@@ -5,7 +5,7 @@ Reference: `legacy/docs/course-structure.md` (frozen). Read it for tiers, sessio
 ## Hierarchy
 ```
 Language (Rust, Go)
- └─ Course section (Core | Ecosystem)
+ └─ Layer (Core | Ecosystem)
      └─ Course (Rust Core: syntax, borrow checker, concurrency. Rust Ecosystem: ratatui, clap, actix)
          └─ Module section (related modules, stacked from basic to advanced)
              └─ Module (one concept: conditionals, loops, enums)
@@ -14,8 +14,8 @@ Language (Rust, Go)
 ```
 
 ## Definitions
-- **Course section:** the two main groups of a language. Core is the language itself (syntax, structs, enums). Ecosystem is frameworks and libraries
-- **Course:** one topic inside a course section
+- **Layer:** the two halves of a language. Core is the language itself (syntax, structs, enums). Ecosystem is frameworks and libraries
+- **Course:** one topic inside a layer
 - **Module section:** the legacy "Section": a group of related modules inside a course, ordered from basic to advanced
 - **Module, Session, Exercise:** unchanged from legacy
 
@@ -23,7 +23,7 @@ Language (Rust, Go)
 Home → Languages → Course navigator → Exercise
 
 - **Languages** is its own full-width screen: the brand moment where the user picks Rust or Go (big name, language color)
-- **Course navigator** covers course sections, courses, modules and sessions. The language is not a column; it shows in the breadcrumb and as the accent color
+- **Course navigator** covers layers, courses, modules and sessions. The language is not a column; it shows in the breadcrumb and as the accent color
 - **State:** the path through the tree, one selected index per level. Both view modes share it, along with the keys (↑↓ move, → in, ← out, Esc back to Languages)
 
 ### View modes
@@ -49,8 +49,7 @@ A module section belongs to a tier, and **a tier is the difficulty of the concep
 - `tier` is a free string in `course.json` for now, and only displayed. It becomes an enum when it starts driving behavior
 
 ## Open
-- "Section" names two levels (course section and module section); rename one
-- Course sections (Core, Ecosystem) are a different axis from the legacy tiers (basic, medium, advanced); define how they relate
+- Layers (Core, Ecosystem) are a different axis from the legacy tiers (basic, medium, advanced); define how they relate
 - Is Ecosystem in the first release, or shown as coming soon?
 - Minimum terminal width for columns mode, and where the setting lives (config file, settings screen)
 - Look of locked (paid) modules and scrolling when a column has more items than fit

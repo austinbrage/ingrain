@@ -1,14 +1,14 @@
 mod courses;
+mod layers;
 mod modules;
-mod sections;
 mod sessions;
 
 use crate::app::{Depth, ExplorerState, ModuleMarks};
 use crate::content::{Catalog, Course};
 use crate::ui::wave::wave_line;
 use courses::courses_column;
+use layers::layers_column;
 use modules::modules_column;
-use sections::sections_column;
 use sessions::sessions_column;
 
 use catppuccin::PALETTE;
@@ -66,7 +66,7 @@ pub fn render_columns(
         modules_column(catalog, state, course, marks, tick)
     };
     let columns = [
-        sections_column(catalog, state),
+        layers_column(catalog, state),
         courses_column(catalog, state),
         third,
     ];

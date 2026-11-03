@@ -1,24 +1,24 @@
 use super::Progress;
 use crate::content::{Course, Library, Module};
 
-// Every course of a language: its section, its position and its id, in catalog order
+// Every course of a language: its layer, its position and its id, in catalog order
 fn course_list(library: &Library) -> Vec<(usize, usize, &str)> {
     library
         .catalog
-        .sections
+        .layers
         .iter()
         .enumerate()
-        .flat_map(|(section, data)| {
+        .flat_map(|(layer, data)| {
             data.courses
                 .iter()
                 .enumerate()
-                .map(move |(course, summary)| (section, course, summary.id.as_str()))
+                .map(move |(course, summary)| (layer, course, summary.id.as_str()))
         })
         .collect()
 }
 
 // The first course with a module left to study, starting at the one practiced last:
-// its section, course and module. Then the courses after it, wrapping to the start
+// its layer, course and module. Then the courses after it, wrapping to the start
 pub fn next_course(
     progress: &Progress,
     language: &str,
@@ -31,14 +31,14 @@ pub fn next_course(
     courses[start..]
         .iter()
         .chain(&courses[..start])
-        .find_map(|&(section, course, id)| {
+        .find_map(|&(layer, course, id)| {
             let module = progress.next_module(language, id, library.courses.get(id)?)?;
-            Some((section, course, module))
+            Some((layer, course, module))
         })
 }
 
 // The written module practiced longest ago in the whole language, for the review:
-// its section, course and module. On a tie, the first in catalog order
+// its layer, course and module. On a tie, the first in catalog order
 pub fn next_review(
     progress: &Progress,
     language: &str,
@@ -46,7 +46,7 @@ pub fn next_review(
 ) -> Option<(usize, usize, usize)> {
     let mut oldest = None;
 
-    for (section, course, id) in course_list(library) {
+    for (layer, course, id) in course_list(library) {
         let Some(course_data) = library.courses.get(id) else {
             continue;
         };
@@ -60,7 +60,7 @@ pub fn next_review(
             let practiced = progress.practiced(&format!("{language}/{id}/{}", summary.id));
 
             if oldest.is_none_or(|(best, _)| practiced < best) {
-                oldest = Some((practiced, (section, course, module)));
+                oldest = Some((practiced, (layer, course, module)));
             }
         }
     }

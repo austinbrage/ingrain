@@ -42,7 +42,7 @@ content/
 ## Files
 | File | Holds | Loaded |
 |---|---|---|
-| `<language>/catalog.json` | language name, course sections, course list | at startup |
+| `<language>/catalog.json` | language name, layers, course list | at startup |
 | `<language>/<course>/course.json` | module sections and modules (name, tier, session count) | when the course is selected |
 | `<language>/<course>/<module>.json` | an optional module intro, sessions (each with an optional intro) and exercises | when a session of the module starts |
 

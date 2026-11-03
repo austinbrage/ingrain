@@ -205,11 +205,11 @@ fn locate<'a>(app: &App, path: &'a str) -> Option<(ExplorerState, usize, usize, 
     let language = HomeLanguage::from_id(ids.next()?)?;
     let (course_id, module_id) = (ids.next()?, ids.next()?);
 
-    let (section, course) = app.content.catalog(language).course_index(course_id)?;
+    let (layer, course) = app.content.catalog(language).course_index(course_id)?;
 
     let mut explorer = ExplorerState::new(language);
     explorer.depth = Depth::Modules;
-    explorer.section = section;
+    explorer.layer = layer;
     explorer.course = course;
     explorer.module = app.content.course(explorer)?.module_index(module_id)?;
 

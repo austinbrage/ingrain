@@ -24,7 +24,7 @@ impl ModuleDone {
             .next_module(explorer.language.id(), course_id, course)
             .is_none();
         let finished_course = course_done.then(|| {
-            content.catalog(explorer.language).sections[explorer.section].courses[explorer.course]
+            content.catalog(explorer.language).layers[explorer.layer].courses[explorer.course]
                 .name
                 .clone()
         });

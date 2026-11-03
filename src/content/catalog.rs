@@ -6,12 +6,12 @@ use super::{Source, read_content};
 #[serde(deny_unknown_fields)]
 pub struct Catalog {
     pub name: String,
-    pub sections: Vec<CourseSection>,
+    pub layers: Vec<Layer>,
 }
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct CourseSection {
+pub struct Layer {
     pub id: String,
     pub name: String,
     pub courses: Vec<CourseSummary>,
@@ -33,14 +33,11 @@ impl Catalog {
         serde_json::from_str(json).unwrap_or_else(|error| panic!("{path} is invalid: {error}"))
     }
 
-    // The section and course positions of a course id
+    // The layer and course positions of a course id
     pub fn course_index(&self, id: &str) -> Option<(usize, usize)> {
-        self.sections
-            .iter()
-            .enumerate()
-            .find_map(|(section, data)| {
-                let course = data.courses.iter().position(|course| course.id == id)?;
-                Some((section, course))
-            })
+        self.layers.iter().enumerate().find_map(|(layer, data)| {
+            let course = data.courses.iter().position(|course| course.id == id)?;
+            Some((layer, course))
+        })
     }
 }

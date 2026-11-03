@@ -43,8 +43,8 @@ impl Library {
         let catalog = Catalog::load(source, language);
         let mut courses = HashMap::new();
 
-        for section in &catalog.sections {
-            for summary in &section.courses {
+        for layer in &catalog.layers {
+            for summary in &layer.courses {
                 if let Some(course) = Course::load(source, language, &summary.id) {
                     courses.insert(summary.id.clone(), course);
                 }

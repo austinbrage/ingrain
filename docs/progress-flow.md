@@ -100,7 +100,7 @@ Enter ──► ExplorerState::continue_target ──► Progress::continue_at �
 ### Pressing Enter on Continue
 `handle_buttons_key` (`app/home.rs`) calls `ExplorerState::continue_target` (`app/explorer.rs`, which the module screen also uses to open the next module). It does only two things:
 
-1. **Ask `Progress`.** `Progress::continue_at(library)` works out everything and answers with a `ContinueAt`: five plain numbers (section, course, module, session, exercise). In the review state it answers with the module to review
+1. **Ask `Progress`.** `Progress::continue_at(library)` works out everything and answers with a `ContinueAt`: five plain numbers (layer, course, module, session, exercise). In the review state it answers with the module to review
 2. **Translate.** `ExplorerState::continue_target` copies the numbers into an `ExplorerState`, and the caller calls `ExerciseState::open`, which gives the exercise screen
 
 The explorer is set to the module list of the course, so Esc from the exercise lands there.
@@ -111,7 +111,7 @@ The explorer works the same way, for the module the user picked instead of the o
 This opening directly is only for modules with no finished session, or with a single session. Otherwise the user picks the session (next section). A module whose only session is failed opens its failed exercise: see "Retaking failed exercises".
 
 ### The sessions column
-When the module has a finished session **and more than one session**, Enter does not open an exercise: it opens a sessions column, so the user can retake a finished session or skip ahead. The column replaces the modules column, so the sections and courses do not move.
+When the module has a finished session **and more than one session**, Enter does not open an exercise: it opens a sessions column, so the user can retake a finished session or skip ahead. The column replaces the modules column, so the layers and courses do not move.
 - `Depth::Sessions` and a `session` index are part of `ExplorerState`. The cursor starts on the first session not done
 - The column shows `Session 1`, `Session 2`..., from the position, with a green `✓` on the finished ones, a red `✗` on the failed ones and a `○` on the rest. The first session not done is the next one, with its name in the accent color and its right side typed like the next module. A failed session that is also the next one (a wrong answer in the middle of its first pass) alternates `next` and `✗`
 - The flags come from `ModuleMarks.sessions` and `ModuleMarks.sessions_failed`, filled by `App::module_marks` through `Progress::sessions_done` and `Progress::sessions_failed`. The module file is read on every frame the column is open and nothing is cached: it is embedded and small, so the flags can never be stale
@@ -143,7 +143,7 @@ It first picks the course with `next_course`, then the module in it with `next_m
 
 | Function | Rule |
 |---|---|
-| `next_course` | start at the course of `last`: if it has a module left to study, that is the one. If not, take the first course after it (in catalog order, across the sections) that has one, and wrap around to the start. Courses without a `course.json` are skipped. If no course has anything left, there is none, and the language is complete |
+| `next_course` | start at the course of `last`: if it has a module left to study, that is the one. If not, take the first course after it (in catalog order, across the layers) that has one, and wrap around to the start. Courses without a `course.json` are skipped. If no course has anything left, there is none, and the language is complete |
 | `next_module` | take the module finished most recently in this course, and go to the first incomplete module after it. If there is none after it, go back to the first incomplete one. If none was finished yet, the first module. If all are complete, there is none |
 | `next_session` | the first session of the module that is not in `done`. When all are done, the first one with failed exercises (the retake). When none is failed, the first session |
 | `next_exercise` | for a session played through (in `done`) with failed exercises, its first failed exercise in content order (`failed_from`). Otherwise the exercise saved in `in_progress` for that session, or the first exercise if there is none (or if its id no longer exists) |

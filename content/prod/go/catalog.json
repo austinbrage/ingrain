@@ -1,6 +1,6 @@
 {
   "name": "Go",
-  "sections": [
+  "layers": [
     {
       "id": "core",
       "name": "Core",
