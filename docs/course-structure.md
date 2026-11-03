@@ -6,16 +6,18 @@ Reference: `legacy/docs/course-structure.md` (frozen). Read it for tiers, sessio
 ```
 Language (Rust, Go)
  └─ Layer (Core | Ecosystem)
-     └─ Course (Rust Core: syntax, borrow checker, concurrency. Rust Ecosystem: ratatui, clap, actix)
-         └─ Module section (related modules, stacked from basic to advanced)
-             └─ Module (one concept: conditionals, loops, enums)
-                 └─ Session (a set of exercises, as in legacy)
-                     └─ Exercise
+     └─ Course group (related courses: Fundamentals, Ownership. Ecosystem: CLI, Web, TUI)
+         └─ Course (Rust Core: syntax, borrow checker, concurrency. Rust Ecosystem: ratatui, clap, actix)
+             └─ Module section (related modules, stacked from basic to advanced)
+                 └─ Module (one concept: conditionals, loops, enums)
+                     └─ Session (a set of exercises, as in legacy)
+                         └─ Exercise
 ```
 
 ## Definitions
 - **Layer:** the two halves of a language. Core is the language itself (syntax, structs, enums). Ecosystem is frameworks and libraries
-- **Course:** one topic inside a layer
+- **Course group:** a label that gathers related courses inside a layer, the way a module section gathers modules. It has only a name: no id, no tier, no count. Nothing depends on it (no folder, no progress key), so the course index stays flat across the groups
+- **Course:** one topic inside a course group
 - **Module section:** the legacy "Section": a group of related modules inside a course, ordered from basic to advanced
 - **Module, Session, Exercise:** unchanged from legacy
 

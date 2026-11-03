@@ -42,10 +42,11 @@ content/
 ## Files
 | File | Holds | Loaded |
 |---|---|---|
-| `<language>/catalog.json` | language name, layers, course list | at startup |
+| `<language>/catalog.json` | language name, layers, each with its course groups and their courses (`id`, `name`) | at startup |
 | `<language>/<course>/course.json` | module sections and modules (name, tier, session count) | when the course is selected |
 | `<language>/<course>/<module>.json` | an optional module intro, sessions (each with an optional intro) and exercises | when a session of the module starts |
 
+- A course group is only a label in `catalog.json` (`{ "name", "courses" }`), like a module section in `course.json`: it has no `id`, and no folder or progress key uses it. The course order is the order of the catalog read through the groups, so a course keeps one flat index in its layer
 - The folder name is the course id and the file name is the module id
 - The module ids in `course.json` must match the file names
 - A course folder always has a `course.json`

@@ -46,7 +46,7 @@ The header and footer of the end screens and of the intro are drawn by `ui/chrom
 | `explorer/hint.rs` | the hint line, one key list per depth, and `Enter retake` on a failed row of the sessions column |
 | `explorer/columns/mod.rs` | `render_columns` (builds, lays out and renders the three columns, with the sessions column in place of the modules column at its depth), `render_single_column`, `Column` and `Item`, the title wave and the cascade, and the typed `next` (`typed_text`) that the modules and sessions columns share. Any `✗` in the right-hand text is drawn red |
 | `explorer/columns/layers.rs` | builds the layers column |
-| `explorer/columns/courses.rs` | builds the courses column |
+| `explorer/columns/courses.rs` | builds the courses column, with a label row per course group and a blank row between groups, as `modules.rs` does with the module sections |
 | `explorer/columns/modules.rs` | builds the modules column |
 | `explorer/columns/sessions.rs` | builds the sessions column of the selected module |
 

@@ -4,7 +4,7 @@ Status: Draft
 
 The course tree as Miller columns, in the home's frame: the four thick corners around the whole screen, and three columns inside, separated by a thin line. One screen drawn at four depths (layers, courses, modules, sessions). The drilldown mode (one level per screen) has its own drafts, `03` to `05`.
 
-The courses depth, with the courses column focused and the modules of Syntax as the preview:
+The courses depth, with the courses column focused and the modules of Syntax as the preview. The courses of Core are in three course groups:
 
 ```
 ┏━━━━━━━                                                                                    ━━━━━━━┓
@@ -12,17 +12,17 @@ The courses depth, with the courses column focused and the modules of Syntax as 
 ┃                                                                                                  ┃
    RUST                          │ CORE                          │ SYNTAX                           
                                  │                               │                                  
-   ▸ Core                      › │ ▌ Syntax                    › │   FOUNDATIONS            basic   
-     Ecosystem                 › │   Structs and enums         › │     Variables              4/4   
-                                 │   Borrow checker            › │     Conditionals           3/3   
-                                 │   Error handling            › │     Loops                  1/4   
-                                 │   Concurrency               › │                                  
-                                 │   Async                     › │   DATA TYPES             basic   
-                                 │                               │     Structs                0/4   
+   ▸ Core                      › │   FUNDAMENTALS                │   FOUNDATIONS            basic   
+     Ecosystem                 › │ ▌   Syntax                  › │     Variables              4/4   
+                                 │     Structs and enums       › │     Conditionals           3/3   
+                                 │                               │     Loops                  1/4   
+                                 │   OWNERSHIP                   │                                  
+                                 │     Borrow checker          › │   DATA TYPES             basic   
+                                 │     Error handling          › │     Structs                0/4   
                                  │                               │     Enums                  0/3   
-                                 │                               │     Pattern matching       0/5   
-                                 │                               │                                  
-                                 │                               │   ABSTRACTIONS          medium   
+                                 │   CONCURRENCY                 │     Pattern matching       0/5   
+                                 │     Concurrency             › │                                  
+                                 │     Async                   › │   ABSTRACTIONS          medium   
                                  │                               │     Traits                 0/5   
                                  │                               │     Generics               0/4   
                                  │                               │                                  
@@ -41,17 +41,17 @@ The modules depth, with the modules column focused and Loops selected:
 ┃                                                                                                  ┃
    RUST                          │ CORE                          │ SYNTAX                           
                                  │                               │                                  
-   ▸ Core                      › │ ▸ Syntax                    › │   FOUNDATIONS            basic   
-     Ecosystem                 › │   Structs and enums         › │     Variables              4/4   
-                                 │   Borrow checker            › │     Conditionals           3/3   
-                                 │   Error handling            › │ ▌   Loops                  1/4   
-                                 │   Concurrency               › │                                  
-                                 │   Async                     › │   DATA TYPES             basic   
-                                 │                               │     Structs                0/4   
+   ▸ Core                      › │   FUNDAMENTALS                │   FOUNDATIONS            basic   
+     Ecosystem                 › │ ▸   Syntax                  › │     Variables              4/4   
+                                 │     Structs and enums       › │     Conditionals           3/3   
+                                 │                               │ ▌   Loops                  1/4   
+                                 │   OWNERSHIP                   │                                  
+                                 │     Borrow checker          › │   DATA TYPES             basic   
+                                 │     Error handling          › │     Structs                0/4   
                                  │                               │     Enums                  0/3   
-                                 │                               │     Pattern matching       0/5   
-                                 │                               │                                  
-                                 │                               │   ABSTRACTIONS          medium   
+                                 │   CONCURRENCY                 │     Pattern matching       0/5   
+                                 │     Concurrency             › │                                  
+                                 │     Async                   › │   ABSTRACTIONS          medium   
                                  │                               │     Traits                 0/5   
                                  │                               │     Generics               0/4   
                                  │                               │                                  
@@ -77,7 +77,9 @@ Drawn at 100x24. The sketch shows the selected row of the focused column as `▌
 - Each column: a title row (the parent of the list), one blank row, then the list
 - A row has the text on the left and, on the right edge, a chevron `›`, a count (`4/4`) or a tier (`basic`)
 - The third column shows the preview of the selected item's children. At the layers depth the selected layer's courses, at the courses depth the selected course's modules. At the sessions depth it is the sessions of the selected module, in place of the modules
-- The modules column groups the modules under section labels (`FOUNDATIONS`, with its tier on the right), with a blank row between groups
+- The modules column groups the modules under module section labels (`FOUNDATIONS`, with its tier on the right), with a blank row between groups
+- The courses column groups the courses under course group labels (`FUNDAMENTALS`) in the same way: a blank row between groups, and the courses indented under their label. A course group label has only its name: no tier, no count, no right-hand text, and the courses keep their `›`. The layers column has no groups
+- The labels of both columns are rows that cannot be selected: ↑↓ skips them and the blank rows. The breadcrumb does not name the course group (`Rust › Core › Syntax`), because it only labels and holds no state of its own
 
 ## Breadcrumb and hint
 - **Breadcrumb:** the path down to the focused column: `Rust` at the layers depth, `Rust › Core` at the courses depth and `Rust › Core › Syntax` at the modules depth and `Rust › Core › Syntax › Variables` at the sessions depth
@@ -108,17 +110,17 @@ Sessions are a fourth level. They appear only when the module has a session comp
 ┃                                                                                                  ┃
    RUST                          │ CORE                          │ VARIABLES                        
                                  │                               │                                  
-   ▸ Core                      › │ ▸ Syntax                    › │   Session 1                  ✓   
-     Ecosystem                 › │   Structs and enums         › │ ▌ Session 2              next█   
-                                 │   Borrow checker            › │   Session 3                  ○   
-                                 │   Error handling            › │   Session 4                  ○   
-                                 │   Concurrency               › │                                  
-                                 │   Async                     › │                                  
+   ▸ Core                      › │   FUNDAMENTALS                │   Session 1                  ✓   
+     Ecosystem                 › │ ▸   Syntax                  › │ ▌ Session 2              next█   
+                                 │     Structs and enums       › │   Session 3                  ○   
+                                 │                               │   Session 4                  ○   
+                                 │   OWNERSHIP                   │                                  
+                                 │     Borrow checker          › │                                  
+                                 │     Error handling          › │                                  
                                  │                               │                                  
-                                 │                               │                                  
-                                 │                               │                                  
-                                 │                               │                                  
-                                 │                               │                                  
+                                 │   CONCURRENCY                 │                                  
+                                 │     Concurrency             › │                                  
+                                 │     Async                   › │                                  
                                  │                               │                                  
                                  │                               │                                  
                                  │                               │                                  
@@ -152,17 +154,17 @@ The modules depth. Conditionals and Loops each have a failed session. The `✗` 
 ┃                                                                                                  ┃
    RUST                          │ CORE                          │ SYNTAX                           
                                  │                               │                                  
-   ▸ Core                      › │ ▸ Syntax                    › │   FOUNDATIONS            basic   
-     Ecosystem                 › │   Structs and enums         › │     Variables            ✓ 4/4   
-                                 │   Borrow checker            › │     Conditionals         ✗ 2/3   
-                                 │   Error handling            › │ ▌   Loops                ✗ 1/4   
-                                 │   Concurrency               › │                                  
-                                 │   Async                     › │   DATA TYPES             basic   
-                                 │                               │     Structs                0/4   
+   ▸ Core                      › │   FUNDAMENTALS                │   FOUNDATIONS            basic   
+     Ecosystem                 › │ ▸   Syntax                  › │     Variables            ✓ 4/4   
+                                 │     Structs and enums       › │     Conditionals         ✗ 2/3   
+                                 │                               │ ▌   Loops                ✗ 1/4   
+                                 │   OWNERSHIP                   │                                  
+                                 │     Borrow checker          › │   DATA TYPES             basic   
+                                 │     Error handling          › │     Structs                0/4   
                                  │                               │     Enums                  0/3   
-                                 │                               │     Pattern matching       0/5   
-                                 │                               │                                  
-                                 │                               │                                  
+                                 │   CONCURRENCY                 │     Pattern matching       0/5   
+                                 │     Concurrency             › │                                  
+                                 │     Async                   › │                                  
                                  │                               │                                  
                                  │                               │                                  
                                  │                               │                                  
@@ -181,17 +183,17 @@ The sessions depth, with the failed session selected. The `✗` takes the place 
 ┃                                                                                                  ┃
    RUST                          │ CORE                          │ VARIABLES                        
                                  │                               │                                  
-   ▸ Core                      › │ ▸ Syntax                    › │   Session 1                  ✓   
-     Ecosystem                 › │   Structs and enums         › │ ▌ Session 2                  ✗   
-                                 │   Borrow checker            › │   Session 3              next█   
-                                 │   Error handling            › │   Session 4                  ○   
-                                 │   Concurrency               › │                                  
-                                 │   Async                     › │                                  
+   ▸ Core                      › │   FUNDAMENTALS                │   Session 1                  ✓   
+     Ecosystem                 › │ ▸   Syntax                  › │ ▌ Session 2                  ✗   
+                                 │     Structs and enums       › │   Session 3              next█   
+                                 │                               │   Session 4                  ○   
+                                 │   OWNERSHIP                   │                                  
+                                 │     Borrow checker          › │                                  
+                                 │     Error handling          › │                                  
                                  │                               │                                  
-                                 │                               │                                  
-                                 │                               │                                  
-                                 │                               │                                  
-                                 │                               │                                  
+                                 │   CONCURRENCY                 │                                  
+                                 │     Concurrency             › │                                  
+                                 │     Async                   › │                                  
                                  │                               │                                  
                                  │                               │                                  
                                  │                               │                                  
@@ -209,7 +211,7 @@ The sessions depth, with the failed session selected. The `✗` takes the place 
 
 ## Open
 - Fill or a bold `sky` bar for the focused row. The fill is built, the bar was not tried
-- The right-hand text and the section labels are not dimmer than the rows. If the list looks flat they can be dimmed with a row built by hand
+- The right-hand text and the module section and course group labels are not dimmer than the rows. If the list looks flat they can be dimmed with a row built by hand
 - The breadcrumb and the hint labels are `overlay1`, dimmer than the rows. Decide with the home whether they should be `subtext0`
 - The header as the gradient title on wide terminals
 - Below about 90 columns the drilldown mode takes over (`docs/ui-structure.md`). Until it exists the layout breaks on narrow terminals
