@@ -19,7 +19,13 @@
       "name": "Ecosystem",
       "course_groups": [
         { "name": "Tooling", "courses": [{ "id": "tools", "name": "Tools" }] },
-        { "name": "Libraries", "courses": [{ "id": "bare", "name": "Bare" }] }
+        {
+          "name": "Libraries",
+          "courses": [
+            { "id": "bare", "name": "Bare" },
+            { "id": "extra", "name": "Extra" }
+          ]
+        }
       ]
     }
   ]

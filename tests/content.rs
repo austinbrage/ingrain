@@ -821,9 +821,10 @@ mod course_groups {
         let catalog = Catalog::load(Source::Test, "rust");
 
         assert_eq!(catalog.course_count(0), 2);
-        assert_eq!(catalog.course_count(1), 2);
+        assert_eq!(catalog.course_count(1), 3);
         assert_eq!(catalog.course_at(0, 1).id, "second");
         assert_eq!(catalog.course_at(1, 1).id, "bare");
+        assert_eq!(catalog.course_at(1, 2).id, "extra");
     }
 
     #[test]
@@ -832,6 +833,7 @@ mod course_groups {
 
         assert_eq!(catalog.course_index("second"), Some((0, 1)));
         assert_eq!(catalog.course_index("bare"), Some((1, 1)));
+        assert_eq!(catalog.course_index("extra"), Some((1, 2)));
         assert_eq!(catalog.course_index("missing"), None);
     }
 
@@ -850,7 +852,10 @@ mod course_groups {
 
         assert_eq!(
             groups,
-            vec![("Tooling", vec!["tools"]), ("Libraries", vec!["bare"])]
+            vec![
+                ("Tooling", vec!["tools"]),
+                ("Libraries", vec!["bare", "extra"])
+            ]
         );
         assert_eq!(catalog.layers[0].course_groups[0].name, "Fundamentals");
         assert_eq!(catalog.layers[0].course_groups[0].courses.len(), 2);

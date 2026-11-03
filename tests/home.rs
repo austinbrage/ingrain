@@ -160,6 +160,18 @@ mod exercise_on_continue {
     }
 
     #[test]
+    fn opens_a_course_of_a_later_group() {
+        let mut app = TestApp::with_progress("last-rust-extra");
+        let screen = app.screen();
+        assert!(screen.contains("Continue   Rust · Extra"));
+
+        app.press(KeyCode::Enter);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust · Extra · Single", "session 1/1 · exercise 1/1"]));
+        assert!(screen.contains("Single exercise"));
+    }
+
+    #[test]
     fn opens_the_exercise_where_the_user_stopped() {
         let mut app = TestApp::with_progress("rust-many-exercise-2");
         assert_eq!(app.screen().background_of("Continue"), Some(selected()));

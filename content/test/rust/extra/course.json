@@ -1,0 +1,10 @@
+{
+  "id": "extra",
+  "module_sections": [
+    {
+      "name": "Add-ons",
+      "tier": "basic",
+      "modules": [{ "id": "single", "name": "Single", "sessions": 1 }]
+    }
+  ]
+}

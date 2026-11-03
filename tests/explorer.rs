@@ -155,6 +155,31 @@ mod courses {
     }
 
     #[test]
+    fn a_course_in_a_later_group_opens_its_own_modules() {
+        let mut app = rust_explorer();
+        app.press(KeyCode::Down); // Ecosystem
+        app.press(KeyCode::Right); // focus the courses column, on Tools
+        app.press(KeyCode::Down); // Bare
+        app.press(KeyCode::Down); // Extra, the second course of the Libraries group
+
+        let screen = app.screen();
+        assert_eq!(screen.background_of("Extra"), Some(highlighted()));
+        assert!(screen.has_row(&["RUST", "ECOSYSTEM", "EXTRA"]));
+        assert!(screen.has_row(&["ADD-ONS", "basic"]));
+        assert!(screen.contains("Single"));
+        assert!(!screen.contains("Helpers"));
+
+        app.press(KeyCode::Right); // open the modules
+        let screen = app.screen();
+        assert!(screen.has_row(&["Ingrain", "Rust › Ecosystem › Extra"]));
+
+        app.press(KeyCode::Enter);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust · Extra · Single", "session 1/1 · exercise 1/1"]));
+        assert!(screen.contains("Single exercise"));
+    }
+
+    #[test]
     fn a_course_without_modules_keeps_the_modules_column_empty_and_does_not_open() {
         let mut app = rust_explorer();
         app.press(KeyCode::Down); // Ecosystem
