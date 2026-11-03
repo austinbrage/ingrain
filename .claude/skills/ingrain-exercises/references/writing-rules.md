@@ -40,6 +40,7 @@ A note is a hint under a piece of code, shown while the user types it.
 
 ## Quizzes
 - The shape and the limits are in `docs/content-structure.md` ("Module file: quiz")
+- **The author's least liked quizzes are the `compiler` and the `error` kinds.** The `compiler` one shows an error message and asks for its cause, and its options often restate the message. The `error` one asks whether code compiles, panics or is fine, and its answer is almost always "A compile error". Use them rarely. A `purpose` or an `output` quiz, or a fill-blank, teaches more
 - A `purpose` option says what the code is **for**, never what it prints (printed results are the `output` kind)
 - The wrong options are plausible mistakes someone could really make reading the code, never jokes or absurdities. None of them is also right
 - The right answer is not always the first or the longest. Vary the `answer` index and the `kind` across a module
@@ -49,6 +50,8 @@ A note is a hint under a piece of code, shown while the user types it.
 
 ## Fill in the blank
 - The shape and the limits are in `docs/content-structure.md` ("Module file: fill-blank")
+- **Only for a pattern the user has already practiced.** A fill-blank repeats something that was typed before, in an earlier exercise of the module or in a module before it, and never teaches a new thing. Before you write one, find where the user typed that piece. A rule that only a quiz explained (for instance, that an unused variable is an error) is not established yet: a fill-blank on it would be a first contact. Its order matters too: it goes after the typing exercise that practices the piece, never before
+- **The author prefers fill-blanks to quizzes overall,** so choose one when a slot could be either and the pattern is established. A fill-blank is its own type, not a replacement for a `compiler` or `error` quiz, and it does not take a one-word fix just because a quiz did. Never quote a compiler message in a fill-blank guide: it is not the real output and it gives hints away. State the goal in plain words
 - **A gap hides the word that holds the idea of the exercise:** a keyword, a name, a type or an operator that the module's concept is about. Never trivia (a brace, `fn`, `main`) and never a whole expression, because an answer is one word
 - **The rest of the code must make the answer certain.** Someone who understands the concept can work the word out from the lines around it, and nothing else fits. If two words would work, list both in `answers`, only when each is really right in that place, and put the best one first because it is the one shown after a mistake
 - Two or three gaps are usual, one is fine, six is the limit. At most two gaps on a line, never next to each other, and each one asks a different thing

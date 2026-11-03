@@ -30,8 +30,10 @@ Arguments: `$ARGUMENTS` is `<language> <course> <module> [exercise] [prompt]`. I
 
 ## What the exercises must be
 - **The user must master the concept.** A module has as many exercises as that takes, from a few to many. There is no fixed number: decide from the course and the module
-- **Combine every type of exercise when possible,** and do not force it: typing exercises, quizzes of every kind (`purpose`, `output`, `compiler`, `error`) and fill-blanks. Alternate them. For Go, favor `compiler` and `error` quizzes, because its compiler errors teach a lot
-- **A fill-blank fits a piece the user has just typed:** it asks for the one word that holds the idea (a keyword, a name, a type), so it works well right after a typing exercise on the same concept, or as a check at the end of a session. It is never a first contact with a concept
+- **Combine every type of exercise when possible,** and do not force it: typing exercises, quizzes of every kind (`purpose`, `output`, `compiler`, `error`) and fill-blanks. Alternate them
+- **The author likes the `compiler` and `error` quizzes the least.** Write them rarely, and only when the lesson is the message itself or a layout rule that one word cannot show (the place of a brace, the scope of a variable). The `error` quiz is the weakest: its answer is almost always "A compile error".
+- **A fill-blank repeats an established pattern.** It is never the first contact with something new. Use it only for a piece the user has already met and practiced: typed in an earlier exercise of the module, or in a module before it. Check the earlier exercises before writing one, and if the piece has not been typed yet, write a typing exercise (or leave the slot to a quiz) instead
+- **The author likes fill-blanks more than quizzes overall.** Look for a spot in every session: after you draft the typing exercises, check which piece the user has just typed that fits one word (a keyword, a name, a type, an operator), and add a fill-blank after that exercise, about one per session. When a slot could be a quiz or a fill-blank and the pattern is established, choose the fill-blank. It is its own type, not a stand-in for a `compiler` or `error` quiz, and it never forces a pattern that is not there: with no established piece, leave it out
 - **Typing exercises are short and focused:** about 3 to 5 chunks and 10 to 15 lines of code. If a concept is long, write **several typing exercises, each on one specific thing**, and not one big one
 - **Ghost is the majority,** around 90% of the chunks. Use `auto` for a piece the user has already written many times, and `copy` to challenge them more (`references/writing-rules.md`, "Modes")
 - **One file,** the same in every exercise: the editor shows `main.go` for Go and `main.rs` for Rust. Each typing exercise builds a complete, runnable program in it. In Go, `package main` is an `auto` chunk, except in the first module of the first course of the language, where it is ghost so the user types it once
@@ -60,4 +62,5 @@ A pass does not mean the content is good. Read each program as a compiler would,
 Then report:
 - what you wrote or changed, exercise by exercise, and what you left as it was
 - every warning: an exercise that exists and had no prompt, a module that looked complete
+- for each session, whether it got a fill-blank, and if not, why (no established piece to repeat)
 - any session count you changed in `course.json`
