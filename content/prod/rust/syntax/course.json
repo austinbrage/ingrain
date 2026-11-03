@@ -5,7 +5,7 @@
       "name": "Foundations",
       "tier": "basic",
       "modules": [
-        { "id": "variables", "name": "Variables", "sessions": 4 },
+        { "id": "variables", "name": "Variables", "sessions": 3 },
         { "id": "conditionals", "name": "Conditionals", "sessions": 3 },
         { "id": "loops", "name": "Loops", "sessions": 1 }
       ]

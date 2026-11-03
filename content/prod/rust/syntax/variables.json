@@ -1,0 +1,172 @@
+{
+  "id": "variables",
+  "intro": {
+    "title": "Variables",
+    "slides": [
+      {
+        "text": "A variable gives a name to a value, and `let` creates one.\n\nIn Rust a variable is **read only** unless you say otherwise, and every value has a **type** that the compiler checks.\n\n`println!` prints a line, and `{speed}` puts the variable `speed` in the text.",
+        "code": "let speed = 10;\nprintln!(\"{speed}\");"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Let and mut",
+        "slides": [
+          {
+            "text": "`let` creates a variable and gives it a value. By default it is **read only**: once it has a value, the compiler rejects a second assignment.",
+            "code": "let speed = 10;\n\n// speed = 20; does not compile"
+          },
+          {
+            "text": "Write `mut` after `let` for a variable that has to change. Mark only the ones that need it, so the rest stay protected.\n\n`lives -= 1` is the short form of `lives = lives - 1`, and the same works with `+=` and `*=`.",
+            "code": "let mut lives = 3;\nlives = lives - 1;\nlives -= 1;"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "fill-blank",
+          "id": "declare-with-let",
+          "title": "Declare a variable",
+          "guide": "Create `age`, a variable that holds 30.",
+          "code": "fn main() {\n    ___ age = 30;\n    println!(\"{age}\");\n}",
+          "gaps": [{ "answers": ["let"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "make-mutable",
+          "title": "Change a value",
+          "guide": "`count` goes up by one. Mark it so it can change.",
+          "code": "fn main() {\n    let ___ count = 0;\n    count += 1;\n    println!(\"{count}\");\n}",
+          "gaps": [{ "answers": ["mut"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "add-to-total",
+          "title": "Update a variable",
+          "guide": "Make `total` changeable, then add `price` to it.",
+          "code": "fn main() {\n    let ___ total = 10;\n    let price = 4;\n    total = total ___ price;\n    println!(\"{total}\");\n}",
+          "gaps": [{ "answers": ["mut"] }, { "answers": ["+"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "update-in-place",
+          "title": "Update in place",
+          "guide": "Double `level` with the short form of assignment.",
+          "code": "fn main() {\n    let mut level = 3;\n    level ___ 2;\n    println!(\"{level}\");\n}",
+          "gaps": [{ "answers": ["*="] }]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Types and constants",
+        "slides": [
+          {
+            "text": "Every value has a type. Rust usually works it out, and you can write it after a colon. Whole numbers are `i8` to `i64` when they can be negative and `u8` to `u64` when they cannot. Decimals are `f64`.",
+            "code": "let a: i32 = -5;\nlet b: u8 = 255;\nlet c: f64 = 2.5;\nlet d: bool = false;\nlet e: char = 'z';"
+          },
+          {
+            "text": "A **constant** never changes, and its value is known when the program is built. Declare it with `const`, in capitals, and always write its type.",
+            "code": "const GRAVITY: f64 = 9.81;"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "fill-blank",
+          "id": "annotate-integer",
+          "title": "Name the type",
+          "guide": "`year` is a whole number that fits in 32 bits and can be negative.",
+          "code": "fn main() {\n    let year: ___ = 2026;\n    println!(\"{year}\");\n}",
+          "gaps": [{ "answers": ["i32"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "flag-and-letter",
+          "title": "True, false and letters",
+          "guide": "`ready` is a true or false value, and `letter` is a single character.",
+          "code": "fn main() {\n    let ready: ___ = true;\n    let letter: ___ = 'R';\n    println!(\"{ready} {letter}\");\n}",
+          "gaps": [{ "answers": ["bool"] }, { "answers": ["char"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "byte-and-ratio",
+          "title": "Whole and decimal",
+          "guide": "`level` is a whole number from 0 to 255. `ratio` is a 64 bit decimal.",
+          "code": "fn main() {\n    let level: ___ = 200;\n    let ratio: ___ = 0.75;\n    println!(\"{level} {ratio}\");\n}",
+          "gaps": [{ "answers": ["u8"] }, { "answers": ["f64"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "declare-constant",
+          "title": "Declare a constant",
+          "guide": "`MAX_LIVES` never changes while the program runs. Declare it.",
+          "code": "___ MAX_LIVES: u32 = 3;\n\nfn main() {\n    println!(\"{MAX_LIVES}\");\n}",
+          "gaps": [{ "answers": ["const"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "constant-type",
+          "title": "Type of a constant",
+          "guide": "A constant needs a type. Pick one that holds 86 400.",
+          "code": "const SECONDS_PER_DAY: ___ = 86_400;\n\nfn main() {\n    println!(\"{SECONDS_PER_DAY}\");\n}",
+          "gaps": [{ "answers": ["u32", "i32", "u64", "i64", "usize", "isize"] }]
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "New values from old ones",
+        "slides": [
+          {
+            "text": "A new `let` with a name that already exists **shadows** it: from there on, the old variable is hidden. Unlike `mut`, shadowing can also change the type that the name holds.",
+            "code": "let id = 7;\nlet id = id + 1;"
+          },
+          {
+            "text": "`as` converts a number to another type: `whole as f64` turns an integer into a float. Rust never converts between number types for you.",
+            "code": "let whole: i32 = 3;\nlet decimal = whole as f64;"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "fill-blank",
+          "id": "shadow-with-let",
+          "title": "Shadow a variable",
+          "guide": "Create a new `value`, one more than the old one, with no `mut`.",
+          "code": "fn main() {\n    let value = 5;\n    ___ value = value + 1;\n    println!(\"{value}\");\n}",
+          "gaps": [{ "answers": ["let"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "shadow-changes-type",
+          "title": "Change the type",
+          "guide": "Replace `word` with its length. The name stays, the type changes.",
+          "code": "fn main() {\n    let word = \"rust\";\n    let word = word.___();\n    println!(\"{word}\");\n}",
+          "gaps": [{ "answers": ["len"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "shadow-into-mut",
+          "title": "Shadow, then change",
+          "guide": "Shadow `total` with a changeable variable, then add 1 to it.",
+          "code": "fn main() {\n    let total = 0;\n    let ___ total = total + 5;\n    total += 1;\n    println!(\"{total}\");\n}",
+          "gaps": [{ "answers": ["mut"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "cast-with-as",
+          "title": "Convert a number",
+          "guide": "Convert `count` to a float before the division.",
+          "code": "fn main() {\n    let count: i32 = 7;\n    let half = count ___ f64 / 2.0;\n    println!(\"{half}\");\n}",
+          "gaps": [{ "answers": ["as"] }]
+        }
+      ]
+    }
+  ]
+}
