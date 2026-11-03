@@ -93,6 +93,14 @@
           }
         },
         {
+          "type": "fill-blank",
+          "id": "stop-at-three",
+          "title": "Stop the loop",
+          "guide": "Stop the loop when `count` reaches 3.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    count := 0\n    for {\n        count++\n        if count == 3 {\n            ___\n        }\n    }\n    fmt.Println(count)\n}",
+          "gaps": [{ "answers": ["break"] }]
+        },
+        {
           "type": "quiz",
           "kind": "output",
           "id": "break-output",
@@ -158,19 +166,12 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "error",
-          "id": "unused-index",
-          "title": "What kind of error is it?",
-          "guide": "Read the code, then pick the kind of error.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    for i, r := range \"go\" {\n        fmt.Println(string(r))\n    }\n}",
-          "options": [
-            "A panic at run time",
-            "No error",
-            "A compile error"
-          ],
-          "answer": 2,
-          "explanation": "`i` is declared by the loop and never used. Go refuses that, so write `_` in its place."
+          "type": "fill-blank",
+          "id": "skip-the-index",
+          "title": "Skip the index",
+          "guide": "`i` is never used, so Go refuses to build. Name it so the value is ignored.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    for ___, r := range \"go\" {\n        fmt.Println(string(r))\n    }\n}",
+          "gaps": [{ "answers": ["_"] }]
         },
         {
           "type": "typing",

@@ -42,20 +42,12 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "compiler",
-          "id": "missing-import",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:4:5: undefined: fmt",
-          "options": [
-            "`main` is spelled wrong",
-            "`Println` needs a capital letter",
-            "The `fmt` package was not imported",
-            "The file must be named `fmt.go`"
-          ],
-          "answer": 2,
-          "explanation": "`fmt` is a package. Using it without `import \"fmt\"` leaves the name undefined."
+          "type": "fill-blank",
+          "id": "import-fmt",
+          "title": "Import a package",
+          "guide": "Import the package that `Println` comes from.",
+          "code": "package main\n\nimport \"___\"\n\nfunc main() {\n    fmt.Println(\"hello\")\n}",
+          "gaps": [{ "answers": ["fmt"] }]
         },
         {
           "type": "typing",
@@ -125,6 +117,14 @@
             "command": "go run main.go",
             "text": "GO"
           }
+        },
+        {
+          "type": "fill-blank",
+          "id": "complete-the-imports",
+          "title": "Complete the imports",
+          "guide": "Import the package that `ToUpper` comes from.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"___\"\n)\n\nfunc main() {\n    fmt.Println(strings.ToUpper(\"go\"))\n}",
+          "gaps": [{ "answers": ["strings"] }]
         },
         {
           "type": "quiz",

@@ -63,20 +63,12 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "compiler",
-          "id": "increment-as-value",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:7:18: syntax error:\n  unexpected ++ at end of statement",
-          "options": [
-            "`++` only works on decimal numbers",
-            "`count` was never declared",
-            "`++` is a statement, not a value to use",
-            "`:=` cannot store a number"
-          ],
-          "answer": 2,
-          "explanation": "In Go, `count++` stands alone on its line. It gives no value, so `next := count++` is a syntax error."
+          "type": "fill-blank",
+          "id": "increase-by-one",
+          "title": "Increase by one",
+          "guide": "Add one to `count` with Go's increment operator.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    count := 1\n    count___\n    fmt.Println(count)\n}",
+          "gaps": [{ "answers": ["++"] }]
         },
         {
           "type": "typing",

@@ -42,20 +42,12 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "compiler",
-          "id": "type-mismatch",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:6:19: cannot use \"thirty\"\n  (untyped string constant) as int value\n  in variable declaration",
-          "options": [
-            "`age` was declared and never used",
-            "A text value was put in an int variable",
-            "`var` cannot be used inside main",
-            "The variable needs `:=` instead of `var`"
-          ],
-          "answer": 1,
-          "explanation": "`age` is an `int`, and `\"thirty\"` is text. Go checks types and does not convert for you."
+          "type": "fill-blank",
+          "id": "match-the-type",
+          "title": "Match the type",
+          "guide": "Give `age` a type that holds text.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var age ___ = \"thirty\"\n    fmt.Println(age)\n}",
+          "gaps": [{ "answers": ["string"] }]
         },
         {
           "type": "typing",
@@ -126,20 +118,12 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "compiler",
-          "id": "no-new-variables",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:7:11: no new variables\n  on left side of :=",
-          "options": [
-            "`:=` was used on a variable that already exists",
-            "The variable was declared and never used",
-            "The value has the wrong type",
-            "`var` was written twice for one variable"
-          ],
-          "answer": 0,
-          "explanation": "`:=` needs at least one new variable on its left side. To change an existing one, use `=`."
+          "type": "fill-blank",
+          "id": "reuse-a-variable",
+          "title": "Reuse a variable",
+          "guide": "`level` already exists. Give it the value 5 with a plain assignment.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    level := 1\n    level ___ 5\n    fmt.Println(level)\n}",
+          "gaps": [{ "answers": ["="] }]
         },
         {
           "type": "typing",

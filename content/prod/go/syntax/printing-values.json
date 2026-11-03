@@ -62,19 +62,12 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "error",
-          "id": "wrong-verb",
-          "title": "What kind of error is it?",
-          "guide": "Read the code, then pick the kind of error.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Printf(\"%d\\n\", \"Ana\")\n}",
-          "options": [
-            "No error",
-            "A compile error",
-            "A panic at run time"
-          ],
-          "answer": 0,
-          "explanation": "It compiles and runs. With the wrong verb, `Printf` does not fail: it prints a marker like `%!d(string=Ana)`."
+          "type": "fill-blank",
+          "id": "verb-for-text",
+          "title": "The verb for text",
+          "guide": "`%d` is for whole numbers. Use the verb that prints a string.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Printf(\"%___\\n\", \"Ana\")\n}",
+          "gaps": [{ "answers": ["s", "v"] }]
         },
         {
           "type": "typing",

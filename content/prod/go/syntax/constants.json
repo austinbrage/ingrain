@@ -46,19 +46,12 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "error",
-          "id": "assign-to-constant",
-          "title": "What kind of error is it?",
-          "guide": "Read the code, then pick the kind of error.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    const limit = 10\n    limit = 20\n    fmt.Println(limit)\n}",
-          "options": [
-            "No error",
-            "A compile error",
-            "A panic at run time"
-          ],
-          "answer": 1,
-          "explanation": "A constant cannot be assigned again. Go reports it before the program runs."
+          "type": "fill-blank",
+          "id": "constant-or-variable",
+          "title": "Constant or variable",
+          "guide": "Go rejects a new value for a constant. `limit` has to change: declare it the other way.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    ___ limit = 10\n    limit = 20\n    fmt.Println(limit)\n}",
+          "gaps": [{ "answers": ["var"] }]
         },
         {
           "type": "typing",
@@ -78,20 +71,12 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "compiler",
-          "id": "missing-value",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:6:11: missing init expr\n  for const declaration",
-          "options": [
-            "`const` cannot be used inside main",
-            "A constant cannot hold text",
-            "A constant needs a value when declared",
-            "The constant was never used"
-          ],
-          "answer": 2,
-          "explanation": "A constant is fixed, so it must get its value in the declaration. There is no zero value like with `var`."
+          "type": "fill-blank",
+          "id": "constant-needs-a-value",
+          "title": "A constant needs a value",
+          "guide": "A constant is set when it is declared. Give `limit` its value.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    const limit ___ 10\n    fmt.Println(limit)\n}",
+          "gaps": [{ "answers": ["="] }]
         },
         {
           "type": "typing",

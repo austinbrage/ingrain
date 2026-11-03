@@ -94,6 +94,14 @@
           }
         },
         {
+          "type": "fill-blank",
+          "id": "catch-the-rest",
+          "title": "Catch the rest",
+          "guide": "Run the last branch when no case matches.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    day := 6\n    switch day {\n    case 6, 7:\n        fmt.Println(\"weekend\")\n    ___:\n        fmt.Println(\"weekday\")\n    }\n}",
+          "gaps": [{ "answers": ["default"] }]
+        },
+        {
           "type": "typing",
           "id": "fallthrough",
           "title": "Fall through",

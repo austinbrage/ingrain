@@ -94,19 +94,12 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "error",
-          "id": "non-bool-condition",
-          "title": "What kind of error is it?",
-          "guide": "Read the code, then pick the kind of error.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    count := 1\n    if count {\n        fmt.Println(\"some\")\n    }\n}",
-          "options": [
-            "No error",
-            "A compile error",
-            "A panic at run time"
-          ],
-          "answer": 1,
-          "explanation": "An `if` needs a `bool`. Go has no truthy numbers, so write `count != 0` or `count > 0`."
+          "type": "fill-blank",
+          "id": "test-a-number",
+          "title": "Test a number",
+          "guide": "An `if` needs a bool, not a number. Run the block when `count` is not zero.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    count := 1\n    if count ___ 0 {\n        fmt.Println(\"some\")\n    }\n}",
+          "gaps": [{ "answers": ["!="] }]
         }
       ]
     }
