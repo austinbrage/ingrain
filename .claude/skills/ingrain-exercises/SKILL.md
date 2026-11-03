@@ -1,15 +1,15 @@
 ---
 name: ingrain-exercises
-description: Create or change the exercises of a module of a language in Ingrain, in the module's file: typing exercises, quizzes, fill-in-the-blank exercises and the intros before them. Use it for a whole module (language, course, module) or for a single exercise (language, course, module, exercise, prompt).
+description: Create or change the exercises of a module of a language in Ingrain, in the module's file: typing exercises, quizzes, fill-in-the-blank exercises and the intros before them. Use it for a whole course (language, course), a whole module (language, course, module) or for a single exercise (language, course, module, exercise, prompt).
 ---
 
 # ingrain-exercises
 
 Writes the exercises of one module, in `content/prod/<language>/<course>/<module>.json`. It is the third of three skills: `ingrain-courses` (the courses of a layer), `ingrain-modules` (the modules of a course) and this one. The module must already be in the `course.json` of its course.
 
-Arguments: `$ARGUMENTS` is `<language> <course> <module> [exercise] [prompt]`. It has two modes.
+Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. It has three modes, picked by the arguments.
 
-## The two modes
+## The three modes
 **1. A whole module: `<language> <course> <module>`.** Write all the exercises the concept needs, plus its intros.
 - **Never touch an exercise that is already written,** not its text, not its id, not its place. If the file already has exercises, add only what the concept still needs, with new ids, and say so. If the module looks complete, say so as a warning and change nothing
 
@@ -17,6 +17,15 @@ Arguments: `$ARGUMENTS` is `<language> <course> <module> [exercise] [prompt]`. I
 - **It does not exist:** create it. The prompt, if there is one, says what it must be. Without a prompt, decide from the module. Put it where it makes sense in the session
 - **It exists, with a prompt:** change it as the prompt says, and nothing else
 - **It exists, without a prompt:** give a **warning** (the exercise is already written and nothing says what to change) and change nothing
+
+**3. A whole course: `<language> <course>`.** Run mode 1 for every module of the course, one after the other.
+- Read the modules of `content/prod/<language>/<course>/course.json`, in the order they are listed
+- For each module, launch one **fresh subagent** and wait for it to finish before launching the next. Never run two at once: a fill-blank depends on what the modules before it already taught
+- Each subagent gets the three-argument call (`<language> <course> <module>`), so it runs mode 1 and never starts a loop of its own. Tell it to follow this skill, to run `cargo test --test content` until it passes, and to return its report
+- **Skip every module whose file already exists,** whether it is complete or not: do not launch a subagent for it and do not touch it. The course call only creates the modules that have no file yet. List the skipped ones in the report
+- **Stop the loop** if a subagent cannot make `cargo test --test content` pass. Do not start the next module, and say which module failed and why
+- Do not commit anything
+- At the end, report one section per module with the report its subagent returned, then a list of every warning and every session count changed in `course.json`
 
 **The same idea holds for the other two skills:** a general call, with no request, never touches what already exists. Only a specific, named target with a request can change something that is written.
 
