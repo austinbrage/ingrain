@@ -123,8 +123,8 @@ Same parts, the card takes the full width. A title longer than the row is cut wi
 - **Number:** the position of the exercise in the session
 - **Mark:** `✓` or `✗`
 - **Title:** the exercise title from the content
-- **Kind:** `typing` or `quiz`, in the dim color
-- **Result:** `passed` or `failed`. A wrong quiz answer makes it `failed` (`docs/progress-flow.md`)
+- **Kind:** `typing`, `quiz` or `fill-blank`, in the dim color, at the right edge before the result (a longer name takes room from the title)
+- **Result:** `passed` or `failed`. A wrong quiz answer, or a wrong gap in a fill-blank, makes it `failed` (`docs/progress-flow.md`)
 - **Status row:** `N of M exercises passed` on the left, and on the right the bar of the exercises passed (`[▓▓▓▓▓▓▓▓░░░░] 2/3`; full when all passed). The drawings show the last frame: on opening, the bar fills one cell every 2 ticks from empty, with the count beside it going `0/3`, `1/3`, `2/3` up to the real value, and then holds. The module progress is not drawn here: the header already says `session 2/3`
 - **Many exercises:** the card is as tall as its rows. If they do not fit the body, the card scrolls with Up and Down like the code card of `01-exercise.md`
 
