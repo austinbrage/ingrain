@@ -2,7 +2,7 @@ mod catalog;
 mod course;
 mod module;
 
-pub use catalog::Catalog;
+pub use catalog::{Catalog, Layer};
 pub use course::Course;
 pub use module::{
     Chunk, Exercise, Intro, Mode, Module, Note, Output, Quiz, QuizKind, Session, Slide, Typing,

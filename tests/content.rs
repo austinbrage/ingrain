@@ -1,4 +1,6 @@
-use ingrain::content::{Catalog, Course, Exercise, Intro, Mode, Module, Quiz, Source, Typing};
+use ingrain::content::{
+    Catalog, Course, Exercise, Intro, Layer, Mode, Module, Quiz, Source, Typing,
+};
 use ratatui::widgets::{Paragraph, Wrap};
 use std::path::{Path, PathBuf};
 
@@ -43,6 +45,28 @@ fn slug_problems(place: &str, ids: &[&str]) -> Vec<String> {
         }
         if ids[..index].contains(id) {
             problems.push(format!("{place}: `{id}` is used twice"));
+        }
+    }
+
+    problems
+}
+
+// A course group has courses, and no other group of the layer has its name
+fn group_problems(place: &str, layer: &Layer) -> Vec<String> {
+    let mut problems = Vec::new();
+
+    for (index, group) in layer.course_groups.iter().enumerate() {
+        if group.courses.is_empty() {
+            problems.push(format!(
+                "{place}: the group `{}` has no courses",
+                group.name
+            ));
+        }
+        if layer.course_groups[..index]
+            .iter()
+            .any(|other| other.name == group.name)
+        {
+            problems.push(format!("{place}: the group `{}` is used twice", group.name));
         }
     }
 
@@ -399,6 +423,11 @@ mod real_content {
 
             problems.extend(slug_problems(language, &layers));
             problems.extend(slug_problems(language, &courses));
+
+            for layer in &catalog.layers {
+                problems.extend(group_problems(&format!("{language}/{}", layer.id), layer));
+            }
+
             problems.extend(unlisted_problems(
                 language,
                 "catalog.json",
@@ -500,6 +529,37 @@ mod checks_of_the_checks {
         assert!(problems[0].contains("`Loops` is not a slug"));
         assert!(problems[1].contains("`loops` is used twice"));
         assert!(slug_problems("rust/syntax", &["loops", "pattern-matching"]).is_empty());
+    }
+
+    fn layer(groups: &str) -> Layer {
+        serde_json::from_str(&format!(
+            r#"{{ "id": "core", "name": "Core", "course_groups": {groups} }}"#
+        ))
+        .unwrap()
+    }
+
+    #[test]
+    fn the_group_check_catches_an_empty_group_and_a_repeated_name() {
+        let bad = layer(
+            r#"[
+                { "name": "Basics", "courses": [{ "id": "syntax", "name": "Syntax" }] },
+                { "name": "Empty", "courses": [] },
+                { "name": "Basics", "courses": [{ "id": "loops", "name": "Loops" }] }
+            ]"#,
+        );
+        let good = layer(
+            r#"[
+                { "name": "Basics", "courses": [{ "id": "syntax", "name": "Syntax" }] },
+                { "name": "Flow", "courses": [{ "id": "loops", "name": "Loops" }] }
+            ]"#,
+        );
+
+        let problems = group_problems("rust/core", &bad);
+
+        assert_eq!(problems.len(), 2);
+        assert!(problems[0].contains("the group `Empty` has no courses"));
+        assert!(problems[1].contains("the group `Basics` is used twice"));
+        assert!(group_problems("rust/core", &good).is_empty());
     }
 
     #[test]
