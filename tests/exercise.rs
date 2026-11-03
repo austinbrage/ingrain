@@ -869,6 +869,201 @@ mod quiz {
     }
 }
 
+mod fill_blank {
+    use super::*;
+
+    fn fill_blank_exercise() -> TestApp {
+        let mut app = TestApp::new_user();
+        app.press(KeyCode::Enter); // opens the language cards
+        app.press(KeyCode::Enter); // opens the Rust explorer
+        app.wait(5); // all rows appear
+        app.press(KeyCode::Down); // Ecosystem
+        app.press(KeyCode::Right); // focus the courses column, on Tools
+        app.press(KeyCode::Right); // focus the modules column
+        for _ in 0..6 {
+            app.press(KeyCode::Down); // down to Fill blank, the last module
+        }
+        app.press(KeyCode::Enter); // opens its first exercise
+
+        app
+    }
+
+    // The first exercise with both gaps typed and checked
+    fn checked(first: &str, second: &str) -> TestApp {
+        let mut app = fill_blank_exercise();
+        app.type_chunk(first);
+        app.press(KeyCode::Enter); // goes to the next gap
+        app.type_chunk(second);
+        app.press(KeyCode::Enter); // checks the gaps
+
+        app
+    }
+
+    // The second exercise, with its only gap typed and checked
+    fn second_checked(word: &str) -> TestApp {
+        let mut app = checked("in", "i");
+        app.press(KeyCode::Enter); // goes on, to the second exercise
+        app.type_chunk(word);
+        app.press(KeyCode::Enter); // checks the gap
+
+        app
+    }
+
+    #[test]
+    fn a_fill_blank_has_no_finish_shortcut() {
+        let mut app = fill_blank_exercise();
+        let before = app.screen().text();
+        assert!(!before.contains("Ctrl-F"));
+
+        app.press_ctrl('f');
+        assert_eq!(app.screen().text(), before);
+    }
+
+    #[test]
+    fn opens_with_the_guide_the_code_with_its_gaps_and_the_list_of_gaps() {
+        let screen = fill_blank_exercise().screen();
+
+        assert!(screen.has_row(&["Rust · Tools · Fill blank", "session 1/1 · exercise 1/2"]));
+        assert!(screen.has_row(&["[░░░░░░░░░░░░]", "0/2 gaps"]));
+        assert!(screen.has_row(&["Enter next gap", "Esc back", "Ctrl-Q quit"]));
+        assert!(screen.contains("Loop with for"));
+        assert!(screen.contains("Fill the gaps of the loop."));
+        assert!(screen.has_row(&["fn main() {"]));
+        assert!(screen.has_row(&["for i", "0..3 {"]));
+        assert!(!screen.contains("for i in"));
+        assert!(screen.has_row(&["println!(\"{}\", "]));
+        assert!(screen.has_row(&["Rust", "Ln 2, Col 11"]));
+        assert!(screen.contains("gaps"));
+        assert!(screen.has_row(&["▶ 1"]));
+        assert!(screen.has_row(&["2"]));
+    }
+
+    #[test]
+    fn typing_fills_the_gap_and_its_row_and_the_letters_are_not_moves() {
+        let mut app = fill_blank_exercise();
+
+        app.type_chunk("in");
+        let screen = app.screen();
+        assert!(screen.has_row(&["for i in", "0..3 {"]));
+        assert!(screen.has_row(&["▶ 1  in"]));
+        assert!(screen.has_row(&["Rust", "Ln 2, Col 13"]));
+        assert!(screen.has_row(&["[░░░░░░░░░░░░]", "0/2 gaps"]));
+
+        app.type_chunk("jk"); // h j k l are letters here, not arrows
+        assert!(app.screen().has_row(&["▶ 1  injk"]));
+    }
+
+    #[test]
+    fn backspace_erases_the_last_char_of_the_gap() {
+        let mut app = fill_blank_exercise();
+
+        app.type_chunk("inx");
+        app.press(KeyCode::Backspace);
+        let screen = app.screen();
+        assert!(screen.has_row(&["for i in", "0..3 {"]));
+        assert!(screen.has_row(&["▶ 1  in"]));
+        assert!(!screen.contains("inx"));
+    }
+
+    #[test]
+    fn enter_moves_to_the_next_gap_and_on_the_last_one_it_checks() {
+        let mut app = fill_blank_exercise();
+
+        app.type_chunk("of");
+        app.press(KeyCode::Enter);
+        let screen = app.screen();
+        assert!(screen.has_row(&["1  of"]));
+        assert!(!screen.has_row(&["▶ 1"]));
+        assert!(screen.has_row(&["▶ 2"]));
+        assert!(screen.has_row(&["Rust", "Ln 3, Col 24"]));
+        assert!(screen.has_row(&["[▓▓▓▓▓▓░░░░░░]", "1/2 gaps"]));
+        assert!(screen.has_row(&["Enter check", "Esc back", "Ctrl-Q quit"]));
+        assert!(!screen.contains("Enter next gap"));
+
+        app.type_chunk("i");
+        assert!(app.screen().has_row(&["▶ 2  i"]));
+        assert!(app.screen().has_row(&["Rust", "Ln 3, Col 25"]));
+    }
+
+    #[test]
+    fn checking_the_right_words_shows_right_on_every_gap() {
+        let screen = checked("in", "i").screen();
+
+        assert!(screen.contains("right"));
+        assert!(screen.has_row(&["✓ 1  in"]));
+        assert!(screen.has_row(&["✓ 2  i"]));
+        assert!(!screen.contains("✗"));
+        assert!(!screen.contains("wrong"));
+        assert!(screen.has_row(&["for i in", "0..3 {"]));
+        assert!(screen.has_row(&["Rust", "read only"]));
+        assert!(screen.has_row(&["[▓▓▓▓▓▓▓▓▓▓▓▓]", "2/2 gaps", "Enter continue", "Esc back"]));
+        assert!(!screen.contains("Enter check"));
+    }
+
+    #[test]
+    fn checking_a_wrong_word_shows_it_with_the_right_one() {
+        let screen = checked("of", "i").screen();
+
+        assert!(screen.contains("wrong"));
+        assert!(screen.has_row(&["✗ 1  of  →  in"]));
+        assert!(screen.has_row(&["✓ 2  i"]));
+        assert!(screen.has_row(&["for i of", "0..3 {"]));
+        assert!(screen.has_row(&["Enter continue"]));
+    }
+
+    #[test]
+    fn any_accepted_answer_passes_and_a_wrong_one_shows_the_first() {
+        let screen = second_checked("u64").screen();
+        assert!(screen.contains("right"));
+        assert!(screen.has_row(&["✓ 1  u64"]));
+
+        let screen = second_checked("str").screen();
+        assert!(screen.contains("wrong"));
+        assert!(screen.has_row(&["✗ 1  str  →  i32"]));
+    }
+
+    #[test]
+    fn after_checking_nothing_is_typed() {
+        let mut app = checked("of", "i");
+        let before = app.screen().text();
+
+        app.type_chunk("x");
+        app.press(KeyCode::Backspace);
+        assert_eq!(app.screen().text(), before);
+    }
+
+    #[test]
+    fn enter_after_checking_opens_the_next_exercise() {
+        let mut app = checked("in", "i");
+
+        app.press(KeyCode::Enter);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Rust · Tools · Fill blank", "session 1/1 · exercise 2/2"]));
+        assert!(screen.has_row(&["[░░░░░░░░░░░░]", "0/1 gaps"]));
+        assert!(screen.contains("Pick a type"));
+        assert!(screen.contains("Name an integer type."));
+        assert!(screen.has_row(&["▶ 1"]));
+        assert!(!screen.contains("Loop with for"));
+    }
+
+    #[test]
+    fn esc_goes_back_to_the_explorer_before_and_after_checking() {
+        let mut app = fill_blank_exercise();
+
+        app.press(KeyCode::Esc);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Ingrain", "Rust › Ecosystem › Tools"]));
+        assert!(!screen.contains("Fill the gaps of the loop."));
+
+        let mut app = checked("in", "i");
+
+        app.press(KeyCode::Esc);
+        let screen = app.screen();
+        assert!(screen.has_row(&["Ingrain", "Rust › Ecosystem › Tools"]));
+        assert!(!screen.contains("Fill the gaps of the loop."));
+    }
+}
+
 mod quit {
     use super::*;
 

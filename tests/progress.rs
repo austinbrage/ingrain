@@ -7,6 +7,7 @@ use common::TestApp;
 
 const MANY: &str = "rust/basics/many";
 const QUIZ: &str = "rust/tools/quiz";
+const FILL_BLANK: &str = "rust/tools/fill-blank";
 
 fn last_course(saved: &Progress) -> (&str, &str) {
     let last = saved.last.as_ref().unwrap();
@@ -149,6 +150,88 @@ mod saved {
             .unwrap();
         assert_eq!(quiz.done, ["session-1"]);
         assert!(quiz.in_progress.is_empty());
+    }
+
+    #[test]
+    fn finishing_a_fill_blank_saves_the_next_exercise_and_the_last_one_saves_the_session() {
+        let mut app = TestApp::with_progress("rust-tools-before-fill-blank");
+        app.press(KeyCode::Enter); // Continue opens the first fill-blank
+        app.type_chunk("in");
+        app.press(KeyCode::Enter); // goes to the next gap
+        app.type_chunk("i");
+        app.press(KeyCode::Enter); // checks the gaps
+        assert!(
+            !app.saved_progress()
+                .modules
+                .iter()
+                .any(|module| module.id == FILL_BLANK)
+        );
+
+        app.press(KeyCode::Enter); // goes on, to the second fill-blank
+        let saved = app.saved_progress();
+        let fill_blank = saved
+            .modules
+            .iter()
+            .find(|module| module.id == FILL_BLANK)
+            .unwrap();
+        assert_eq!(
+            fill_blank.in_progress.get("session-1").map(String::as_str),
+            Some("total-type")
+        );
+        assert!(fill_blank.done.is_empty());
+
+        app.type_chunk("i32");
+        app.press(KeyCode::Enter); // checks the gap
+        app.press(KeyCode::Enter); // goes on
+
+        let saved = app.saved_progress();
+        let fill_blank = saved
+            .modules
+            .iter()
+            .find(|module| module.id == FILL_BLANK)
+            .unwrap();
+        assert_eq!(fill_blank.done, ["session-1"]);
+        assert!(fill_blank.in_progress.is_empty());
+        assert!(fill_blank.failed.is_empty());
+    }
+
+    #[test]
+    fn a_wrong_gap_is_saved_as_failed() {
+        let mut app = TestApp::with_progress("rust-tools-before-fill-blank");
+        app.press(KeyCode::Enter); // Continue opens the first fill-blank
+        app.type_chunk("of");
+        app.press(KeyCode::Enter); // goes to the next gap
+        app.type_chunk("i");
+        app.press(KeyCode::Enter); // checks the gaps, one is wrong
+        app.press(KeyCode::Enter); // goes on
+
+        let saved = app.saved_progress();
+        let fill_blank = saved
+            .modules
+            .iter()
+            .find(|module| module.id == FILL_BLANK)
+            .unwrap();
+        assert_eq!(fill_blank.failed["session-1"], ["loop-range"]);
+    }
+
+    #[test]
+    fn a_wrong_gap_on_the_last_exercise_still_saves_the_session_as_done() {
+        let mut app = TestApp::with_progress("rust-fill-blank-exercise-2");
+        app.press(KeyCode::Enter); // Continue opens the second fill-blank
+        assert!(app.screen().contains("Pick a type"));
+
+        app.type_chunk("str");
+        app.press(KeyCode::Enter); // checks the gap, which is wrong
+        app.press(KeyCode::Enter); // goes on
+
+        let saved = app.saved_progress();
+        let fill_blank = saved
+            .modules
+            .iter()
+            .find(|module| module.id == FILL_BLANK)
+            .unwrap();
+        assert_eq!(fill_blank.done, ["session-1"]);
+        assert_eq!(fill_blank.failed["session-1"], ["total-type"]);
     }
 
     #[test]

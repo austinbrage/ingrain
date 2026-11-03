@@ -147,6 +147,20 @@ mod exercise_on_continue {
     }
 
     #[test]
+    fn opens_the_second_fill_blank_when_the_first_one_is_saved() {
+        let mut app = TestApp::with_progress("rust-fill-blank-exercise-2");
+        assert_eq!(app.screen().background_of("Continue"), Some(selected()));
+
+        app.press(KeyCode::Enter);
+        let screen = app.screen();
+
+        assert!(screen.has_row(&["Rust · Tools · Fill blank", "session 1/1 · exercise 2/2"]));
+        assert!(screen.has_row(&["[░░░░░░░░░░░░]", "0/1 gaps", "Enter check"]));
+        assert!(screen.contains("Pick a type"));
+        assert!(!screen.contains("Loop with for"));
+    }
+
+    #[test]
     fn opens_the_next_course_when_the_last_one_is_finished() {
         let mut app = TestApp::with_progress("rust-basics-done");
         let screen = app.screen();

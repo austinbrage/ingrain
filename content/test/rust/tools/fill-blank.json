@@ -1,0 +1,26 @@
+{
+  "id": "fill-blank",
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "fill-blank",
+          "id": "loop-range",
+          "title": "Loop with for",
+          "guide": "Fill the gaps of the loop.",
+          "code": "fn main() {\n    for i ___ 0..3 {\n        println!(\"{}\", ___);\n    }\n}",
+          "gaps": [{ "answers": ["in"] }, { "answers": ["i"] }]
+        },
+        {
+          "type": "fill-blank",
+          "id": "total-type",
+          "title": "Pick a type",
+          "guide": "Name an integer type.",
+          "code": "fn main() {\n    let total: ___ = 1 + 2;\n    println!(\"{}\", total);\n}",
+          "gaps": [{ "answers": ["i32", "u32", "i64", "u64"] }]
+        }
+      ]
+    }
+  ]
+}

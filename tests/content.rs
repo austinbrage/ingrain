@@ -1,5 +1,5 @@
 use ingrain::content::{
-    Catalog, Course, Exercise, Intro, Layer, Mode, Module, Quiz, Source, Typing,
+    Catalog, Course, Exercise, FillBlank, Intro, Layer, Mode, Module, Quiz, Source, Typing,
 };
 use ratatui::widgets::{Paragraph, Wrap};
 use std::path::{Path, PathBuf};
@@ -17,12 +17,19 @@ const MAX_INTRO_TEXT_ROWS: usize = 8;
 const MAX_SNIPPET_LINES: usize = 14;
 const MAX_SNIPPET_WIDTH: usize = 40;
 
-// The limits of a quiz: its options, and the code window, which does not scroll
+// The limits of a quiz: its options
 const MIN_QUIZ_OPTIONS: usize = 2;
 const MAX_QUIZ_OPTIONS: usize = 4;
 const MAX_OPTION_CHARS: usize = 50;
-const MAX_QUIZ_CODE_LINES: usize = 14;
-const MAX_QUIZ_CODE_WIDTH: usize = 50;
+
+// The limits of a fill-blank: its gaps, whose block is 3 cells wide at least
+const MIN_GAPS: usize = 1;
+const MAX_GAPS: usize = 6;
+const GAP_MARKER: &str = "___";
+
+// The code window of a quiz and of a fill-blank does not scroll
+const MAX_CODE_LINES: usize = 14;
+const MAX_CODE_WIDTH: usize = 50;
 
 // ------------------------------------------------------------
 // The checks: small functions, each returns what is wrong as sentences that say where
@@ -259,14 +266,90 @@ fn quiz_problems(place: &str, quiz: &Quiz) -> Vec<String> {
         .max()
         .unwrap_or(0);
 
-    if lines > MAX_QUIZ_CODE_LINES {
+    if lines > MAX_CODE_LINES {
         problems.push(format!(
-            "{place}: the code has {lines} lines, the limit is {MAX_QUIZ_CODE_LINES}"
+            "{place}: the code has {lines} lines, the limit is {MAX_CODE_LINES}"
         ));
     }
-    if widest > MAX_QUIZ_CODE_WIDTH {
+    if widest > MAX_CODE_WIDTH {
         problems.push(format!(
-            "{place}: the code has a line of {widest} columns, the limit is {MAX_QUIZ_CODE_WIDTH}"
+            "{place}: the code has a line of {widest} columns, the limit is {MAX_CODE_WIDTH}"
+        ));
+    }
+
+    problems
+}
+
+// A fill-blank has one `___` in its code for each of its 1 to 6 gaps, each gap has different
+// single-word answers, and the code fits the code window once the gaps hold their longest answer
+fn fill_blank_problems(place: &str, fill_blank: &FillBlank) -> Vec<String> {
+    let mut problems = Vec::new();
+    let gaps = fill_blank.gaps.len();
+    let markers = fill_blank.code.matches(GAP_MARKER).count();
+
+    if !(MIN_GAPS..=MAX_GAPS).contains(&gaps) {
+        problems.push(format!(
+            "{place}: a fill-blank needs {MIN_GAPS} to {MAX_GAPS} gaps and has {gaps}"
+        ));
+    }
+    if markers != gaps {
+        problems.push(format!(
+            "{place}: the code has {markers} `{GAP_MARKER}` and there are {gaps} gaps"
+        ));
+    }
+
+    for (index, gap) in fill_blank.gaps.iter().enumerate() {
+        let place = format!("{place} gap {}", index + 1);
+
+        if gap.answers.is_empty() {
+            problems.push(format!("{place}: the gap has no answers"));
+        }
+
+        for (answer_index, answer) in gap.answers.iter().enumerate() {
+            if answer.is_empty() || answer.contains(char::is_whitespace) {
+                problems.push(format!(
+                    "{place}: the answer `{answer}` is not a single word"
+                ));
+            }
+            if gap.answers[..answer_index].contains(answer) {
+                problems.push(format!("{place}: the answer `{answer}` is repeated"));
+            }
+        }
+    }
+
+    let mut longest = fill_blank.gaps.iter().map(|gap| {
+        gap.answers
+            .iter()
+            .map(|answer| answer.chars().count())
+            .max()
+            .unwrap_or(0)
+    });
+    let mut shown = String::new();
+
+    for (index, text) in fill_blank.code.split(GAP_MARKER).enumerate() {
+        if index > 0 {
+            let width = longest.next().unwrap_or(0).max(GAP_MARKER.len());
+
+            shown.push_str(&"x".repeat(width));
+        }
+        shown.push_str(text);
+    }
+
+    let lines = shown.lines().count();
+    let widest = shown
+        .lines()
+        .map(|line| line.chars().count())
+        .max()
+        .unwrap_or(0);
+
+    if lines > MAX_CODE_LINES {
+        problems.push(format!(
+            "{place}: the code has {lines} lines, the limit is {MAX_CODE_LINES}"
+        ));
+    }
+    if widest > MAX_CODE_WIDTH {
+        problems.push(format!(
+            "{place}: the code has a line of {widest} columns, the limit is {MAX_CODE_WIDTH}"
         ));
     }
 
@@ -496,6 +579,9 @@ mod real_content {
                                 }
                                 Exercise::Quiz(quiz) => {
                                     problems.extend(quiz_problems(&place, quiz))
+                                }
+                                Exercise::FillBlank(fill_blank) => {
+                                    problems.extend(fill_blank_problems(&place, fill_blank))
                                 }
                             }
                         }
@@ -753,6 +839,81 @@ mod checks_of_the_checks {
         assert_eq!(wide.len(), 1);
         assert!(wide[0].contains("a line of 51 columns"));
         assert!(quiz_problems("rust/x/y/q", &fits).is_empty());
+    }
+
+    // A fill-blank with the given code and gaps (as JSON), built from JSON
+    fn fill_blank(code: &str, gaps: &str) -> FillBlank {
+        serde_json::from_str(&format!(
+            r#"{{ "id": "f", "title": "T", "guide": "G", "code": "{code}", "gaps": [{gaps}] }}"#
+        ))
+        .unwrap()
+    }
+
+    #[test]
+    fn the_fill_blank_check_catches_markers_that_do_not_match_the_gaps() {
+        let gap = r#"{ "answers": ["a"] }"#;
+        let more_markers = fill_blank_problems("rust/x/y/f", &fill_blank("___ ___", gap));
+        let fewer_markers = fill_blank_problems("rust/x/y/f", &fill_blank("c", gap));
+
+        assert_eq!(more_markers.len(), 1);
+        assert!(more_markers[0].contains("the code has 2 `___` and there are 1 gaps"));
+        assert_eq!(fewer_markers.len(), 1);
+        assert!(fill_blank_problems("rust/x/y/f", &fill_blank("___", gap)).is_empty());
+    }
+
+    #[test]
+    fn the_fill_blank_check_catches_no_gaps_and_too_many_gaps() {
+        let none = fill_blank_problems("rust/x/y/f", &fill_blank("c", ""));
+        let gaps = [r#"{ "answers": ["a"] }"#; 7].join(",");
+        let seven = fill_blank_problems("rust/x/y/f", &fill_blank(&"___ ".repeat(7), &gaps));
+
+        assert_eq!(none.len(), 1);
+        assert!(none[0].contains("needs 1 to 6 gaps and has 0"));
+        assert_eq!(seven.len(), 1);
+        assert!(seven[0].contains("has 7"));
+    }
+
+    #[test]
+    fn the_fill_blank_check_catches_a_gap_with_no_answer_a_phrase_and_a_repeat() {
+        let check = |gap: &str| fill_blank_problems("rust/x/y/f", &fill_blank("___", gap));
+
+        let none = check(r#"{ "answers": [] }"#);
+        let empty = check(r#"{ "answers": [""] }"#);
+        let phrase = check(r#"{ "answers": ["a b"] }"#);
+        let repeated = check(r#"{ "answers": ["a", "a"] }"#);
+
+        assert_eq!(none.len(), 1);
+        assert!(none[0].contains("rust/x/y/f gap 1: the gap has no answers"));
+        assert_eq!(empty.len(), 1);
+        assert!(empty[0].contains("is not a single word"));
+        assert_eq!(phrase.len(), 1);
+        assert!(phrase[0].contains("the answer `a b` is not a single word"));
+        assert_eq!(repeated.len(), 1);
+        assert!(repeated[0].contains("the answer `a` is repeated"));
+        assert!(check(r#"{ "answers": ["a", "b"] }"#).is_empty());
+    }
+
+    #[test]
+    fn the_fill_blank_check_catches_code_that_is_too_tall_or_too_wide_with_the_longest_answer() {
+        let gap = |answer: &str| format!(r#"{{ "answers": ["{answer}"] }}"#);
+        let tall = fill_blank_problems(
+            "rust/x/y/f",
+            &fill_blank(&format!("___{}", r"\nx".repeat(14)), &gap("a")),
+        );
+        let wide = fill_blank_problems(
+            "rust/x/y/f",
+            &fill_blank(&format!("{}___", "x".repeat(47)), &gap("a")),
+        );
+        let long_answer = fill_blank_problems(
+            "rust/x/y/f",
+            &fill_blank(&format!("{}___", "x".repeat(47)), &gap("abcdef")),
+        );
+
+        assert_eq!(tall.len(), 1);
+        assert!(tall[0].contains("the code has 15 lines"));
+        assert!(wide.is_empty()); // 47 columns and the block of 3 make exactly 50
+        assert_eq!(long_answer.len(), 1);
+        assert!(long_answer[0].contains("a line of 53 columns"));
     }
 
     #[test]

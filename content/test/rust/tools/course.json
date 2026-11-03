@@ -10,7 +10,8 @@
         { "id": "retake", "name": "Retake", "sessions": 1 },
         { "id": "recap", "name": "Recap", "sessions": 2 },
         { "id": "kinds", "name": "Kinds", "sessions": 1 },
-        { "id": "intro", "name": "Intro", "sessions": 1 }
+        { "id": "intro", "name": "Intro", "sessions": 1 },
+        { "id": "fill-blank", "name": "Fill blank", "sessions": 1 }
       ]
     }
   ]
