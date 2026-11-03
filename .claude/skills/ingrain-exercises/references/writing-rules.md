@@ -1,6 +1,6 @@
 # Writing rules for ingrain-exercises
 
-What a test cannot check. The schema, the limits and the ids are in `docs/content-structure.md`, and this file does not copy them. The mechanical rules (ids, session counts, the card limits, quiz options, chunk lines, note anchors) are checked by `cargo test --test content` (`tests/content.rs`). Everything below is judgment, and it is yours to get right.
+What a test cannot check. The schema, the limits and the ids are in `docs/content-structure.md`, and this file does not copy them. The mechanical rules (ids, session counts, the card limits, quiz options, fill-blank gaps, chunk lines, note anchors) are checked by `cargo test --test content` (`tests/content.rs`). Everything below is judgment, and it is yours to get right.
 
 ## The idea behind the content
 - **Each course assumes the user knows nothing about its own concept, but knows everything outside it.** The ratatui course assumes nothing about the crate, but assumes the user knows Rust and general programming (loops, variables, `?`, closures, `if let`). Guides and notes never teach what is outside the course concept
@@ -46,6 +46,17 @@ A note is a hint under a piece of code, shown while the user types it.
 - The code is short, uses a feature of the module's concept and not general programming, and has no comments that give the answer away
 - The `explanation` says why the answer is right, in a sentence or two, and does not repeat the option
 - **Never run the code.** The `answer` of an `output` quiz, and the `output` of a typing exercise, are what you can predict by reading the program. Keep every program deterministic, so the output is certain: no randomness, no current time, no map iteration order, no goroutines racing for the output. If you cannot be sure of an output, change the program
+
+## Fill in the blank
+- The shape and the limits are in `docs/content-structure.md` ("Module file: fill-blank")
+- **A gap hides the word that holds the idea of the exercise:** a keyword, a name, a type or an operator that the module's concept is about. Never trivia (a brace, `fn`, `main`) and never a whole expression, because an answer is one word
+- **The rest of the code must make the answer certain.** Someone who understands the concept can work the word out from the lines around it, and nothing else fits. If two words would work, list both in `answers`, only when each is really right in that place, and put the best one first because it is the one shown after a mistake
+- Two or three gaps are usual, one is fine, six is the limit. At most two gaps on a line, never next to each other, and each one asks a different thing
+- **The guide says what to fill, never the answers.** Nothing else in the exercise gives one away: no comment, no name, no other line that repeats the word
+- The code is a complete, valid program once the gaps hold their first answers. You do not run it: read it as a compiler would. Never write `___` in the code for any other reason
+- A fill-blank has no `output` and no `explanation`, so the title and the guide must be enough to know what to do
+- The answers are spelled as in the code, letter for letter: the check is exact, case included
+- Vary the place of the gaps across a module (a keyword here, a type there), and alternate the exercise with typing exercises and quizzes
 
 ## Intros
 - **As much as the concept needs, not a fixed number.** An easy concept (conditionals) gets a short intro, a single slide, or none at all. A hard concept (concurrency) gets longer texts, more slides and snippets. Judge it from the course and the module

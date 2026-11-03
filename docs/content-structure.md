@@ -58,7 +58,7 @@ content/
 - A module that is listed in `course.json` but has no `<module>.json` yet is skipped when the app looks for the next module to study
 
 ## Module file: typing
-`<module>.json` holds `sessions`, each with `exercises`. An exercise has a `type`, which is `"typing"` or `"quiz"` today (`"fill-blank"` and `"find-error"` are planned, see `docs/todos/08-new-exercise-type.md`). The type names the **input style**: typing, picking an option, typing into gaps, picking a line. The shape below is for `"typing"`: the user types code that is shown. The quiz is in the next section.
+`<module>.json` holds `sessions`, each with `exercises`. An exercise has a `type`, which is `"typing"`, `"quiz"` or `"fill-blank"` today (`"find-error"` is planned, see `docs/todos/08-new-exercise-type.md`). The type names the **input style**: typing, picking an option, typing into gaps, picking a line. The shape below is for `"typing"`: the user types code that is shown. The quiz and the fill-blank are in the next sections.
 
 | Field | Where | Meaning |
 |---|---|---|
@@ -120,6 +120,34 @@ A `"quiz"` exercise shows code and the user picks one option. It sits in the sam
 - **`output` is written, not run:** the skill that writes exercises does not run the code. It writes the `output` of a typing exercise, and the `answer` of an `output` quiz, from what it can predict by reading the program, so the programs must be deterministic (no randomness, no current time, no map iteration order). A quiz has no `output` field of its own (it was dropped on 2026-10-28, and a file that has it fails at load)
 - No score, and no retry inside the exercise. A wrong answer is saved in the `failed` list of its session, and the failed exercises can be retaken (`docs/progress-flow.md`)
 - The rules about options and `answer` are not checked when the module loads, because a panic there would take the app down with its own data. They are checked by the content validation, `tests/content.rs` (see Open)
+
+## Module file: fill-blank
+A `"fill-blank"` exercise shows code with gaps in it, and the user types only the missing word of each gap. It sits in the same `exercises` list as the others, and `deny_unknown_fields` applies. Its screen is `docs/ui/exercise/10-fill-blank.md`.
+
+```json
+{
+  "type": "fill-blank",
+  "id": "loop-range",
+  "title": "Loop with for",
+  "guide": "Fill the gaps of the loop.",
+  "code": "fn main() {\n    for i ___ 0..3 {\n        println!(\"{}\", ___);\n    }\n}",
+  "gaps": [{ "answers": ["in"] }, { "answers": ["i"] }]
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `id`, `title`, `guide` | as in a typing exercise. The `guide` is markdown (the subset below) and says what to fill, never the answers |
+| `code` | the code shown, highlighted, one string with `\n`. Each gap is `___` (three underscores, a valid identifier in Rust and Go, so the highlighter takes it as code) |
+| `gaps` | one entry per `___`, in order: the n-th `___` takes the n-th gap |
+| `gaps[].answers` | the words the gap accepts. The first one is the one shown when the user is wrong |
+
+- **Answers:** single words with no spaces, different inside a gap, and matched letter for letter (case included). List more than one only when each is really right in that place (`i32` and `u32` for a counter that never goes negative); the first is the best one
+- **Gaps:** between 1 and 6, and the number of `___` in `code` must equal the number of `gaps`
+- **Code size:** about 14 lines and 50 columns or less, the quiz rule. A gap takes as many columns as its longest answer, with a minimum of 3
+- **How it is played:** Enter moves to the next gap, and Enter on the last one checks all of them. A wrong word in any gap makes the exercise failed: it is saved in the `failed` list of its session and can be retaken (`docs/progress-flow.md`), as a quiz. No retry, and no score
+- **No `output`, no explanation:** the exercise has no complete screen, so there is nowhere to show them, and a file that has either fails at load
+- The rules about the gaps are not checked when the module loads, because a panic there would take the app down with its own data. They are checked by the content validation, `tests/content.rs` (see Open)
 
 ## Intro: before a module or a session
 A module and a session can each have an optional `intro`, a few slides that teach a concept before the exercises. It is a field next to `id` and `sessions` (on the module) or next to `id` and `exercises` (on the session), not an exercise: it has no id and never counts in the position of the header, in `done`, in `in_progress` or in `failed`. The screen is `docs/ui/06-intro.md` and the decisions are at the bottom of that file.
@@ -193,6 +221,6 @@ A later import script walks the folders and writes the items. The path of the fo
 
 ## Open
 - `tier` in `course.json` is a free string, not validated. Check the allowed values once tiers drive behavior
-- Exercise JSON shape for the types still to come (`fill-blank`, `find-error`); the typing and quiz shapes are above
+- Exercise JSON shape for the type still to come (`find-error`); the typing, quiz and fill-blank shapes are above
 - The content validation is `tests/content.rs`, a `cargo test` over `content/prod/`: each check is a small function at the top of the file, tested on a tiny example with a fault on purpose. Not validated, on purpose: the allowed tiers and the markdown subset of the guides, and compiling the assembled chunks
 - Content `version` field, so changed exercises do not invalidate saved progress
