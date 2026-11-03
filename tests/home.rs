@@ -225,7 +225,7 @@ mod explorer_from_cards {
 
         assert!(screen.has_row(&["Ingrain", "Rust"]));
         assert!(screen.has_row(&["RUST", "CORE", "BASICS"]));
-        assert!(screen.has_row(&["Core", "Basics", "FOUNDATIONS", "basic"]));
+        assert!(screen.has_row(&["Core", "FUNDAMENTALS", "FOUNDATIONS", "basic"]));
         assert!(screen.has_row(&["One"]));
     }
 
@@ -245,7 +245,8 @@ mod explorer_from_cards {
 
         assert!(screen.has_row(&["Ingrain", "Go"]));
         assert!(screen.has_row(&["GO", "CORE", "BASICS"]));
-        assert!(screen.has_row(&["Core", "Basics"]));
+        assert!(screen.has_row(&["Core", "FUNDAMENTALS"]));
+        assert!(screen.has_row(&["Basics"]));
 
         app.press(KeyCode::Esc);
         let screen = app.screen();

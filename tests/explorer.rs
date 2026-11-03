@@ -29,7 +29,7 @@ mod layers {
         assert_eq!(screen.background_of("Core"), Some(highlighted()));
         assert_ne!(screen.background_of("Ecosystem"), Some(highlighted()));
         assert!(screen.has_row(&["RUST", "CORE", "BASICS"]));
-        assert!(screen.has_row(&["Core", "Basics", "FOUNDATIONS", "basic"]));
+        assert!(screen.has_row(&["Core", "FUNDAMENTALS", "FOUNDATIONS", "basic"]));
         assert!(!screen.contains("Tools"));
         assert!(!screen.contains("Helpers"));
         assert!(screen.has_row(&["Ingrain", "Rust"]));
@@ -41,7 +41,7 @@ mod layers {
         assert_ne!(screen.background_of("Core"), Some(highlighted()));
         assert_eq!(screen.background_of("Ecosystem"), Some(highlighted()));
         assert!(screen.has_row(&["RUST", "ECOSYSTEM", "TOOLS"]));
-        assert!(screen.has_row(&["Core", "Tools", "UTILITIES", "medium"]));
+        assert!(screen.has_row(&["Core", "TOOLING", "UTILITIES", "medium"]));
         assert!(screen.has_row(&["Helpers"]));
         assert!(!screen.contains("Basics"));
         assert!(!screen.contains("FOUNDATIONS"));
@@ -50,7 +50,7 @@ mod layers {
         let screen = app.screen();
         assert_eq!(screen.background_of("Core"), Some(highlighted()));
         assert!(screen.has_row(&["RUST", "CORE", "BASICS"]));
-        assert!(screen.has_row(&["Core", "Basics", "FOUNDATIONS", "basic"]));
+        assert!(screen.has_row(&["Core", "FUNDAMENTALS", "FOUNDATIONS", "basic"]));
         assert!(!screen.contains("Tools"));
         assert!(!screen.contains("Helpers"));
 
@@ -129,6 +129,32 @@ mod courses {
     }
 
     #[test]
+    fn the_courses_show_under_their_group_headers_and_the_selection_skips_them() {
+        let mut app = rust_explorer();
+        let screen = app.screen();
+        assert!(screen.has_rows_in_order(&["FUNDAMENTALS", "Basics", "Second"]));
+
+        app.press(KeyCode::Down); // Ecosystem, two groups of one course each
+        app.press(KeyCode::Right); // focus the courses column, on Tools
+        let screen = app.screen();
+        assert!(screen.has_rows_in_order(&["TOOLING", "Tools", "LIBRARIES", "Bare"]));
+        assert_eq!(screen.background_of("Tools"), Some(highlighted()));
+        assert_ne!(screen.background_of("TOOLING"), Some(highlighted()));
+        assert_ne!(screen.background_of("LIBRARIES"), Some(highlighted()));
+
+        app.press(KeyCode::Down); // jumps over the blank row and LIBRARIES
+        let screen = app.screen();
+        assert_eq!(screen.background_of("Bare"), Some(highlighted()));
+        assert_ne!(screen.background_of("LIBRARIES"), Some(highlighted()));
+        assert!(screen.has_row(&["RUST", "ECOSYSTEM", "BARE"]));
+
+        app.press(KeyCode::Up);
+        let screen = app.screen();
+        assert_eq!(screen.background_of("Tools"), Some(highlighted()));
+        assert_ne!(screen.background_of("TOOLING"), Some(highlighted()));
+    }
+
+    #[test]
     fn a_course_without_modules_keeps_the_modules_column_empty_and_does_not_open() {
         let mut app = rust_explorer();
         app.press(KeyCode::Down); // Ecosystem
@@ -137,7 +163,7 @@ mod courses {
 
         let screen = app.screen();
         assert!(screen.has_row(&["RUST", "ECOSYSTEM", "BARE"]));
-        assert!(screen.has_row(&["Ecosystem", "Bare"]));
+        assert!(screen.has_rows_in_order(&["LIBRARIES", "Bare"]));
         assert!(!screen.contains("UTILITIES"));
         assert!(!screen.contains("Helpers"));
 
