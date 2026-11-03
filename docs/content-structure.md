@@ -194,5 +194,5 @@ A later import script walks the folders and writes the items. The path of the fo
 ## Open
 - `tier` in `course.json` is a free string, not validated. Check the allowed values once tiers drive behavior
 - Exercise JSON shape for the types still to come (`fill-blank`, `find-error`); the typing and quiz shapes are above
-- The content validation is `tests/content.rs`, a `cargo test` over `content/prod/` (see `docs/todos/03-content-skill.md`, "The validator"). Not validated, on purpose: the allowed tiers and the markdown subset of the guides, and compiling the assembled chunks
+- The content validation is `tests/content.rs`, a `cargo test` over `content/prod/`: each check is a small function at the top of the file, tested on a tiny example with a fault on purpose. Not validated, on purpose: the allowed tiers and the markdown subset of the guides, and compiling the assembled chunks
 - Content `version` field, so changed exercises do not invalidate saved progress

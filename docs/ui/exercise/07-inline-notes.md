@@ -41,7 +41,7 @@ The notes of a chunk (explanations tied to a piece of its code) show in the edit
 ## The content
 - `text` is plain text, no markdown, no backticks: one short sentence of about 60 characters, two lines at most, that does not repeat the anchor's name
 - `on` is a piece of the chunk's own text, copied from it, that occurs exactly once. If it is not found the note shows from the start
-- The rules are in `docs/content-structure.md` and in the content skill todo (`docs/todos/03-content-skill.md`)
+- The rules are in `docs/content-structure.md` and in the `ingrain-exercises` skill
 
 ## In the code
 - `ui/exercise/editor/hints.rs`: `note_positions` (the row and column of each anchor), `note_hint` (the block), `wrap`, and `wrong_hint`
