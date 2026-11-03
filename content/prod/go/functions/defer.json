@@ -1,0 +1,199 @@
+{
+  "id": "defer",
+  "intro": {
+    "title": "Defer",
+    "slides": [
+      {
+        "text": "Many functions finish with a task that must always happen: closing something, releasing it, saying goodbye. `defer` lets you write that task right next to the code that needs it, and Go runs it when the function ends.\n\nThe snippet is pseudo code, not Go.",
+        "code": "work():\n    open something\n    run later: close it\n    do the job\n    (close runs here, on exit)"
+      },
+      {
+        "text": "Two sessions:\n\n- **Session 1:** what `defer` does, in what order and on an early return\n- **Session 2:** when its values are read, closures and results"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Delaying a call",
+        "slides": [
+          {
+            "text": "Put `defer` before a function call. The call does not run there: it waits until the surrounding function is about to return, and then it runs.",
+            "code": "defer fmt.Println(\"later\")"
+          },
+          {
+            "text": "A function can defer many calls. They pile up like plates: the **last** one deferred is the **first** one to run.",
+            "code": "defer step(\"a\")\ndefer step(\"b\")\n// runs b, then a"
+          },
+          {
+            "text": "Deferred calls run however the function ends: at its last line or at a `return` in the middle. That is why cleanup goes in a `defer` and not at the bottom, where an early `return` would skip it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "run-at-end",
+          "title": "Delay a call",
+          "guide": "Defer a print, and see when it runs.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. The deferred line comes first but prints last.", "notes": [{"on": "defer", "text": "Waits until main is about to return."}], "text": "func main() {\n    defer fmt.Println(\"bye\")\n    fmt.Println(\"hello\")\n    fmt.Println(\"working\")\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "hello\nworking\nbye"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "reverse-order",
+          "title": "Several deferred calls",
+          "guide": "Defer three calls and watch their order.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Each `defer` adds a call to the pile.", "text": "func main() {\n    fmt.Println(\"start\")\n    defer fmt.Println(\"one\")\n    defer fmt.Println(\"two\")\n    defer fmt.Println(\"three\")\n    fmt.Println(\"end\")\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "start\nend\nthree\ntwo\none"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "which-order",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    defer fmt.Println(\"a\")\n    for i := 0; i < 2; i++ {\n        fmt.Println(i)\n    }\n    defer fmt.Println(\"b\")\n}",
+          "options": [
+            "a, b, 0, 1",
+            "b, a, 0, 1",
+            "0, 1, b, a",
+            "0, 1, a, b"
+          ],
+          "answer": 2,
+          "explanation": "Nothing deferred runs until `main` ends, so the loop prints first. Then the deferred calls run last in, first out: `b`, then `a`."
+        },
+        {
+          "type": "typing",
+          "id": "early-return-cleanup",
+          "title": "Cleanup on an early return",
+          "guide": "Defer the closing line, then return early. It still runs.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. The function can leave in the middle.", "notes": [{"on": "defer fmt.Println(\"close\")", "text": "Deferred right after opening, so it is never forgotten."}], "text": "func readData(empty bool) {\n    fmt.Println(\"open\")\n    defer fmt.Println(\"close\")\n    if empty {\n        fmt.Println(\"nothing to read\")\n        return\n    }\n    fmt.Println(\"reading\")\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "Call it once with each case.", "text": "func main() {\n    readData(true)\n    readData(false)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "open\nnothing to read\nclose\nopen\nreading\nclose"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "close-the-connection",
+          "title": "Always disconnect",
+          "guide": "Fill the word that delays the closing line, and the word that leaves the function early.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc send(msg string) {\n    fmt.Println(\"connect\")\n    ___ fmt.Println(\"disconnect\")\n    if msg == \"\" {\n        ___\n    }\n    fmt.Println(\"send\", msg)\n}\n\nfunc main() { send(\"\") }",
+          "gaps": [
+            {"answers": ["defer"]},
+            {"answers": ["return"]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "What a deferred call sees",
+        "slides": [
+          {
+            "text": "When Go reaches a `defer`, it reads the **arguments** of the call at once and keeps them. Only the call itself waits. A change to the variable afterwards does not reach the deferred call.",
+            "code": "x := 1\ndefer fmt.Println(x)\nx = 9    // the call keeps 1"
+          },
+          {
+            "text": "To see the latest value, defer a function literal that calls itself at the end. Its body runs late and, as a closure, reads the variable as it is **then**. The `()` after the literal is the call that `defer` needs.",
+            "code": "defer func() {\n    fmt.Println(x)\n}()"
+          },
+          {
+            "text": "A deferred closure runs after the `return` has set the result, and before the caller gets it. If the function has a **named result**, the closure can change it, and the caller receives the changed value."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "argument-now",
+          "title": "Arguments are read at once",
+          "guide": "Change a variable after deferring a print of it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. The deferred call keeps the `n` it saw.", "notes": [{"on": "defer fmt.Println(\"deferred:\", n)", "text": "n is read here, not when the call runs."}], "text": "func main() {\n    n := 1\n    defer fmt.Println(\"deferred:\", n)\n    n = 2\n    fmt.Println(\"now:\", n)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "now: 2\ndeferred: 1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "defer-closure",
+          "title": "Defer a function literal",
+          "guide": "Defer a literal, so it reads the variable when it runs.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Same program, but the print is inside a literal.", "notes": [{"on": "}()", "text": "Defer needs a call, so the literal ends with ()."}], "text": "func main() {\n    n := 1\n    defer func() {\n        fmt.Println(\"deferred:\", n)\n    }()\n    n = 2\n    fmt.Println(\"now:\", n)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "now: 2\ndeferred: 2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "change-the-result",
+          "title": "Change a named result",
+          "guide": "A deferred closure can change the value a function returns.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `score` is set to 5, then the deferred closure runs before the caller gets it.", "notes": [{"on": "score += 10", "text": "Runs after return, so the caller gets the result."}], "text": "func bonus() (score int) {\n    defer func() {\n        score += 10\n    }()\n    score = 5\n    return score\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "The caller receives 15, not 5.", "text": "func main() {\n    fmt.Println(bonus())\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "15"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "double-the-result",
+          "title": "Double the result",
+          "guide": "Fill the word that delays the literal, and the operator that doubles the result.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc total() (sum int) {\n    ___ func() {\n        sum ___ 2\n    }()\n    sum = 20\n    return sum\n}\n\nfunc main() { fmt.Println(total()) }",
+          "gaps": [
+            {"answers": ["defer"]},
+            {"answers": ["*="]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "loop-defers",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    for i := 1; i <= 3; i++ {\n        defer fmt.Println(i)\n    }\n    fmt.Println(\"loop done\")\n}",
+          "options": [
+            "loop done, 1, 2, 3",
+            "1, 2, 3, loop done",
+            "3, 2, 1, loop done",
+            "loop done, 3, 2, 1"
+          ],
+          "answer": 3,
+          "explanation": "Each pass defers a call with the `i` of that pass. All of them wait for `main` to end, so `loop done` comes first, then the calls in reverse: 3, 2, 1."
+        }
+      ]
+    }
+  ]
+}

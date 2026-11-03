@@ -1,0 +1,215 @@
+{
+  "id": "closures",
+  "intro": {
+    "title": "Closures",
+    "slides": [
+      {
+        "text": "A function literal can use variables from the code around it. When it does, it is a **closure**: it keeps those variables with it, even after the code that made it has finished. You will read them, change them and build functions that remember.\n\nThe snippet is pseudo code, not Go.",
+        "code": "x = 1\nf = function that uses x\nx = 2\nf()    sees x as 2"
+      },
+      {
+        "text": "Two sessions:\n\n- **Session 1:** a closure and the variables it captures\n- **Session 2:** functions that build closures, and closures passed to other functions"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Capturing variables",
+        "slides": [
+          {
+            "text": "A function literal can use any variable that is in scope where it is written. It does not get a copy: it uses **the variable itself**.",
+            "code": "rate := 2\nscale := func(n int) int {\n    return n * rate\n}"
+          },
+          {
+            "text": "Because the closure shares the variable, it sees every change made to it, and it can change it too. The value it reads is the one the variable has **when the closure runs**, not when it was written.",
+            "code": "rate = 5\nscale(3)    // 15, not 6"
+          },
+          {
+            "text": "A closure keeps its variables alive as long as it exists. A function can return a closure, and the variable it captured stays with it. Each call of that function creates a **new** variable.\n\nThe snippet is pseudo code.",
+            "code": "make():\n    var = 0\n    return function using var\n\na = make()\nb = make()    own var, not a's"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "capture-read",
+          "title": "Use a variable from outside",
+          "guide": "Write a function literal that reads variables declared around it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. The literal uses `price` and `tax`, which it did not declare.", "notes": [{"on": "price + tax", "text": "Both come from outside the function literal."}], "text": "func main() {\n    price := 20\n    tax := 3\n    total := func() int {\n        return price + tax\n    }\n    fmt.Println(total())\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "23"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "sees-the-change",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    price := 10\n    twice := func() int {\n        return price * 2\n    }\n    price = 50\n    fmt.Println(twice())\n}",
+          "options": [
+            "20",
+            "100",
+            "50",
+            "10"
+          ],
+          "answer": 1,
+          "explanation": "The closure uses the variable `price`, not the 10 it held when the closure was written. It runs after `price` became 50, so it returns 100."
+        },
+        {
+          "type": "typing",
+          "id": "capture-modify",
+          "title": "Change a variable from inside",
+          "guide": "A closure can also change the variable it captured.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Every call of `hit` changes the `count` declared outside it.", "notes": [{"on": "count++", "text": "Changes the outer variable, not a copy."}], "text": "func main() {\n    count := 0\n    hit := func() {\n        count++\n    }\n    hit()\n    hit()\n    hit()\n    fmt.Println(count)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "make-counter",
+          "title": "A counter that remembers",
+          "guide": "Return a closure that keeps its own count between calls.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `count` lives on after `makeCounter` returns, because the closure holds it.", "notes": [{"on": "count := 0", "text": "Made once per call of makeCounter."}], "text": "func makeCounter() func() int {\n    count := 0\n    return func() int {\n        count++\n        return count\n    }\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Each counter has its own `count`.", "text": "func main() {\n    a := makeCounter()\n    b := makeCounter()\n    fmt.Println(a(), a(), a())\n    fmt.Println(b())\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1 2 3\n1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "next-id",
+          "title": "Hand out ids",
+          "guide": "Fill the word that makes the result a function, and the variable the inner function keeps changing.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc newID() ___() int {\n    last := 0\n    return func() int {\n        ___++\n        return last\n    }\n}\nfunc main() {\n    fmt.Println(newID()())\n}",
+          "gaps": [
+            {
+              "answers": [
+                "func"
+              ]
+            },
+            {
+              "answers": [
+                "last"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Closures as tools",
+        "slides": [
+          {
+            "text": "A function can build a closure that is set up by its arguments. The parameters are captured like any other variable, so each closure made carries its own settings.",
+            "code": "func makeScaler(k int) func(int) int"
+          },
+          {
+            "text": "A closure is also how you hand a function **some data** without changing its type. The function that receives it only sees `func(int) bool`, while the closure knows a limit or a total from the place it was written.",
+            "code": "ok := func(n int) bool {\n    return n > limit\n}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "make-adder",
+          "title": "Build an adder",
+          "guide": "Make a function that returns a closure set up by its argument.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. The parameter `n` stays with the closure.", "notes": [{"on": "x + n", "text": "x is the closure's own, n was captured."}], "text": "func makeAdder(n int) func(int) int {\n    return func(x int) int {\n        return x + n\n    }\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "Two closures from the same function, each with its own `n`.", "text": "func main() {\n    add5 := makeAdder(5)\n    add10 := makeAdder(10)\n    fmt.Println(add5(1), add10(1))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "6 11"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "count-if",
+          "title": "Count what passes a test",
+          "guide": "The test is a closure that uses a variable from where it is written.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `countIf` only knows it gets a function from int to bool.", "text": "func countIf(nums []int, ok func(int) bool) int {\n    total := 0\n    for _, n := range nums {\n        if ok(n) {\n            total++\n        }\n    }\n    return total\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "The closure carries `limit` into `countIf`, which never sees it.", "notes": [{"on": "n > limit", "text": "limit comes from main, not from countIf."}], "text": "func main() {\n    limit := 10\n    nums := []int{4, 12, 7, 30}\n    big := countIf(nums, func(n int) bool {\n        return n > limit\n    })\n    fmt.Println(big)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "long-enough",
+          "title": "A test with a setting",
+          "guide": "Fill the word that starts the literal, and the variable it compares the length with.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    floor := 3\n    long := ___(s string) bool {\n        return len(s) >= ___\n    }\n    fmt.Println(long(\"go\"))\n    fmt.Println(long(\"gopher\"))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "func"
+              ]
+            },
+            {
+              "answers": [
+                "floor"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "each-sum",
+          "title": "Add up inside a closure",
+          "guide": "Pass a closure that adds into a variable declared outside it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `each` calls `f` once for every number.", "text": "func each(nums []int, f func(int)) {\n    for _, n := range nums {\n        f(n)\n    }\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "Each call of the closure adds to the same `total`.", "notes": [{"on": "total += n", "text": "Updates main's total on every call."}], "text": "func main() {\n    total := 0\n    each([]int{1, 2, 3}, func(n int) {\n        total += n\n    })\n    fmt.Println(total)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "6"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "shared-variable",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    n := 0\n    inc := func() {\n        n++\n    }\n    get := func() int { return n }\n    inc()\n    inc()\n    fmt.Println(get())\n}",
+          "options": [
+            "0",
+            "1",
+            "2",
+            "3"
+          ],
+          "answer": 2,
+          "explanation": "`inc` and `get` capture the same variable `n`. Two calls of `inc` make it 2, and `get` reads that same variable."
+        }
+      ]
+    }
+  ]
+}

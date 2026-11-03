@@ -1,0 +1,195 @@
+{
+  "id": "variadic-functions",
+  "intro": {
+    "title": "Variadic functions",
+    "slides": [
+      {
+        "text": "Every function so far took a fixed number of arguments. A **variadic** function takes as many as the caller wants: none, one or fifty. You will declare one, loop over what it receives, and hand it a whole list at once.\n\nThe snippet is pseudo code, not Go.",
+        "code": "total(1, 2)\ntotal(5, 6, 7, 8)\ntotal()\n\nsame function, any number of values"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Any number of arguments",
+        "slides": [
+          {
+            "text": "Put `...` before the type of the **last** parameter. The caller can then pass any number of values of that type, including none.",
+            "code": "func name(values ...int) {\n    // values holds what was passed\n}"
+          },
+          {
+            "text": "Inside the function, the parameter is a **slice**: an ordered list of values of one type. You do not build slices yet. Here you only read one, the way you read a string: `len` counts its values and `range` walks over them.\n\nThe snippet is pseudo code.",
+            "code": "call(4, 5, 6)   values = 4, 5, 6\ncall(9)         values = 9\ncall()          values = nothing"
+          },
+          {
+            "text": "Other parameters can come before the variadic one. They are normal parameters, and the variadic one takes whatever is left."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "sum-numbers",
+          "title": "Add any amount of numbers",
+          "guide": "Write a function that adds up every number it receives.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "`...int` lets the caller pass any number of ints. Inside, `nums` is a list you walk with `range`, as you did with a string.", "notes": [{"on": "...int", "text": "Zero or more ints may be passed."}], "text": "func sum(nums ...int) int {\n    total := 0\n    for _, n := range nums {\n        total += n\n    }\n    return total\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "The same function is called with a different number of arguments each time.", "text": "func main() {\n    fmt.Println(sum(1, 2, 3))\n    fmt.Println(sum(10, 20))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "6\n30"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "count-arguments",
+          "title": "Count the arguments",
+          "guide": "Return how many strings the caller passed.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "`len` works on the variadic parameter: it counts the values received.", "text": "func count(words ...string) int {\n    return len(words)\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "A call with no arguments is valid. The list is then empty.", "text": "func main() {\n    fmt.Println(count(\"a\", \"b\", \"c\"))\n    fmt.Println(count())\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\n0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "variadic-sum",
+          "title": "Variadic and loop",
+          "guide": "Make the parameter variadic, and walk over the values it received.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc show(nums ___ int) {\n    for _, n := range ___ {\n        fmt.Println(n)\n    }\n}\n\nfunc main() {\n    show(4, 5, 6)\n}",
+          "gaps": [{ "answers": ["..."] }, { "answers": ["nums"] }]
+        },
+        {
+          "type": "typing",
+          "id": "title-and-names",
+          "title": "A fixed parameter first",
+          "guide": "Print a title, then each name that follows it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The variadic parameter goes last. Whatever comes before it is a normal parameter, filled first.", "notes": [{"on": "names ...string", "text": "Takes every argument after the title."}], "text": "func announce(title string, names ...string) {\n    fmt.Println(title)\n    for _, name := range names {\n        fmt.Println(\"-\", name)\n    }\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "The first argument is the title. All the rest become `names`.", "text": "func main() {\n    announce(\"Guests\", \"Ana\", \"Luis\", \"Eva\")\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Guests\n- Ana\n- Luis\n- Eva"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "extra-and-rest",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc total(extra int, nums ...int) int {\n    for _, n := range nums {\n        extra += n\n    }\n    return extra\n}\n\nfunc main() {\n    fmt.Println(total(10, 1, 2), total(10))\n}",
+          "options": [
+            "3 10",
+            "13 0",
+            "13 10",
+            "23 10"
+          ],
+          "answer": 2,
+          "explanation": "In the first call `extra` is 10 and `nums` holds 1 and 2, so it returns 13. In the second `nums` is empty, so the loop never runs and `extra` comes back as 10."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Passing a whole slice",
+        "slides": [
+          {
+            "text": "Sometimes the values are already in a slice. You write one with its type and the values in braces. The type `[]int` means a slice of ints.",
+            "code": "values := []int{1, 2, 3}"
+          },
+          {
+            "text": "Passing the slice as one argument does not work: the function wants separate values. Put `...` after the slice and Go **spreads** it, so each value becomes its own argument.",
+            "code": "values := []int{1, 2, 3}\nshow(values...)\n\n// the same as\nshow(1, 2, 3)"
+          },
+          {
+            "text": "Inside the function, the slice you spread and the parameter point at the same values. Keep that in mind when a function changes what it received."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "spread-slice",
+          "title": "Spread a slice",
+          "guide": "Multiply any amount of numbers, then call it with a slice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Start the result at 1, because multiplying by 0 would wipe it out.", "text": "func product(nums ...int) int {\n    result := 1\n    for _, n := range nums {\n        result *= n\n    }\n    return result\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "`...` after the slice turns its values into separate arguments. Plain values still work.", "notes": [{"on": "[]int{2, 3, 4}", "text": "A slice holding three ints."}], "text": "func main() {\n    values := []int{2, 3, 4}\n    fmt.Println(product(values...))\n    fmt.Println(product(5, 6))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "24\n30"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "spread-and-declare",
+          "title": "Declare and spread",
+          "guide": "Make the parameter variadic, and spread the slice in the call.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc count(words ___ string) int {\n    return len(words)\n}\n\nfunc main() {\n    names := []string{\"Ana\", \"Luis\"}\n    fmt.Println(count(names ___))\n}",
+          "gaps": [{ "answers": ["..."] }, { "answers": ["..."] }]
+        },
+        {
+          "type": "typing",
+          "id": "shared-values",
+          "title": "The same values",
+          "guide": "Change the first value inside a function, and see the slice outside.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "`nums[0]` is the first value: positions start at 0. Assigning to it replaces that value.", "text": "func zeroFirst(nums ...int) {\n    nums[0] = 0\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Spreading hands the function your own slice, not a copy. Printing a slice shows its values in brackets.", "text": "func main() {\n    values := []int{5, 6, 7}\n    zeroFirst(values...)\n    fmt.Println(values)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[0 6 7]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "first-and-last",
+          "title": "First and last",
+          "guide": "Return the first and the last value, whichever way they were passed.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "A variadic function can return several values. The last position is one less than the length.", "notes": [{"on": "len(nums)-1", "text": "Positions start at 0, so the last is length minus 1."}], "text": "func ends(nums ...int) (int, int) {\n    return nums[0], nums[len(nums)-1]\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Receive both results, and print them.", "text": "func main() {\n    first, last := ends(4, 9, 2, 7)\n    fmt.Println(first, last)\n}"},
+            {"mode": "ghost", "line": 12, "guide": "Reuse the two variables with `=`, this time from a slice.", "text": "    values := []int{1, 2, 3}\n    first, last = ends(values...)\n    fmt.Println(first, last)\n"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4 7\n1 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "first-or-default",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc first(nums ...int) int {\n    if len(nums) == 0 {\n        return -1\n    }\n    return nums[0]\n}\n\nfunc main() {\n    fmt.Println(first(), first(7, 8))\n}",
+          "options": [
+            "0 7",
+            "-1 7",
+            "-1 8",
+            "-1 0"
+          ],
+          "answer": 1,
+          "explanation": "With no arguments `nums` is empty, so the guard returns -1. With `7, 8` it returns the first value, 7."
+        }
+      ]
+    }
+  ]
+}

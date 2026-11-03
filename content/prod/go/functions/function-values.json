@@ -1,0 +1,198 @@
+{
+  "id": "function-values",
+  "intro": {
+    "title": "Function values",
+    "slides": [
+      {
+        "text": "Until now a function was something you declared and called by name. In Go a function is also a **value**: you can keep it in a variable, hand it to another function, return it from one and put it in a list. You will do each of these.\n\nThe snippet is pseudo code, not Go.",
+        "code": "f = some function\nf(3)\n\nuse(f)            pass it in\nf = make_one()    get it back"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "A function in a variable",
+        "slides": [
+          {
+            "text": "Write the name of a function **without parentheses** and you get the function itself, not its result. Store it in a variable, then call it through the variable with `()`.",
+            "code": "run := compute\nanswer := run(2, 3)"
+          },
+          {
+            "text": "A variable that holds a function has a **function type**: the word `func`, the types of the parameters and the type of the result. Two functions with the same parameters and result have the same type, so either one fits in the same variable.\n\nThese are types, not full code.",
+            "code": "func(int) string\nfunc(int, int) int\nfunc(string) string"
+          },
+          {
+            "text": "A function can take another function as a parameter. Its type is written in the parameter list, and inside the function you call it like any other.",
+            "code": "func show(f func(string) string) {\n    fmt.Println(f(\"go\"))\n}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "assign-function",
+          "title": "Store a function",
+          "guide": "Put functions in variables, and call them from there.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Two functions with the same shape.", "text": "func double(n int) int {\n    return n * 2\n}\n\nfunc triple(n int) int {\n    return n * 3\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "A name with no parentheses is the function itself. The parentheses call it.", "notes": [{"on": "f := double", "text": "Nothing runs yet: f just holds the function."}], "text": "func main() {\n    f := double\n    fmt.Println(f(4))\n    g := triple\n    fmt.Println(g(4))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "8\n12"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "reassign-function",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc add1(n int) int { return n + 1 }\nfunc times2(n int) int { return n * 2 }\n\nfunc main() {\n    f := add1\n    a := f(5)\n    f = times2\n    b := f(5)\n    fmt.Println(a, b)\n}",
+          "options": [
+            "10 10",
+            "6 10",
+            "6 6",
+            "10 6"
+          ],
+          "answer": 1,
+          "explanation": "`f` first holds `add1`, so `f(5)` is 6. The assignment `f = times2` puts a different function in the same variable, so the second `f(5)` is 10."
+        },
+        {
+          "type": "typing",
+          "id": "function-type",
+          "title": "Spell the function type",
+          "guide": "Declare a variable that holds a function, then switch which one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Two functions that take two ints and return one.", "text": "func add(a, b int) int {\n    return a + b\n}\n\nfunc multiply(a, b int) int {\n    return a * b\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "The variable has no value yet, only a type. Any function of that type can be assigned to it.", "notes": [{"on": "func(int, int) int", "text": "Two ints in, one int out."}], "text": "func main() {\n    var op func(int, int) int\n    op = add\n    fmt.Println(op(3, 4))\n    op = multiply\n    fmt.Println(op(3, 4))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "7\n12"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "function-parameter",
+          "title": "Pass a function in",
+          "guide": "Write a function that receives another function and uses it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Two functions to hand over later.", "text": "func double(n int) int {\n    return n * 2\n}\n\nfunc square(n int) int {\n    return n * n\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "The second parameter has a function type. Inside, call it like any function.", "notes": [{"on": "f func(int) int", "text": "A parameter that holds a function."}, {"on": "f(n)", "text": "Runs whichever function was passed in."}], "text": "func apply(n int, f func(int) int) int {\n    return f(n)\n}\n"},
+            {"mode": "ghost", "line": 17, "guide": "Pass each function by its name, without parentheses.", "text": "func main() {\n    fmt.Println(apply(5, double))\n    fmt.Println(apply(5, square))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10\n25"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "apply-twice",
+          "title": "Run it twice",
+          "guide": "Fill the word that starts a function type, and the function to hand over.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc double(n int) int { return n * 2 }\n\nfunc twice(n int, f ___(int) int) int {\n    return f(f(n))\n}\n\nfunc main() {\n    fmt.Println(twice(3, ___))\n}",
+          "gaps": [{ "answers": ["func"] }, { "answers": ["double"] }]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Functions made on the spot",
+        "slides": [
+          {
+            "text": "You can write a function with no name right where you need it: a **function literal**. Store it in a variable, or put `()` after it to run it at once.",
+            "code": "shout := func(s string) string {\n    return s + \"!\"\n}\n\nfunc() {\n    fmt.Println(\"now\")\n}()"
+          },
+          {
+            "text": "A function can also **return** a function. Put a function type as the result type, and return a function value. The caller stores it and calls it.\n\nThe snippet is pseudo code.",
+            "code": "func choose(...) func(int) int {\n    return some function\n}\n\nf := choose(...)\nf(5)"
+          },
+          {
+            "text": "Functions of the same type can live together in a slice. Walk the slice and call each one.",
+            "code": "var steps []func(string) string"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "function-literal",
+          "title": "A function with no name",
+          "guide": "Write a function right where you use it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A function with no name goes into a variable.", "notes": [{"on": "func(n int) int {", "text": "A function written in place, with no name."}], "text": "func main() {\n    square := func(n int) int {\n        return n * n\n    }\n    fmt.Println(square(6))\n}"},
+            {"mode": "ghost", "line": 10, "guide": "Parentheses right after the literal run it on the spot.", "notes": [{"on": "}()", "text": "Defines the function and calls it right away."}], "text": "    func() {\n        fmt.Println(\"called at once\")\n    }()\n"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "36\ncalled at once"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "literal-and-call",
+          "title": "Write it and run it",
+          "guide": "Fill the word that starts a function with no name, and what runs the stored function.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    add := ___(a, b int) int {\n        return a + b\n    }\n    fmt.Println(add(2, 3))\n    greet := func() {\n        fmt.Println(\"hi\")\n    }\n    greet___\n}",
+          "gaps": [{ "answers": ["func"] }, { "answers": ["()"] }]
+        },
+        {
+          "type": "typing",
+          "id": "return-function",
+          "title": "Hand back a function",
+          "guide": "Write a function that decides which function to return.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Two functions to choose from.", "text": "func double(n int) int {\n    return n * 2\n}\n\nfunc triple(n int) int {\n    return n * 3\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "The result type is a function type. Return a function by its name, with no parentheses.", "notes": [{"on": "string) func(int) int", "text": "The result is itself a function."}], "text": "func pick(name string) func(int) int {\n    if name == \"double\" {\n        return double\n    }\n    return triple\n}\n"},
+            {"mode": "ghost", "line": 20, "guide": "Store what comes back, then call it.", "text": "func main() {\n    f := pick(\"double\")\n    g := pick(\"triple\")\n    fmt.Println(f(7), g(7))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "14 21"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "slice-of-functions",
+          "title": "A list of functions",
+          "guide": "Keep functions in a slice and call each one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Two functions of the same type.", "text": "func inc(n int) int {\n    return n + 1\n}\n\nfunc square(n int) int {\n    return n * n\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "The slice type says what its values are: functions from int to int. Call each one inside the loop.", "notes": [{"on": "[]func(int) int{inc, square}", "text": "A list whose values are functions."}], "text": "func main() {\n    steps := []func(int) int{inc, square}\n    for _, step := range steps {\n        fmt.Println(step(6))\n    }\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "7\n36"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "run-twice-with-division",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc run(f func(int) int, n int) int {\n    return f(n)\n}\n\nfunc main() {\n    half := func(n int) int { return n / 2 }\n    inc := func(n int) int { return n + 1 }\n    a := run(half, 9)\n    fmt.Println(a, run(inc, a))\n}",
+          "options": [
+            "5 6",
+            "4 4",
+            "4.5 5.5",
+            "4 5"
+          ],
+          "answer": 3,
+          "explanation": "`run(half, 9)` calls `half` with 9. Both are ints, so `9 / 2` is 4. Then `run(inc, a)` calls `inc` with 4 and gets 5."
+        }
+      ]
+    }
+  ]
+}

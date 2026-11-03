@@ -1,0 +1,187 @@
+{
+  "id": "multiple-returns",
+  "intro": {
+    "title": "Multiple returns",
+    "slides": [
+      {
+        "text": "Most languages let a function give back one value. A Go function can give back several at once, and the caller receives each of them. You will return pairs, ignore the ones you do not need, and use a second value to say whether the first one is usable.\n\nThe snippet is pseudo code, not Go.",
+        "code": "first, second = name(input)\n\nname(input):\n    give back a, b"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Returning several values",
+        "slides": [
+          {
+            "text": "Instead of one type after the parentheses, the function lists a type for each value it returns, inside their own parentheses. `return` then lists as many values, in the same order.",
+            "code": "func name(...) (type1, type2) {\n    return value1, value2\n}"
+          },
+          {
+            "text": "The caller must receive every value. If it does not need one, it can drop it with `_`, the blank name that Go never asks you to use."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "two-values",
+          "title": "Return two values",
+          "guide": "Write a function that gives its two inputs back in reverse order.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "List one type per returned value, in parentheses. `return` gives the values in that order.", "notes": [{"on": "(string, string)", "text": "Two values come back, both strings."}], "text": "func swap(a, b string) (string, string) {\n    return b, a\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "The caller names one variable for each returned value, in order.", "text": "func main() {\n    x, y := swap(\"left\", \"right\")\n    fmt.Println(x, y)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "right left"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "min-and-max",
+          "title": "Order two numbers",
+          "guide": "Give back the smaller number first and the larger one second.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A function can return from several places, always with the same number of values.", "text": "func minMax(a, b int) (int, int) {\n    if a < b {\n        return a, b\n    }\n    return b, a\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "The values arrive in the order the function returned them.", "text": "func main() {\n    low, high := minMax(8, 3)\n    fmt.Println(low, high)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3 8"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "neighbors",
+          "title": "Type and receive",
+          "guide": "Give the second returned value its type, and declare the two variables that receive the results.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc neighbors(n int) (int, ___) {\n    return n - 1, n + 1\n}\n\nfunc main() {\n    before, after ___ neighbors(10)\n    fmt.Println(before, after)\n}",
+          "gaps": [{ "answers": ["int"] }, { "answers": [":="] }]
+        },
+        {
+          "type": "typing",
+          "id": "ignore-one",
+          "title": "Ignore a value",
+          "guide": "Keep only one of the two values a function returns.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Quotient and remainder of a division, returned together.", "text": "func divmod(a, b int) (int, int) {\n    return a / b, a % b\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "`_` stands where a value you do not need would go. It discards that value, so no variable is left unused.", "notes": [{"on": "_, r", "text": "The quotient is thrown away."}], "text": "func main() {\n    _, r := divmod(17, 5)\n    fmt.Println(r)\n}"},
+            {"mode": "ghost", "line": 12, "guide": "`_` can sit in any position. Now keep the quotient and drop the remainder.", "text": "    q, _ := divmod(17, 5)\n    fmt.Println(q)\n"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2\n3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "swap-twice",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc swap(a, b int) (int, int) {\n    return b, a\n}\n\nfunc main() {\n    x, y := swap(1, 2)\n    x, y = swap(x, y)\n    fmt.Println(x, y)\n}",
+          "options": [
+            "2 1",
+            "1 2",
+            "1 1",
+            "2 2"
+          ],
+          "answer": 1,
+          "explanation": "The first call gives `2, 1`. Swapping those two values again puts them back as `1, 2`."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "A second value that says more",
+        "slides": [
+          {
+            "text": "A common use of two values: the first is the result, and the second is a `bool` that says whether the result can be trusted. The caller checks the flag before using the result. The snippet is pseudo code.",
+            "code": "result, ok = attempt(input)\n\nif ok:\n    use result\nelse:\n    handle the failure"
+          },
+          {
+            "text": "You can also **name** the returned values in the signature. They start as zero values inside the function, you assign them like variables, and a bare `return` gives them back."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "safe-divide",
+          "title": "Result and flag",
+          "guide": "Divide two numbers, and say whether the division was possible.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The second value is a `bool`: `false` when the first value means nothing.", "notes": [{"on": "(int, bool)", "text": "A number, plus whether it is valid."}], "text": "func safeDivide(a, b int) (int, bool) {\n    if b == 0 {\n        return 0, false\n    }\n    return a / b, true\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "Assign to variables that already exist with `=`, not `:=`.", "text": "func main() {\n    result, ok := safeDivide(10, 2)\n    fmt.Println(result, ok)\n    result, ok = safeDivide(1, 0)\n    fmt.Println(result, ok)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "5 true\n0 false"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "check-the-flag",
+          "title": "Check before using",
+          "guide": "Use the flag to decide what to print.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Half of a number, and whether it was exact.", "text": "func half(n int) (int, bool) {\n    return n / 2, n % 2 == 0\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "The flag is a `bool`, so it works directly as a condition.", "text": "func main() {\n    h, even := half(7)\n    if even {\n        fmt.Println(\"half is\", h)\n    } else {\n        fmt.Println(7, \"is odd\")\n    }\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "7 is odd"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "flag-type-and-test",
+          "title": "Type and test the flag",
+          "guide": "Give the flag its type, and print the result only when the flag allows it.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc positive(n int) (int, ___) {\n    return n, n > 0\n}\n\nfunc main() {\n    value, ok := positive(6)\n    if ___ {\n        fmt.Println(value)\n    }\n}",
+          "gaps": [{ "answers": ["bool"] }, { "answers": ["ok"] }]
+        },
+        {
+          "type": "typing",
+          "id": "named-results",
+          "title": "Name the results",
+          "guide": "Split a number into its tens and its ones.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Give each result a name. They exist from the start, so you assign them. A bare `return` gives them back.", "notes": [{"on": "return\n", "text": "No values listed: it returns the named ones."}], "text": "func split(total int) (whole, rest int) {\n    whole = total / 10\n    rest = total % 10\n    return\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "The caller does not see the names. It receives two plain values.", "text": "func main() {\n    tens, ones := split(47)\n    fmt.Println(tens, ones)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4 7"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "named-then-return",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc order() (first, second int) {\n    first = 1\n    second = 2\n    return second, first\n}\n\nfunc main() {\n    a, b := order()\n    fmt.Println(a, b)\n}",
+          "options": [
+            "1 2",
+            "1 1",
+            "2 1",
+            "2 2"
+          ],
+          "answer": 2,
+          "explanation": "A `return` that lists values gives exactly those, in that order, whatever the named results hold. The caller gets `2, 1`."
+        }
+      ]
+    }
+  ]
+}

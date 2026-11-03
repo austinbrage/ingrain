@@ -1,0 +1,172 @@
+{
+  "id": "declaring-functions",
+  "intro": {
+    "title": "Declaring functions",
+    "slides": [
+      {
+        "text": "A function is a named piece of code you write once and run as many times as you want. You already wrote one, `main`. Here you declare your own, give them parameters, and make them give a value back.\n\nThe snippet is pseudo code, not Go.",
+        "code": "name        what to call it\ninputs      what it receives\noutput      what it gives back\nbody        what it does"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Calling, receiving, returning",
+        "slides": [
+          {
+            "text": "A function does nothing until something **calls** it. A call can pass values in, and the function can send one value back to the place that called it. The snippet is pseudo code.",
+            "code": "result = name(input)\n\nname(input):\n    work with input\n    give back an answer"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "say-hello",
+          "title": "Your first function",
+          "guide": "Declare a function that prints a line, then call it twice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "`func` declares a function: a name, parentheses and a body in braces. The body does not run yet.", "notes": [{"on": "greet", "text": "You choose the name."}], "text": "func greet() {\n    fmt.Println(\"Hello, Go!\")\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "`main` is a function too. Call `greet` by its name with parentheses. Each call runs the body again.", "text": "func main() {\n    greet()\n    greet()\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello, Go!\nHello, Go!"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "one-parameter",
+          "title": "Pass a value in",
+          "guide": "Make the function greet whoever it receives.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A **parameter** is a name with a type, inside the parentheses. The body uses it like a variable.", "notes": [{"on": "name string", "text": "Callers must pass a string here."}], "text": "func greet(name string) {\n    fmt.Println(\"Hello,\", name)\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "The value you pass in a call is an **argument**. It fills the parameter.", "text": "func main() {\n    greet(\"Ana\")\n    greet(\"Luis\")\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello, Ana\nHello, Luis"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "two-parameters",
+          "title": "More than one parameter",
+          "guide": "Describe a person with a name and an age.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Separate the parameters with commas. Each one has its own type.", "text": "func describe(name string, age int) {\n    fmt.Println(name, \"is\", age, \"years old\")\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Arguments go in the same order as the parameters.", "text": "func main() {\n    describe(\"Ana\", 30)\n    describe(\"Luis\", 25)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Ana is 30 years old\nLuis is 25 years old"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "parameter-and-call",
+          "title": "Type and call",
+          "guide": "Give the first parameter its type, and call the function.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc show(label ___, times int) {\n    fmt.Println(label, times)\n}\n\nfunc main() {\n    ___(\"age\", 30)\n}",
+          "gaps": [{ "answers": ["string"] }, { "answers": ["show"] }]
+        },
+        {
+          "type": "typing",
+          "id": "return-a-value",
+          "title": "Give a value back",
+          "guide": "Write a function that adds two numbers and gives the sum back.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The type after the parentheses is what the function gives back. `return` sends that value to the caller.", "notes": [{"on": "return", "text": "Ends the function and hands back the value."}], "text": "func add(a int, b int) int {\n    return a + b\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "A call that returns a value can be stored in a variable, like any other value.", "text": "func main() {\n    total := add(2, 3)\n    fmt.Println(total)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "5"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "result-not-stored",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc square(n int) int {\n    return n * n\n}\n\nfunc main() {\n    n := 3\n    square(n)\n    fmt.Println(n)\n}",
+          "options": [
+            "9",
+            "3",
+            "6",
+            "Nothing, it does not compile"
+          ],
+          "answer": 1,
+          "explanation": "`square(n)` gives back 9, but nothing stores it, so the value is thrown away. `n` is still 3."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "shared-parameter-type",
+          "title": "Parameters that share a type",
+          "guide": "Compute the area of a rectangle from its two sides.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Neighbor parameters of the same type can share it: write the type once, after the last name.", "notes": [{"on": "width, height int", "text": "Both parameters are ints."}], "text": "func area(width, height int) int {\n    return width * height\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "A call can sit inside another call. The result goes straight to `Println`.", "text": "func main() {\n    fmt.Println(area(3, 4))\n    fmt.Println(area(5, 2))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "12\n10"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "perimeter",
+          "title": "Finish the function",
+          "guide": "Name the second parameter and send the result back.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc perimeter(a, ___ int) int {\n    ___ 2 * (a + b)\n}\n\nfunc main() {\n    fmt.Println(perimeter(1, 2))\n}",
+          "gaps": [{ "answers": ["b"] }, { "answers": ["return"] }]
+        },
+        {
+          "type": "typing",
+          "id": "functions-calling-functions",
+          "title": "Functions calling functions",
+          "guide": "Build one function on top of another, with `main` first.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "`main` can call a function written below it. Go reads the whole file before it runs.", "text": "func main() {\n    fmt.Println(quadruple(3))\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "A function can call another one. The inner call runs first, and its result goes to the outer one.", "text": "func quadruple(n int) int {\n    return double(double(n))\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "The helper the others rely on.", "text": "func double(n int) int {\n    return n * 2\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "12"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "what-pick-does",
+          "title": "What is it for?",
+          "guide": "Read the function, then pick what it is for.",
+          "code": "func pick(a, b int) int {\n    if a > b {\n        return a\n    }\n    return b\n}",
+          "options": [
+            "Tells whether a is greater than b",
+            "Sorts two numbers in place",
+            "Gives back the larger of two numbers",
+            "Gives back the difference of two numbers"
+          ],
+          "answer": 2,
+          "explanation": "It returns `a` when `a` is bigger, and `b` otherwise. It gives back a number, not a yes or no."
+        }
+      ]
+    }
+  ]
+}
