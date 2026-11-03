@@ -1,3 +1,4 @@
+mod fill_blank;
 mod quiz;
 mod typing;
 
@@ -5,6 +6,7 @@ use catppuccin::PALETTE;
 
 use crate::app::{Body, ExerciseState};
 use crate::content::Exercise;
+use fill_blank::render_fill_blank;
 use quiz::render_quiz;
 use typing::{render_finish_modal, render_typing};
 
@@ -20,6 +22,8 @@ const HINT: &str = "Ctrl-F finish   Esc back   Ctrl-Q quit ";
 const PREVIOUS_HINT: &str = "Ctrl-P previous   Ctrl-F finish   Esc back   Ctrl-Q quit ";
 const CHOOSE_HINT: &str = "↑↓ choose   Enter check   Esc back   Ctrl-Q quit ";
 const ANSWERED_HINT: &str = "Enter continue   Esc back   Ctrl-Q quit ";
+const NEXT_GAP_HINT: &str = "Enter next gap   Esc back   Ctrl-Q quit ";
+const CHECK_HINT: &str = "Enter check   Esc back   Ctrl-Q quit ";
 const BAR_WIDTH: usize = 12; // Cells of the chunk bar in the footer
 
 pub fn exercise(frame: &mut Frame, breadcrumb: String, state: &ExerciseState) {
@@ -83,7 +87,29 @@ pub fn exercise(frame: &mut Frame, breadcrumb: String, state: &ExerciseState) {
 
             (bar, hint)
         }
-        (Exercise::Typing(_), Body::Quiz(_)) | (Exercise::Quiz(_), Body::Typing(_)) => {
+        (Exercise::FillBlank(fill_blank), Body::FillBlank(fill_blank_state)) => {
+            render_fill_blank(frame, body, language, fill_blank_state, fill_blank);
+
+            // The bar counts the gaps left behind with Enter, and is full once checked
+            let gaps = fill_blank.gaps.len();
+            let done = if fill_blank_state.checked {
+                gaps
+            } else {
+                fill_blank_state.gap
+            };
+            let hint = if fill_blank_state.checked {
+                ANSWERED_HINT
+            } else if fill_blank_state.gap + 1 >= gaps {
+                CHECK_HINT
+            } else {
+                NEXT_GAP_HINT
+            };
+
+            (bar(done, gaps, "gaps"), hint)
+        }
+        (Exercise::Typing(_), Body::Quiz(_) | Body::FillBlank(_))
+        | (Exercise::Quiz(_), Body::Typing(_) | Body::FillBlank(_))
+        | (Exercise::FillBlank(_), Body::Typing(_) | Body::Quiz(_)) => {
             unreachable!("the body is built from its exercise")
         }
     };

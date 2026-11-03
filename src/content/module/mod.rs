@@ -1,7 +1,9 @@
+mod fill_blank;
 mod intro;
 mod quiz;
 mod typing;
 
+pub use fill_blank::{FillBlank, Gap};
 pub use intro::{Intro, Slide};
 pub use quiz::{Quiz, QuizKind};
 pub use typing::{Chunk, Mode, Note, Typing};
@@ -31,6 +33,7 @@ pub struct Session {
 pub enum Exercise {
     Typing(Typing),
     Quiz(Quiz),
+    FillBlank(FillBlank),
 }
 
 // Used on inner modules (exercise types)
@@ -46,6 +49,7 @@ impl Exercise {
         match self {
             Exercise::Typing(typing) => &typing.id,
             Exercise::Quiz(quiz) => &quiz.id,
+            Exercise::FillBlank(fill_blank) => &fill_blank.id,
         }
     }
 
@@ -53,6 +57,7 @@ impl Exercise {
         match self {
             Exercise::Typing(typing) => &typing.title,
             Exercise::Quiz(quiz) => &quiz.title,
+            Exercise::FillBlank(fill_blank) => &fill_blank.title,
         }
     }
 
@@ -61,6 +66,7 @@ impl Exercise {
         match self {
             Exercise::Typing(_) => "typing",
             Exercise::Quiz(_) => "quiz",
+            Exercise::FillBlank(_) => "fill-blank",
         }
     }
 }

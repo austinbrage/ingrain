@@ -2,7 +2,7 @@ use crate::app::{
     Action, CompleteState, Content, ExerciseState, ExplorerState, ModuleDone, ModuleFailed, Screen,
     SessionDone,
 };
-use crate::content::{Output, Quiz, Typing};
+use crate::content::{FillBlank, Output, Quiz, Typing};
 use crate::progress::Progress;
 
 // What Enter does on the complete screen
@@ -82,6 +82,22 @@ impl ExerciseDone {
             retake: state.retake,
             next_failed: state.next_failed,
             code: quiz.code.lines().map(String::from).collect(),
+            output: None,
+            scroll: 0,
+        }
+    }
+
+    pub fn from_fill_blank(state: &ExerciseState, fill_blank: &FillBlank) -> Self {
+        Self {
+            explorer: state.explorer,
+            session: state.session,
+            exercise: state.exercise,
+            session_count: state.session_count(),
+            exercise_count: state.exercise_count(),
+            title: fill_blank.title.clone(),
+            retake: state.retake,
+            next_failed: state.next_failed,
+            code: fill_blank.code.lines().map(String::from).collect(),
             output: None,
             scroll: 0,
         }

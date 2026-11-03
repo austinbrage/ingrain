@@ -5,7 +5,8 @@ mod module;
 pub use catalog::{Catalog, Layer};
 pub use course::Course;
 pub use module::{
-    Chunk, Exercise, Intro, Mode, Module, Note, Output, Quiz, QuizKind, Session, Slide, Typing,
+    Chunk, Exercise, FillBlank, Gap, Intro, Mode, Module, Note, Output, Quiz, QuizKind, Session,
+    Slide, Typing,
 };
 
 use include_dir::{Dir, include_dir};

@@ -1,6 +1,8 @@
+mod fill_blank;
 mod quiz;
 mod typing;
 
+pub use fill_blank::FillBlankState;
 pub use quiz::QuizState;
 pub use typing::{EditorView, Kind, Row, ShortcutUses, TypingState};
 
@@ -12,6 +14,7 @@ use crate::progress::Progress;
 pub enum Body {
     Typing(TypingState),
     Quiz(QuizState),
+    FillBlank(FillBlankState),
 }
 
 pub struct ExerciseState {
@@ -79,6 +82,7 @@ impl ExerciseState {
         let body = match &module.sessions[session].exercises[exercise] {
             Exercise::Typing(typing) => Body::Typing(TypingState::new(typing)),
             Exercise::Quiz(_) => Body::Quiz(QuizState::default()),
+            Exercise::FillBlank(fill_blank) => Body::FillBlank(FillBlankState::new(fill_blank)),
         };
 
         Screen::Exercise(Self {
@@ -261,6 +265,38 @@ impl ExerciseState {
                 // return Some(Screen::Complete(complete));
             }
             (Action::Left | Action::Right | Action::Quit, _) => {}
+        }
+
+        None
+    }
+
+    // Raw keys: a fill-blank types its words, Enter moves on to the next gap and then checks
+    pub fn handle_fill_blank_key(
+        &mut self,
+        key: TypingKey,
+        content: &Content,
+        progress: &mut Progress,
+    ) -> Option<Screen> {
+        let (Exercise::FillBlank(fill_blank), Body::FillBlank(fill_blank_state)) = (
+            &self.module.sessions[self.session].exercises[self.exercise],
+            &mut self.body,
+        ) else {
+            return None;
+        };
+
+        match (key, fill_blank_state.checked) {
+            (TypingKey::Back, _) => return Some(Screen::Explorer(self.explorer)),
+            (TypingKey::Enter, false) => fill_blank_state.enter(),
+            (TypingKey::Enter, true) => {
+                let passed = fill_blank_state.passed(fill_blank);
+                // Like the quiz: no complete screen, `done` only decides where to go
+                let mut done = ExerciseDone::from_fill_blank(self, fill_blank);
+                self.record_completion(content, progress, passed);
+                return done.handle_key(Action::Select, content, progress);
+            }
+            (TypingKey::Char(c), false) => fill_blank_state.type_char(c),
+            (TypingKey::Backspace, false) => fill_blank_state.backspace(),
+            _ => {}
         }
 
         None

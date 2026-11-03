@@ -15,7 +15,8 @@ pub use complete::{
     CompleteState, DoneRow, ExerciseDone, ModuleDone, ModuleFailed, Next, SessionDone, SessionRow,
 };
 pub use exercise::{
-    Body, EditorView, ExerciseState, Kind, QuizState, Row, ShortcutUses, TypingState,
+    Body, EditorView, ExerciseState, FillBlankState, Kind, QuizState, Row, ShortcutUses,
+    TypingState,
 };
 pub use explorer::{Depth, ExplorerState, ModuleMarks};
 pub use home::{HomeButton, HomeLanguage, HomeState};
@@ -102,7 +103,7 @@ impl App {
             return;
         }
 
-        // Handle Exercise: typing needs raw keys, a quiz needs actions
+        // Handle Exercise: typing and fill-blank need raw keys, a quiz needs actions
         if let Screen::Exercise(state) = &mut self.screen {
             let next = match state.body {
                 Body::Typing(_) => to_typing_key(key).and_then(|typing_key| {
@@ -115,6 +116,9 @@ impl App {
                 }),
                 Body::Quiz(_) => action.and_then(|action| {
                     state.handle_quiz_action(action, &self.content, &mut self.progress)
+                }),
+                Body::FillBlank(_) => to_typing_key(key).and_then(|typing_key| {
+                    state.handle_fill_blank_key(typing_key, &self.content, &mut self.progress)
                 }),
             };
 
