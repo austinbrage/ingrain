@@ -6,19 +6,34 @@
       "name": "Core",
       "course_groups": [
         {
-          "name": "Courses",
+          "name": "Fundamentals",
           "courses": [
             { "id": "syntax", "name": "Syntax" },
             { "id": "functions", "name": "Functions" },
             { "id": "collections", "name": "Collections" },
             { "id": "strings-and-text", "name": "Strings and text" },
-            { "id": "pointers", "name": "Pointers" },
+            { "id": "pointers", "name": "Pointers" }
+          ]
+        },
+        {
+          "name": "Types and abstraction",
+          "courses": [
             { "id": "structs-and-methods", "name": "Structs and methods" },
             { "id": "interfaces", "name": "Interfaces" },
-            { "id": "error-handling", "name": "Error handling" },
+            { "id": "error-handling", "name": "Error handling" }
+          ]
+        },
+        {
+          "name": "Larger programs",
+          "courses": [
             { "id": "packages-and-modules", "name": "Packages and modules" },
             { "id": "generics", "name": "Generics" },
-            { "id": "concurrency", "name": "Concurrency" },
+            { "id": "concurrency", "name": "Concurrency" }
+          ]
+        },
+        {
+          "name": "Everyday tools",
+          "courses": [
             { "id": "standard-library", "name": "Standard library" },
             { "id": "testing", "name": "Testing" },
             { "id": "tooling", "name": "Tooling" }
@@ -31,11 +46,24 @@
       "name": "Ecosystem",
       "course_groups": [
         {
-          "name": "Courses",
+          "name": "CLI",
           "courses": [
             { "id": "cobra", "name": "cobra" },
+            { "id": "viper", "name": "viper" }
+          ]
+        },
+        {
+          "name": "Web",
+          "courses": [
             { "id": "gin", "name": "gin" },
-            { "id": "bubbletea", "name": "bubbletea" }
+            { "id": "gorm", "name": "gorm" }
+          ]
+        },
+        {
+          "name": "TUI",
+          "courses": [
+            { "id": "bubbletea", "name": "bubbletea" },
+            { "id": "lipgloss", "name": "lipgloss" }
           ]
         }
       ]

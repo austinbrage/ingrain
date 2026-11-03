@@ -6,12 +6,22 @@
       "name": "Core",
       "course_groups": [
         {
-          "name": "Courses",
+          "name": "Fundamentals",
           "courses": [
             { "id": "syntax", "name": "Syntax" },
-            { "id": "structs-and-enums", "name": "Structs and enums" },
+            { "id": "structs-and-enums", "name": "Structs and enums" }
+          ]
+        },
+        {
+          "name": "Ownership",
+          "courses": [
             { "id": "borrow-checker", "name": "Borrow checker" },
-            { "id": "error-handling", "name": "Error handling" },
+            { "id": "error-handling", "name": "Error handling" }
+          ]
+        },
+        {
+          "name": "Concurrency",
+          "courses": [
             { "id": "concurrency", "name": "Concurrency" },
             { "id": "async", "name": "Async" }
           ]
@@ -23,11 +33,24 @@
       "name": "Ecosystem",
       "course_groups": [
         {
-          "name": "Courses",
+          "name": "TUI",
           "courses": [
             { "id": "ratatui", "name": "ratatui" },
+            { "id": "crossterm", "name": "crossterm" }
+          ]
+        },
+        {
+          "name": "CLI",
+          "courses": [
             { "id": "clap", "name": "clap" },
-            { "id": "actix", "name": "actix" }
+            { "id": "indicatif", "name": "indicatif" }
+          ]
+        },
+        {
+          "name": "Web",
+          "courses": [
+            { "id": "actix", "name": "actix" },
+            { "id": "sqlx", "name": "sqlx" }
           ]
         }
       ]
