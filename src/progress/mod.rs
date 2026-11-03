@@ -250,7 +250,8 @@ impl Progress {
             match next_course(self, &last.language, library, &last.course) {
                 Some((layer, course, _)) => ContinueLabel::Course(format!(
                     "{} · {}",
-                    catalog.name, catalog.layers[layer].courses[course].name
+                    catalog.name,
+                    catalog.course_at(layer, course).name
                 )),
                 None => ContinueLabel::Review(catalog.name.clone()),
             },
@@ -264,7 +265,7 @@ impl Progress {
         let (layer, course, module) = next_course(self, &last.language, library, &last.course)
             .or_else(|| next_review(self, &last.language, library))?;
 
-        let course_id = &library.catalog.layers[layer].courses[course].id;
+        let course_id = &library.catalog.course_at(layer, course).id;
         let module_id = &library.courses.get(course_id)?.module_at(module)?.id;
         let module_path = format!("{}/{course_id}/{module_id}", last.language);
         let data = Module::load(library.source, &last.language, course_id, module_id)?;

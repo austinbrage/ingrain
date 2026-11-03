@@ -4,22 +4,32 @@
     {
       "id": "core",
       "name": "Core",
-      "courses": [
-        { "id": "syntax", "name": "Syntax" },
-        { "id": "structs-and-enums", "name": "Structs and enums" },
-        { "id": "borrow-checker", "name": "Borrow checker" },
-        { "id": "error-handling", "name": "Error handling" },
-        { "id": "concurrency", "name": "Concurrency" },
-        { "id": "async", "name": "Async" }
+      "course_groups": [
+        {
+          "name": "Courses",
+          "courses": [
+            { "id": "syntax", "name": "Syntax" },
+            { "id": "structs-and-enums", "name": "Structs and enums" },
+            { "id": "borrow-checker", "name": "Borrow checker" },
+            { "id": "error-handling", "name": "Error handling" },
+            { "id": "concurrency", "name": "Concurrency" },
+            { "id": "async", "name": "Async" }
+          ]
+        }
       ]
     },
     {
       "id": "ecosystem",
       "name": "Ecosystem",
-      "courses": [
-        { "id": "ratatui", "name": "ratatui" },
-        { "id": "clap", "name": "clap" },
-        { "id": "actix", "name": "actix" }
+      "course_groups": [
+        {
+          "name": "Courses",
+          "courses": [
+            { "id": "ratatui", "name": "ratatui" },
+            { "id": "clap", "name": "clap" },
+            { "id": "actix", "name": "actix" }
+          ]
+        }
       ]
     }
   ]

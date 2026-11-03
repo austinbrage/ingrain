@@ -9,8 +9,7 @@ fn course_list(library: &Library) -> Vec<(usize, usize, &str)> {
         .iter()
         .enumerate()
         .flat_map(|(layer, data)| {
-            data.courses
-                .iter()
+            data.courses()
                 .enumerate()
                 .map(move |(course, summary)| (layer, course, summary.id.as_str()))
         })

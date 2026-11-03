@@ -4,17 +4,22 @@
     {
       "id": "core",
       "name": "Core",
-      "courses": [
-        { "id": "basics", "name": "Basics" },
-        { "id": "second", "name": "Second" }
+      "course_groups": [
+        {
+          "name": "Fundamentals",
+          "courses": [
+            { "id": "basics", "name": "Basics" },
+            { "id": "second", "name": "Second" }
+          ]
+        }
       ]
     },
     {
       "id": "ecosystem",
       "name": "Ecosystem",
-      "courses": [
-        { "id": "tools", "name": "Tools" },
-        { "id": "bare", "name": "Bare" }
+      "course_groups": [
+        { "name": "Tooling", "courses": [{ "id": "tools", "name": "Tools" }] },
+        { "name": "Libraries", "courses": [{ "id": "bare", "name": "Bare" }] }
       ]
     }
   ]

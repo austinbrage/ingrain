@@ -8,8 +8,7 @@ pub fn courses_column(catalog: &Catalog, state: ExplorerState) -> Column {
     Column {
         title: layer.name.to_uppercase(),
         items: layer
-            .courses
-            .iter()
+            .courses()
             .map(|course| Item {
                 text: course.name.clone(),
                 right: "›".to_string(),

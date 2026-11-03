@@ -4,7 +4,9 @@
     {
       "id": "core",
       "name": "Core",
-      "courses": [{ "id": "basics", "name": "Basics" }]
+      "course_groups": [
+        { "name": "Fundamentals", "courses": [{ "id": "basics", "name": "Basics" }] }
+      ]
     }
   ]
 }

@@ -393,7 +393,7 @@ mod real_content {
             let courses: Vec<&str> = catalog
                 .layers
                 .iter()
-                .flat_map(|layer| &layer.courses)
+                .flat_map(|layer| layer.courses())
                 .map(|course| course.id.as_str())
                 .collect();
 
@@ -750,5 +750,49 @@ mod checks_of_the_checks {
         assert_eq!(markdown.len(), 1);
         assert!(markdown[0].contains("has markdown"));
         assert!(check(&chunk("b", "plain")).is_empty());
+    }
+}
+
+mod course_groups {
+    use super::*;
+
+    #[test]
+    fn course_at_counts_the_courses_across_the_groups_of_a_layer() {
+        let catalog = Catalog::load(Source::Test, "rust");
+
+        assert_eq!(catalog.course_count(0), 2);
+        assert_eq!(catalog.course_count(1), 2);
+        assert_eq!(catalog.course_at(0, 1).id, "second");
+        assert_eq!(catalog.course_at(1, 1).id, "bare");
+    }
+
+    #[test]
+    fn course_index_finds_a_course_in_a_later_group() {
+        let catalog = Catalog::load(Source::Test, "rust");
+
+        assert_eq!(catalog.course_index("second"), Some((0, 1)));
+        assert_eq!(catalog.course_index("bare"), Some((1, 1)));
+        assert_eq!(catalog.course_index("missing"), None);
+    }
+
+    #[test]
+    fn a_layer_keeps_its_groups_with_their_names_and_courses() {
+        let catalog = Catalog::load(Source::Test, "rust");
+
+        let groups: Vec<(&str, Vec<&str>)> = catalog.layers[1]
+            .course_groups
+            .iter()
+            .map(|group| {
+                let courses = group.courses.iter().map(|c| c.id.as_str()).collect();
+                (group.name.as_str(), courses)
+            })
+            .collect();
+
+        assert_eq!(
+            groups,
+            vec![("Tooling", vec!["tools"]), ("Libraries", vec!["bare"])]
+        );
+        assert_eq!(catalog.layers[0].course_groups[0].name, "Fundamentals");
+        assert_eq!(catalog.layers[0].course_groups[0].courses.len(), 2);
     }
 }

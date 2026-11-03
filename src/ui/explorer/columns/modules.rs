@@ -9,7 +9,7 @@ pub fn modules_column(
     marks: &ModuleMarks,
     tick: u64,
 ) -> Column {
-    let selected_course = &catalog.layers[state.layer].courses[state.course];
+    let selected_course = catalog.course_at(state.layer, state.course);
     let focused = state.depth == Depth::Modules;
 
     let mut items = Vec::new();

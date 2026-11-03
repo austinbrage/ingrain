@@ -92,7 +92,7 @@ impl ExplorerState {
     pub fn explorer_breadcrumb(self, app: &App) -> String {
         let catalog = app.content.catalog(self.language);
         let layer = &catalog.layers[self.layer];
-        let course = &layer.courses[self.course];
+        let course = catalog.course_at(self.layer, self.course);
         let module = app
             .content
             .course(self)
@@ -155,9 +155,7 @@ impl ExplorerState {
 
     // Handle 3nd Column on Explorer
     fn handle_courses_key(&mut self, action: Action, content: &Content) -> Option<Screen> {
-        let course_count = content.catalog(self.language).layers[self.layer]
-            .courses
-            .len();
+        let course_count = content.catalog(self.language).course_count(self.layer);
         let module_count = content
             .course(*self)
             .map_or(0, |course| course.module_count());
