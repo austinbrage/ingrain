@@ -14,7 +14,7 @@ When `ingrain-courses` calls this skill, the request carries the **scope** of th
 ## Read first
 1. `docs/course-structure.md`: the hierarchy, and "Tiers"
 2. `docs/content-structure.md`: "Folders", "Files", "Sessions in the explorer" and "Ids"
-3. The course's entry in the catalog, and the courses next to it
+3. The course's entry in the catalog, the courses of its group, and the courses next to it
 4. The current `course.json` of the course, if it exists, and the files in its folder: a module whose file exists is **written** and has content
 
 The shape of `course.json`:

@@ -10,15 +10,21 @@ Writes the courses of one layer of a language, in `content/prod/<language>/catal
 Arguments: `$ARGUMENTS` is `<language> <layer> [request]`. The layer is `core` or `ecosystem`. Without a request, write the whole list of courses of that layer. With a request, change the list as it says.
 
 ## Read first
-1. `docs/course-structure.md`: the hierarchy (language, layer, course, module section, module) and what each level means
+1. `docs/course-structure.md`: the hierarchy (language, layer, course group, course, module section, module) and what each level means
 2. `docs/content-structure.md`: "Folders", "Files" and "Ids", for the shape of `catalog.json` and the rules of ids
 3. The current `content/prod/<language>/catalog.json`, and the folders in `content/prod/<language>/`: a course whose folder exists is **written** and has content
 
 The shape of a layer in the catalog:
 ```json
-{ "id": "core", "name": "Core", "courses": [{ "id": "syntax", "name": "Syntax" }] }
+{
+  "id": "core",
+  "name": "Core",
+  "course_groups": [
+    { "name": "Fundamentals", "courses": [{ "id": "syntax", "name": "Syntax" }] }
+  ]
+}
 ```
-A course id is a slug (lowercase letters, digits and hyphens), and it is also the name of its folder. The name is what the user reads.
+A course id is a slug (lowercase letters, digits and hyphens), and it is also the name of its folder. The name is what the user reads. A course group has only a name: no id, no tier.
 
 ## What the courses of a layer must be
 - **A course is one topic** of the language, and its modules are the concepts of that topic
@@ -28,17 +34,20 @@ A course id is a slug (lowercase letters, digits and hyphens), and it is also th
 - **There is no fixed number.** A layer has as many courses as it needs. If that is 100, write 100: the explorer column scrolls
 - **The order is the order of study.** The first course is the first one to learn, and the app proposes the next course in this order. Decide what a layer needs and in what order **from your own knowledge of the language or the library** (what everyday code uses, what depends on what, how hard each topic is), not from a list given to you
 - A course name is short and plain (`Syntax`, `Pointers`, `Error handling`)
+- **Course groups gather related courses under one label** (`Fundamentals`, `Ownership`, `CLI`, `Web`). A group has at least one course, and no other group of the layer has its name. The groups are runs of the study order: the order of the catalog read through the groups is still the order of study, so a group never reorders courses
+- **A group is worth its label with two or more courses.** If a theme has one course, join it to its neighbors, or add the courses the layer is missing (for the ecosystem, the libraries that are used together). Do not write a group of one course
 
 ## Writing
 - **A general call is a call with no request.** On a layer with no courses, write the full list, in the order of study. On a layer that already has courses, **warn** that it has, add only the courses that are missing, and touch nothing that is already in the catalog
 - **To change a course that exists** (rename, reorder, remove), the user names it in a request. Change only what the request asks and leave everything else exactly as it is
-- Keep every existing id. Keep the layer's `id` and `name`
+- Keep every existing id. Keep the layer's `id` and `name`, and the name of every group unless the request changes it
 
 ## Modifying: be careful
 - **Never rename or reuse the id of a course that has a folder.** The saved progress points at `<language>/<course>/<module>`, so a renamed id loses what the user did
 - **Never remove a course that has a folder.** A course with content stays in the catalog. If the request asks for it, say you did not, and why
 - A course with **no folder** has no content and no progress, so it can be renamed, reordered or removed freely
 - Names can change freely
+- Moving a course to another group is allowed only if the study order stays the same
 - Reordering is allowed, but say so: it changes the order in which users are taken through the courses
 - If the request would remove, rename or reorder courses that exist, say exactly what will change and ask before writing
 
@@ -49,7 +58,7 @@ The catalog only stores an id and a name, so what a course covers would be lost 
 3. Do it one course at a time, in the order of study. Do not call it for a course that already has a folder, and do not touch the modules of an existing course
 
 ## Finish
-Run `cargo test --test content` and fix everything it reports. Among other checks, it fails when a course id is not a slug, when an id repeats, and when a course folder is not listed in the catalog.
+Run `cargo test --test content` and fix everything it reports. Among other checks, it fails when a course id is not a slug, when an id repeats, and when a course folder is not listed in the catalog, and when a group has no courses or repeats the name of another group of its layer.
 
 Then report:
 - what you added, changed or left as it was
