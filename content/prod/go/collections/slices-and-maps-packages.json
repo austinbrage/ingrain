@@ -1,0 +1,284 @@
+{
+  "id": "slices-and-maps-packages",
+  "intro": {
+    "title": "The slices package",
+    "slides": [
+      {
+        "text": "You have built slices by hand. The standard library has a package, `slices`, with ready-made functions for the jobs you keep repeating: sorting, comparing and copying."
+      },
+      {
+        "text": "Three sessions:\n\n- **1:** the basics of `slices`\n- **2:** sorting by your own rule\n- **3:** ties and order"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "The slices package",
+        "slides": [
+          {
+            "text": "A package is used by its name, a dot and a function, like `fmt.Println`. The `slices` functions take the slice as their first argument, so you do not write loops for common jobs.\n\nThe snippet is pseudo code, not Go.",
+            "code": "sort the list\nis \"go\" in the list?\nwhere is \"go\" in the list?\nmake a copy of the list"
+          },
+          {
+            "text": "Some functions change the slice they receive, like the one that sorts. Others only read it, and a few give back a new slice. Check which one you are calling before you rely on the old values."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "sort-values",
+          "title": "Sort a slice",
+          "guide": "Put the values of a slice in order.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n"},
+            {"mode": "ghost", "line": 3, "guide": "Import `slices` next to `fmt`. It holds ready-made functions for slices.", "notes": [{"on": "slices", "text": "Sorting, searching and more for slices."}], "text": "import (\n    \"fmt\"\n    \"slices\"\n)\n"},
+            {"mode": "auto", "line": 8, "text": "func main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "`slices.Sort` orders the slice in place, from smallest to largest. It returns nothing.", "notes": [{"on": "slices.Sort(nums)", "text": "Changes nums itself."}], "text": "    nums := []int{3, 1, 2}\n    slices.Sort(nums)\n    fmt.Println(nums)"},
+            {"mode": "ghost", "line": 12, "guide": "Text sorts too, in alphabetical order.", "text": "    words := []string{\"pear\", \"fig\", \"apple\"}\n    slices.Sort(words)\n    fmt.Println(words)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 3]\n[apple fig pear]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "search-values",
+          "title": "Search a slice",
+          "guide": "Ask a slice if it holds a value, and where.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "A slice of tags.", "text": "    tags := []string{\"go\", \"rs\", \"py\"}"},
+            {"mode": "ghost", "line": 10, "guide": "`slices.Contains` answers with a bool.", "text": "    fmt.Println(slices.Contains(tags, \"rs\"))"},
+            {"mode": "ghost", "line": 11, "guide": "`slices.Index` gives the position of the first match, or -1 when the value is not there.", "notes": [{"on": "\"js\"", "text": "Not in the slice, so the answer is -1."}], "text": "    fmt.Println(slices.Index(tags, \"py\"))\n    fmt.Println(slices.Index(tags, \"js\"))"},
+            {"mode": "ghost", "line": 13, "guide": "`slices.Max` and `slices.Min` find the largest and the smallest value.", "text": "    nums := []int{4, 9, 2}\n    fmt.Println(slices.Max(nums), slices.Min(nums))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\n2\n-1\n9 2"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "find-ids",
+          "title": "Find an id",
+          "guide": "Print whether `ids` holds 3, then the position of 9.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n    ids := []int{7, 3, 9}\n    fmt.Println(slices.___(ids, 3))\n    fmt.Println(slices.___(ids, 9))\n}",
+          "gaps": [{"answers": ["Contains"]}, {"answers": ["Index"]}]
+        },
+        {
+          "type": "typing",
+          "id": "equal-and-clone",
+          "title": "Compare and copy",
+          "guide": "Copy a slice, compare it, and change only the copy.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "`slices.Clone` makes a new slice with the same values. It shares nothing with the original.", "text": "    a := []int{1, 2, 3}\n    b := slices.Clone(a)"},
+            {"mode": "ghost", "line": 11, "guide": "Slices cannot be compared with `==`. `slices.Equal` compares length and values.", "text": "    fmt.Println(slices.Equal(a, b))"},
+            {"mode": "ghost", "line": 12, "guide": "`slices.Reverse` flips a slice in place. Only the copy changes.", "text": "    slices.Reverse(b)\n    fmt.Println(a, b)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\n[1 2 3] [3 2 1]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "clone-and-sort",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n    nums := []int{5, 2, 8}\n    sorted := slices.Clone(nums)\n    slices.Sort(sorted)\n    fmt.Println(nums, sorted,\n        slices.Index(sorted, 5))\n}",
+          "options": [
+            "[2 5 8] [2 5 8] 1",
+            "[5 2 8] [2 5 8] 0",
+            "[5 2 8] [2 5 8] 1",
+            "[5 2 8] [5 2 8] 1"
+          ],
+          "answer": 2,
+          "explanation": "Only the clone is sorted, so `nums` keeps its order. In the sorted slice, 5 sits at index 1."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Sorting by your own rule",
+        "slides": [
+          {
+            "text": "`slices.Sort` goes from the smallest to the largest, and that is all it knows. For any other order, you give `slices.SortFunc` a rule: a function that compares two items, `a` and `b`, and answers with a number.\n\nThe snippet is pseudo code, not Go.",
+            "code": "rule(a, b):\n    a goes first  -> a negative number\n    a and b tie   -> 0\n    b goes first  -> a positive number"
+          },
+          {
+            "text": "The `cmp` package has `cmp.Compare(x, y)`, which gives exactly those answers for numbers and text. Swap its arguments and the order flips.\n\nThe rule is a function value, so it can be written in place or kept in a variable, as in the functions course.",
+            "code": "slices.SortFunc(list, rule)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "compare-values",
+          "title": "Compare two values",
+          "guide": "Ask `cmp.Compare` which of two values is bigger.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"cmp\"\n    \"fmt\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "`cmp.Compare` answers -1 when the first value is smaller, 0 when they are equal and 1 when it is bigger. The imports are already in the file.", "notes": [{"on": "cmp.Compare(2, 2)", "text": "Equal values answer 0."}], "text": "    fmt.Println(cmp.Compare(1, 2))\n    fmt.Println(cmp.Compare(2, 2))\n    fmt.Println(cmp.Compare(3, 2))"},
+            {"mode": "ghost", "line": 12, "guide": "Text is compared too, in alphabetical order.", "text": "    fmt.Println(cmp.Compare(\"apple\", \"pear\"))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "-1\n0\n1\n-1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "sort-descending",
+          "title": "Sort from the biggest",
+          "guide": "Give `SortFunc` a rule that puts the biggest value first.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"cmp\"\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "A slice to sort. The imports are already in the file.", "text": "    nums := []int{3, 1, 4, 1, 5}"},
+            {"mode": "ghost", "line": 11, "guide": "`slices.SortFunc` takes the slice and a rule. Swapping `a` and `b` in `cmp.Compare` reverses the order.", "notes": [{"on": "cmp.Compare(b, a)", "text": "Reversed, so bigger values go first."}], "text": "    slices.SortFunc(nums, func(a, b int) int {\n        return cmp.Compare(b, a)\n    })\n    fmt.Println(nums)"},
+            {"mode": "ghost", "line": 15, "guide": "The same rule works for text: the last word in the alphabet comes first.", "text": "    words := []string{\"fig\", \"pear\", \"apple\"}\n    slices.SortFunc(words, func(a, b string) int {\n        return cmp.Compare(b, a)\n    })\n    fmt.Println(words)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[5 4 3 1 1]\n[pear fig apple]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "descending-scores",
+          "title": "Highest score first",
+          "guide": "Sort `scores` from the highest to the lowest.",
+          "code": "package main\n\nimport (\n    \"cmp\"\n    \"slices\"\n)\n\nfunc main() {\n    scores := []int{40, 90, 70}\n    slices.___(scores, func(a, b int) int {\n        return cmp.___(b, a)\n    })\n}",
+          "gaps": [{"answers": ["SortFunc"]}, {"answers": ["Compare"]}]
+        },
+        {
+          "type": "typing",
+          "id": "sort-by-length",
+          "title": "Sort by length",
+          "guide": "Sort words by how long they are, not by their letters.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"cmp\"\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "Four words of different lengths. The imports are already in the file.", "text": "    words := []string{\"banana\", \"kiwi\", \"fig\", \"apple\"}"},
+            {"mode": "ghost", "line": 11, "guide": "A rule can live in a variable. This one compares the lengths of the words.", "text": "    byLength := func(a, b string) int {\n        return cmp.Compare(len(a), len(b))\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "Pass the rule to `SortFunc` by its name.", "text": "    slices.SortFunc(words, byLength)\n    fmt.Println(words)"},
+            {"mode": "ghost", "line": 16, "guide": "Swap the arguments to put the longest word first.", "text": "    slices.SortFunc(words, func(a, b string) int {\n        return cmp.Compare(len(b), len(a))\n    })\n    fmt.Println(words)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[fig kiwi apple banana]\n[banana apple kiwi fig]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "length-purpose",
+          "title": "What is it for?",
+          "guide": "Read the code, then pick what it is for.",
+          "code": "slices.SortFunc(names, func(a, b string) int {\n    return cmp.Compare(len(b), len(a))\n})",
+          "options": [
+            "Puts the shortest names first",
+            "Puts the longest names first",
+            "Sorts the names alphabetically",
+            "Drops the names that share a length"
+          ],
+          "answer": 1,
+          "explanation": "The arguments are swapped, so a longer `b` makes the answer positive and moves it before `a`: the longest names come first."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Ties and order",
+        "slides": [
+          {
+            "text": "Two items that compare equal are a tie. `SortFunc` may leave tied items in any order, so a result with ties can change from one Go version to another. `SortStableFunc` keeps them in the order they already had."
+          },
+          {
+            "text": "To break a tie yourself, compare by one thing and then by another. `cmp.Or` returns the first answer that is not zero, so it does exactly that.\n\nThe snippet is pseudo code, not Go.",
+            "code": "compare the lengths\nif they tie, compare the letters\nif they still tie, they are equal"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "tie-break",
+          "title": "Break a tie",
+          "guide": "Sort by length, and by letters when two words tie.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"cmp\"\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "Words that share a length: a tie to break. The imports are already in the file.", "text": "    words := []string{\"bb\", \"a\", \"cc\", \"aa\", \"b\"}"},
+            {"mode": "ghost", "line": 11, "guide": "`cmp.Or` returns the first of its arguments that is not 0. The letters only matter when the lengths tie.", "notes": [{"on": "cmp.Or(", "text": "Takes the first answer that is not 0."}], "text": "    slices.SortFunc(words, func(a, b string) int {\n        return cmp.Or(\n            cmp.Compare(len(a), len(b)),\n            cmp.Compare(a, b),\n        )\n    })\n    fmt.Println(words)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[a b aa bb cc]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "sort-stable",
+          "title": "Keep the original order",
+          "guide": "Sort by length without moving words that tie.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"cmp\"\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "Three words of 2 letters and two of 3. The imports are already in the file.", "text": "    words := []string{\"bob\", \"al\", \"cy\", \"eve\", \"jo\"}"},
+            {"mode": "ghost", "line": 11, "guide": "`SortStableFunc` keeps tied items in their original order, so `al`, `cy` and `jo` stay in that order.", "notes": [{"on": "SortStableFunc", "text": "Equal items keep the order they had."}], "text": "    slices.SortStableFunc(words, func(a, b string) int {\n        return cmp.Compare(len(a), len(b))\n    })\n    fmt.Println(words)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[al cy jo bob eve]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "stable-by-length",
+          "title": "Stable by length",
+          "guide": "Sort `names` by length, keeping `bo` before `al`.",
+          "code": "package main\n\nimport (\n    \"cmp\"\n    \"slices\"\n)\n\nfunc main() {\n    names := []string{\"bo\", \"al\", \"eve\"}\n    byLength := func(a, b string) int {\n        return cmp.___(len(a), len(b))\n    }\n    slices.___(names, byLength)\n}",
+          "gaps": [{"answers": ["Compare"]}, {"answers": ["SortStableFunc"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "stable-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "words := []string{\n    \"pear\", \"fig\", \"kiwi\",\n    \"go\", \"plum\",\n}\nslices.SortStableFunc(words,\n    func(a, b string) int {\n        return cmp.Compare(len(a), len(b))\n    })\nfmt.Println(words)",
+          "options": [
+            "[go fig kiwi pear plum]",
+            "[go fig plum kiwi pear]",
+            "[go fig pear kiwi plum]",
+            "[fig go pear kiwi plum]"
+          ],
+          "answer": 2,
+          "explanation": "The words sort by length: `go`, `fig`, then the three 4-letter words. A stable sort keeps `pear`, `kiwi`, `plum` in their original order."
+        },
+        {
+          "type": "typing",
+          "id": "check-sorted",
+          "title": "Is it sorted?",
+          "guide": "Ask whether a slice is in order, before and after sorting.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"cmp\"\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "An unsorted slice. The imports are already in the file.", "text": "    nums := []int{3, 1, 2}\n    fmt.Println(slices.IsSorted(nums))"},
+            {"mode": "ghost", "line": 12, "guide": "`IsSorted` is true once the slice goes from smallest to largest.", "text": "    slices.Sort(nums)\n    fmt.Println(slices.IsSorted(nums))"},
+            {"mode": "ghost", "line": 14, "guide": "A slice sorted from the biggest is not sorted for `IsSorted`.", "text": "    slices.SortFunc(nums, func(a, b int) int {\n        return cmp.Compare(b, a)\n    })\n    fmt.Println(nums)\n    fmt.Println(slices.IsSorted(nums))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "false\ntrue\n[3 2 1]\nfalse"
+          }
+        }
+      ]
+    }
+  ]
+}

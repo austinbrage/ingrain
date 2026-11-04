@@ -1,0 +1,269 @@
+{
+  "id": "slice-capacity",
+  "intro": {
+    "title": "Slice capacity",
+    "slides": [
+      {
+        "text": "A slice has a length, the values it shows, and a **capacity**, the room it has to grow before it needs a bigger place. Knowing both explains why slices sometimes share values and sometimes do not.\n\nThe snippet is pseudo code, not Go.",
+        "code": "slice shows 2 values\nroom for 5 values in total\nlength = 2, capacity = 5"
+      },
+      {
+        "text": "Three sessions:\n\n- **1:** reading the capacity\n- **2:** append with and without room\n- **3:** the room left behind a cut"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Length and capacity",
+        "slides": [
+          {
+            "text": "Behind a slice there is a stretch of values. The length is how many the slice shows, and the capacity is how many it could show, counting from where it starts to the end of that stretch.\n\nThe snippet is pseudo code, not Go.",
+            "code": "values = 1, 2, 3, 4, 5\nslice starts at 3, shows 3, 4\nlength = 2\ncapacity = 3 (3, 4, 5)"
+          },
+          {
+            "text": "`len` gives the length and `cap` gives the capacity. A slice can be cut again up to its capacity, even past its length."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "cap-and-len",
+          "title": "Length and capacity",
+          "guide": "Read both numbers of a slice with `len` and `cap`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`make` takes a third number: the capacity. This slice shows 2 values and has room for 5.", "notes": [{"on": "2, 5", "text": "Length first, capacity second."}], "text": "    s := make([]int, 2, 5)\n    fmt.Println(len(s), cap(s))"},
+            {"mode": "ghost", "line": 8, "guide": "A literal has exactly as much room as values.", "text": "    lit := []int{1, 2, 3}\n    fmt.Println(len(lit), cap(lit))"},
+            {"mode": "ghost", "line": 10, "guide": "Without a third number, `make` gives the capacity the same value as the length.", "text": "    full := make([]int, 3)\n    fmt.Println(len(full), cap(full))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 5\n3 3\n3 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "cut-changes-cap",
+          "title": "A cut changes the room",
+          "guide": "Cut a slice and see how much room the piece has.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice of five values, and a piece that starts at index 1.", "text": "    s := []int{1, 2, 3, 4, 5}\n    t := s[1:3]"},
+            {"mode": "ghost", "line": 8, "guide": "The piece shows 2 values, but its room runs from index 1 to the end of `s`: 4 values.", "notes": [{"on": "cap(t)", "text": "Counts from where t starts, not from 0."}], "text": "    fmt.Println(t, len(t), cap(t))"},
+            {"mode": "ghost", "line": 9, "guide": "A slice can be cut up to its capacity, so `t` can reach values past its own length.", "text": "    t = t[:cap(t)]\n    fmt.Println(t)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[2 3] 2 4\n[2 3 4 5]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "grow-the-buffer",
+          "title": "Fill the buffer",
+          "guide": "Add a value to `buf` and store it, then print its length and its capacity.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    buf := make([]int, 0, 4)\n    buf = ___(buf, 1)\n    fmt.Println(len(buf), ___(buf))\n}",
+          "gaps": [{"answers": ["append"]}, {"answers": ["cap"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "piece-capacity",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{1, 2, 3, 4, 5}\n    t := s[2:4]\n    fmt.Println(len(t), cap(t), t[:3])\n}",
+          "options": [
+            "2 2 [3 4 5]",
+            "2 5 [3 4 5]",
+            "2 3 [3 4]",
+            "2 3 [3 4 5]"
+          ],
+          "answer": 3,
+          "explanation": "`t` starts at index 2 of `s`, so its room is 3 values, and cutting it up to 3 reaches the last value of `s`."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Append and the room",
+        "slides": [
+          {
+            "text": "When there is room, `append` writes the new value into the stretch the slice already looks at. Another slice over the same stretch sees it.\n\nThe snippet is pseudo code, not Go.",
+            "code": "values = 0, 0, _, _\nlist shows 0, 0\nappend 9 to list\nvalues = 0, 0, 9, _"
+          },
+          {
+            "text": "When the room is full, `append` makes a new, bigger stretch and copies the values into it. The result no longer shares anything with the old slice. How much bigger the new stretch is depends on Go, so a program should not count on it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "append-in-place",
+          "title": "Append with room to spare",
+          "guide": "Append to a slice that has room and see who notices.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice of 2 values with room for 4, and an append that fits in that room.", "text": "    s := make([]int, 2, 4)\n    t := append(s, 9)"},
+            {"mode": "ghost", "line": 8, "guide": "`t` and `s` look at the same values, so a change through `t` shows in `s`.", "notes": [{"on": "t[0] = 7", "text": "No copy was made, so s sees it too."}], "text": "    t[0] = 7\n    fmt.Println(s, t)"},
+            {"mode": "ghost", "line": 10, "guide": "`s` keeps its length. The capacity did not change either, because nothing new was made.", "text": "    fmt.Println(len(s), cap(s), len(t), cap(t))"},
+            {"mode": "ghost", "line": 11, "guide": "The value `append` wrote is still there, just past the length of `s`.", "text": "    fmt.Println(s[:3])"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[7 0] [7 0 9]\n2 4 3 4\n[7 0 9]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "append-past-cap",
+          "title": "Append with no room",
+          "guide": "Append to a slice that is full and see what separates.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice with no room left, so the append has to make a new stretch of values.", "text": "    s := make([]int, 2, 2)\n    t := append(s, 5)"},
+            {"mode": "ghost", "line": 8, "guide": "`t` has its own values now. Changing it does not reach `s`.", "text": "    t[0] = 9\n    fmt.Println(s, t)"},
+            {"mode": "ghost", "line": 10, "guide": "And changing `s` does not reach `t`.", "text": "    s[1] = 4\n    fmt.Println(s, t)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[0 0] [9 0 5]\n[0 4] [9 0 5]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "limit-capacity",
+          "title": "Limit the room",
+          "guide": "Cut a piece that cannot write into the original.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A third number in the cut sets where the room ends. `s[:2:2]` shows 2 values and has room for 2.", "notes": [{"on": "[:2:2]", "text": "The last number caps the room."}], "text": "    s := []int{1, 2, 3, 4}\n    part := s[:2:2]"},
+            {"mode": "ghost", "line": 8, "guide": "The piece has no spare room.", "text": "    fmt.Println(part, len(part), cap(part))"},
+            {"mode": "ghost", "line": 9, "guide": "With no room, the append makes new values, and `s` stays as it was.", "text": "    part = append(part, 9)\n    fmt.Println(s, part)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2] 2 2\n[1 2 3 4] [1 2 9]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "safe-piece",
+          "title": "A safe piece",
+          "guide": "Take the first three values of `s`, with the room limited so that the append can never change `s`.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{5, 6, 7, 8}\n    part := s[:3:___]\n    part = append(part, 0)\n    fmt.Println(s, part)\n}",
+          "gaps": [{"answers": ["3"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "shared-append",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := make([]int, 1, 3)\n    b := append(a, 5)\n    c := append(a, 6)\n    fmt.Println(b[1], c[1], len(a))\n}",
+          "options": [
+            "5 6 1",
+            "5 5 1",
+            "6 6 1",
+            "6 6 2"
+          ],
+          "answer": 2,
+          "explanation": "Both appends fit in the room of `a`, so both write to index 1 of the same values. The second write wins, and `a` keeps its length of 1."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "The room left behind",
+        "slides": [
+          {
+            "text": "A piece cut from the start or the middle of a slice has the values after it as spare room. They are not shown, but they are still there, and `append` writes over them.\n\nThe snippet is pseudo code, not Go.",
+            "code": "values = 1, 2, 3, 4, 5\nhead shows 1, 2 (room for 5)\nappend 99 to head\nvalues = 1, 2, 99, 4, 5"
+          },
+          {
+            "text": "This is why removing a value with `append(s[:i], s[i+1:]...)` also moves the values of the original slice. The result fits in the room that was already there.\n\nTo stop a piece from writing into the original, limit its room with a third number in the cut."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "overwrite-after-cut",
+          "title": "Append after a cut",
+          "guide": "Append to a piece and look at the original.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice of five values, and a piece with the first two.", "text": "    s := []int{1, 2, 3, 4, 5}\n    head := s[:2]"},
+            {"mode": "ghost", "line": 8, "guide": "The piece shows 2 values, but its room reaches the end of `s`.", "text": "    fmt.Println(len(head), cap(head))"},
+            {"mode": "ghost", "line": 9, "guide": "The append fits in that room, so it writes over the third value of `s`.", "notes": [{"on": "append(head, 99)", "text": "Lands on index 2 of s."}], "text": "    head = append(head, 99)\n    fmt.Println(head, s)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 5\n[1 2 99] [1 2 99 4 5]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "room-left-by-remove",
+          "title": "The room a remove uses",
+          "guide": "Remove a value and see what the original keeps.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Keep a second name for the same values, then remove index 1.", "text": "    nums := []int{1, 2, 3, 4, 5}\n    whole := nums\n    nums = append(nums[:1], nums[2:]...)"},
+            {"mode": "ghost", "line": 9, "guide": "The result has 4 values, and the room of 5 did not change.", "text": "    fmt.Println(nums, len(nums), cap(nums))"},
+            {"mode": "ghost", "line": 10, "guide": "The values moved left inside the same stretch. The last place still holds its old value.", "text": "    fmt.Println(whole)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 3 4 5] 4 5\n[1 3 4 5 5]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "safe-head",
+          "title": "A head that cannot write",
+          "guide": "Take the first two values of `s` and add 9, without ever changing `s`. Then print the length of the head.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{1, 2, 3, 4}\n    head := ___(s[:2:2], 9)\n    fmt.Println(s, ___(head))\n}",
+          "gaps": [{"answers": ["append"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "cut-then-append",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := []int{1, 2, 3}\n    b := a[:2]\n    b = append(b, 9)\n    fmt.Println(a, len(b), cap(b))\n}",
+          "options": [
+            "[1 2 3] 3 3",
+            "[1 2 9] 3 3",
+            "[1 2 9] 3 6",
+            "[1 2 3] 3 6"
+          ],
+          "answer": 1,
+          "explanation": "`b` has room for 3 values, so the append writes into `a` and nothing is copied. The capacity stays 3."
+        },
+        {
+          "type": "typing",
+          "id": "three-index-with-start",
+          "title": "Limit a piece in the middle",
+          "guide": "Cut a piece from the middle and cap its room.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The third number is the end of the room, counted like the second one. `s[1:3:4]` shows 2 values and has room for 3.", "notes": [{"on": "s[1:3:4]", "text": "Room is 4 minus 1."}], "text": "    s := []int{0, 1, 2, 3, 4, 5}\n    p := s[1:3:4]\n    fmt.Println(p, len(p), cap(p))"},
+            {"mode": "ghost", "line": 9, "guide": "This append fits the room, so it reaches `s`.", "text": "    p = append(p, 100)\n    fmt.Println(s)"},
+            {"mode": "ghost", "line": 11, "guide": "The room is now full, so this append makes new values. Changing `p` no longer reaches `s`.", "text": "    p = append(p, 200)\n    p[0] = 9\n    fmt.Println(s, p)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2] 2 3\n[0 1 2 100 4 5]\n[0 1 2 100 4 5] [9 2 100 200]"
+          }
+        }
+      ]
+    }
+  ]
+}

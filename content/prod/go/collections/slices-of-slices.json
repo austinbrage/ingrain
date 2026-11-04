@@ -1,0 +1,117 @@
+{
+  "id": "slices-of-slices",
+  "intro": {
+    "title": "Slices of slices",
+    "slides": [
+      {
+        "text": "A slice can hold other slices, and that is how Go makes a grid. Each row is a slice of its own, so rows can have different lengths and a row can be shared. You will build grids, walk them and see what a row shares."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Slices of slices",
+        "slides": [
+          {
+            "text": "A grid in Go is a slice whose values are slices. Each row is its own slice, so rows can have different lengths, unlike a grid of arrays.\n\nThe snippet is pseudo code, not Go.",
+            "code": "grid = list of rows\n    row 0 = 1, 2, 3\n    row 1 = 4, 5\ngrid at row 1, place 0 = 4"
+          },
+          {
+            "text": "Because a row is a slice, a `make` for the grid only makes the outer list. Every row still has to be made."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "ragged-rows",
+          "title": "Rows of different sizes",
+          "guide": "Write a slice of slices and read it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The type is `[][]int`. Each inner list is a row, and they can differ in length.", "notes": [{"on": "[][]int", "text": "A slice whose values are slices of int."}], "text": "    rows := [][]int{{1, 2, 3}, {4, 5}, {6}}\n    fmt.Println(rows)"},
+            {"mode": "ghost", "line": 8, "guide": "Count the rows, then the values of one row.", "text": "    fmt.Println(len(rows), len(rows[1]))"},
+            {"mode": "ghost", "line": 9, "guide": "Two indexes: the row, then the place in it.", "text": "    fmt.Println(rows[0][2], rows[1][0])"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[[1 2 3] [4 5] [6]]\n3 2\n3 4"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "make-a-grid",
+          "title": "Make a grid",
+          "guide": "Make a grid row by row.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`make` only builds the outer slice. Its rows start empty.", "text": "    grid := make([][]int, 3)"},
+            {"mode": "ghost", "line": 7, "guide": "Make every row, each with its own values.", "text": "    for r := range grid {\n        grid[r] = make([]int, 4)\n    }\n    fmt.Println(grid)"},
+            {"mode": "ghost", "line": 11, "guide": "Set one place and read a row length.", "text": "    grid[1][2] = 7\n    fmt.Println(grid, len(grid[0]))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[[0 0 0 0] [0 0 0 0] [0 0 0 0]]\n[[0 0 0 0] [0 0 7 0] [0 0 0 0]] 4"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "row-totals",
+          "title": "Total of every row",
+          "guide": "Add up each row into a slice of totals.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "One total for each row.", "text": "    grid := [][]int{{1, 2}, {3, 4, 5}}\n    totals := make([]int, len(grid))"},
+            {"mode": "ghost", "line": 8, "guide": "Walk the rows, then the values of each row.", "text": "    for r, row := range grid {\n        for _, v := range row {\n            totals[r] += v\n        }\n    }\n    fmt.Println(totals)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[3 12]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "sum-the-grid",
+          "title": "Sum the grid",
+          "guide": "Add up every value of the grid.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    grid := [][]int{{1, 2}, {3, 4}}\n    sum := 0\n    for _, row := range ___ {\n        for _, v := range ___ {\n            sum += v\n        }\n    }\n    fmt.Println(sum)\n}",
+          "gaps": [{"answers": ["grid"]}, {"answers": ["row"]}]
+        },
+        {
+          "type": "typing",
+          "id": "rows-are-slices",
+          "title": "Rows are slices",
+          "guide": "Change a row, then replace a whole row.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A row is a slice, so a variable can look at it.", "text": "    grid := [][]int{{1, 2}, {3, 4}}\n    row := grid[0]"},
+            {"mode": "ghost", "line": 8, "guide": "Changing `row` changes the grid, because they share values.", "text": "    row[1] = 50\n    fmt.Println(grid)"},
+            {"mode": "ghost", "line": 10, "guide": "Replacing the row in the grid does not touch `row`.", "text": "    grid[1] = []int{9}\n    fmt.Println(grid, row)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[[1 50] [3 4]]\n[[1 50] [9]] [1 50]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "same-row-twice",
+          "title": "One row, two places",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    row := make([]int, 2)\n    grid := [][]int{row, row}\n    grid[0][0] = 5\n    fmt.Println(grid)\n}",
+          "options": [
+            "[[5 0] [5 0]]",
+            "[[5 0] [0 0]]",
+            "[[5 0] [0 5]]",
+            "[[5 5] [0 0]]"
+          ],
+          "answer": 0,
+          "explanation": "Both rows of the grid are the same slice, so they look at the same values. Setting one place shows in both."
+        }
+      ]
+    }
+  ]
+}

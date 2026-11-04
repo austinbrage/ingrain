@@ -1,0 +1,85 @@
+{
+  "id": "arrays-in-functions",
+  "intro": {
+    "title": "Arrays in functions",
+    "slides": [
+      {
+        "text": "You know that an array is copied when you give it to a function. Here you will hand a changed array back, see that `range` walks a copy, and meet what happens when an index goes past the end."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Hand it back, and watch out",
+        "slides": [
+          {
+            "text": "A function that gets an array works on a copy, so to change the caller's array it gives the changed one back, and the caller stores it.\n\nThe snippet is pseudo code, not Go.",
+            "code": "changed = make_bigger(row)\nrow = changed"
+          },
+          {
+            "text": "Two traps remain. A loop over an array walks a copy taken before it starts. And an index outside the array stops the program with a panic, unless the index is a plain number written in the code, which the compiler rejects."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "return-the-copy",
+          "title": "Give the array back",
+          "guide": "Return the changed copy and store it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The function returns an array of the same type it receives. `range` with only an index skips the value.", "notes": [{"on": "[3]int {", "text": "The result is an array too."}], "text": "func triple(nums [3]int) [3]int {\n    for i := range nums {\n        nums[i] *= 3\n    }\n    return nums\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "The caller replaces its array with the one it got back.", "text": "func main() {\n    nums := [3]int{1, 2, 3}\n    nums = triple(nums)\n    fmt.Println(nums)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[3 6 9]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "hand-it-back",
+          "title": "Hand it back",
+          "guide": "Make the function give its array back, and store the result so `n` changes.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc zero(n [3]int) [3]int {\n    n[0] = 9\n    ___ n\n}\n\nfunc main() {\n    n := [3]int{1, 2, 3}\n    ___ = zero(n)\n    fmt.Println(n)\n}",
+          "gaps": [{"answers": ["return"]}, {"answers": ["n"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "range-copy",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := [3]int{1, 2, 3}\n    sum := 0\n    for _, v := range a {\n        a[2] = 10\n        sum += v\n    }\n    fmt.Println(sum, a)\n}",
+          "options": [
+            "13 [1 2 10]",
+            "6 [1 2 3]",
+            "6 [1 2 10]",
+            "13 [1 2 3]"
+          ],
+          "answer": 2,
+          "explanation": "`range` walks a copy of the array, so `v` at the last position is still 3 and the sum is 6. The change reaches `a` itself."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "past-the-end",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick what happens.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := [3]int{10, 20, 30}\n    for i := 0; i <= len(a); i++ {\n        fmt.Println(a[i])\n    }\n}",
+          "options": [
+            "10, 20, 30",
+            "10, 20, 30, then a panic",
+            "10, 20, 30, 0",
+            "A compile error"
+          ],
+          "answer": 1,
+          "explanation": "The last index is 2, so `i <= len(a)` reaches 3. The index is a variable, so the compiler cannot see it and the program panics when it runs."
+        }
+      ]
+    }
+  ]
+}

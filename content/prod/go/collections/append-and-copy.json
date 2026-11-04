@@ -1,0 +1,295 @@
+{
+  "id": "append-and-copy",
+  "intro": {
+    "title": "Append and copy",
+    "slides": [
+      {
+        "text": "A slice can grow. You do not resize it: you ask for a longer slice with one more value in it, and keep that one.\n\nThe snippet is pseudo code, not Go.",
+        "code": "list = 10, 20\nlonger = list plus 30\nlonger = 10, 20, 30"
+      },
+      {
+        "text": "In this module you will add values to a slice, build one in a loop, join two slices, and make a separate copy of a slice's values. Then you will use `append` inside functions, and remove and insert values. Stacks, queues and shifting values come in the next module."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Grow and duplicate",
+        "slides": [
+          {
+            "text": "`append` does not change the slice you give it. It **returns** a longer slice, so the result has to be stored, usually in the same variable. An empty `nil` slice can be appended to as well.\n\nThe snippet is pseudo code, not Go.",
+            "code": "list = append to list the value 5"
+          },
+          {
+            "text": "Cutting a slice gave a window on the same values. To get values that are truly separate, you make a new slice and `copy` the values into it. After that, changing one does not touch the other."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "append-values",
+          "title": "Append values",
+          "guide": "Add one value, then several, to a slice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`append` takes a slice and the value to add. It returns the longer slice, so store it back.", "notes": [{"on": "append(nums, 3)", "text": "Returns a new slice, so it is stored again."}], "text": "    nums := []int{1, 2}\n    nums = append(nums, 3)\n    fmt.Println(nums)"},
+            {"mode": "ghost", "line": 9, "guide": "Several values can be added in one call.", "text": "    nums = append(nums, 4, 5)\n    fmt.Println(nums, len(nums))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 3]\n[1 2 3 4 5] 5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "build-in-a-loop",
+          "title": "Build in a loop",
+          "guide": "Start from an empty slice and fill it as a loop runs.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A `nil` slice is a fine place to start. It has no values yet.", "text": "    var squares []int"},
+            {"mode": "ghost", "line": 7, "guide": "Each turn of the loop appends one more value.", "text": "    for i := 1; i <= 4; i++ {\n        squares = append(squares, i*i)\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "The loop grew the slice from nothing to four values.", "text": "    fmt.Println(squares, len(squares))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 4 9 16] 4"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "join-two-slices",
+          "title": "Join two slices",
+          "guide": "Append every value of one slice to another.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two slices of the same type.", "text": "    first := []int{1, 2}\n    second := []int{3, 4}"},
+            {"mode": "ghost", "line": 8, "guide": "Passing `second` alone would add it as one value, which does not fit. `...` after it spreads its values, as in a variadic call.", "notes": [{"on": "second...", "text": "Adds each value of second, one by one."}], "text": "    all := append(first, second...)"},
+            {"mode": "ghost", "line": 9, "guide": "The new slice holds all four values.", "text": "    fmt.Println(all)\n    fmt.Println(len(all))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 3 4]\n4"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "add-a-task",
+          "title": "Add a task",
+          "guide": "Add a task to the list and store the result, then print how many tasks there are.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    todo := []string{\"read\"}\n    todo = ___(todo, \"write\")\n    fmt.Println(___(todo), todo)\n}",
+          "gaps": [{"answers": ["append"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "append-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{1}\n    s = append(s, 2, 3)\n    s = append(s, []int{4, 5}...)\n    fmt.Println(len(s), s[3])\n}",
+          "options": [
+            "5 5",
+            "5 4",
+            "4 4",
+            "6 4"
+          ],
+          "answer": 1,
+          "explanation": "The slice grows from 1 value to 3, then to 5 with the spread. Index 3 is the fourth value, 4."
+        },
+        {
+          "type": "typing",
+          "id": "copy-a-slice",
+          "title": "Copy a slice",
+          "guide": "Make a separate copy of a slice's values.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`copy` fills a slice that already exists, so make one as long as the source first.", "text": "    src := []int{1, 2, 3}\n    dst := make([]int, len(src))"},
+            {"mode": "ghost", "line": 8, "guide": "`copy` takes the destination first, then the source. It returns how many values it copied.", "notes": [{"on": "copy(dst, src)", "text": "The destination comes first, the source second."}], "text": "    n := copy(dst, src)\n    fmt.Println(n, dst)"},
+            {"mode": "ghost", "line": 10, "guide": "The two slices have their own values now, so changing one leaves the other alone.", "text": "    dst[0] = 99\n    fmt.Println(src, dst)"},
+            {"mode": "ghost", "line": 12, "guide": "`copy` stops at the shorter slice. A destination of 2 gets only 2 values.", "text": "    short := make([]int, 2)\n    copy(short, src)\n    fmt.Println(short)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3 [1 2 3]\n[1 2 3] [99 2 3]\n[1 2]"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Append in functions",
+        "slides": [
+          {
+            "text": "A function shares the values of the slice it gets, but its length is its own. When `append` makes the slice longer inside a function, only the function's slice is longer.\n\nTo let the caller see it, return the new slice and store it."
+          },
+          {
+            "text": "Calling `append` and dropping the result is not even allowed: Go reports that its value is not used. The result is the whole point of the call."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "append-lost-in-function",
+          "title": "Append inside a function",
+          "guide": "Append to a slice inside a function, and look at it from the caller.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "`append` gives back a longer slice. Here it is stored in the function's own `nums`.", "notes": [{"on": "nums = append(nums, 9)", "text": "Only this local nums gets longer."}], "text": "func addNine(nums []int) {\n    nums = append(nums, 9)\n    fmt.Println(\"inside\", nums)\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "The caller's slice kept its old length.", "text": "func main() {\n    data := []int{1, 2}\n    addNine(data)\n    fmt.Println(\"outside\", data)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "inside [1 2 9]\noutside [1 2]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "return-the-longer-slice",
+          "title": "Return the longer slice",
+          "guide": "Fix the function: give the longer slice back.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Return what `append` gives back.", "text": "func addNine(nums []int) []int {\n    return append(nums, 9)\n}\n"},
+            {"mode": "ghost", "line": 8, "guide": "The caller stores the result each time.", "text": "func main() {\n    data := []int{1, 2}\n    data = addNine(data)\n    data = addNine(data)\n    fmt.Println(data)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 9 9]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "add-and-store",
+          "title": "Return and store",
+          "guide": "Finish the function so the caller gets the longer slice, then call it and keep the result.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc add(list []int, v int) []int {\n    ___ append(list, v)\n}\n\nfunc main() {\n    nums := []int{1}\n    nums = ___(nums, 2)\n    fmt.Println(nums)\n}",
+          "gaps": [{"answers": ["return"]}, {"answers": ["add"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "change-then-grow",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc edit(s []int) {\n    s[0] = 100\n    s = append(s, 4)\n}\n\nfunc main() {\n    s := []int{1, 2, 3}\n    edit(s)\n    fmt.Println(s, len(s))\n}",
+          "options": [
+            "[100 2 3] 3",
+            "[100 2 3 4] 4",
+            "[1 2 3] 3",
+            "[1 2 3 4] 4"
+          ],
+          "answer": 0,
+          "explanation": "Setting `s[0]` changes the shared values, so the caller sees 100. The `append` only lengthens the function's own slice, so the caller's length stays 3."
+        },
+        {
+          "type": "typing",
+          "id": "filter-into-new",
+          "title": "Filter into a new slice",
+          "guide": "Return a new slice with only the values that pass a test.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Start from a `nil` slice and append only what passes.", "text": "func evens(nums []int) []int {\n    var out []int\n    for _, n := range nums {\n        if n%2 == 0 {\n            out = append(out, n)\n        }\n    }\n    return out\n}\n"},
+            {"mode": "ghost", "line": 14, "guide": "When nothing passes, nothing was appended: the result is still `nil`.", "text": "func main() {\n    fmt.Println(evens([]int{1, 2, 3, 4}))\n    none := evens([]int{1, 3})\n    fmt.Println(none, none == nil)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[2 4]\n[] true"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Remove and insert",
+        "slides": [
+          {
+            "text": "Go has no remove for a slice. To remove a value you close the gap: append what comes after it onto what comes before it.\n\nThe snippet is pseudo code, not Go.",
+            "code": "before = list up to the index\nafter = list past the index\nlist = before plus after"
+          },
+          {
+            "text": "Both parts live in the same storage, so closing the gap moves values inside it. Anyone holding the old slice sees the moved values too. Why they share storage comes in the Slice capacity module.\n\nInserting is the reverse: make room at the end, move the tail one place right, then write the new value."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "remove-an-element",
+          "title": "Remove an element",
+          "guide": "Remove the value at a chosen index.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Remove the value at index `i`.", "text": "    nums := []int{10, 20, 30, 40, 50}\n    i := 2"},
+            {"mode": "ghost", "line": 8, "guide": "Append the values after the index onto the values before it. The gap closes and the length drops by one.", "notes": [{"on": "nums[i+1:]...", "text": "Starts one past i, so the value at i is skipped."}], "text": "    nums = append(nums[:i], nums[i+1:]...)\n    fmt.Println(nums, len(nums))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[10 20 40 50] 4"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "remove-changes-original",
+          "title": "The original moves too",
+          "guide": "Remove a value, and look at the old slice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Remove index 1 from `a` and keep the result in `b`.", "text": "    a := []int{1, 2, 3, 4, 5}\n    b := append(a[:1], a[2:]...)"},
+            {"mode": "ghost", "line": 8, "guide": "`b` is right. But the values moved inside the shared storage, so `a` shows them, with its last value left over. Why the storage is shared comes in the Slice capacity module.", "text": "    fmt.Println(b)\n    fmt.Println(a)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 3 4 5]\n[1 3 4 5 5]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "remove-at",
+          "title": "Remove by index",
+          "guide": "Finish the function that removes a value, then remove the value 6 by its index.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc remove(s []int, i int) []int {\n    return ___(s[:i], s[i+1:]...)\n}\n\nfunc main() {\n    nums := []int{5, 6, 7}\n    nums = remove(nums, ___)\n    fmt.Println(nums)\n}",
+          "gaps": [{"answers": ["append"]}, {"answers": ["1"]}]
+        },
+        {
+          "type": "typing",
+          "id": "insert-with-copy",
+          "title": "Insert an element",
+          "guide": "Insert a value in the middle of a slice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Insert 3 at index `i`.", "text": "    nums := []int{1, 2, 4, 5}\n    i := 2"},
+            {"mode": "ghost", "line": 8, "guide": "First make room: append any value at the end.", "text": "    nums = append(nums, 0)\n    fmt.Println(nums)"},
+            {"mode": "ghost", "line": 10, "guide": "Move the tail one place right. The parts overlap, and `copy` still gets it right.", "notes": [{"on": "nums[i+1:]", "text": "Shorter than the source, so only what fits moves."}], "text": "    copy(nums[i+1:], nums[i:])\n    fmt.Println(nums)"},
+            {"mode": "ghost", "line": 12, "guide": "Index `i` is free for the new value.", "text": "    nums[i] = 3\n    fmt.Println(nums)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 4 5 0]\n[1 2 4 4 5]\n[1 2 3 4 5]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "remove-and-alias",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\nfunc main() {\n    s := []int{1, 2, 3, 4}\n    t := s\n    s = append(s[:1], s[2:]...)\n    fmt.Println(s, t)\n}",
+          "options": [
+            "[1 3 4] [1 2 3 4]",
+            "[1 3 4] [1 3 4]",
+            "[1 3 4] [1 3 4 4]",
+            "[1 3 4 4] [1 3 4 4]"
+          ],
+          "answer": 2,
+          "explanation": "Removing moves 3 and 4 one place left in the shared values. `s` is 3 long, but `t` still has length 4 and shows the leftover 4 at the end."
+        }
+      ]
+    }
+  ]
+}

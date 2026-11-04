@@ -1,0 +1,191 @@
+{
+  "id": "map-keys-and-clearing",
+  "intro": {
+    "title": "Map keys and clearing",
+    "slides": [
+      {
+        "text": "Two more things to know about maps. Which types can be keys, and what a map can hold as a value. And how to overwrite entries and empty a map without losing it."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Keys and values",
+        "slides": [
+          {
+            "text": "A key must be something Go can compare with `==`, because that is how the map finds it. Strings, numbers, booleans and arrays of those work. Slices, maps and functions cannot be compared, so they cannot be keys.\n\nThe snippet is pseudo code, not Go.",
+            "code": "key types\n    text, number, bool   -> ok\n    array of those       -> ok\n    list that can grow   -> not ok\n    map                  -> not ok"
+          },
+          {
+            "text": "A value can be any type at all, including a slice. The key type is fixed when the map is made, and a key that is an array is copied when it is stored, so changing the array later does not move the entry."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "int-and-bool-keys",
+          "title": "Numbers and booleans as keys",
+          "guide": "Use keys that are not text.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Whole numbers work as keys, with no quotes.", "text": "    squares := map[int]int{3: 9, 1: 1, 10: 100}\n    squares[2] = 4"},
+            {"mode": "ghost", "line": 8, "guide": "Printing sorts number keys by value, so 10 comes last.", "text": "    fmt.Println(squares)\n    fmt.Println(squares[10], squares[7])"},
+            {"mode": "ghost", "line": 10, "guide": "A bool is a key too. The index can be any expression of the key type.", "text": "    answers := map[bool]string{true: \"yes\", false: \"no\"}\n    fmt.Println(answers, answers[len(\"go\") == 2])"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[1:1 2:4 3:9 10:100]\n100 0\nmap[false:no true:yes] yes"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "array-keys",
+          "title": "Arrays as keys",
+          "guide": "Use a pair of numbers as one key.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The key type is an array, so each key is a pair like a point on a grid.", "notes": [{"on": "[2]int{3, 4}", "text": "The pair is the whole key."}], "text": "    seen := map[[2]int]bool{}\n    seen[[2]int{0, 1}] = true\n    seen[[2]int{3, 4}] = true"},
+            {"mode": "ghost", "line": 9, "guide": "The same values in another order are another key.", "text": "    fmt.Println(seen[[2]int{0, 1}], seen[[2]int{1, 0}])"},
+            {"mode": "ghost", "line": 10, "guide": "Printing sorts the keys, pair by pair.", "text": "    fmt.Println(seen, len(seen))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true false\nmap[[0 1]:true [3 4]:true] 2"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "visited-cells",
+          "title": "Visited cells",
+          "guide": "Make a map that has a pair of whole numbers as its key, mark one cell as visited, then print its mark and the number of entries.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    visited := map[___]bool{}\n    visited[[2]int{1, 2}] = ___\n    fmt.Println(visited[[2]int{1, 2}],\n        ___(visited))\n}",
+          "gaps": [{"answers": ["[2]int"]}, {"answers": ["true"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "typing",
+          "id": "slice-values",
+          "title": "Slices as values",
+          "guide": "Store a slice under each key.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The value type is a slice. Each value is written with just its braces.", "notes": [{"on": "map[string][]string", "text": "Text keys, and a list of text for each."}], "text": "    tags := map[string][]string{\n        \"go\":   {\"fast\", \"simple\"},\n        \"rust\": {\"safe\"},\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "A missing key gives the zero value of a slice: nil, with a length of 0.", "text": "    fmt.Println(len(tags[\"go\"]), tags[\"rust\"])\n    fmt.Println(tags[\"c\"] == nil, len(tags[\"c\"]))"},
+            {"mode": "ghost", "line": 12, "guide": "The slice is stored by reference, so you can set one of its values in place.", "text": "    tags[\"go\"][0] = \"quick\"\n    fmt.Println(tags[\"go\"])"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 [safe]\ntrue 0\n[quick simple]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "slice-key",
+          "title": "Why does it fail?",
+          "guide": "Read the message, then pick its cause.",
+          "code": "./main.go:6:11: invalid map key type []string",
+          "options": [
+            "A key must be a string or a number",
+            "The value type must come before the key",
+            "Slices cannot be compared, so they cannot be keys",
+            "The map needs make before it has keys"
+          ],
+          "answer": 2,
+          "explanation": "Go finds a key by comparing it, and slices cannot be compared with `==`. An array of strings would work."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "array-key-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    m := map[[2]int]string{{1, 2}: \"a\"}\n    k := [2]int{1, 2}\n    m[k] += \"b\"\n    k[0] = 9\n    m[k] = \"c\"\n    fmt.Println(m, len(m))\n}",
+          "options": [
+            "map[[9 2]:c] 1",
+            "map[[1 2]:ab] 1",
+            "map[[1 2]:ab [9 2]:c] 2",
+            "map[[9 2]:abc] 1"
+          ],
+          "answer": 2,
+          "explanation": "The key is stored as a copy, so changing `k` afterwards does not move the first entry. `[9 2]` is a new key."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Overwrite and clear",
+        "slides": [
+          {
+            "text": "Writing to a key that exists replaces its value, so `len` stays the same. Storing a zero is not removing: the key stays, with the value 0. Only `delete` removes a key.\n\nThe snippet is pseudo code, not Go.",
+            "code": "prices has tea, milk -> 2 entries\nset tea to 4   -> still 2 entries\nset milk to 0  -> still 2 entries\ndelete milk    -> 1 entry"
+          },
+          {
+            "text": "`clear` removes every entry of a map at once. The map is still the same map: it is not nil, you can write to it again, and every name that shares it sees it empty.\n\nSetting a variable to `nil` is different: only that variable lets go of the map."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "overwrite-entries",
+          "title": "Overwrite an entry",
+          "guide": "See what changes the length and what does not.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two entries to start with.", "text": "    plan := map[string]int{\"mon\": 3, \"tue\": 5}\n    fmt.Println(len(plan))"},
+            {"mode": "ghost", "line": 8, "guide": "Replacing `mon` adds nothing. `wed` is new and reads the others.", "text": "    plan[\"mon\"] = 4\n    plan[\"wed\"] = plan[\"mon\"] + plan[\"tue\"]"},
+            {"mode": "ghost", "line": 10, "guide": "Storing 0 keeps the key. Only `delete` removes it.", "text": "    plan[\"tue\"] = 0\n    fmt.Println(plan, len(plan))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2\nmap[mon:4 tue:0 wed:9] 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "clear-a-map",
+          "title": "Clear a map",
+          "guide": "Empty a map without losing it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`alias` shares the same entries.", "text": "    cache := map[string]int{\"a\": 1, \"b\": 2}\n    alias := cache"},
+            {"mode": "ghost", "line": 8, "guide": "`clear` removes every entry. The map is empty, not nil.", "notes": [{"on": "clear(cache)", "text": "Removes all the entries and keeps the map."}], "text": "    clear(cache)\n    fmt.Println(cache, len(cache), cache == nil)"},
+            {"mode": "ghost", "line": 10, "guide": "The map still takes writes, and `alias` sees them.", "text": "    cache[\"c\"] = 3\n    fmt.Println(alias)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[] 0 false\nmap[c:3]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "clear-and-reuse",
+          "title": "Clear and reuse",
+          "guide": "Empty the map, add a score, remove that score again with its key, then print how many entries are left and the map.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    scores := map[string]int{\"Ana\": 8, \"Eva\": 5}\n    ___(scores)\n    scores[\"Leo\"] = 2\n    ___(scores, \"Leo\")\n    fmt.Println(___(scores), scores)\n}",
+          "gaps": [{"answers": ["clear"]}, {"answers": ["delete"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "clear-or-nil",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    m := map[string]int{\"a\": 1}\n    n := m\n    m = nil\n    n[\"b\"] = 2\n    fmt.Println(len(m), len(n), m == nil)\n}",
+          "options": [
+            "0 0 true",
+            "0 2 true",
+            "2 2 false",
+            "0 1 true"
+          ],
+          "answer": 1,
+          "explanation": "`m = nil` only changes the variable `m`. `n` still holds the map, which takes the new entry and now has 2."
+        }
+      ]
+    }
+  ]
+}

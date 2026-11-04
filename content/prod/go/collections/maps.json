@@ -1,0 +1,314 @@
+{
+  "id": "maps",
+  "intro": {
+    "title": "Maps",
+    "slides": [
+      {
+        "text": "A map stores values that you find by a key instead of by a position. It is how Go keeps things like a price for each product or a score for each player.\n\nThe snippet is pseudo code, not Go.",
+        "code": "prices\n    \"tea\" -> 3\n    \"milk\" -> 2\nprice of \"tea\" is 3"
+      },
+      {
+        "text": "In this module you will create maps, add and change entries, look up a key that is not there, and remove entries. Then you will see nil maps and what happens when a map is shared with a function. Key and value types come in the next module, and ways of using maps to solve problems after it."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Keys and values",
+        "slides": [
+          {
+            "text": "Every entry of a map is a pair: a key and the value stored under it. All keys have one type and all values have one type, and the map type names both.\n\nThe snippet is pseudo code, not Go.",
+            "code": "map from text to number\n    key: text\n    value: number"
+          },
+          {
+            "text": "A map has no order and no positions. A key appears at most once, and writing to a key that exists replaces its value. Printing a map with `fmt` lists the entries sorted by key, so the output is always the same."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "map-literal",
+          "title": "Write a map",
+          "guide": "Make a map with its entries and read one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The type is `map[key]value`. A literal lists each key and its value, separated by a colon.", "notes": [{"on": "map[string]int", "text": "Text keys, whole number values."}], "text": "    ages := map[string]int{\n        \"Ana\": 31,\n        \"Eva\": 27,\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "A key in brackets reads its value. `len` counts the entries.", "text": "    fmt.Println(ages)\n    fmt.Println(ages[\"Ana\"], len(ages))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[Ana:31 Eva:27]\n31 2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "make-and-set",
+          "title": "Make and fill a map",
+          "guide": "Start from an empty map and add entries one by one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`make` builds an empty map that is ready to use.", "notes": [{"on": "make(", "text": "An empty map you can write to."}], "text": "    stock := make(map[string]int)"},
+            {"mode": "ghost", "line": 7, "guide": "Assigning to a new key adds an entry.", "text": "    stock[\"pen\"] = 10\n    stock[\"ink\"] = 4\n    fmt.Println(stock)"},
+            {"mode": "ghost", "line": 10, "guide": "Assigning to a key that exists replaces its value.", "text": "    stock[\"pen\"] = 7\n    fmt.Println(stock)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[ink:4 pen:10]\nmap[ink:4 pen:7]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "price-list",
+          "title": "Build a price list",
+          "guide": "Make an empty map of text keys and whole number values, add a price, then print how many entries it has.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    prices := ___(map[___]int)\n    prices[\"tea\"] = 3\n    fmt.Println(___(prices), prices)\n}",
+          "gaps": [{"answers": ["make"]}, {"answers": ["string"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "typing",
+          "id": "missing-key",
+          "title": "Look up a missing key",
+          "guide": "See what a lookup gives when the key is not in the map.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A map with one entry, and a lookup of that entry.", "text": "    votes := map[string]int{\"red\": 3}\n    fmt.Println(votes[\"red\"])"},
+            {"mode": "ghost", "line": 8, "guide": "A key that is not there gives the zero value of the value type, with no error. The lookup does not add the key.", "notes": [{"on": "votes[\"blue\"]", "text": "No entry, so this is the zero value."}], "text": "    fmt.Println(votes[\"blue\"], len(votes))"},
+            {"mode": "ghost", "line": 9, "guide": "Because a missing key reads as 0, `++` works on a new key and creates it.", "text": "    votes[\"blue\"]++\n    fmt.Println(votes[\"blue\"], len(votes))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\n0 1\n1 2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "delete-entry",
+          "title": "Delete an entry",
+          "guide": "Remove entries from a map.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A map with three fruits and how many of each.", "text": "    cart := map[string]int{\"fig\": 5}\n    cart[\"pear\"] = 1\n    cart[\"kiwi\"] = 3\n    fmt.Println(cart)"},
+            {"mode": "ghost", "line": 10, "guide": "`delete` takes the map and the key to remove.", "notes": [{"on": "delete(", "text": "Removes the entry for that key."}], "text": "    delete(cart, \"pear\")\n    fmt.Println(cart, len(cart))"},
+            {"mode": "ghost", "line": 12, "guide": "Deleting a key that is not there does nothing and is not an error.", "text": "    delete(cart, \"plum\")\n    fmt.Println(len(cart))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[fig:5 kiwi:3 pear:1]\nmap[fig:5 kiwi:3] 2\n2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "map-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    m := map[string]int{\"a\": 1}\n    m[\"b\"] = m[\"a\"] + m[\"z\"]\n    delete(m, \"a\")\n    m[\"c\"]++\n    fmt.Println(m, len(m))\n}",
+          "options": [
+            "map[a:1 b:1 c:1] 3",
+            "map[b:1] 1",
+            "map[b:1 c:1] 2",
+            "map[b:2 c:1] 2"
+          ],
+          "answer": 2,
+          "explanation": "`m[\"z\"]` is 0 and adds nothing, so `b` is 1. `a` is deleted, and `c` starts from 0 and becomes 1."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Nil maps",
+        "slides": [
+          {
+            "text": "A map that is declared but never made is **nil**. It has no storage yet. Reading it, asking its `len` and deleting from it all work and behave like an empty map, but writing to it stops the program with a panic.\n\nThe snippet is pseudo code, not Go.",
+            "code": "maps\n    declared only -> nil\n        read   -> zero value\n        write  -> panic\n    made          -> ready\n        write  -> works"
+          },
+          {
+            "text": "`make` and a literal like `map[string]int{}` both give a map that is ready to write to. A nil map is a trap when a map is declared in one place and filled in another, so make it before the first write."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "nil-map-reads",
+          "title": "Declare without make",
+          "guide": "See what a map that was never made can do.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A `var` with a map type and no value gives a nil map. It prints like an empty one.", "notes": [{"on": "== nil", "text": "Only a nil map is equal to nil."}], "text": "    var ages map[string]int\n    fmt.Println(ages == nil, len(ages), ages)"},
+            {"mode": "ghost", "line": 8, "guide": "Reading a key of a nil map is fine and gives the zero value.", "text": "    fmt.Println(ages[\"Ana\"])"},
+            {"mode": "ghost", "line": 9, "guide": "Deleting from a nil map does nothing and is not an error.", "text": "    delete(ages, \"Ana\")\n    fmt.Println(len(ages))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true 0 map[]\n0\n0"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "nil-then-make",
+          "title": "Make before writing",
+          "guide": "Turn a nil map into one you can write to.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Declared and never made, so it is nil.", "text": "    var stock map[string]int\n    fmt.Println(stock == nil)"},
+            {"mode": "ghost", "line": 8, "guide": "After `make` the variable holds a real map, and the write works. The variable already exists, so use `=`.", "text": "    stock = make(map[string]int)\n    stock[\"pen\"] = 2"},
+            {"mode": "ghost", "line": 10, "guide": "It is not nil anymore.", "text": "    fmt.Println(stock == nil, stock)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse map[pen:2]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "ready-to-write",
+          "title": "Ready to write",
+          "guide": "Make the map only when it is still nil, then print how many entries it has.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var seats map[string]int\n    if seats == ___ {\n        seats = ___(map[string]int)\n    }\n    seats[\"A1\"] = 1\n    fmt.Println(___(seats))\n}",
+          "gaps": [{"answers": ["nil"]}, {"answers": ["make"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "error",
+          "id": "write-to-nil",
+          "title": "Does it have an error?",
+          "guide": "Read the code, then pick what happens.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var m map[string]int\n    fmt.Println(m[\"a\"])\n    m[\"a\"] = 1\n    fmt.Println(m)\n}",
+          "options": [
+            "No error, it prints 0 and map[a:1]",
+            "A compile error on the read",
+            "A panic at the write, after printing 0",
+            "A compile error on the write"
+          ],
+          "answer": 2,
+          "explanation": "The program compiles. The read of a nil map gives 0, and the write panics when it runs, so the second print never happens."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "nil-or-empty-map",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var a map[string]int\n    b := map[string]int{}\n    c := make(map[string]int)\n    b[\"x\"] = 1\n    c[\"y\"]++\n    fmt.Println(a == nil, b == nil,\n        len(a), len(b), len(c))\n}",
+          "options": [
+            "true true 0 1 1",
+            "true false 0 1 1",
+            "false false 0 1 1",
+            "true false 0 0 0"
+          ],
+          "answer": 1,
+          "explanation": "Only `a` was never made, so only `a` is nil. All three have a `len` and the two made maps took one entry each."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Sharing a map",
+        "slides": [
+          {
+            "text": "An array is copied when you assign it or pass it to a function. A map is not: the variable holds a reference to the entries, so a copy of the variable looks at the **same** entries.\n\nThe snippet is pseudo code, not Go.",
+            "code": "a is a map -> entries x:1\nb = a   -> b sees the same entries\nb sets x = 9 -> a sees x = 9"
+          },
+          {
+            "text": "The same goes for a function. It can add, change and delete entries of the caller's map. What it cannot do is replace the caller's variable: giving its own parameter a new map only changes its own copy.\n\nTo get an independent map, make a new one and copy the entries into it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "map-in-function",
+          "title": "Change it in a function",
+          "guide": "Pass a map to a function that changes it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Unlike an array, a map is not copied: the function changes the caller's entries.", "notes": [{"on": "map[string]int", "text": "The whole map type, with no length."}], "text": "func addStock(stock map[string]int) {\n    stock[\"pen\"] += 5\n    stock[\"ink\"] = 1\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "The new entry and the new count show in `main`.", "text": "func main() {\n    stock := map[string]int{\"pen\": 2}\n    addStock(stock)\n    fmt.Println(stock)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[ink:1 pen:7]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "second-name",
+          "title": "A second name",
+          "guide": "Assign a map to another variable and change it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Unlike an array, `b := a` copies no entries.", "text": "    a := map[string]int{\"x\": 1}\n    b := a"},
+            {"mode": "ghost", "line": 8, "guide": "Change the map through `b`.", "text": "    b[\"x\"] = 9\n    b[\"y\"] = 2"},
+            {"mode": "ghost", "line": 10, "guide": "`a` and `b` are two names for one map.", "text": "    fmt.Println(a, b)\n    fmt.Println(len(a) == len(b))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[x:9 y:2] map[x:9 y:2]\ntrue"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "raise-the-price",
+          "title": "Raise the price",
+          "guide": "Write a function that takes a map and raises a price, call it from main, then print the price and the number of entries.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc raise(prices ___[string]int) {\n    prices[\"tea\"] = 5\n}\n\nfunc main() {\n    prices := map[string]int{\"tea\": 3}\n    ___(prices)\n    fmt.Println(prices[\"tea\"], ___(prices))\n}",
+          "gaps": [{"answers": ["map"]}, {"answers": ["raise"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "typing",
+          "id": "new-map-inside",
+          "title": "A new map inside",
+          "guide": "See what a function can and cannot change.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Setting an entry changes the caller's map.", "text": "func reset(m map[string]int) {\n    m[\"a\"] = 100\n}\n"},
+            {"mode": "ghost", "line": 7, "guide": "A new map only moves this function's own copy of the variable. The caller keeps its map.", "notes": [{"on": "m = map", "text": "The caller never sees this assignment."}], "text": "    m = map[string]int{\"a\": 1, \"b\": 2}\n    m[\"b\"] = 200\n    fmt.Println(\"inside\", m)"},
+            {"mode": "ghost", "line": 11, "guide": "The caller's map kept only the first change.", "text": "func main() {\n    data := map[string]int{\"a\": 5}\n    reset(data)\n    fmt.Println(\"outside\", data)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "inside map[a:1 b:200]\noutside map[a:100]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "copy-chosen-keys",
+          "title": "Copy into a new map",
+          "guide": "Build an independent map from another one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The new map starts empty and has its own entries.", "text": "    src := map[string]int{\"a\": 1, \"b\": 2, \"c\": 3}\n    dst := make(map[string]int)"},
+            {"mode": "ghost", "line": 8, "guide": "Copy the entries of the keys you want, one at a time.", "text": "    for _, k := range []string{\"a\", \"c\"} {\n        dst[k] = src[k]\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "Changing the copy leaves the original alone.", "text": "    dst[\"a\"] = 10\n    fmt.Println(src, dst)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[a:1 b:2 c:3] map[a:10 c:3]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "shared-map-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc add(m map[string]int) { m[\"n\"]++ }\n\nfunc main() {\n    a := map[string]int{\"n\": 1}\n    b := a\n    add(b)\n    b[\"n\"] += 10\n    fmt.Println(a[\"n\"], b[\"n\"])\n}",
+          "options": [
+            "11 11",
+            "12 12",
+            "2 12",
+            "62 62"
+          ],
+          "answer": 1,
+          "explanation": "`add` raises `n` to 2 on the shared map. Then `b` adds 10, and `a` is the same map, so both read 12."
+        }
+      ]
+    }
+  ]
+}

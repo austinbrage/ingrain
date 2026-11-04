@@ -1,0 +1,217 @@
+{
+  "id": "slice-edge-cases",
+  "intro": {
+    "title": "Slice edge cases",
+    "slides": [
+      {
+        "text": "Two sessions on the corners of slices:\n\n- **Session 1:** the `nil` slice against the empty one, and `clear`\n- **Session 2:** cutting again and again, and the traps of comparing slices"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Nil, empty and cleared",
+        "slides": [
+          {
+            "text": "A nil slice is a slice with no values behind it. An empty slice has a window of size zero. For most code they act the same: their length is 0 and a loop over them does nothing.\n\nThe snippet is pseudo code, not Go.",
+            "code": "nil list    -> no window at all\nempty list  -> a window with 0 boxes\nboth have length 0"
+          },
+          {
+            "text": "They differ only when compared with `nil`. So to ask whether a slice has values, test its length, not nil. And `clear` sets every value of a slice back to its zero value, without changing the length."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "nil-or-empty",
+          "title": "Nil or empty",
+          "guide": "Three ways to get a slice with no values.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A declared slice, an empty literal and a made one.", "text": "    var a []int\n    b := []int{}\n    c := make([]int, 0)"},
+            {"mode": "ghost", "line": 9, "guide": "All three have length 0, but only the first is nil. They print the same.", "text": "    fmt.Println(len(a), len(b), len(c))\n    fmt.Println(a == nil, b == nil, c == nil)\n    fmt.Println(a, b, c)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 0 0\ntrue false false\n[] [] []"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "nothing-to-walk",
+          "title": "Nothing to walk",
+          "guide": "Loop over a nil slice and see nothing happen.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Ranging over a nil slice is fine: it does zero turns.", "text": "    var items []string\n    for _, it := range items {\n        fmt.Println(it)\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Its length is 0, and cutting it gives a slice with no values.", "text": "    fmt.Println(\"done\", len(items))\n    fmt.Println(items[:0] == nil)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "done 0\ntrue"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "empty-check",
+          "title": "Is it empty",
+          "guide": "Print whether the slice has no values, then whether it is nil.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    users := []string{}\n    fmt.Println(___(users) == 0)\n    fmt.Println(users ___ nil)\n}",
+          "gaps": [{"answers": ["len"]}, {"answers": ["=="]}]
+        },
+        {
+          "type": "typing",
+          "id": "clear-a-slice",
+          "title": "Clear values",
+          "guide": "Set the values of a slice to zero.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`clear` sets every value of a slice to its zero value. Cleared through a piece, the original changes too.", "notes": [{"on": "clear(part)", "text": "Zeroes the values, and the length stays."}], "text": "    nums := []int{1, 2, 3, 4}\n    part := nums[:2]\n    clear(part)\n    fmt.Println(nums, len(nums))"},
+            {"mode": "ghost", "line": 10, "guide": "Clearing the whole slice zeroes every value.", "text": "    clear(nums)\n    fmt.Println(nums)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[0 0 3 4] 4\n[0 0 0 0]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "clear-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{4, 5, 6, 7}\n    t := s[1:3]\n    clear(t)\n    fmt.Println(len(t), s)\n}",
+          "options": [
+            "4 [0 0 0 0]",
+            "2 [4 0 0 7]",
+            "2 [4 0]",
+            "0 [4 7]"
+          ],
+          "answer": 1,
+          "explanation": "`t` holds indexes 1 and 2 of `s`. `clear` zeroes those two values and removes nothing, so `t` keeps length 2 and `s` shows the zeros."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Cutting again, and traps",
+        "slides": [
+          {
+            "text": "A cut can be assigned back to the same variable. `s = s[1:]` drops the first value and `s = s[:len(s)-1]` drops the last. Nothing is copied: the slice just looks at fewer values.\n\nThe snippet is pseudo code, not Go.",
+            "code": "list looks at boxes 1, 2, 3, 4\nlist = list from 1\nlist looks at boxes 2, 3, 4"
+          },
+          {
+            "text": "A cut of a cut counts its indexes from where the first one starts, but it still shares the original values. And two slices cannot be compared with `==`: only a comparison with `nil` is allowed. Comparing values takes a loop."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "drop-the-ends",
+          "title": "Drop the ends",
+          "guide": "Shrink a slice from both sides.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Cut from index 1 and keep the result in the same variable.", "text": "    nums := []int{1, 2, 3, 4, 5}\n    nums = nums[1:]\n    fmt.Println(nums)"},
+            {"mode": "ghost", "line": 9, "guide": "Cut up to the last index to drop the last value.", "text": "    nums = nums[:len(nums)-1]\n    fmt.Println(nums, len(nums))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[2 3 4 5]\n[2 3 4] 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "take-from-front",
+          "title": "Take from the front",
+          "guide": "Take values one by one from the front of a slice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Read the first value, then drop it from the slice.", "text": "    queue := []string{\"a\", \"b\", \"c\"}\n    next := queue[0]\n    queue = queue[1:]\n    fmt.Println(next, queue)"},
+            {"mode": "ghost", "line": 10, "guide": "Do it again for the next value.", "text": "    next = queue[0]\n    queue = queue[1:]\n    fmt.Println(next, queue, len(queue))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "a [b c]\nb [c] 1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "take-next",
+          "title": "Take the next job",
+          "guide": "Take the first job and drop it from the slice.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    jobs := []string{\"x\", \"y\", \"z\"}\n    first := jobs[___]\n    jobs = jobs[___:]\n    fmt.Println(first, ___(jobs))\n}",
+          "gaps": [{"answers": ["0"]}, {"answers": ["1"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "typing",
+          "id": "cut-a-cut",
+          "title": "Cut a cut",
+          "guide": "Cut a piece out of a piece.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A piece of a piece. Its indexes count from where it starts.", "text": "    s := []int{0, 1, 2, 3, 4, 5}\n    mid := s[1:5]\n    inner := mid[1:3]"},
+            {"mode": "ghost", "line": 9, "guide": "All three look at the same values.", "text": "    fmt.Println(mid, inner)\n    inner[0] = 99\n    fmt.Println(s)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 3 4] [2 3]\n[0 1 99 3 4 5]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "same-values",
+          "title": "Same values",
+          "guide": "Compare two slices by hand.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "`==` does not work between two slices. Different lengths are never equal.", "text": "func same(a, b []int) bool {\n    if len(a) != len(b) {\n        return false\n    }\n    return true\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Then compare the values position by position.", "text": "    for i := range a {\n        if a[i] != b[i] {\n            return false\n        }\n    }"},
+            {"mode": "ghost", "line": 16, "guide": "Same values in the same order are equal.", "text": "func main() {\n    x := []int{1, 2}\n    y := []int{1, 2}\n    z := []int{2, 1}\n    fmt.Println(same(x, y), same(x, z))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true false"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "piece-of-piece",
+          "title": "A piece of a piece",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{1, 2, 3, 4, 5}\n    t := s[1:3]\n    u := t[1:]\n    u[0] = 9\n    fmt.Println(s, t, u, len(u))\n}",
+          "options": [
+            "[1 2 3 4 5] [2 3] [9] 1",
+            "[1 9 3 4 5] [2 3] [9] 1",
+            "[1 2 9 4 5] [2 9] [9] 1",
+            "[1 2 9 4 5] [2 9] [9] 2"
+          ],
+          "answer": 2,
+          "explanation": "`t` is s[1:3] and `u` is t[1:], which is s[2:3]. So `u[0]` is `s[2]`. The value shows in all three, and `u` holds one value."
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "slices-and-equals",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:9:14: invalid operation: a == b\n(slice can only be compared to nil)",
+          "options": [
+            "The slices have different lengths",
+            "`==` only works on numbers and strings",
+            "Both slices must be declared with `make`",
+            "Slices can only be compared with nil"
+          ],
+          "answer": 3,
+          "explanation": "Slices have no `==` between them: the only comparison allowed is with `nil`. To compare values, loop over them."
+        }
+      ]
+    }
+  ]
+}

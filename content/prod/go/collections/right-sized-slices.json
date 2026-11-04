@@ -1,0 +1,216 @@
+{
+  "id": "right-sized-slices",
+  "intro": {
+    "title": "Right-sized slices",
+    "slides": [
+      {
+        "text": "You know what capacity is. Now you will use it: make a slice with the room it needs, tell when an append moved the values, reuse a buffer, and let go of a big slice you only needed a piece of."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Make it the right size",
+        "slides": [
+          {
+            "text": "When you know how many values you will add, make the slice with length 0 and the capacity you need. Every `append` then fits, and the slice never has to move to a bigger place.\n\nThe snippet is pseudo code, not Go.",
+            "code": "list shows 0, room for 4\nappend 1 -> shows 1, room for 4\nappend 2 -> shows 2, room for 4"
+          },
+          {
+            "text": "Do not mix up the two forms. `make([]int, 3)` already shows 3 zeros, and `append` adds after them. `make([]int, 0, 3)` shows nothing and has room for 3."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "prealloc-loop",
+          "title": "Make room, then append",
+          "guide": "Build a slice in a loop with its room made first.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Length 0, room for 4.", "text": "    squares := make([]int, 0, 4)\n    fmt.Println(len(squares), cap(squares))"},
+            {"mode": "ghost", "line": 8, "guide": "Every append fits, so the capacity never changes.", "text": "    for i := 1; i <= 4; i++ {\n        squares = append(squares, i*i)\n    }\n    fmt.Println(squares, len(squares), cap(squares))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 4\n[1 4 9 16] 4 4"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "make-length-trap",
+          "title": "Length or capacity",
+          "guide": "Compare the two ways of calling make.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The 3 is a length here: the slice already holds 3 zeros.", "notes": [{"on": "make([]int, 3)", "text": "Three zeros already inside."}], "text": "    a := make([]int, 3)\n    a = append(a, 7)\n    fmt.Println(a, len(a))"},
+            {"mode": "ghost", "line": 9, "guide": "Here the 3 is only room, so the slice starts empty.", "text": "    b := make([]int, 0, 3)\n    b = append(b, 7)\n    fmt.Println(b, len(b), cap(b))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[0 0 0 7] 4\n[7] 1 3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "labels-with-room",
+          "title": "Make room for the labels",
+          "guide": "Make `labels` empty with room for every name, then add each label to it.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    names := []string{\"ann\", \"bo\"}\n    labels := make([]string, ___, len(names))\n    for _, n := range names {\n        labels = ___(labels, n+\"!\")\n    }\n    fmt.Println(labels, len(labels))\n}",
+          "gaps": [{"answers": ["0"]}, {"answers": ["append"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "make-then-append",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    n := 3\n    s := make([]int, n)\n    for i := 0; i < n; i++ {\n        s = append(s, i)\n    }\n    fmt.Println(s, len(s))\n}",
+          "options": [
+            "[0 1 2] 3",
+            "[0 0 0] 3",
+            "[0 0 0 0 1 2] 6",
+            "[0 1 2 0 0 0] 6"
+          ],
+          "answer": 2,
+          "explanation": "`make([]int, n)` starts with 3 zeros, and the loop adds 0, 1 and 2 after them."
+        },
+        {
+          "type": "typing",
+          "id": "prealloc-in-function",
+          "title": "Make room in a function",
+          "guide": "Return a slice built with the room it needs.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The function knows it will keep at most half the numbers, so it makes that room.", "text": "func evensUpTo(n int) []int {\n    out := make([]int, 0, n/2)\n    for i := 1; i <= n; i++ {\n        if i%2 == 0 {\n            out = append(out, i)\n        }\n    }\n    return out\n}\n"},
+            {"mode": "ghost", "line": 14, "guide": "Here the room is used up exactly.", "text": "func main() {\n    e := evensUpTo(6)\n    fmt.Println(e, len(e), cap(e))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[2 4 6] 3 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "reslice-to-cap",
+          "title": "Grow by cutting",
+          "guide": "Make the slice longer without append.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Empty, with room for 4. A cut can show 2 of those places.", "text": "    buf := make([]int, 0, 4)\n    buf = buf[:2]\n    buf[0] = 1\n    buf[1] = 2\n    fmt.Println(buf, len(buf), cap(buf))"},
+            {"mode": "ghost", "line": 11, "guide": "Cutting up to the capacity shows the rest of the room, still zero.", "text": "    buf = buf[:cap(buf)]\n    fmt.Println(buf)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2] 2 4\n[1 2 0 0]"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Who shares and who copies",
+        "slides": [
+          {
+            "text": "After an `append`, the code does not say whether the slice got new values or reused the old ones. You can find out without printing the capacity: change a value through one slice and see whether the other one notices.\n\nWhen there is no room, Go makes a bigger stretch, usually about double for small slices. The exact size is up to Go, so a program should not count on it."
+          },
+          {
+            "text": "A cut keeps the whole stretch of values alive, even when it shows only two of them. A small piece of a huge slice holds all that memory. To let go of the big one, copy the piece into a slice of its own.\n\nThe snippet is pseudo code, not Go.",
+            "code": "big = 1000 values\nsmall = first 2 of big (holds 1000)\nkeep = new list, a copy of those 2"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "detect-realloc",
+          "title": "Who still shares",
+          "guide": "Find out which appends made new values.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Room for 3, and an append that fits.", "text": "    s := make([]int, 2, 3)\n    t := append(s, 1)\n    t[0] = 9\n    fmt.Println(s[0], t[0])"},
+            {"mode": "ghost", "line": 10, "guide": "Now `t` is full, so this append makes new values. A change to `u` stays in `u`.", "text": "    u := append(t, 2)\n    u[0] = 5\n    fmt.Println(t[0], u[0])"},
+            {"mode": "ghost", "line": 13, "guide": "The new stretch is bigger than the old one.", "text": "    fmt.Println(cap(u) > cap(t))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "9 9\n9 5\ntrue"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "append-hidden-in-function",
+          "title": "Spare room in a function",
+          "guide": "Append inside a function that has room to spare.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The function appends to its own copy of the slice.", "text": "func addNine(nums []int) {\n    nums = append(nums, 9)\n}\n"},
+            {"mode": "ghost", "line": 8, "guide": "The caller still shows 2 values. But the 9 was written into the room behind them.", "notes": [{"on": "data[:3]", "text": "Reaches into the room."}], "text": "func main() {\n    data := make([]int, 2, 4)\n    addNine(data)\n    fmt.Println(data)\n    fmt.Println(data[:3])\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[0 0]\n[0 0 9]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "full-then-change",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := make([]int, 2, 2)\n    b := append(a, 1)\n    a[0] = 7\n    fmt.Println(b[0], cap(a))\n}",
+          "options": [
+            "7 2",
+            "0 2",
+            "7 3",
+            "0 3"
+          ],
+          "answer": 1,
+          "explanation": "`a` is full, so `b` has its own values and the change to `a` does not reach it. `a` keeps its capacity of 2."
+        },
+        {
+          "type": "typing",
+          "id": "release-big-slice",
+          "title": "Let go of the big slice",
+          "guide": "Keep a few values without holding the rest.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A small piece still has the room of the whole slice.", "text": "    big := make([]int, 1000)\n    small := big[:2]\n    fmt.Println(len(small), cap(small))"},
+            {"mode": "ghost", "line": 9, "guide": "A copy has its own values, and only as much room as it needs.", "text": "    keep := make([]int, 2)\n    copy(keep, big[:2])\n    fmt.Println(len(keep), cap(keep))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 1000\n2 2"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "keep-the-head",
+          "title": "Keep only the head",
+          "guide": "Make `keep` as long as `part`, and copy the values of `part` into it.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    big := make([]int, 50)\n    part := big[:3]\n    keep := make([]int, ___(part))\n    ___(keep, part)\n    fmt.Println(cap(part), cap(keep))\n}",
+          "gaps": [{"answers": ["len"]}, {"answers": ["copy"]}]
+        },
+        {
+          "type": "typing",
+          "id": "reuse-the-buffer",
+          "title": "Reuse the room",
+          "guide": "Empty a slice and fill it again in the same place.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Fill the room, and keep a second name for the same values.", "text": "    buf := make([]int, 0, 3)\n    buf = append(buf, 1, 2, 3)\n    old := buf"},
+            {"mode": "ghost", "line": 9, "guide": "Cutting to length 0 keeps the room, so the next append writes over the first value.", "notes": [{"on": "buf[:0]", "text": "Empty, but the room stays."}], "text": "    buf = buf[:0]\n    buf = append(buf, 9)\n    fmt.Println(buf, old)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[9] [9 2 3]"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+{
+  "id": "arrays",
+  "intro": {
+    "title": "Arrays",
+    "slides": [
+      {
+        "text": "An array is a numbered row of values of one type, with a length that is fixed when you write it. It is the plain building block that Go's flexible lists are made from.\n\nThe snippet is pseudo code, not Go.",
+        "code": "row of 3 numbers\n    position 0, position 1, position 2"
+      },
+      {
+        "text": "Three sessions:\n\n- **Session 1:** declaring arrays, reading and changing positions, and walking them\n- **Session 2:** arrays as values you copy, compare and pass to functions\n- **Session 3:** indexed literals, grids and counting with an index"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Positions and length",
+        "slides": [
+          {
+            "text": "Every position has an index, and counting starts at 0. An array of 3 has the indexes 0, 1 and 2, and nothing else.\n\nThe snippet is pseudo code, not Go.",
+            "code": "scores = row of 3 numbers\nscores at 0 = 90\nread scores at 2"
+          },
+          {
+            "text": "The length is written in the type, and it can never grow or shrink. A position that was never set holds the zero value of the type."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "declare-array",
+          "title": "Declare an array",
+          "guide": "Make an array and fill its positions.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "An array has a fixed length, written in brackets before the type. Without values, every position starts at the zero value.", "notes": [{"on": "[3]int", "text": "The 3 is the length, and it never changes."}], "text": "    var scores [3]int\n    fmt.Println(scores)"},
+            {"mode": "ghost", "line": 8, "guide": "A position is picked with its index in brackets. The first one is 0.", "text": "    scores[0] = 90\n    scores[2] = 75\n    fmt.Println(scores)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[0 0 0]\n[90 0 75]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "array-literal",
+          "title": "Start with values",
+          "guide": "Write an array with its values already inside.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A literal lists the values in braces after the type.", "notes": [{"on": "[4]int{", "text": "Four ints, so four values go in the braces."}], "text": "    primes := [4]int{2, 3, 5, 7}"},
+            {"mode": "ghost", "line": 7, "guide": "Printing an array shows its values in brackets. The last of four is at index 3.", "text": "    fmt.Println(primes)\n    fmt.Println(primes[0], primes[3])"},
+            {"mode": "ghost", "line": 9, "guide": "`len` tells how many positions the array has.", "text": "    fmt.Println(len(primes))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[2 3 5 7]\n2 7\n4"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "let-go-count",
+          "title": "Let Go count",
+          "guide": "Write an array without saying its length.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "With `...` in place of the length, Go counts the values for you. The array still has a fixed length.", "notes": [{"on": "[...]", "text": "Go fills in the 3 from the values."}], "text": "    days := [...]string{\"Mon\", \"Tue\", \"Wed\"}\n    fmt.Println(days, len(days))"},
+            {"mode": "ghost", "line": 8, "guide": "Assigning to a position replaces the value there.", "text": "    days[1] = \"Fri\"\n    fmt.Println(days)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[Mon Tue Wed] 3\n[Mon Fri Wed]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "count-and-replace",
+          "title": "Count and replace",
+          "guide": "Print how many names the array holds, then replace the second one.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    names := [3]string{\"Ana\", \"Luis\", \"Eva\"}\n    fmt.Println(___(names))\n    names[___] = \"Sam\"\n    fmt.Println(names)\n}",
+          "gaps": [{"answers": ["len"]}, {"answers": ["1"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "fill-positions",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var a [4]int\n    a[2] = 6\n    a[3] = a[2] + 1\n    fmt.Println(a, len(a))\n}",
+          "options": [
+            "[0 6 7 0] 4",
+            "[0 0 6 6] 4",
+            "[0 0 6 7] 4",
+            "[0 0 6 7] 3"
+          ],
+          "answer": 2,
+          "explanation": "Positions start at 0, so index 2 is the third one. Unset positions stay 0, and `len` is the length of the array, 4."
+        },
+        {
+          "type": "typing",
+          "id": "walk-the-array",
+          "title": "Walk an array",
+          "guide": "Visit every position of an array with range.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A list of temperatures and a total to grow.", "text": "    temps := [4]int{18, 21, 19, 25}\n    total := 0"},
+            {"mode": "ghost", "line": 8, "guide": "`range` gives the index and the value of each position, as it did with a string.", "text": "    for i, t := range temps {\n        total += t\n        fmt.Println(i, t)\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "This line runs after the loop.", "text": "    fmt.Println(\"total\", total)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 18\n1 21\n2 19\n3 25\ntotal 83"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Arrays are values",
+        "slides": [
+          {
+            "text": "An array behaves like a number: when you assign it or pass it to a function, the whole row is copied. Changing the copy leaves the original alone.\n\nThe snippet is pseudo code, not Go.",
+            "code": "b = copy of a\nchange b at 0\na is untouched"
+          },
+          {
+            "text": "The length is part of the type, so an array of 3 ints and an array of 4 ints are different types. Two arrays of the same type can be compared with `==`."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "copy-on-assign",
+          "title": "Assign an array",
+          "guide": "Give an array to a new variable, then change the new one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Assigning an array to another variable copies every value.", "notes": [{"on": "b := a", "text": "Not a link: b gets its own values."}], "text": "    a := [3]int{1, 2, 3}\n    b := a"},
+            {"mode": "ghost", "line": 8, "guide": "Only `b` changes. `a` keeps its values.", "text": "    b[0] = 99\n    fmt.Println(a)\n    fmt.Println(b)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 3]\n[99 2 3]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "compare-arrays",
+          "title": "Compare arrays",
+          "guide": "Check whether two arrays hold the same values.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Three arrays of the same type. Two hold the same values, in the same order.", "text": "    x := [2]int{1, 2}\n    y := [2]int{1, 2}\n    z := [2]int{2, 1}"},
+            {"mode": "ghost", "line": 9, "guide": "`==` compares the values one by one, in order.", "text": "    fmt.Println(x == y)\n    fmt.Println(x == z)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "array-to-function",
+          "title": "Send an array in",
+          "guide": "Pass an array to a function and see what comes back.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The parameter type includes the length. The function gets a copy of the array, so it changes only its own.", "notes": [{"on": "[3]int", "text": "Only a [3]int fits here, not a [4]int."}], "text": "func double(nums [3]int) {\n    for i := 0; i < len(nums); i++ {\n        nums[i] *= 2\n    }\n    fmt.Println(\"inside\", nums)\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "The array in `main` is the same as before the call.", "text": "func main() {\n    nums := [3]int{1, 2, 3}\n    double(nums)\n    fmt.Println(\"outside\", nums)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "inside [2 4 6]\noutside [1 2 3]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "copy-then-compare",
+          "title": "Copy and compare",
+          "guide": "Copy `a` into `b`, change `b`, then print whether the two are equal.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := [3]int{1, 2, 3}\n    b := ___\n    b[0] = 9\n    fmt.Println(a ___ b)\n}",
+          "gaps": [{"answers": ["a"]}, {"answers": ["=="]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "compiler",
+          "id": "different-lengths",
+          "title": "Why does it not compile?",
+          "guide": "Read the message, then pick the cause.",
+          "code": "./main.go:8:7: cannot use b (variable of\ntype [4]int) as [3]int value in\nassignment",
+          "options": [
+            "An array cannot be assigned to a variable",
+            "The two arrays have different lengths",
+            "`b` was declared and not used",
+            "`b` needs the `...` length to be copied"
+          ],
+          "answer": 1,
+          "explanation": "The length is part of the type, so [4]int and [3]int are two different types and one cannot take the other."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "copy-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := [3]int{1, 2, 3}\n    b := a\n    a[1] = 5\n    fmt.Println(a == b, b[1])\n}",
+          "options": [
+            "true 5",
+            "true 2",
+            "false 5",
+            "false 2"
+          ],
+          "answer": 3,
+          "explanation": "`b` is a copy, so changing `a` does not reach it. They are no longer equal, and `b[1]` is still 2."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Shaping arrays",
+        "slides": [
+          {
+            "text": "A literal can name the positions it fills, and every other position stays at its zero value. A grid is an array whose items are arrays.\n\nThe snippet is pseudo code, not Go.",
+            "code": "row of 5 numbers\n    position 1 = 10\n    position 3 = 30\n\ngrid of 2 rows, 3 columns\n    cell at row 1, column 2"
+          },
+          {
+            "text": "A fixed length is a good fit for a fixed set of things, like one counter per letter of the alphabet. An integer value, such as a letter minus `'a'`, works as an index."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "indexed-literal",
+          "title": "Fill chosen positions",
+          "guide": "Write literals that set only some positions.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Fewer values than the length is fine. The positions left over keep the zero value.", "text": "    a := [5]int{1, 2}\n    fmt.Println(a)"},
+            {"mode": "ghost", "line": 8, "guide": "An index and a colon before a value put it in that position.", "notes": [{"on": "3: 30", "text": "Position 3 gets 30."}], "text": "    b := [5]int{1: 10, 3: 30}\n    fmt.Println(b)"},
+            {"mode": "ghost", "line": 10, "guide": "With `...` the length reaches the highest position named.", "text": "    c := [...]int{4: 1}\n    fmt.Println(len(c))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 0 0 0]\n[0 10 0 30 0]\n5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "grid",
+          "title": "Build a grid",
+          "guide": "An array of arrays, filled with nested loops.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two lengths make a grid: 2 rows, each with 3 ints.", "notes": [{"on": "[2][3]int", "text": "Rows first, then columns."}], "text": "    var grid [2][3]int\n    fmt.Println(grid)"},
+            {"mode": "ghost", "line": 8, "guide": "The outer loop walks the rows and the inner one the columns. Two indexes pick a cell.", "text": "    for r := 0; r < 2; r++ {\n        for c := 0; c < 3; c++ {\n            grid[r][c] = r*3 + c\n        }\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "`len` of the grid counts rows, and `len` of one row counts columns.", "text": "    fmt.Println(grid)\n    fmt.Println(grid[1][2], len(grid), len(grid[0]))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[[0 0 0] [0 0 0]]\n[[0 1 2] [3 4 5]]\n5 2 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "count-letters",
+          "title": "Count letters",
+          "guide": "Use letters as indexes into an array of counters.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "One counter for each of the 26 letters.", "text": "    var counts [26]int"},
+            {"mode": "ghost", "line": 7, "guide": "A letter minus `'a'` is its place in the alphabet, so it works as the index.", "notes": [{"on": "r-'a'", "text": "'a' gives 0, 'b' gives 1, and so on."}], "text": "    for _, r := range \"hello\" {\n        counts[r-'a']++\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Read the counters of `h` and `l`.", "text": "    fmt.Println(counts['h'-'a'], counts['l'-'a'])\n    fmt.Println(len(counts))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1 2\n26"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "skip-the-index",
+          "title": "Sum without the index",
+          "guide": "Add up the prices without using their positions, then print the total and how many prices there are.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    prices := [3]int{4, 8, 6}\n    total := 0\n    for ___, p := range prices {\n        total += p\n    }\n    fmt.Println(total, ___(prices))\n}",
+          "gaps": [{"answers": ["_"]}, {"answers": ["len"]}]
+        }
+      ]
+    }
+  ]
+}

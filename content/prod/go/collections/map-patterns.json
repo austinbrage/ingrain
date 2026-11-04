@@ -1,0 +1,304 @@
+{
+  "id": "map-patterns",
+  "intro": {
+    "title": "Map patterns",
+    "slides": [
+      {
+        "text": "You can already create maps and change them. Now you will use them to solve problems: telling a stored zero from a missing key, walking over every entry, counting things, and keeping a set of values you have seen."
+      },
+      {
+        "text": "Three sessions:\n\n- **Session 1:** checking if a key is there, and `range` over a map\n- **Session 2:** counters and sets\n- **Session 3:** groups and maps of maps"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Is the key there?",
+        "slides": [
+          {
+            "text": "A lookup of a missing key gives the zero value, so `0` can mean a stored zero or no entry at all. The lookup can also hand back a second answer: whether the key exists.\n\nThe snippet is pseudo code, not Go.",
+            "code": "value, found = lookup \"tea\"\n\nfound is true   -> key is stored\nfound is false -> no such key"
+          },
+          {
+            "text": "`range` also walks over a map and gives each key with its value. Go visits the entries in a **random order**, and the order changes from run to run. Use it only for results that do not depend on the order, like a sum or a count."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "comma-ok",
+          "title": "Zero or missing?",
+          "guide": "Tell a stored zero from a missing key.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "One key stores 0 and the other is missing. A plain lookup cannot tell them apart.", "text": "    prices := map[string]int{\"tea\": 3, \"gum\": 0}\n    fmt.Println(prices[\"gum\"], prices[\"pen\"])"},
+            {"mode": "ghost", "line": 8, "guide": "A lookup can give two values: the value, and whether the key exists.", "notes": [{"on": "ok :=", "text": "True when the key is in the map."}], "text": "    price, ok := prices[\"gum\"]\n    fmt.Println(price, ok)"},
+            {"mode": "ghost", "line": 10, "guide": "A missing key gives the zero value and false. Both names exist now, so use `=`.", "text": "    price, ok = prices[\"pen\"]\n    fmt.Println(price, ok)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 0\n0 true\n0 false"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "check-in-if",
+          "title": "Check inside an if",
+          "guide": "Test if a key exists, right in the `if`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A map with a single entry.", "text": "    stock := map[string]int{\"pen\": 4}"},
+            {"mode": "ghost", "line": 7, "guide": "Do the lookup in the `if` and test `ok`. Both names only exist inside the `if`.", "text": "    if n, ok := stock[\"pen\"]; ok {\n        fmt.Println(\"pen:\", n)\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "`_` skips the value when only the presence matters. `!ok` means the key is missing.", "text": "    if _, ok := stock[\"ink\"]; !ok {\n        fmt.Println(\"no ink\")\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "pen: 4\nno ink"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "have-or-none",
+          "title": "Have it or not",
+          "guide": "Check if the key exists, print its value when it does, and take the other branch when it does not.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    stock := map[string]int{\"pen\": 4}\n    if n, found := stock[\"pen\"]; ___ {\n        fmt.Println(\"have\", ___)\n    } ___ {\n        fmt.Println(\"none\")\n    }\n}",
+          "gaps": [{"answers": ["found"]}, {"answers": ["n"]}, {"answers": ["else"]}]
+        },
+        {
+          "type": "typing",
+          "id": "range-map",
+          "title": "Walk over a map",
+          "guide": "Loop over every entry of a map.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A map of scores.", "text": "    scores := map[string]int{\n        \"Ana\":   8,\n        \"Eva\":   5,\n        \"Leo\":   9,\n        \"Maria\": 6,\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "`range` over a map gives each key and its value. The order is random, but a sum is the same in any order.", "notes": [{"on": "range scores", "text": "Visits every entry, in random order."}], "text": "    total := 0\n    for _, score := range scores {\n        total += score\n    }\n    fmt.Println(total)"},
+            {"mode": "ghost", "line": 17, "guide": "With one variable, `range` gives only the keys. Counting is also safe in any order.", "text": "    short := 0\n    for name := range scores {\n        if len(name) == 3 {\n            short++\n        }\n    }\n    fmt.Println(short)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "28\n3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "lookup-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    m := map[string]int{\"a\": 0, \"b\": 2}\n    v, ok := m[\"a\"]\n    w, found := m[\"c\"]\n    total := 0\n    for _, n := range m {\n        total += n\n    }\n    fmt.Println(v, ok, w, found, total)\n}",
+          "options": [
+            "0 false 0 false 2",
+            "0 true 0 false 2",
+            "0 true 0 true 2",
+            "0 true 0 false 0"
+          ],
+          "answer": 1,
+          "explanation": "`a` is stored with 0, so `ok` is true. `c` is missing, so `w` is 0 and `found` is false. The sum is 0 + 2."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Counters and sets",
+        "slides": [
+          {
+            "text": "A counter is a map from something to how many times it appeared. A missing key reads as 0, so adding 1 works even the first time.\n\nThe snippet is pseudo code, not Go.",
+            "code": "for each word in words\n    count of word = count of word + 1"
+          },
+          {
+            "text": "A set remembers which values exist and nothing else. Use a map whose values are `bool`: a key stored as `true` is in the set, and a missing key reads as `false`, which means it is not."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "count-items",
+          "title": "Count with a map",
+          "guide": "Count how many times each value appears.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A list of votes, some repeated.", "text": "    votes := []string{\"red\", \"blue\", \"red\", \"red\", \"blue\"}"},
+            {"mode": "ghost", "line": 7, "guide": "Each vote adds 1 to its own count. The first time, the count starts from 0.", "notes": [{"on": "counts[v]++", "text": "Creates the key when it is new."}], "text": "    counts := make(map[string]int)\n    for _, v := range votes {\n        counts[v]++\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "The counts, and a lookup of a value that never appeared.", "text": "    fmt.Println(counts)\n    fmt.Println(counts[\"red\"], counts[\"green\"])"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[blue:2 red:3]\n3 0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "count-words",
+          "title": "Count the words",
+          "guide": "Walk over the words, count each one, then print how many different words there are and the count of one.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    words := []string{\"go\", \"rs\", \"go\"}\n    counts := make(map[string]int)\n    for _, w ___ words {\n        counts[___]++\n    }\n    fmt.Println(___(counts), counts[\"go\"])\n}",
+          "gaps": [{"answers": ["range"]}, {"answers": ["w"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "typing",
+          "id": "map-as-set",
+          "title": "A map as a set",
+          "guide": "Keep a set of values with a map of booleans.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Add values to the set by storing `true`. `{}` after the type makes an empty map.", "notes": [{"on": "map[string]bool{}", "text": "Same as make, written as a literal."}], "text": "    seen := map[string]bool{}\n    seen[\"a\"] = true\n    seen[\"b\"] = true"},
+            {"mode": "ghost", "line": 9, "guide": "A member reads as true. Anything else reads as false.", "text": "    fmt.Println(seen[\"a\"], seen[\"z\"])"},
+            {"mode": "ghost", "line": 10, "guide": "`delete` takes a value out of the set.", "text": "    delete(seen, \"a\")\n    fmt.Println(seen[\"a\"], len(seen))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true false\nfalse 1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "unique-values",
+          "title": "Remove duplicates",
+          "guide": "Use a set to keep each value only once, in its first order.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A list with repeated names.", "text": "    names := []string{\"Ana\", \"Eva\", \"Ana\", \"Leo\", \"Eva\"}"},
+            {"mode": "ghost", "line": 7, "guide": "The set remembers the names already seen, and `unique` collects the rest.", "text": "    seen := make(map[string]bool)\n    var unique []string"},
+            {"mode": "ghost", "line": 9, "guide": "A name that is not in the set yet is new: mark it and keep it.", "notes": [{"on": "!seen[name]", "text": "True only the first time a name shows up."}], "text": "    for _, name := range names {\n        if !seen[name] {\n            seen[name] = true\n            unique = append(unique, name)\n        }\n    }"},
+            {"mode": "ghost", "line": 16, "guide": "Only the first of each name stays, in order.", "text": "    fmt.Println(unique, len(unique))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[Ana Eva Leo] 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "counter-and-set",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    nums := []int{3, 1, 3, 2, 3}\n    counts := map[int]int{}\n    for _, n := range nums {\n        counts[n]++\n    }\n    c, ok := counts[5]\n    fmt.Println(len(counts), counts[3], c, ok)\n}",
+          "options": [
+            "5 3 0 false",
+            "3 3 0 true",
+            "3 3 0 false",
+            "3 1 0 false"
+          ],
+          "answer": 2,
+          "explanation": "`counts` has one key for each different number: 3, 1 and 2. The number 3 appears three times. The key 5 is missing, so `c` is 0 and `ok` is false."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Groups and maps of maps",
+        "slides": [
+          {
+            "text": "A map can keep a **slice** under each key. To group values, append each one to the slice of its key. A missing key reads as a nil slice and `append` accepts one, so the first value needs no setup.\n\nThe snippet is pseudo code, not Go.",
+            "code": "for each word in words\n    group[length of word] =\n        group[length of word] plus word"
+          },
+          {
+            "text": "`append` returns the new slice and does not change the map. The result has to be stored back under the key, or the group stays as it was."
+          },
+          {
+            "text": "A value can also be another map: a map of maps. Reading through a missing outer key is safe, because it gives a nil inner map. **Writing** to a nil inner map stops the program, so make the inner map first when it is missing."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "group-words",
+          "title": "Group by a key",
+          "guide": "Put each word in the group of its length.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A list of words to group by length.", "text": "    words := []string{\"go\", \"rust\", \"c\", \"zig\", \"java\"}"},
+            {"mode": "ghost", "line": 7, "guide": "Each group is a slice stored under its length. A new length starts from a nil slice, and `append` accepts it.", "notes": [{"on": "= append(", "text": "Stores the grown slice back under its key."}], "text": "    byLen := make(map[int][]string)\n    for _, w := range words {\n        byLen[len(w)] = append(byLen[len(w)], w)\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "Words keep the order they came in. A length nobody has gives a nil slice.", "text": "    fmt.Println(byLen)\n    fmt.Println(len(byLen[4]), byLen[9])"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[1:[c] 2:[go] 3:[zig] 4:[rust java]]\n2 []"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "even-and-odd-groups",
+          "title": "Even and odd groups",
+          "guide": "Group the numbers by whether they are even. Print the even group and how many are odd.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    nums := []int{4, 7, 10, 3}\n    groups := make(map[bool][]int)\n    for _, n := range nums {\n        even := n%2 == 0\n        groups[even] = ___(groups[even], n)\n    }\n    fmt.Println(groups[___], ___(groups[false]))\n}",
+          "gaps": [{"answers": ["append"]}, {"answers": ["true"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "group-not-stored",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    m := map[string][]int{\"a\": {1}}\n    s := m[\"a\"]\n    s = append(s, 2)\n    t := m[\"b\"]\n    t = append(t, 3)\n    fmt.Println(m, len(s), len(t))\n}",
+          "options": [
+            "map[a:[1 2] b:[3]] 2 1",
+            "map[a:[1]] 2 1",
+            "map[a:[1 2]] 2 1",
+            "map[a:[1]] 1 1"
+          ],
+          "answer": 1,
+          "explanation": "`append` returns a new slice, and nothing stores it in `m`. The map still holds `[1]` and has no `b`. Only the local `s` and `t` grew."
+        },
+        {
+          "type": "typing",
+          "id": "nested-maps",
+          "title": "A map of maps",
+          "guide": "Keep the grades of each student, by subject.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A map whose values are maps: each student has their own subjects.", "text": "    grades := make(map[string]map[string]int)"},
+            {"mode": "ghost", "line": 7, "guide": "A student with no inner map yet gets one before any write. Writing to a nil map stops the program.", "notes": [{"on": "== nil", "text": "A missing student reads as a nil map."}], "text": "    if grades[\"Ana\"] == nil {\n        grades[\"Ana\"] = make(map[string]int)\n    }\n    grades[\"Ana\"][\"math\"] = 9\n    grades[\"Ana\"][\"art\"] = 7"},
+            {"mode": "ghost", "line": 12, "guide": "Or build the whole inner map at once with a literal.", "text": "    grades[\"Eva\"] = map[string]int{\"math\": 6}\n    fmt.Println(grades)"},
+            {"mode": "ghost", "line": 14, "guide": "Reading through a missing student is safe: it gives 0 and adds nothing.", "text": "    fmt.Println(grades[\"Leo\"][\"math\"], len(grades))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[Ana:map[art:7 math:9] Eva:map[math:6]]\n0 2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "check-both-levels",
+          "title": "Check both levels",
+          "guide": "Check the outer key, then the inner key.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Ana has an art grade of 0, stored on purpose.", "text": "    scores := map[string]map[string]int{\n        \"Ana\": {\"math\": 9, \"art\": 0},\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "Ask for the student first, then for the subject inside. A stored 0 still counts as there.", "text": "    if subjects, ok := scores[\"Ana\"]; ok {\n        if n, ok := subjects[\"art\"]; ok {\n            fmt.Println(\"art:\", n)\n        }\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "To check only the inner key, leave the outer lookup inline: a missing student reads as an empty map.", "text": "    if _, ok := scores[\"Leo\"][\"math\"]; !ok {\n        fmt.Println(\"no math for Leo\")\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "art: 0\nno math for Leo"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "nested-purpose",
+          "title": "What is it for?",
+          "guide": "Read the code, then pick what it is for.",
+          "code": "func count(\n    m map[string]map[string]int,\n    a, b string,\n) {\n    if m[a] == nil {\n        m[a] = map[string]int{}\n    }\n    m[a][b]++\n}",
+          "options": [
+            "Removes the key b from the map of a",
+            "Copies the map of a under the key b",
+            "Makes a new inner map for every key of m",
+            "Counts how many times b occurs under a"
+          ],
+          "answer": 3,
+          "explanation": "The inner map of `a` is made when it is missing, and then the count of `b` inside it goes up by one. The first call for any pair works."
+        }
+      ]
+    }
+  ]
+}

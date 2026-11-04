@@ -1,0 +1,325 @@
+{
+  "id": "slices",
+  "intro": {
+    "title": "Slices",
+    "slides": [
+      {
+        "text": "A slice is a flexible list of values of one type. Unlike an array, its length is not written in the type, so it is the list you will use most in Go.\n\nThe snippet is pseudo code, not Go.",
+        "code": "list of numbers\n    10, 20, 30\nlength = 3"
+      },
+      {
+        "text": "In this module you will create slices, cut pieces out of them and see what a piece shares, walk them with `range`, and pass them to functions. Grids, nil slices and the traps of cutting come in the next modules, and growing a slice after them."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "A window on values",
+        "slides": [
+          {
+            "text": "A slice does not hold values itself. It looks at a stretch of values stored somewhere else, like a window on a wall of boxes. Making a new slice from it opens a new window on the same boxes.\n\nThe snippet is pseudo code, not Go.",
+            "code": "boxes = 10, 20, 30, 40\nwindow = boxes from 1 to 3\nwindow shows 20, 30"
+          },
+          {
+            "text": "Cutting a slice uses two positions with a colon. The first is where the piece starts, and the second is where it stops, and that one is **not** included. Leaving one out means the start or the end."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "slice-literal",
+          "title": "Write a slice",
+          "guide": "Make a slice with its values and read it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice literal looks like an array literal, but the brackets are empty: no length.", "notes": [{"on": "[]string", "text": "Empty brackets: the length is not fixed."}], "text": "    colors := []string{\"red\", \"green\", \"blue\"}\n    fmt.Println(colors)"},
+            {"mode": "ghost", "line": 8, "guide": "Indexes and `len` work as they did on arrays.", "text": "    fmt.Println(colors[1], len(colors))"},
+            {"mode": "ghost", "line": 9, "guide": "A position can be replaced the same way.", "text": "    colors[0] = \"pink\"\n    fmt.Println(colors)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[red green blue]\ngreen 3\n[pink green blue]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "nil-and-make",
+          "title": "Empty and made slices",
+          "guide": "Declare a slice with no values, then make one with room for values.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice declared without values is `nil`. It has length 0 and can be compared with `nil`.", "notes": [{"on": "== nil", "text": "True while the slice has never been given a list."}], "text": "    var names []string\n    fmt.Println(names == nil, len(names))"},
+            {"mode": "ghost", "line": 8, "guide": "`make` builds a slice of a given length. Every position starts at the zero value.", "notes": [{"on": "make(", "text": "Creates the slice with 3 zeroed positions."}], "text": "    scores := make([]int, 3)\n    scores[1] = 8\n    fmt.Println(scores, scores == nil)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true 0\n[0 8 0] false"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "make-a-slice",
+          "title": "Make a slice",
+          "guide": "Build a slice of 4 ints, set the first one, then print its length and its values.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    ages := ___([]int, 4)\n    ages[0] = 30\n    fmt.Println(___(ages), ages)\n}",
+          "gaps": [{"answers": ["make"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "typing",
+          "id": "cut-a-slice",
+          "title": "Cut a slice",
+          "guide": "Take pieces out of a slice with a colon.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Five letters to cut from.", "text": "    letters := []string{\"a\", \"b\", \"c\", \"d\", \"e\"}"},
+            {"mode": "ghost", "line": 7, "guide": "`[1:3]` starts at index 1 and stops before index 3, so it holds two values.", "notes": [{"on": "1:3", "text": "Index 3 is where it stops, and it is left out."}], "text": "    fmt.Println(letters[1:3])"},
+            {"mode": "ghost", "line": 8, "guide": "Leave out the start to begin at 0, or the end to go to the last value.", "text": "    fmt.Println(letters[:2])\n    fmt.Println(letters[3:])"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[b c]\n[a b]\n[d e]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "shared-values",
+          "title": "Share the values",
+          "guide": "Change a piece of a slice and look at the original.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A piece is a new slice that looks at the same values, not a copy of them.", "notes": [{"on": "nums[:2]", "text": "A window on nums, with no new values."}], "text": "    nums := []int{1, 2, 3, 4}\n    part := nums[:2]"},
+            {"mode": "ghost", "line": 8, "guide": "Changing a value through `part` changes it for `nums` too.", "text": "    part[0] = 99\n    fmt.Println(part)\n    fmt.Println(nums)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[99 2]\n[99 2 3 4]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "piece-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{10, 20, 30, 40}\n    t := s[1:3]\n    t[1] = 0\n    fmt.Println(s, t)\n}",
+          "options": [
+            "[10 20 30 40] [20 0]",
+            "[10 0 30 40] [0 30]",
+            "[10 20 0 40] [20 0]",
+            "[10 20 0 40] [20 30]"
+          ],
+          "answer": 2,
+          "explanation": "`t` starts at index 1 of `s`, so `t[1]` is index 2 of `s`. Both see the change, and `t` holds 20 and 0."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Walking a slice",
+        "slides": [
+          {
+            "text": "`range` walks a slice and gives two things on every turn: the index and the value. The value is a **copy** of what sits there, so changing it does not change the slice. To change the slice, use the index.\n\nThe snippet is pseudo code, not Go.",
+            "code": "for each index and value of list\n    value is a copy\n    list at index is the real one"
+          },
+          {
+            "text": "A slice has no copy of its values when you loop: it still looks at the same boxes. If the loop changes a position that is still ahead, the loop will see the new value."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "walk-a-slice",
+          "title": "Walk a slice",
+          "guide": "Loop over a slice with its index and value.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Three scores to work with.", "text": "    scores := []int{70, 85, 90}\n    total := 0"},
+            {"mode": "ghost", "line": 8, "guide": "`range` gives the index and the value of every position.", "text": "    for i, s := range scores {\n        total += s\n        fmt.Println(i, s)\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "`len` is the count of values, so it gives the average.", "text": "    fmt.Println(\"average\", total/len(scores))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 70\n1 85\n2 90\naverage 81"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "change-with-index",
+          "title": "The value is a copy",
+          "guide": "Change values in a loop, with and without the index.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The value `n` is a copy. Changing it leaves the slice alone.", "notes": [{"on": "n *= 10", "text": "Changes the copy only."}], "text": "    nums := []int{1, 2, 3}\n    for _, n := range nums {\n        n *= 10\n        fmt.Println(n)\n    }\n    fmt.Println(nums)"},
+            {"mode": "ghost", "line": 12, "guide": "Use the index to reach the real value in the slice.", "text": "    for i := range nums {\n        nums[i] *= 10\n    }\n    fmt.Println(nums)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10\n20\n30\n[1 2 3]\n[10 20 30]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "double-in-place",
+          "title": "Double in place",
+          "guide": "Double every price inside the slice, and print the slice.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    prices := []int{4, 8, 6}\n    for i, p ___ prices {\n        prices[___] = p * 2\n    }\n    fmt.Println(prices)\n}",
+          "gaps": [{"answers": ["range"]}, {"answers": ["i"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "live-values",
+          "title": "Same loop, now a slice",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{1, 2, 3}\n    sum := 0\n    for _, v := range s {\n        s[2] = 10\n        sum += v\n    }\n    fmt.Println(sum, s)\n}",
+          "options": [
+            "6 [1 2 10]",
+            "13 [1 2 10]",
+            "6 [1 2 3]",
+            "13 [1 2 3]"
+          ],
+          "answer": 1,
+          "explanation": "A slice shares its values with the loop, so `v` at index 2 is already 10: 1 + 2 + 10 is 13. A ranged array would be copied first."
+        },
+        {
+          "type": "typing",
+          "id": "largest-value",
+          "title": "Find the largest",
+          "guide": "Find the position of the biggest value.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`best` holds the index of the biggest value seen so far.", "text": "    temps := []int{18, 24, 21, 19}\n    best := 0"},
+            {"mode": "ghost", "line": 8, "guide": "Compare each value with the best one, and keep its index.", "text": "    for i, t := range temps {\n        if t > temps[best] {\n            best = i\n        }\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "The index also gives the value.", "text": "    fmt.Println(best, temps[best])"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1 24"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "reverse-in-place",
+          "title": "Reverse in place",
+          "guide": "Reverse a slice by swapping its ends.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Five values to turn around.", "text": "    nums := []int{1, 2, 3, 4, 5}\n    fmt.Println(nums)"},
+            {"mode": "ghost", "line": 8, "guide": "Swap the first with the last, the second with the one before it, and stop halfway.", "notes": [{"on": "len(nums)/2", "text": "Past the middle, the swaps would undo themselves."}], "text": "    for i := 0; i < len(nums)/2; i++ {\n        j := len(nums) - 1 - i\n        nums[i], nums[j] = nums[j], nums[i]\n    }\n    fmt.Println(nums)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 3 4 5]\n[5 4 3 2 1]"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Slices in functions",
+        "slides": [
+          {
+            "text": "A function receives its own copy of the slice, but that copy looks at the same values as the caller's. So changing a value inside shows outside.\n\nThe snippet is pseudo code, not Go.",
+            "code": "caller list -> boxes 1, 2, 3\nfunction gets a window on those boxes\nfunction sets box 0 -> caller sees it"
+          },
+          {
+            "text": "What the function cannot do is move the caller's window. Giving its parameter a whole new slice only changes the function's own copy."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "change-in-function",
+          "title": "Change it from a function",
+          "guide": "Pass a slice to a function that changes it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Unlike an array, a slice shares its values with the caller.", "notes": [{"on": "[]int", "text": "No length: any slice fits."}], "text": "func double(nums []int) {\n    for i := range nums {\n        nums[i] *= 2\n    }\n}\n"},
+            {"mode": "ghost", "line": 10, "guide": "The change shows in the caller.", "text": "func main() {\n    nums := []int{1, 2, 3}\n    double(nums)\n    fmt.Println(nums)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[2 4 6]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "zero-the-last",
+          "title": "Zero the last value",
+          "guide": "Zero the last value inside a function, then print the slice in main.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc zeroLast(nums []int) {\n    nums[___(nums)-1] = 0\n}\n\nfunc main() {\n    data := []int{5, 6}\n    ___(data)\n    fmt.Println(data)\n}",
+          "gaps": [{"answers": ["len"]}, {"answers": ["zeroLast"]}]
+        },
+        {
+          "type": "typing",
+          "id": "new-slice-inside",
+          "title": "A new slice inside",
+          "guide": "See what a function can and cannot change.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Setting a value changes the caller's slice.", "text": "func reset(nums []int) {\n    nums[0] = 100\n}\n"},
+            {"mode": "ghost", "line": 7, "guide": "A new slice only moves this function's own copy. The caller keeps its slice.", "notes": [{"on": "nums = []int", "text": "The caller never sees this assignment."}], "text": "    nums = []int{7, 7, 7}\n    nums[1] = 200\n    fmt.Println(\"inside\", nums)"},
+            {"mode": "ghost", "line": 11, "guide": "The caller's slice kept only the first change.", "text": "func main() {\n    data := []int{1, 2, 3}\n    reset(data)\n    fmt.Println(\"outside\", data)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "inside [7 200 7]\noutside [100 2 3]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "param-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc change(s []int) {\n    s[0] = 9\n    s = []int{4}\n}\n\nfunc main() {\n    s := []int{1, 2}\n    change(s)\n    fmt.Println(s)\n}",
+          "options": [
+            "[1 2]",
+            "[4]",
+            "[9 4]",
+            "[9 2]"
+          ],
+          "answer": 3,
+          "explanation": "`s[0] = 9` goes through to the caller's values. `s = []int{4}` only repoints the function's copy, so main still sees [9 2]."
+        },
+        {
+          "type": "typing",
+          "id": "send-a-piece",
+          "title": "Send a piece",
+          "guide": "Pass only a piece of a slice to a function.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The function adds 1 to every value it receives.", "text": "func bump(nums []int) {\n    for i := range nums {\n        nums[i]++\n    }\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "A piece shares the values, so the original changes only there.", "notes": [{"on": "data[1:4]", "text": "Only indexes 1, 2 and 3 are sent."}], "text": "func main() {\n    data := []int{1, 2, 3, 4, 5}\n    bump(data[1:4])\n    fmt.Println(data)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 3 4 5 5]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "return-a-slice",
+          "title": "Return a slice",
+          "guide": "Build a slice in a function and give it back.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Make the slice, fill it by index and return it. No length in the result type.", "text": "func squares(n int) []int {\n    out := make([]int, n)\n    for i := range out {\n        out[i] = i * i\n    }\n    return out\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "The caller gets the slice the function made.", "text": "func main() {\n    sq := squares(5)\n    fmt.Println(sq, len(sq))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[0 1 4 9 16] 5"
+          }
+        }
+      ]
+    }
+  ]
+}

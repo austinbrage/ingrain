@@ -1,0 +1,230 @@
+{
+  "id": "sets-and-lookup-tables",
+  "intro": {
+    "title": "Sets and lookup tables",
+    "slides": [
+      {
+        "text": "Two more jobs for maps. Sets with set operations (union, intersection, difference), and tables that hold functions or remembered results."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Sets and set operations",
+        "slides": [
+          {
+            "text": "A set only needs its keys. `struct{}` is a type with no fields and no data, so a `map[string]struct{}` holds keys and nothing more. Its one value is written `struct{}{}`: the type, then braces for an empty value.\n\nThe value says nothing, so membership is tested with the two-value lookup you know."
+          },
+          {
+            "text": "Set operations are loops over sets. **Union:** the members of either. **Intersection:** the members of both. **Difference:** the members of one that are not in the other. Each builds a new set and leaves the originals alone.\n\nThe snippet is pseudo code, not Go.",
+            "code": "union:        all of a, then all of b\nintersection: for each member of a,\n              keep it if b has it\ndifference:   for each member of a,\n              keep it if b does not"
+          },
+          {
+            "text": "A set cannot hold sets: a map is not comparable, so it cannot be a key. What works is a **map of sets**, one inner set for each key, made when it is missing."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "struct-set",
+          "title": "A set of empty structs",
+          "guide": "Keep a set with no values at all.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The value type is `struct{}`, an empty struct. Its one value is `struct{}{}`.", "text": "    seen := map[string]struct{}{}\n    seen[\"a\"] = struct{}{}\n    seen[\"b\"] = struct{}{}\n    fmt.Println(len(seen), seen)"},
+            {"mode": "ghost", "line": 10, "guide": "Without a bool to read, test membership with the two-value lookup.", "text": "    _, hasA := seen[\"a\"]\n    _, hasZ := seen[\"z\"]\n    fmt.Println(hasA, hasZ)"},
+            {"mode": "ghost", "line": 13, "guide": "`delete` works the same.", "text": "    delete(seen, \"a\")\n    fmt.Println(len(seen))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 map[a:{} b:{}]\ntrue false\n1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "set-union",
+          "title": "Union of two sets",
+          "guide": "Build a set with the members of both.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two sets that share `y`.", "text": "    a := map[string]bool{\"x\": true, \"y\": true}\n    b := map[string]bool{\"y\": true, \"z\": true}"},
+            {"mode": "ghost", "line": 8, "guide": "Add every member of each. A member that is already there just stays.", "text": "    union := make(map[string]bool)\n    for k := range a {\n        union[k] = true\n    }\n    for k := range b {\n        union[k] = true\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "`y` counts once.", "text": "    fmt.Println(union, len(union))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[x:true y:true z:true] 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "set-intersection",
+          "title": "Members of both",
+          "guide": "Keep only what both sets have.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two sets that share `y` and `z`.", "text": "    a := map[string]bool{\n        \"x\": true, \"y\": true, \"z\": true,\n    }\n    b := map[string]bool{\n        \"y\": true, \"z\": true, \"w\": true,\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Walk over one set and keep the members the other set has too.", "notes": [{"on": "b[k]", "text": "False when the other set lacks it."}], "text": "    both := make(map[string]bool)\n    for k := range a {\n        if b[k] {\n            both[k] = true\n        }\n    }"},
+            {"mode": "ghost", "line": 18, "guide": "The originals did not change.", "text": "    fmt.Println(both, len(both), len(a))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[y:true z:true] 2 3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "shared-clubs",
+          "title": "Members of both clubs",
+          "guide": "Collect the people who are in both clubs, and print how many there are.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    chess := map[string]bool{\"A\": true, \"E\": true}\n    art := map[string]bool{\"E\": true, \"L\": true}\n    both := make(map[string]bool)\n    for name := ___ chess {\n        if art[name] { both[name] = ___ }\n    }\n    fmt.Println(both, ___(both))\n}",
+          "gaps": [{"answers": ["range"]}, {"answers": ["true"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "typing",
+          "id": "set-difference",
+          "title": "In one set but not the other",
+          "guide": "Keep what only one of the sets has.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The same two sets as before.", "text": "    a := map[string]bool{\n        \"x\": true, \"y\": true, \"z\": true,\n    }\n    b := map[string]bool{\n        \"y\": true, \"z\": true, \"w\": true,\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Keep the members of `a` that `b` lacks.", "text": "    onlyA := make(map[string]bool)\n    for k := range a {\n        if !b[k] {\n            onlyA[k] = true\n        }\n    }"},
+            {"mode": "ghost", "line": 18, "guide": "Swap the roles to get the other side.", "text": "    onlyB := make(map[string]bool)\n    for k := range b {\n        if !a[k] {\n            onlyB[k] = true\n        }\n    }\n    fmt.Println(onlyA, onlyB)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[x:true] map[w:true]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "set-per-key",
+          "title": "A set for each key",
+          "guide": "Collect the roles of each user, without repeats.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Pairs in parallel slices: user `i` has role `i`. Ana appears twice.", "text": "    users := []string{\"ana\", \"leo\", \"ana\"}\n    roles := []string{\"admin\", \"dev\", \"dev\"}"},
+            {"mode": "ghost", "line": 8, "guide": "The outer map holds one set for each user. A new user gets their set first.", "text": "    groups := make(map[string]map[string]bool)\n    for i, user := range users {\n        if groups[user] == nil {\n            groups[user] = make(map[string]bool)\n        }\n        groups[user][roles[i]] = true\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "Reading a role of a user who lacks it gives false.", "text": "    fmt.Println(groups)\n    fmt.Println(groups[\"leo\"][\"admin\"], len(groups[\"ana\"]))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[ana:map[admin:true dev:true] leo:map[dev:true]]\nfalse 2"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Lookup tables and caches",
+        "slides": [
+          {
+            "text": "A map can hold **functions** as values. The key is a name and the value is the function to run for it: a dispatch table. It takes the place of a long `switch`, and the table can change while the program runs.\n\nThe snippet is pseudo code, not Go.",
+            "code": "table[\"add\"] = the add function\ntable[\"mul\"] = the mul function\n\nrun table[name] with the arguments"
+          },
+          {
+            "text": "A missing key gives the zero value, and for a function type that is `nil`. Calling a nil function stops the program, so check that the key is there before you call it."
+          },
+          {
+            "text": "A **cache** is a map from an input to a result already worked out. Before doing the work, look the input up. After doing it, store the result. The same input is never worked out twice.\n\nStore the zero result too: a lookup cannot tell it from a missing key unless you use the two-value form."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "function-table",
+          "title": "A table of functions",
+          "guide": "Pick the operation by its name.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The value type is a function type: two ints in, one int out.", "notes": [{"on": "func(int, int) int{", "text": "Every entry needs this same function type."}], "text": "    ops := map[string]func(int, int) int{\n        \"add\": func(a, b int) int {\n            return a + b\n        },\n        \"mul\": func(a, b int) int {\n            return a * b\n        },\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "Look a function up by name, then call it right away with `()`.", "text": "    fmt.Println(ops[\"add\"](3, 4), ops[\"mul\"](3, 4))"},
+            {"mode": "ghost", "line": 15, "guide": "A new entry is a new key, so the table can grow while the program runs.", "text": "    ops[\"sub\"] = func(a, b int) int {\n        return a - b\n    }\n    fmt.Println(ops[\"sub\"](9, 4))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "7 12\n5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "missing-operation",
+          "title": "An operation that is missing",
+          "guide": "Look an operation up before calling it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A table with one operation.", "text": "    ops := map[string]func(int) int{\n        \"double\": func(n int) int {\n            return n * 2\n        },\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "A missing key gives the zero value of the function type: `nil`.", "text": "    fmt.Println(ops[\"triple\"] == nil)"},
+            {"mode": "ghost", "line": 12, "guide": "Check the key before calling. Calling a nil function stops the program.", "text": "    if op, ok := ops[\"triple\"]; ok {\n        fmt.Println(op(4))\n    } else {\n        fmt.Println(\"no such operation\")\n    }"},
+            {"mode": "ghost", "line": 17, "guide": "The same check for an operation that exists.", "text": "    if op, ok := ops[\"double\"]; ok {\n        fmt.Println(op(4))\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nno such operation\n8"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "run-greeting",
+          "title": "Run a greeting",
+          "guide": "Fill the result type of the greetings, look up the Spanish one and run it when it exists.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    greet := map[string]func() ___{\n        \"en\": func() string { return \"hi\" },\n        \"es\": func() string { return \"hola\" },\n    }\n    if say, ___ := greet[\"es\"]; ok {\n        fmt.Println(___())\n    }\n}",
+          "gaps": [{"answers": ["string"]}, {"answers": ["ok"]}, {"answers": ["say"]}]
+        },
+        {
+          "type": "typing",
+          "id": "cache-results",
+          "title": "Cache a result",
+          "guide": "Do the work once for each input.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`calls` counts how often the real work runs.", "text": "    calls := 0\n    square := func(n int) int {\n        calls++\n        return n * n\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "Look in the cache first. Only on a miss, do the work and store the result.", "notes": [{"on": "; ok", "text": "A hit returns the stored result with no work."}], "text": "    cache := make(map[int]int)\n    get := func(n int) int {\n        if v, ok := cache[n]; ok {\n            return v\n        }\n        v := square(n)\n        cache[n] = v\n        return v\n    }"},
+            {"mode": "ghost", "line": 20, "guide": "Three calls, but the work ran only for new inputs.", "text": "    fmt.Println(get(4), get(4), get(5))\n    fmt.Println(\"calls:\", calls)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "16 16 25\ncalls: 2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "memoized-fib",
+          "title": "Memoize a recursion",
+          "guide": "Make a recursive function remember its results.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The map comes in as a parameter, so every recursive call shares it. The first two numbers need no cache.", "text": "func fib(n int, memo map[int]int) int {\n    if n < 2 {\n        return n\n    }\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Return a stored result when there is one. Otherwise work it out, store it, and return it.", "notes": [{"on": "fib(n-1, memo)", "text": "Each result is cached, so none is repeated."}], "text": "    if v, ok := memo[n]; ok {\n        return v\n    }\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\n    return memo[n]"},
+            {"mode": "ghost", "line": 15, "guide": "Without the cache, `fib(30)` would make over a million calls.", "text": "func main() {\n    memo := make(map[int]int)\n    fmt.Println(fib(30, memo))\n    fmt.Println(len(memo))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "832040\n29"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "zero-result-cache",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "cache := map[int]int{}\ncalls := 0\nhalf := func(n int) {\n    if cache[n] != 0 {\n        return\n    }\n    calls++\n    cache[n] = n / 2\n}\nfor _, n := range []int{8, 1, 1, 8} {\n    half(n)\n}\nfmt.Println(calls, len(cache))",
+          "options": [
+            "2 2",
+            "4 2",
+            "3 2",
+            "3 3"
+          ],
+          "answer": 2,
+          "explanation": "The result of 8 is 4, so its second call is a hit. The result of 1 is 0, which looks like a missing key, so both calls of 1 do the work: 3 calls, and 2 keys."
+        }
+      ]
+    }
+  ]
+}

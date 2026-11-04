@@ -2,28 +2,62 @@
   "id": "collections",
   "module_sections": [
     {
-      "name": "Arrays and slices",
+      "name": "Arrays",
       "tier": "basic",
       "modules": [
-        { "id": "arrays", "name": "Arrays", "sessions": 1 },
-        { "id": "slices", "name": "Slices", "sessions": 1 },
-        { "id": "append-and-copy", "name": "Append and copy", "sessions": 1 }
+        { "id": "arrays", "name": "Arrays", "sessions": 3 },
+        { "id": "arrays-in-functions", "name": "Arrays in functions", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Slices",
+      "tier": "basic",
+      "modules": [
+        { "id": "slices", "name": "Slices", "sessions": 3 },
+        { "id": "slices-of-slices", "name": "Slices of slices", "sessions": 1 },
+        { "id": "slice-edge-cases", "name": "Slice edge cases", "sessions": 2 }
+      ]
+    },
+    {
+      "name": "Growing slices",
+      "tier": "basic",
+      "modules": [
+        { "id": "append-and-copy", "name": "Append and copy", "sessions": 3 },
+        { "id": "stacks-queues-and-copies", "name": "Stacks, queues and copies", "sessions": 2 }
       ]
     },
     {
       "name": "Maps",
       "tier": "basic",
       "modules": [
-        { "id": "maps", "name": "Maps", "sessions": 1 },
-        { "id": "map-patterns", "name": "Map patterns", "sessions": 1 }
+        { "id": "maps", "name": "Maps", "sessions": 3 },
+        { "id": "map-keys-and-clearing", "name": "Map keys and clearing", "sessions": 2 },
+        { "id": "map-patterns", "name": "Map patterns", "sessions": 3 },
+        { "id": "aggregating-maps", "name": "Aggregating maps", "sessions": 2 }
       ]
     },
     {
-      "name": "Going deeper",
+      "name": "Slice capacity",
       "tier": "medium",
       "modules": [
-        { "id": "slice-capacity", "name": "Slice capacity", "sessions": 1 },
-        { "id": "slices-and-maps-packages", "name": "The slices and maps packages", "sessions": 1 }
+        { "id": "slice-capacity", "name": "Slice capacity", "sessions": 3 },
+        { "id": "right-sized-slices", "name": "Right-sized slices", "sessions": 2 }
+      ]
+    },
+    {
+      "name": "Maps, going further",
+      "tier": "medium",
+      "modules": [
+        { "id": "sets-and-lookup-tables", "name": "Sets and lookup tables", "sessions": 2 }
+      ]
+    },
+    {
+      "name": "The slices and maps packages",
+      "tier": "medium",
+      "modules": [
+        { "id": "slices-and-maps-packages", "name": "The slices package", "sessions": 3 },
+        { "id": "searching-and-editing-slices", "name": "Searching and editing slices", "sessions": 3 },
+        { "id": "maps-package", "name": "The maps package", "sessions": 3 }
       ]
     }
   ]

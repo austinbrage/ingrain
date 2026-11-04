@@ -1,0 +1,202 @@
+{
+  "id": "stacks-queues-and-copies",
+  "intro": {
+    "title": "Stacks, queues and copies",
+    "slides": [
+      {
+        "text": "You can already append, copy, remove and insert. Now you will use a slice as a stack and as a queue, then filter in place, clone, build rows and shift values with `copy`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Stack and queue",
+        "slides": [
+          {
+            "text": "A stack takes values at the end and gives them back from the end. A queue takes values at the end and gives them back from the front.\n\nA slice is both, with `append` and a cut. No extra type is needed."
+          },
+          {
+            "text": "Taking a value out is a cut, not a delete: the slice gets shorter, and the next `append` writes over the value that was cut off."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "stack-push-pop",
+          "title": "A stack",
+          "guide": "Push values to a slice and pop them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A stack takes values at the end. Pushing is an `append`.", "text": "    var stack []string\n    stack = append(stack, \"a\")\n    stack = append(stack, \"b\")\n    stack = append(stack, \"c\")\n    fmt.Println(stack)"},
+            {"mode": "ghost", "line": 11, "guide": "Popping reads the last value, then cuts it off.", "notes": [{"on": "stack[:len(stack)-1]", "text": "Everything except the last value."}], "text": "    top := stack[len(stack)-1]\n    stack = stack[:len(stack)-1]\n    fmt.Println(top, stack)"},
+            {"mode": "ghost", "line": 14, "guide": "The next push takes the place of the popped value.", "text": "    stack = append(stack, \"d\")\n    fmt.Println(stack, len(stack))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[a b c]\nc [a b]\n[a b d] 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "stack-functions",
+          "title": "Push and pop functions",
+          "guide": "Wrap the stack operations in two functions.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Push returns the longer stack.", "text": "func push(stack []int, v int) []int {\n    return append(stack, v)\n}\n"},
+            {"mode": "ghost", "line": 8, "guide": "Pop returns two things: the shorter stack and the value taken.", "text": "func pop(stack []int) ([]int, int) {\n    last := len(stack) - 1\n    return stack[:last], stack[last]\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "Both results are stored. Popping the last value leaves an empty slice.", "text": "func main() {\n    var s []int\n    s = push(s, 1)\n    s = push(s, 2)\n    s, v := pop(s)\n    fmt.Println(v, s)\n    s, v = pop(s)\n    fmt.Println(v, s, len(s))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 [1]\n1 [] 0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "push-and-peek",
+          "title": "Push and peek",
+          "guide": "Push a value onto the stack, then read its top value.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    stack := []int{7, 8}\n    stack = ___(stack, 9)\n    top := stack[___(stack)-1]\n    fmt.Println(top, stack)\n}",
+          "gaps": [{"answers": ["append"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "typing",
+          "id": "queue-line",
+          "title": "A queue",
+          "guide": "Add values at the end and take them from the front.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A queue takes values at the end, like a stack.", "text": "    queue := []string{\"a\", \"b\"}\n    queue = append(queue, \"c\")\n    fmt.Println(queue)"},
+            {"mode": "ghost", "line": 9, "guide": "It gives values from the front: read index 0, then cut it off.", "text": "    first := queue[0]\n    queue = queue[1:]\n    fmt.Println(first, queue)"},
+            {"mode": "ghost", "line": 12, "guide": "Values keep joining at the end while others leave from the front.", "text": "    queue = append(queue, \"d\")\n    fmt.Println(queue, len(queue))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[a b c]\na [b c]\n[b c d] 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "stack-then-queue",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\nfunc main() {\n    s := []int{1, 2, 3}\n    s = s[:len(s)-1]\n    s = append(s, 4)\n    s = s[1:]\n    fmt.Println(s, len(s))\n}",
+          "options": [
+            "[2 3 4] 3",
+            "[1 2 4] 3",
+            "[2 4] 3",
+            "[2 4] 2"
+          ],
+          "answer": 3,
+          "explanation": "Cutting the end leaves [1 2], the append makes it [1 2 4], and cutting the front leaves [2 4], which has 2 values."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Copies and results",
+        "slides": [
+          {
+            "text": "Sometimes you want a fresh slice, not a window on the old values. Appending to `nil` builds one, and `copy` fills one you made yourself.\n\nOther times you want to reuse the old values on purpose: filtering into the same storage, or shifting values inside one slice."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "filter-in-place",
+          "title": "Filter in place",
+          "guide": "Keep some values without making a new slice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Start from an empty piece of the same slice.", "text": "    nums := []int{1, 2, 3, 4, 5, 6}\n    kept := nums[:0]"},
+            {"mode": "ghost", "line": 8, "guide": "Each kept value is appended into the space the loop already passed.", "text": "    for _, n := range nums {\n        if n%2 == 0 {\n            kept = append(kept, n)\n        }\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "No new storage was needed, but the original was written over on the way. Why the storage is shared comes in the Slice capacity module.", "text": "    fmt.Println(kept)\n    fmt.Println(nums)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[2 4 6]\n[2 4 6 4 5 6]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "clone-with-append",
+          "title": "Clone with append",
+          "guide": "Make a separate copy in one line.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Appending to a `nil` slice builds a new one with the same values.", "notes": [{"on": "[]int(nil)", "text": "A nil slice of ints to append onto."}], "text": "    src := []int{1, 2, 3}\n    clone := append([]int(nil), src...)"},
+            {"mode": "ghost", "line": 8, "guide": "It is a real copy: the two slices do not share values.", "text": "    clone[0] = 99\n    fmt.Println(src, clone)"},
+            {"mode": "ghost", "line": 10, "guide": "Cloning nothing gives nothing: the result is still `nil`.", "text": "    var none []int\n    c := append([]int(nil), none...)\n    fmt.Println(c == nil, len(c))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[1 2 3] [99 2 3]\ntrue 0"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "build-rows",
+          "title": "Build rows",
+          "guide": "Build a grid by appending rows.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice of rows, empty for now.", "text": "    var grid [][]int"},
+            {"mode": "ghost", "line": 7, "guide": "Build each row with `append`, then append the row to the grid.", "text": "    for r := 1; r <= 3; r++ {\n        var row []int\n        for c := 1; c <= 3; c++ {\n            row = append(row, r*c)\n        }\n        grid = append(grid, row)\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "A grid of three rows of three values.", "text": "    fmt.Println(grid)\n    fmt.Println(len(grid), len(grid[2]))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[[1 2 3] [2 4 6] [3 6 9]]\n3 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "shift-left",
+          "title": "Shift values left",
+          "guide": "Move the values of a slice one place left.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`copy` works inside one slice. The parts overlap, and each value moves one place left.", "text": "    nums := []int{1, 2, 3, 4, 5}\n    n := copy(nums, nums[1:])"},
+            {"mode": "ghost", "line": 8, "guide": "`copy` returns how many values moved. The last value is a leftover.", "text": "    fmt.Println(n, nums)"},
+            {"mode": "ghost", "line": 9, "guide": "Cut off the leftover.", "text": "    nums = nums[:len(nums)-1]\n    fmt.Println(nums)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4 [2 3 4 5 5]\n[2 3 4 5]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "shift-and-trim",
+          "title": "Shift and trim",
+          "guide": "Shift the values one place left, then keep only the values that moved.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    nums := []int{1, 2, 3, 4}\n    n := ___(nums, nums[1:])\n    nums = nums[:___]\n    fmt.Println(n, nums)\n}",
+          "gaps": [{"answers": ["copy"]}, {"answers": ["n"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "clone-then-change",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\nfunc main() {\n    a := []int{1, 2}\n    b := append([]int(nil), a...)\n    b = append(b, a...)\n    b[0] = 9\n    fmt.Println(a, b)\n}",
+          "options": [
+            "[9 2] [9 2 1 2]",
+            "[1 2] [9 2 1 2]",
+            "[1 2] [1 2 1 2]",
+            "[9 2] [9 2]"
+          ],
+          "answer": 1,
+          "explanation": "`b` starts as a separate copy of `a`, then grows to [1 2 1 2]. Setting `b[0]` changes only `b`, and `a` stays [1 2]."
+        }
+      ]
+    }
+  ]
+}

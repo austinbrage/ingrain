@@ -1,0 +1,209 @@
+{
+  "id": "aggregating-maps",
+  "intro": {
+    "title": "Aggregating maps",
+    "slides": [
+      {
+        "text": "Maps are good at summing things up. You will keep totals, averages, largest and smallest values per key, find the most frequent key, then filter, delete from and invert maps."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Totals, extremes and the most frequent",
+        "slides": [
+          {
+            "text": "Many jobs are one pass over the data that keeps a result for each key: a total, a count, the biggest value. The map holds one result per key.\n\nThe snippet is pseudo code, not Go.",
+            "code": "for each sale\n    total[city of sale] =\n        total[city of sale] + amount"
+          },
+          {
+            "text": "A total can start from nothing, because a missing key reads as 0. A **maximum** cannot: 0 beats every negative value. Start it from the first value you see for the key, found by asking whether the key is there."
+          },
+          {
+            "text": "To find the key used the most, count first and then walk over the counts, keeping the biggest so far. The walk is in random order, so it is only safe when no two keys can have the same count."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "total-per-key",
+          "title": "Total per key",
+          "guide": "Add up the sales of each city.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Parallel slices: the sale at position `i` belongs to the city at position `i`.", "text": "    cities := []string{\n        \"Rome\", \"Oslo\", \"Rome\",\n        \"Oslo\", \"Rome\",\n    }\n    sales := []int{5, 3, 2, 4, 6}"},
+            {"mode": "ghost", "line": 11, "guide": "`+=` on a missing key starts from 0, so a total needs no setup.", "text": "    totals := make(map[string]int)\n    for i, city := range cities {\n        totals[city] += sales[i]\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "One total for each city.", "text": "    fmt.Println(totals)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[Oslo:7 Rome:13]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "average-per-key",
+          "title": "Average per key",
+          "guide": "Keep a sum and a count for each name.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The points of each player, in parallel slices.", "text": "    names := []string{\n        \"Ana\", \"Leo\", \"Ana\", \"Leo\", \"Ana\",\n    }\n    points := []int{8, 5, 6, 9, 10}"},
+            {"mode": "ghost", "line": 10, "guide": "An average needs two maps: the sum of each key and how many values it had.", "text": "    sums := make(map[string]int)\n    counts := make(map[string]int)\n    for i, n := range names {\n        sums[n] += points[i]\n        counts[n]++\n    }"},
+            {"mode": "ghost", "line": 16, "guide": "Divide per key. Whole number division drops the rest.", "text": "    fmt.Println(\n        sums[\"Ana\"]/counts[\"Ana\"],\n        sums[\"Leo\"]/counts[\"Leo\"],\n    )"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "8 7"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "max-per-key",
+          "title": "Highest per key",
+          "guide": "Keep the highest reading of each city.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Some readings are negative.", "text": "    cities := []string{\n        \"Oslo\", \"Rome\", \"Oslo\", \"Rome\", \"Oslo\",\n    }\n    temps := []int{-5, 3, -2, 8, -9}"},
+            {"mode": "ghost", "line": 10, "guide": "The first reading of a city is its highest so far. After that, only a bigger one replaces it.", "notes": [{"on": "!ok", "text": "True only for the first reading of a city."}], "text": "    highest := make(map[string]int)\n    for i, city := range cities {\n        cur, ok := highest[city]\n        if !ok || temps[i] > cur {\n            highest[city] = temps[i]\n        }\n    }"},
+            {"mode": "ghost", "line": 17, "guide": "A negative maximum is kept: it was never compared with 0.", "text": "    fmt.Println(highest)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[Oslo:-2 Rome:8]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "lowest-per-key",
+          "title": "Lowest per key",
+          "guide": "Keep the smallest number of each kind, odd or even. A kind with no entry yet takes its first number.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    nums := []int{7, 3, 9, 4, 1}\n    low := make(map[int]int)\n    for _, n := range nums {\n        if cur, ok := low[n%2]; ___ || n ___ cur {\n            low[n%2] = n\n        }\n    }\n    fmt.Println(low)\n}",
+          "gaps": [{"answers": ["!ok"]}, {"answers": ["<"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "zero-beats-negatives",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    best := map[string]int{}\n    for _, t := range []int{-4, -1, -7} {\n        if t > best[\"Oslo\"] {\n            best[\"Oslo\"] = t\n        }\n    }\n    fmt.Println(best[\"Oslo\"], len(best))\n}",
+          "options": [
+            "-1 1",
+            "0 0",
+            "0 1",
+            "-4 1"
+          ],
+          "answer": 1,
+          "explanation": "The missing key reads as 0, and no temperature is bigger than 0. Nothing is ever stored, and reading the key did not add it, so the map stays empty."
+        },
+        {
+          "type": "typing",
+          "id": "most-frequent",
+          "title": "The most frequent key",
+          "guide": "Count the votes, then find the winner.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Three colors with three different counts.", "text": "    votes := []string{\n        \"red\", \"blue\", \"red\",\n        \"green\", \"red\", \"blue\",\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "The counter you already know.", "text": "    counts := make(map[string]int)\n    for _, v := range votes {\n        counts[v]++\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "Keep the biggest count seen so far. No two counts are equal here, so the random order cannot change the winner.", "notes": [{"on": "n > bestCount", "text": "With a tie, the first one visited would win."}], "text": "    best := \"\"\n    bestCount := 0\n    for name, n := range counts {\n        if n > bestCount {\n            best = name\n            bestCount = n\n        }\n    }\n    fmt.Println(best, bestCount)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "red 3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Changing and flipping maps",
+        "slides": [
+          {
+            "text": "It is safe to `delete` entries of a map while you `range` over it. An entry deleted before the loop reaches it is not visited. Adding entries during the loop is allowed too, but the loop may or may not visit them, so do not rely on it."
+          },
+          {
+            "text": "**Inverting** a map swaps keys and values: the old values become the keys. Every value must be different for this to be lossless. When two keys share a value, they land on the same new key and one overwrites the other, and which one wins depends on the random order."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "delete-while-ranging",
+          "title": "Delete while ranging",
+          "guide": "Remove the empty items while walking over the map.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Some items are out of stock.", "text": "    stock := map[string]int{\n        \"pen\": 0, \"ink\": 3,\n        \"cap\": 0, \"pad\": 5,\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Deleting the current key inside its own loop is safe in Go.", "text": "    for name, n := range stock {\n        if n == 0 {\n            delete(stock, name)\n        }\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "Only the items in stock are left.", "text": "    fmt.Println(stock, len(stock))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[ink:3 pad:5] 2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "filter-into-new",
+          "title": "Filter into a new map",
+          "guide": "Keep the cheap items in a new map.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The original must stay as it is.", "text": "    prices := map[string]int{\n        \"tea\": 3, \"cake\": 9,\n        \"pie\": 12, \"gum\": 1,\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Instead of deleting, copy what passes the test into a second map.", "text": "    cheap := make(map[string]int)\n    for item, price := range prices {\n        if price < 5 {\n            cheap[item] = price\n        }\n    }"},
+            {"mode": "ghost", "line": 16, "guide": "The new map has the cheap items and the old one is untouched.", "text": "    fmt.Println(cheap, len(prices))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[gum:1 tea:3] 4"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "drop-low-scores",
+          "title": "Drop low scores",
+          "guide": "Remove every score below 5 while walking over the map, then print how many are left.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    scores := map[string]int{\"Ana\": 8, \"Eva\": 3}\n    for name, score := range scores {\n        if score < 5 {\n            ___(scores, ___)\n        }\n    }\n    fmt.Println(___(scores))\n}",
+          "gaps": [{"answers": ["delete"]}, {"answers": ["name"]}, {"answers": ["len"]}]
+        },
+        {
+          "type": "typing",
+          "id": "invert-map",
+          "title": "Invert a map",
+          "guide": "Swap the keys and the values of a map.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Each name has its own id.", "text": "    ids := map[string]int{\n        \"Ana\": 1, \"Eva\": 2, \"Leo\": 3,\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "The new map goes from id to name. Each old value becomes a key.", "notes": [{"on": "names[id] = name", "text": "Value and key trade places."}], "text": "    names := make(map[int]string)\n    for name, id := range ids {\n        names[id] = name\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "Now an id finds its name.", "text": "    fmt.Println(names)\n    fmt.Println(names[2], len(names))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[1:Ana 2:Eva 3:Leo]\nEva 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "invert-collision",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    ids := map[string]int{\n        \"red\": 1, \"rose\": 1, \"sky\": 2,\n    }\n    flipped := map[int]string{}\n    for name, n := range ids {\n        flipped[n] = name\n    }\n    fmt.Println(len(flipped), flipped[2])\n}",
+          "options": [
+            "3 sky",
+            "2 rose",
+            "2 sky",
+            "2 red"
+          ],
+          "answer": 2,
+          "explanation": "`red` and `rose` share the value 1, so they fight for the same key and one is lost: only 2 keys remain. Which of the two stays is not known, but `flipped[2]` is always `sky`."
+        }
+      ]
+    }
+  ]
+}

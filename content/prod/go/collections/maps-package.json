@@ -1,0 +1,265 @@
+{
+  "id": "maps-package",
+  "intro": {
+    "title": "The maps package",
+    "slides": [
+      {
+        "text": "The `maps` package does for maps what `slices` does for slices: copying, deleting by a rule and collecting keys and values. You will also put both packages together."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "The maps package",
+        "slides": [
+          {
+            "text": "`maps.Keys` gives the keys of a map, but in the random order of a `range`, and not as a slice. To get a slice you can trust, wrap it in `slices.Sorted`, which collects the keys and sorts them.\n\nThe snippet is pseudo code, not Go.",
+            "code": "keys = keys of the map (any order)\nlist = keys put in order"
+          },
+          {
+            "text": "A sorted list of keys is how you read a map in a fixed order: loop over the keys, and look each one up. `maps.Clone` and `maps.Equal` do for maps what `slices.Clone` and `slices.Equal` do for slices."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "sorted-keys",
+          "title": "Read a map in order",
+          "guide": "Sort the keys of a map, then walk it in that order.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "A map of ages. The imports of `maps` and `slices` are already in the file.", "text": "    ages := map[string]int{\n        \"Eva\": 31,\n        \"Ana\": 28,\n        \"Leo\": 40,\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "`maps.Keys` gives the keys in random order. `slices.Sorted` turns them into a sorted slice.", "notes": [{"on": "slices.Sorted(", "text": "Collects the keys and puts them in order."}], "text": "    keys := slices.Sorted(maps.Keys(ages))\n    fmt.Println(keys)"},
+            {"mode": "ghost", "line": 17, "guide": "Loop over the sorted keys and look each one up. The order is always the same.", "text": "    for _, k := range keys {\n        fmt.Println(k, ages[k])\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[Ana Eva Leo]\nAna 28\nEva 31\nLeo 40"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "clone-and-equal-maps",
+          "title": "Clone and compare maps",
+          "guide": "Copy a map and compare it with the original.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "`maps.Clone` makes a new map with the same entries.", "text": "    a := map[string]int{\"x\": 1}\n    b := maps.Clone(a)"},
+            {"mode": "ghost", "line": 11, "guide": "Changing the clone does not reach the original.", "text": "    b[\"x\"] = 9\n    fmt.Println(a, b)"},
+            {"mode": "ghost", "line": 13, "guide": "Maps cannot be compared with `==`. `maps.Equal` compares keys and values.", "text": "    fmt.Println(maps.Equal(a, b))"},
+            {"mode": "ghost", "line": 14, "guide": "Put the old value back and compare again.", "text": "    b[\"x\"] = 1\n    fmt.Println(maps.Equal(a, b))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[x:1] map[x:9]\nfalse\ntrue"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "sorted-and-backup",
+          "title": "Keys and a backup",
+          "guide": "Sort the keys of `stock`, then make a copy of it that you can change freely.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n    \"slices\"\n)\n\nfunc main() {\n    stock := map[string]int{\"pen\": 2, \"ink\": 5}\n    names := slices.Sorted(maps.___(stock))\n    backup := maps.___(stock)\n    fmt.Println(names, len(backup))\n}",
+          "gaps": [{"answers": ["Keys"]}, {"answers": ["Clone"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "sorted-keys-purpose",
+          "title": "What is it for?",
+          "guide": "Read the code, then pick what it is for.",
+          "code": "stock := map[string]int{\n    \"pen\": 2,\n    \"ink\": 5,\n}\nnames := slices.Sorted(maps.Keys(stock))",
+          "options": [
+            "Copies the map into a new sorted map",
+            "Sorts the entries of the map in place",
+            "Lists the keys of a map in a fixed order",
+            "Removes the duplicate keys of a map"
+          ],
+          "answer": 2,
+          "explanation": "`maps.Keys` gives the keys in random order, and `slices.Sorted` collects them into a sorted slice, so the order is always the same."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Copy, delete and collect",
+        "slides": [
+          {
+            "text": "`maps.Copy(dst, src)` writes every entry of one map into another, overwriting keys they share. It changes `dst`, so use `maps.Clone` first when you need a new map.\n\n`maps.DeleteFunc` removes the entries that fit a rule, and the rule gets both the key and the value."
+          },
+          {
+            "text": "`maps.Values` and `maps.Keys` are not slices. Wrap them in `slices.Sorted`, or in `slices.Collect` when the order does not matter. Printing a map with `fmt` is always in key order, but looping over it is not."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "merge-with-copy",
+          "title": "Copy into a map",
+          "guide": "Write the entries of one map into another.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "Two maps that share the key `b`. The imports are already in the file.", "text": "    base := map[string]int{\"a\": 1, \"b\": 2}\n    extra := map[string]int{\"b\": 20, \"c\": 30}"},
+            {"mode": "ghost", "line": 11, "guide": "`maps.Copy(dst, src)` writes every entry of `src` into `dst`. A key that `dst` already has gets the new value.", "notes": [{"on": "maps.Copy", "text": "Overwrites the keys they share."}], "text": "    maps.Copy(base, extra)\n    fmt.Println(base)"},
+            {"mode": "ghost", "line": 13, "guide": "The source is not changed.", "text": "    fmt.Println(extra)"},
+            {"mode": "ghost", "line": 14, "guide": "Clone first when the original must stay as it is.", "text": "    merged := maps.Clone(base)\n    maps.Copy(merged, map[string]int{\"d\": 4})\n    fmt.Println(len(merged), len(base))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[a:1 b:20 c:30]\nmap[b:20 c:30]\n4 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "drop-with-rule",
+          "title": "Delete what fits a rule",
+          "guide": "Remove the entries of a map that match a rule.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "Three items with their stock. The imports are already in the file.", "text": "    stock := map[string]int{\n        \"pen\": 0,\n        \"ink\": 5,\n        \"pad\": 0,\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "A rule for `maps`: it gets the key and the value of an entry, and says true to remove it.", "notes": [{"on": "n == 0", "text": "True for the items out of stock."}], "text": "    soldOut := func(k string, n int) bool {\n        return n == 0\n    }"},
+            {"mode": "ghost", "line": 17, "guide": "`maps.DeleteFunc` removes every entry for which the rule is true.", "text": "    maps.DeleteFunc(stock, soldOut)\n    fmt.Println(stock)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[ink:5]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "values-in-order",
+          "title": "Values and collecting",
+          "guide": "Read the values of a map as a slice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "Ages, two of them equal. The imports are already in the file.", "text": "    ages := map[string]int{\n        \"Eva\": 31,\n        \"Ana\": 28,\n        \"Leo\": 31,\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "`maps.Values` gives the values in random order. `slices.Sorted` makes them a sorted slice, keeping equal ones.", "text": "    vals := slices.Sorted(maps.Values(ages))\n    fmt.Println(vals)"},
+            {"mode": "ghost", "line": 17, "guide": "`slices.Collect` gathers keys or values into a slice with no fixed order. Sort it yourself.", "notes": [{"on": "slices.Collect", "text": "Gathers into a slice, in random order."}], "text": "    keys := slices.Collect(maps.Keys(ages))\n    slices.Sort(keys)\n    fmt.Println(keys)"},
+            {"mode": "ghost", "line": 20, "guide": "A collected slice can use any `slices` helper, like `Max`.", "text": "    all := slices.Collect(maps.Values(ages))\n    fmt.Println(slices.Max(all))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[28 31 31]\n[Ana Eva Leo]\n31"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "copy-and-drop",
+          "title": "Copy, then drop",
+          "guide": "Write the entries of `b` into `a`, then remove from `b` every entry the rule `over` accepts.",
+          "code": "package main\n\nimport \"maps\"\n\nfunc main() {\n    a := map[string]int{\"x\": 1}\n    b := map[string]int{\"x\": 2, \"y\": 3}\n    maps.___(a, b)\n    over := func(k string, n int) bool {\n        return n > 2\n    }\n    maps.___(b, over)\n}",
+          "gaps": [{"answers": ["Copy"]}, {"answers": ["DeleteFunc"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "copy-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "a := map[string]int{\"x\": 1, \"y\": 2}\nb := map[string]int{\"y\": 5}\nmaps.Copy(a, b)\nfmt.Println(a, b)",
+          "options": [
+            "map[x:1 y:2] map[y:5]",
+            "map[y:5] map[y:5]",
+            "map[x:1 y:7] map[y:5]",
+            "map[x:1 y:5] map[y:5]"
+          ],
+          "answer": 3,
+          "explanation": "`Copy` writes `b` into `a`: `y` is overwritten and `x` stays. `b` is only read, so it does not change."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Putting it together",
+        "slides": [
+          {
+            "text": "Real code mixes the two packages. A map has no order, so to show it ranked you collect its keys into a slice, sort that slice with a rule that looks each key up in the map, and then walk the slice.\n\nThe snippet is pseudo code, not Go.",
+            "code": "keys = the keys of the map\nsort keys by: value of the key, then key\nfor each key in keys:\n    show key and its value"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "rank-words",
+          "title": "Rank by count",
+          "guide": "List the keys of a map from the highest count to the lowest.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"cmp\"\n    \"fmt\"\n    \"maps\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "How many times each word was seen. The imports are already in the file.", "text": "    counts := map[string]int{\n        \"go\": 3,\n        \"rs\": 5,\n        \"py\": 3,\n        \"c\": 1,\n    }"},
+            {"mode": "ghost", "line": 17, "guide": "Gather the keys into a slice. Their order is random for now.", "text": "    keys := slices.Collect(maps.Keys(counts))"},
+            {"mode": "ghost", "line": 18, "guide": "The rule reads `counts` to compare two keys: the higher count first, and the letters when counts tie.", "notes": [{"on": "counts[b], counts[a]", "text": "b first: higher counts go first."}], "text": "    slices.SortFunc(keys, func(a, b string) int {\n        return cmp.Or(\n            cmp.Compare(counts[b], counts[a]),\n            cmp.Compare(a, b),\n        )\n    })\n    fmt.Println(keys)"},
+            {"mode": "ghost", "line": 25, "guide": "Walk the ranking and look up each count.", "text": "    for _, k := range keys {\n        fmt.Println(k, counts[k])\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[rs go py c]\nrs 5\ngo 3\npy 3\nc 1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "merge-counts",
+          "title": "Add two days of counts",
+          "guide": "Total two maps of counts without changing the first.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "The counts of two days. The imports are already in the file.", "text": "    mon := map[string]int{\"go\": 2, \"rs\": 1}\n    tue := map[string]int{\"go\": 1, \"py\": 4}"},
+            {"mode": "ghost", "line": 12, "guide": "Start from a clone of `mon`, then add each count of `tue`.", "text": "    total := maps.Clone(mon)\n    for k, n := range tue {\n        total[k] += n\n    }"},
+            {"mode": "ghost", "line": 16, "guide": "Print the totals in key order.", "text": "    keys := slices.Sorted(maps.Keys(total))\n    for _, k := range keys {\n        fmt.Println(k, total[k])\n    }"},
+            {"mode": "ghost", "line": 20, "guide": "`mon` is untouched.", "text": "    fmt.Println(mon)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "go 3\npy 4\nrs 1\nmap[go:2 rs:1]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "ranked-keys-purpose",
+          "title": "What is it for?",
+          "guide": "Read the code, then pick what it is for.",
+          "code": "keys := slices.Collect(maps.Keys(m))\nslices.SortFunc(keys, func(a, b string) int {\n    return cmp.Compare(m[b], m[a])\n})",
+          "options": [
+            "Lists the keys, highest value first",
+            "Lists the keys in alphabetical order",
+            "Copies the map into a slice of its values",
+            "Removes the keys that share a value"
+          ],
+          "answer": 0,
+          "explanation": "The rule compares the values of two keys, with `b` first, so the key with the highest value comes first."
+        },
+        {
+          "type": "fill-blank",
+          "id": "rank-hits",
+          "title": "Rank the hits",
+          "guide": "Sort `keys` by their hits, highest first.",
+          "code": "package main\n\nimport (\n    \"cmp\"\n    \"slices\"\n)\n\nfunc main() {\n    hits := map[string]int{\"a\": 2, \"b\": 9, \"c\": 5}\n    keys := []string{\"a\", \"b\", \"c\"}\n    slices.SortFunc(keys, func(x, y string) int {\n        return cmp.___(hits[___], hits[x])\n    })\n}",
+          "gaps": [{"answers": ["Compare"]}, {"answers": ["y"]}]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "rank-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "counts := map[string]int{\n    \"a\": 2, \"b\": 2, \"c\": 7,\n}\nkeys := slices.Sorted(maps.Keys(counts))\nslices.SortStableFunc(keys,\n    func(x, y string) int {\n        return cmp.Compare(counts[y], counts[x])\n    })\nfmt.Println(keys)",
+          "options": [
+            "[a b c]",
+            "[c b a]",
+            "[c a b]",
+            "[a c b]"
+          ],
+          "answer": 2,
+          "explanation": "The keys start sorted as `a b c`. The stable sort puts `c` (7) first, and `a` and `b` tie, so they keep their order."
+        }
+      ]
+    }
+  ]
+}
