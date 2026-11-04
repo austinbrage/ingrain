@@ -53,7 +53,7 @@
           "guide": "Defer three calls and watch their order.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Each `defer` adds a call to the pile.", "text": "func main() {\n    fmt.Println(\"start\")\n    defer fmt.Println(\"one\")\n    defer fmt.Println(\"two\")\n    defer fmt.Println(\"three\")\n    fmt.Println(\"end\")\n}"}
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Each `defer` adds a call to the pile.", "notes": [{"on": "defer fmt.Println(\"three\")", "text": "Deferred calls run last in, first out."}], "text": "func main() {\n    fmt.Println(\"start\")\n    defer fmt.Println(\"one\")\n    defer fmt.Println(\"two\")\n    defer fmt.Println(\"three\")\n    fmt.Println(\"end\")\n}"}
           ],
           "output": {
             "command": "go run main.go",

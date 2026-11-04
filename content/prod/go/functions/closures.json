@@ -84,7 +84,7 @@
           "guide": "Return a closure that keeps its own count between calls.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `count` lives on after `makeCounter` returns, because the closure holds it.", "notes": [{"on": "count := 0", "text": "Made once per call of makeCounter."}], "text": "func makeCounter() func() int {\n    count := 0\n    return func() int {\n        count++\n        return count\n    }\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `count` lives on after `makeCounter` returns, because the closure holds it.", "notes": [{"on": "count := 0", "text": "Made once per call of makeCounter."}, {"on": "return func() int {", "text": "Hands back a new function that keeps count alive."}], "text": "func makeCounter() func() int {\n    count := 0\n    return func() int {\n        count++\n        return count\n    }\n}\n"},
             {"mode": "ghost", "line": 13, "guide": "Each counter has its own `count`.", "text": "func main() {\n    a := makeCounter()\n    b := makeCounter()\n    fmt.Println(a(), a(), a())\n    fmt.Println(b())\n}"}
           ],
           "output": {
@@ -185,7 +185,7 @@
           "guide": "Pass a closure that adds into a variable declared outside it.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `each` calls `f` once for every number.", "text": "func each(nums []int, f func(int)) {\n    for _, n := range nums {\n        f(n)\n    }\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `each` calls `f` once for every number.", "notes": [{"on": "f func(int)", "text": "A function parameter that returns nothing."}], "text": "func each(nums []int, f func(int)) {\n    for _, n := range nums {\n        f(n)\n    }\n}\n"},
             {"mode": "ghost", "line": 11, "guide": "Each call of the closure adds to the same `total`.", "notes": [{"on": "total += n", "text": "Updates main's total on every call."}], "text": "func main() {\n    total := 0\n    each([]int{1, 2, 3}, func(n int) {\n        total += n\n    })\n    fmt.Println(total)\n}"}
           ],
           "output": {
@@ -268,7 +268,7 @@
           "guide": "Return two closures that share one variable.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `inc` and `get` both use the same `count`.", "notes": [{"on": "return inc, get", "text": "Two closures, one shared count."}], "text": "func newCounter() (func(), func() int) {\n    count := 0\n    inc := func() {\n        count++\n    }\n    get := func() int {\n        return count\n    }\n    return inc, get\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `inc` and `get` both use the same `count`.", "notes": [{"on": "return inc, get", "text": "Two closures, one shared count."}, {"on": "(func(), func() int)", "text": "Two results, both functions."}], "text": "func newCounter() (func(), func() int) {\n    count := 0\n    inc := func() {\n        count++\n    }\n    get := func() int {\n        return count\n    }\n    return inc, get\n}\n"},
             {"mode": "ghost", "line": 15, "guide": "Each call of `newCounter` makes its own `count`.", "text": "func main() {\n    inc, get := newCounter()\n    inc()\n    inc()\n    fmt.Println(get())\n    _, other := newCounter()\n    fmt.Println(other())\n}"}
           ],
           "output": {

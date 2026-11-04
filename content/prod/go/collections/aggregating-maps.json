@@ -35,7 +35,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Parallel slices: the sale at position `i` belongs to the city at position `i`.", "text": "    cities := []string{\n        \"Rome\", \"Oslo\", \"Rome\",\n        \"Oslo\", \"Rome\",\n    }\n    sales := []int{5, 3, 2, 4, 6}"},
-            {"mode": "ghost", "line": 11, "guide": "`+=` on a missing key starts from 0, so a total needs no setup.", "text": "    totals := make(map[string]int)\n    for i, city := range cities {\n        totals[city] += sales[i]\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "`+=` on a missing key starts from 0, so a total needs no setup.", "notes": [{"on": "+=", "text": "A new key starts at 0, so this adds from there."}], "text": "    totals := make(map[string]int)\n    for i, city := range cities {\n        totals[city] += sales[i]\n    }"},
             {"mode": "ghost", "line": 15, "guide": "One total for each city.", "text": "    fmt.Println(totals)"}
           ],
           "output": {
@@ -139,7 +139,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Some items are out of stock.", "text": "    stock := map[string]int{\n        \"pen\": 0, \"ink\": 3,\n        \"cap\": 0, \"pad\": 5,\n    }"},
-            {"mode": "ghost", "line": 10, "guide": "Deleting the current key inside its own loop is safe in Go.", "text": "    for name, qty := range stock {\n        if qty == 0 {\n            delete(stock, name)\n        }\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Deleting the current key inside its own loop is safe in Go.", "notes": [{"on": "delete(stock, name)", "text": "Deleting the current entry while ranging is safe."}], "text": "    for name, qty := range stock {\n        if qty == 0 {\n            delete(stock, name)\n        }\n    }"},
             {"mode": "ghost", "line": 15, "guide": "Only the items in stock are left.", "text": "    fmt.Println(stock, len(stock))"}
           ],
           "output": {

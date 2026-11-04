@@ -57,7 +57,7 @@
           "chunks": [
             {"mode": "copy", "line": 1, "guide": "Type the start again.", "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `main` again.", "text": "func main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`Print` writes the text and stays on the same line.", "text": "    fmt.Print(\"Hello, \")"},
+            {"mode": "ghost", "line": 6, "guide": "`Print` writes the text and stays on the same line.", "notes": [{"on": "Print", "text": "Prints the text and stays on the same line."}], "text": "    fmt.Print(\"Hello, \")"},
             {"mode": "ghost", "line": 7, "guide": "`Println` writes the text and then moves to the next line.", "text": "    fmt.Println(\"Go!\")"}
           ],
           "output": {
@@ -109,7 +109,7 @@
           "guide": "Import two packages in a block, and use both.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n"},
-            {"mode": "ghost", "line": 3, "guide": "With several packages, group them in parentheses, one per line. `strings` works with text.", "notes": [{"on": "strings", "text": "A package of functions for working with text."}], "text": "import (\n    \"fmt\"\n    \"strings\"\n)\n"},
+            {"mode": "ghost", "line": 3, "guide": "With several packages, group them in parentheses, one per line. `strings` works with text.", "notes": [{"on": "import (", "text": "Imports several packages in one group."}, {"on": "strings", "text": "A package of functions for working with text."}], "text": "import (\n    \"fmt\"\n    \"strings\"\n)\n"},
             {"mode": "auto", "line": 8, "text": "func main() {\n}"},
             {"mode": "ghost", "line": 9, "guide": "`strings.ToUpper` turns text into capitals. It reads like `fmt.Println`: package, dot, function.", "notes": [{"on": "strings.ToUpper", "text": "Calls ToUpper from the strings package."}], "text": "    fmt.Println(strings.ToUpper(\"go\"))"}
           ],

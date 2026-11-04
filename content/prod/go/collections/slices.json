@@ -159,7 +159,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Three scores to work with.", "text": "    scores := []int{70, 85, 90}\n    total := 0"},
             {"mode": "ghost", "line": 8, "guide": "`range` gives the index and the value of every position.", "text": "    for i, score := range scores {\n        total += score\n        fmt.Println(i, score)\n    }"},
-            {"mode": "ghost", "line": 13, "guide": "`len` is the count of values, so it gives the average.", "text": "    fmt.Println(\"average\", total/len(scores))"}
+            {"mode": "ghost", "line": 12, "guide": "`len` is the count of values, so it gives the average.", "text": "    fmt.Println(\"average\", total/len(scores))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -229,7 +229,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Five values to turn around.", "text": "    ranks := []int{1, 2, 3, 4, 5}\n    fmt.Println(ranks)"},
-            {"mode": "ghost", "line": 8, "guide": "Swap the first with the last, the second with the one before it, and stop halfway.", "notes": [{"on": "len(ranks)/2", "text": "Past the middle, the swaps would undo themselves."}], "text": "    for i := 0; i < len(ranks)/2; i++ {\n        j := len(ranks) - 1 - i\n        ranks[i], ranks[j] = ranks[j], ranks[i]\n    }\n    fmt.Println(ranks)"}
+            {"mode": "ghost", "line": 8, "guide": "Swap the first with the last, the second with the one before it, and stop halfway.", "notes": [{"on": "len(ranks)/2", "text": "Past the middle, the swaps would undo themselves."}, {"on": "ranks[i], ranks[j] =", "text": "Swaps the two values in one step."}], "text": "    for i := 0; i < len(ranks)/2; i++ {\n        j := len(ranks) - 1 - i\n        ranks[i], ranks[j] = ranks[j], ranks[i]\n    }\n    fmt.Println(ranks)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -330,7 +330,7 @@
           "guide": "Build a slice in a function and give it back.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Make the slice, fill it by index and return it. No length in the result type.", "text": "func squares(count int) []int {\n    out := make([]int, count)\n    for i := range out {\n        out[i] = i * i\n    }\n    return out\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "Make the slice, fill it by index and return it. No length in the result type.", "notes": [{"on": "count int) []int", "text": "The function hands back a whole slice."}], "text": "func squares(count int) []int {\n    out := make([]int, count)\n    for i := range out {\n        out[i] = i * i\n    }\n    return out\n}\n"},
             {"mode": "ghost", "line": 12, "guide": "The caller gets the slice the function made.", "text": "func main() {\n    sq := squares(5)\n    fmt.Println(sq, len(sq))\n}"}
           ],
           "output": {

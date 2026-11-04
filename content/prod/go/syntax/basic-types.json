@@ -77,12 +77,24 @@
               "mode": "ghost",
               "line": 6,
               "guide": "A number with a decimal point is a `float64`, the usual type for decimals.",
+              "notes": [
+                {
+                  "on": "9.5",
+                  "text": "A number with a dot becomes a float64."
+                }
+              ],
               "text": "    price := 9.5"
             },
             {
               "mode": "ghost",
               "line": 7,
               "guide": "A whole number also fits a `float64`: it is a decimal with nothing after the point.",
+              "notes": [
+                {
+                  "on": "= 2",
+                  "text": "A whole number can fill a float64."
+                }
+              ],
               "text": "    var ratio float64 = 2"
             },
             {
@@ -146,6 +158,12 @@
               "mode": "ghost",
               "line": 9,
               "guide": "Going back to `int` cuts off the decimals. It does not round.",
+              "notes": [
+                {
+                  "on": "int(",
+                  "text": "Cuts off the decimals, with no rounding."
+                }
+              ],
               "text": "    whole := int(price)"
             },
             {
@@ -214,6 +232,12 @@
               "mode": "ghost",
               "line": 8,
               "guide": "A `bool` is `true` or `false`, and nothing else.",
+              "notes": [
+                {
+                  "on": "false",
+                  "text": "A bool value; the other one is true."
+                }
+              ],
               "text": "    open := false"
             },
             {
@@ -277,6 +301,12 @@
               "mode": "ghost",
               "line": 8,
               "guide": "Converting the rune to a `string` gives the character back as text.",
+              "notes": [
+                {
+                  "on": "string(",
+                  "text": "Turns the character into a one-letter string."
+                }
+              ],
               "text": "    fmt.Println(string(letter))"
             }
           ],
@@ -322,18 +352,40 @@
               "mode": "ghost",
               "line": 6,
               "guide": "`int8` takes 8 bits and holds -128 to 127. That is its whole range.",
+              "notes": [
+                {
+                  "on": "int8",
+                  "text": "Takes 8 bits, so it holds -128 to 127."
+                }
+              ],
               "text": "    var small int8 = -128"
             },
             {
               "mode": "ghost",
               "line": 7,
               "guide": "`int16` holds up to 32767.",
+              "notes": [
+                {
+                  "on": "int16",
+                  "text": "Takes 16 bits, so it holds up to 32767."
+                }
+              ],
               "text": "    var medium int16 = 30000"
             },
             {
               "mode": "ghost",
               "line": 8,
               "guide": "`int32` reaches about 2 billion. `int64` reaches about 9 quintillion, so 5 billion fits.",
+              "notes": [
+                {
+                  "on": "int32",
+                  "text": "Takes 32 bits, up to about 2 billion."
+                },
+                {
+                  "on": "int64",
+                  "text": "Takes 64 bits, the largest signed size."
+                }
+              ],
               "text": "    var large int32 = 100000\n    var huge int64 = 5000000000"
             },
             {
@@ -375,6 +427,12 @@
               "mode": "ghost",
               "line": 6,
               "guide": "`byte` is used for raw data. A character like `'G'` is just the number 71, which fits.",
+              "notes": [
+                {
+                  "on": "byte",
+                  "text": "Another name for uint8."
+                }
+              ],
               "text": "    var letter byte = 'G'"
             },
             {
@@ -418,6 +476,12 @@
               "mode": "ghost",
               "line": 6,
               "guide": "200 is above 127, so it wraps: 200 - 256 = -56. `big` is a variable, so Go lets it through.",
+              "notes": [
+                {
+                  "on": "int8(",
+                  "text": "Converts to int8, so 200 wraps around."
+                }
+              ],
               "text": "    big := 200\n    small := int8(big)"
             },
             {
@@ -475,6 +539,12 @@
               "mode": "ghost",
               "line": 6,
               "guide": "`3.0` is a constant with nothing after the point, so it fits an `int`. `2.5` would not compile: the `.5` would be lost.",
+              "notes": [
+                {
+                  "on": "3.0",
+                  "text": "A whole-valued constant fits in an int."
+                }
+              ],
               "text": "    var whole int = 3.0"
             },
             {

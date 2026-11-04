@@ -22,7 +22,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Two whole numbers to work with.", "text": "    a := 17\n    b := 5"},
             {"mode": "ghost", "line": 8, "guide": "`+`, `-` and `*` work as in maths. `a` and `b` themselves do not change.", "text": "    fmt.Println(a+b, a-b, a*b)"},
-            {"mode": "ghost", "line": 9, "guide": "`/` on two whole numbers gives a whole number: the decimals are cut off. `%` gives the remainder of the division.", "notes": [{"on": "%", "text": "What is left over after dividing."}], "text": "    fmt.Println(a/b, a%b)"}
+            {"mode": "ghost", "line": 9, "guide": "`/` on two whole numbers gives a whole number: the decimals are cut off. `%` gives the remainder of the division.", "notes": [{"on": "%", "text": "What is left over after dividing."}, {"on": "a/b", "text": "Whole-number division: decimals are cut off."}], "text": "    fmt.Println(a/b, a%b)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -53,8 +53,8 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A number to update.", "text": "    count := 10"},
-            {"mode": "ghost", "line": 7, "guide": "`+=` adds to the variable itself, and `*=` multiplies it. `count += 5` means `count = count + 5`.", "text": "    count += 5\n    count *= 2"},
-            {"mode": "ghost", "line": 9, "guide": "`++` adds 1. In Go it is a statement on its own line.", "text": "    count++"},
+            {"mode": "ghost", "line": 7, "guide": "`+=` adds to the variable itself, and `*=` multiplies it. `count += 5` means `count = count + 5`.", "notes": [{"on": "+=", "text": "Adds to the variable in place."}, {"on": "*=", "text": "Multiplies the variable in place."}], "text": "    count += 5\n    count *= 2"},
+            {"mode": "ghost", "line": 9, "guide": "`++` adds 1. In Go it is a statement on its own line.", "notes": [{"on": "++", "text": "Adds one to the variable."}], "text": "    count++"},
             {"mode": "ghost", "line": 10, "guide": "Print the final value.", "text": "    fmt.Println(count)"}
           ],
           "output": {
@@ -78,9 +78,9 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A number to compare.", "text": "    age := 25"},
-            {"mode": "ghost", "line": 7, "guide": "A comparison gives a `bool`: `>=` is true when the left side is bigger or equal.", "text": "    adult := age >= 18"},
-            {"mode": "ghost", "line": 8, "guide": "`||` is true when either side is true.", "text": "    free := age < 12 || age > 65"},
-            {"mode": "ghost", "line": 9, "guide": "`&&` needs both sides true, and `!` flips a bool.", "notes": [{"on": "!free", "text": "True when free is false."}], "text": "    paid := adult && !free"},
+            {"mode": "ghost", "line": 7, "guide": "A comparison gives a `bool`: `>=` is true when the left side is bigger or equal.", "notes": [{"on": ">=", "text": "True when the left side is at least the right."}], "text": "    adult := age >= 18"},
+            {"mode": "ghost", "line": 8, "guide": "`||` is true when either side is true.", "notes": [{"on": "||", "text": "True when either side is true."}], "text": "    free := age < 12 || age > 65"},
+            {"mode": "ghost", "line": 9, "guide": "`&&` needs both sides true, and `!` flips a bool.", "notes": [{"on": "!free", "text": "True when free is false."}, {"on": "&&", "text": "True only when both sides are true."}], "text": "    paid := adult && !free"},
             {"mode": "ghost", "line": 10, "guide": "Print the three bools.", "text": "    fmt.Println(adult, free, paid)"}
           ],
           "output": {
@@ -133,7 +133,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "In bits, 12 is `1100` and 10 is `1010`.", "text": "    a := 12\n    b := 10"},
-            {"mode": "ghost", "line": 8, "guide": "`&` keeps the bits that are 1 in both: `1000`. `|` keeps the bits that are 1 in either: `1110`. `^` keeps the bits that are 1 in only one: `0110`.", "notes": [{"on": "a^b", "text": "Xor: a bit that differs between the two."}], "text": "    fmt.Println(a&b, a|b, a^b)"},
+            {"mode": "ghost", "line": 8, "guide": "`&` keeps the bits that are 1 in both: `1000`. `|` keeps the bits that are 1 in either: `1110`. `^` keeps the bits that are 1 in only one: `0110`.", "notes": [{"on": "a^b", "text": "Xor: a bit that differs between the two."}, {"on": "a&b", "text": "And: the bits set in both numbers."}, {"on": "a|b", "text": "Or: the bits set in either number."}], "text": "    fmt.Println(a&b, a|b, a^b)"},
             {"mode": "ghost", "line": 9, "guide": "`&^` clears from `a` every bit that is 1 in `b`: `1100` becomes `0100`.", "notes": [{"on": "&^", "text": "And not: a single operator in Go."}], "text": "    fmt.Println(a&^b)"}
           ],
           "output": {
@@ -149,8 +149,8 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Two numbers to shift.", "text": "    n := 3\n    m := 20"},
-            {"mode": "ghost", "line": 8, "guide": "`n << 1` moves the bits one place left, so the number doubles. `n << 3` doubles it three times.", "text": "    fmt.Println(n<<1, n<<3)"},
-            {"mode": "ghost", "line": 9, "guide": "`>>` moves the bits right. Each place halves the number, and the bits that fall off are lost.", "text": "    fmt.Println(m>>1, m>>2)"}
+            {"mode": "ghost", "line": 8, "guide": "`n << 1` moves the bits one place left, so the number doubles. `n << 3` doubles it three times.", "notes": [{"on": "n<<1", "text": "Moves the bits left: doubles the number."}], "text": "    fmt.Println(n<<1, n<<3)"},
+            {"mode": "ghost", "line": 9, "guide": "`>>` moves the bits right. Each place halves the number, and the bits that fall off are lost.", "notes": [{"on": "m>>1", "text": "Moves the bits right: halves the number."}], "text": "    fmt.Println(m>>1, m>>2)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -189,8 +189,8 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "`b` is zero, so `a / b` would crash the program.", "text": "    a := 10\n    b := 0"},
-            {"mode": "ghost", "line": 8, "guide": "`&&` is false as soon as its left side is false, so the right side is never evaluated. There is no division, and no crash.", "notes": [{"on": "b != 0 &&", "text": "The guard: it goes on the left."}], "text": "    ok := b != 0 && a/b > 1\n    fmt.Println(ok)"},
-            {"mode": "ghost", "line": 10, "guide": "`||` does the same when its left side is true: the right side is skipped.", "text": "    skip := b == 0 || a/b > 1\n    fmt.Println(skip)"}
+            {"mode": "ghost", "line": 8, "guide": "`&&` is false as soon as its left side is false, so the right side is never evaluated. There is no division, and no crash.", "notes": [{"on": "b != 0 &&", "text": "The guard: it goes on the left."}, {"on": "!=", "text": "True when the two sides differ."}], "text": "    ok := b != 0 && a/b > 1\n    fmt.Println(ok)"},
+            {"mode": "ghost", "line": 10, "guide": "`||` does the same when its left side is true: the right side is skipped.", "notes": [{"on": "==", "text": "True when the two sides are equal."}], "text": "    skip := b == 0 || a/b > 1\n    fmt.Println(skip)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -221,8 +221,8 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Two strings to join.", "text": "    first := \"Hello\"\n    second := \"Go\""},
-            {"mode": "ghost", "line": 8, "guide": "On strings, `+` joins them into a new string. Spaces and punctuation are strings too.", "text": "    greeting := first + \", \" + second"},
-            {"mode": "ghost", "line": 9, "guide": "`+=` works on strings as well: it adds to the end.", "text": "    greeting += \"!\""},
+            {"mode": "ghost", "line": 8, "guide": "On strings, `+` joins them into a new string. Spaces and punctuation are strings too.", "notes": [{"on": "first +", "text": "On text, + joins the pieces into one string."}], "text": "    greeting := first + \", \" + second"},
+            {"mode": "ghost", "line": 9, "guide": "`+=` works on strings as well: it adds to the end.", "notes": [{"on": "+=", "text": "Adds the text to the end of the variable."}], "text": "    greeting += \"!\""},
             {"mode": "ghost", "line": 10, "guide": "Print the result.", "text": "    fmt.Println(greeting)"}
           ],
           "output": {

@@ -85,7 +85,7 @@
           "guide": "Return a slice built with the room it needs.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The function knows it will keep at most half the numbers, so it makes that room.", "text": "func evensUpTo(limit int) []int {\n    evens := make([]int, 0, limit/2)\n    for i := 1; i <= limit; i++ {\n        if i%2 == 0 {\n            evens = append(evens, i)\n        }\n    }\n    return evens\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "The function knows it will keep at most half the numbers, so it makes that room.", "notes": [{"on": "limit/2", "text": "Half the limit is room enough for the evens."}], "text": "func evensUpTo(limit int) []int {\n    evens := make([]int, 0, limit/2)\n    for i := 1; i <= limit; i++ {\n        if i%2 == 0 {\n            evens = append(evens, i)\n        }\n    }\n    return evens\n}\n"},
             {"mode": "ghost", "line": 14, "guide": "Here the room is used up exactly.", "text": "func main() {\n    evens := evensUpTo(6)\n    fmt.Println(evens, len(evens), cap(evens))\n}"}
           ],
           "output": {
@@ -101,7 +101,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Empty, with room for 4. A cut can show 2 of those places.", "text": "    buf := make([]int, 0, 4)\n    buf = buf[:2]\n    buf[0] = 1\n    buf[1] = 2\n    fmt.Println(buf, len(buf), cap(buf))"},
-            {"mode": "ghost", "line": 11, "guide": "Cutting up to the capacity shows the rest of the room, still zero.", "text": "    buf = buf[:cap(buf)]\n    fmt.Println(buf)"}
+            {"mode": "ghost", "line": 11, "guide": "Cutting up to the capacity shows the rest of the room, still zero.", "notes": [{"on": "buf[:cap(buf)]", "text": "Stretches the length to use all the room."}], "text": "    buf = buf[:cap(buf)]\n    fmt.Println(buf)"}
           ],
           "output": {
             "command": "go run main.go",

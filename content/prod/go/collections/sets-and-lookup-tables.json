@@ -34,8 +34,8 @@
           "guide": "Keep a set with no values at all.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "The value type is `struct{}`, an empty struct. Its one value is `struct{}{}`.", "text": "    seen := map[string]struct{}{}\n    seen[\"a\"] = struct{}{}\n    seen[\"b\"] = struct{}{}\n    fmt.Println(len(seen), seen)"},
-            {"mode": "ghost", "line": 10, "guide": "Without a bool to read, test membership with the two-value lookup.", "text": "    _, hasA := seen[\"a\"]\n    _, hasZ := seen[\"z\"]\n    fmt.Println(hasA, hasZ)"},
+            {"mode": "ghost", "line": 6, "guide": "The value type is `struct{}`, an empty struct. Its one value is `struct{}{}`.", "notes": [{"on": "map[string]struct{}{}", "text": "An empty struct takes no space, only keys count."}, {"on": "seen[\"a\"] = struct{}{}", "text": "The key being there is the whole signal."}], "text": "    seen := map[string]struct{}{}\n    seen[\"a\"] = struct{}{}\n    seen[\"b\"] = struct{}{}\n    fmt.Println(len(seen), seen)"},
+            {"mode": "ghost", "line": 10, "guide": "Without a bool to read, test membership with the two-value lookup.", "notes": [{"on": "_, hasA", "text": "Only the exists answer matters for a set."}], "text": "    _, hasA := seen[\"a\"]\n    _, hasZ := seen[\"z\"]\n    fmt.Println(hasA, hasZ)"},
             {"mode": "ghost", "line": 13, "guide": "`delete` works the same.", "text": "    delete(seen, \"a\")\n    fmt.Println(len(seen))"}
           ],
           "output": {
@@ -143,7 +143,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "The value type is a function type: two ints in, one int out.", "notes": [{"on": "func(int, int) int{", "text": "Every entry needs this same function type."}], "text": "    ops := map[string]func(int, int) int{\n        \"add\": func(a, b int) int {\n            return a + b\n        },\n        \"mul\": func(a, b int) int {\n            return a * b\n        },\n    }"},
-            {"mode": "ghost", "line": 14, "guide": "Look a function up by name, then call it right away with `()`.", "text": "    fmt.Println(ops[\"add\"](3, 4), ops[\"mul\"](3, 4))"},
+            {"mode": "ghost", "line": 14, "guide": "Look a function up by name, then call it right away with `()`.", "notes": [{"on": "ops[\"add\"](3, 4)", "text": "Looks up the function, then calls it."}], "text": "    fmt.Println(ops[\"add\"](3, 4), ops[\"mul\"](3, 4))"},
             {"mode": "ghost", "line": 15, "guide": "A new entry is a new key, so the table can grow while the program runs.", "text": "    ops[\"sub\"] = func(a, b int) int {\n        return a - b\n    }\n    fmt.Println(ops[\"sub\"](9, 4))"}
           ],
           "output": {
@@ -159,7 +159,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A table with one operation.", "text": "    ops := map[string]func(int) int{\n        \"double\": func(n int) int {\n            return n * 2\n        },\n    }"},
-            {"mode": "ghost", "line": 11, "guide": "A missing key gives the zero value of the function type: `nil`.", "text": "    fmt.Println(ops[\"triple\"] == nil)"},
+            {"mode": "ghost", "line": 11, "guide": "A missing key gives the zero value of the function type: `nil`.", "notes": [{"on": "ops[\"triple\"] == nil", "text": "A missing entry is a nil function."}], "text": "    fmt.Println(ops[\"triple\"] == nil)"},
             {"mode": "ghost", "line": 12, "guide": "Check the key before calling. Calling a nil function stops the program.", "text": "    if op, ok := ops[\"triple\"]; ok {\n        fmt.Println(op(4))\n    } else {\n        fmt.Println(\"no such operation\")\n    }"},
             {"mode": "ghost", "line": 17, "guide": "The same check for an operation that exists.", "text": "    if op, ok := ops[\"double\"]; ok {\n        fmt.Println(op(4))\n    }"}
           ],

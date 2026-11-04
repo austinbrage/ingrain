@@ -32,7 +32,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 9, "guide": "A sorted slice. `BinarySearch` only works on sorted data. The imports are already in the file.", "text": "    ids := []int{10, 20, 30, 40}"},
-            {"mode": "ghost", "line": 10, "guide": "`slices.BinarySearch` returns the position and whether the value is there.", "text": "    pos, found := slices.BinarySearch(ids, 30)\n    fmt.Println(pos, found)"},
+            {"mode": "ghost", "line": 10, "guide": "`slices.BinarySearch` returns the position and whether the value is there.", "notes": [{"on": "slices.BinarySearch(ids, 30)", "text": "Finds the position and says if it was found."}], "text": "    pos, found := slices.BinarySearch(ids, 30)\n    fmt.Println(pos, found)"},
             {"mode": "ghost", "line": 12, "guide": "When the value is missing, the position is where it would go to keep the order.", "notes": [{"on": "25", "text": "It would sit between 20 and 30."}], "text": "    pos, found = slices.BinarySearch(ids, 25)\n    fmt.Println(pos, found)"},
             {"mode": "ghost", "line": 14, "guide": "A value bigger than all of them goes at the end: the position is the length.", "text": "    pos, found = slices.BinarySearch(ids, 99)\n    fmt.Println(pos, found)"}
           ],
@@ -49,8 +49,8 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 9, "guide": "A slice of numbers. The imports are already in the file.", "text": "    nums := []int{3, 8, 5, 12, 7}"},
-            {"mode": "ghost", "line": 10, "guide": "`slices.IndexFunc` gives the position of the first item for which the function is true, or -1.", "notes": [{"on": "n > 6", "text": "True for the first item over 6."}], "text": "    i := slices.IndexFunc(nums, func(n int) bool {\n        return n > 6\n    })\n    fmt.Println(i)"},
-            {"mode": "ghost", "line": 14, "guide": "`slices.ContainsFunc` only says whether some item fits the rule.", "text": "    has := slices.ContainsFunc(nums, func(n int) bool {\n        return n < 0\n    })\n    fmt.Println(has)"},
+            {"mode": "ghost", "line": 10, "guide": "`slices.IndexFunc` gives the position of the first item for which the function is true, or -1.", "notes": [{"on": "slices.IndexFunc(", "text": "Position of the first item the function accepts."}, {"on": "n > 6", "text": "True for the first item over 6."}], "text": "    i := slices.IndexFunc(nums, func(n int) bool {\n        return n > 6\n    })\n    fmt.Println(i)"},
+            {"mode": "ghost", "line": 14, "guide": "`slices.ContainsFunc` only says whether some item fits the rule.", "notes": [{"on": "slices.ContainsFunc", "text": "True when any item passes the function."}], "text": "    has := slices.ContainsFunc(nums, func(n int) bool {\n        return n < 0\n    })\n    fmt.Println(has)"},
             {"mode": "ghost", "line": 18, "guide": "When nothing fits, `IndexFunc` gives -1 like `Index`.", "text": "    fmt.Println(slices.IndexFunc(nums, func(n int) bool {\n        return n > 100\n    }))"}
           ],
           "output": {
@@ -75,7 +75,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"cmp\"\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 10, "guide": "Three words of different lengths. The imports are already in the file.", "text": "    words := []string{\"fig\", \"banana\", \"kiwi\"}"},
             {"mode": "ghost", "line": 11, "guide": "`MaxFunc` and `MinFunc` take the same kind of rule as `SortFunc`. This one compares lengths.", "text": "    byLength := func(a, b string) int {\n        return cmp.Compare(len(a), len(b))\n    }"},
-            {"mode": "ghost", "line": 14, "guide": "`MaxFunc` returns the biggest item by the rule, and `MinFunc` the smallest.", "text": "    fmt.Println(slices.MaxFunc(words, byLength))\n    fmt.Println(slices.MinFunc(words, byLength))"}
+            {"mode": "ghost", "line": 14, "guide": "`MaxFunc` returns the biggest item by the rule, and `MinFunc` the smallest.", "notes": [{"on": "slices.MaxFunc(words, byLength)", "text": "The biggest item by your own comparison."}, {"on": "slices.MinFunc(words, byLength)", "text": "The smallest item by your own comparison."}], "text": "    fmt.Println(slices.MaxFunc(words, byLength))\n    fmt.Println(slices.MinFunc(words, byLength))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -123,7 +123,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 9, "guide": "A slice with a gap in the middle. The imports are already in the file.", "text": "    ids := []int{1, 2, 5}"},
-            {"mode": "ghost", "line": 10, "guide": "`slices.Insert` puts values in at an index and returns the new slice. Store the result.", "notes": [{"on": "ids = ", "text": "Insert may return a new slice."}], "text": "    ids = slices.Insert(ids, 2, 3, 4)\n    fmt.Println(ids)"},
+            {"mode": "ghost", "line": 10, "guide": "`slices.Insert` puts values in at an index and returns the new slice. Store the result.", "notes": [{"on": "ids = ", "text": "Insert may return a new slice."}, {"on": "slices.Insert(ids, 2, 3, 4)", "text": "Puts 3 and 4 in before position 2."}], "text": "    ids = slices.Insert(ids, 2, 3, 4)\n    fmt.Println(ids)"},
             {"mode": "ghost", "line": 12, "guide": "An index equal to the length adds at the end, like `append`.", "text": "    ids = slices.Insert(ids, len(ids), 6)\n    fmt.Println(ids)"},
             {"mode": "ghost", "line": 14, "guide": "Index 0 adds at the front.", "text": "    ids = slices.Insert(ids, 0, 0)\n    fmt.Println(ids)"}
           ],
@@ -173,7 +173,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 9, "guide": "Six numbers. The imports are already in the file.", "text": "    s := []int{1, 2, 3, 4, 5, 6}"},
-            {"mode": "ghost", "line": 10, "guide": "`slices.DeleteFunc` removes every item for which the function is true. Store the result.", "notes": [{"on": "n%2 == 0", "text": "True for the even numbers."}], "text": "    s = slices.DeleteFunc(s, func(n int) bool {\n        return n%2 == 0\n    })\n    fmt.Println(s)"},
+            {"mode": "ghost", "line": 10, "guide": "`slices.DeleteFunc` removes every item for which the function is true. Store the result.", "notes": [{"on": "slices.DeleteFunc(s", "text": "Removes every item the function accepts."}, {"on": "n%2 == 0", "text": "True for the even numbers."}], "text": "    s = slices.DeleteFunc(s, func(n int) bool {\n        return n%2 == 0\n    })\n    fmt.Println(s)"},
             {"mode": "ghost", "line": 14, "guide": "Useful to drop empty strings from a list.", "text": "    t := []string{\"go\", \"\", \"rust\", \"\"}\n    t = slices.DeleteFunc(t, func(w string) bool {\n        return w == \"\"\n    })\n    fmt.Println(t, len(t))"}
           ],
           "output": {
@@ -231,7 +231,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 9, "guide": "Repeated values, mixed up. The imports are already in the file.", "text": "    ids := []int{3, 1, 3, 2, 1, 3}"},
             {"mode": "ghost", "line": 10, "guide": "`slices.Compact` removes repeats that sit next to each other. Sort first so equal values are neighbours.", "text": "    slices.Sort(ids)\n    fmt.Println(ids)"},
-            {"mode": "ghost", "line": 12, "guide": "Store what `Compact` returns, as with `Delete`.", "text": "    ids = slices.Compact(ids)\n    fmt.Println(ids)"}
+            {"mode": "ghost", "line": 12, "guide": "Store what `Compact` returns, as with `Delete`.", "notes": [{"on": "slices.Compact(ids)", "text": "Merges runs of equal values into one."}], "text": "    ids = slices.Compact(ids)\n    fmt.Println(ids)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -262,8 +262,8 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 9, "guide": "Two small slices. The imports are already in the file.", "text": "    first := []int{1, 2}\n    second := []int{3}"},
-            {"mode": "ghost", "line": 11, "guide": "`slices.Concat` joins any number of slices into a new one.", "text": "    all := slices.Concat(first, second, first)\n    fmt.Println(all)"},
-            {"mode": "ghost", "line": 13, "guide": "`slices.Repeat` repeats a slice a number of times, in a new slice.", "text": "    fmt.Println(slices.Repeat(second, 3))"},
+            {"mode": "ghost", "line": 11, "guide": "`slices.Concat` joins any number of slices into a new one.", "notes": [{"on": "slices.Concat(first, second, first)", "text": "Joins the slices into one new slice."}], "text": "    all := slices.Concat(first, second, first)\n    fmt.Println(all)"},
+            {"mode": "ghost", "line": 13, "guide": "`slices.Repeat` repeats a slice a number of times, in a new slice.", "notes": [{"on": "slices.Repeat(second, 3)", "text": "Builds a new slice with the values three times."}], "text": "    fmt.Println(slices.Repeat(second, 3))"},
             {"mode": "ghost", "line": 14, "guide": "The originals did not change.", "text": "    fmt.Println(first, second)"}
           ],
           "output": {
@@ -296,7 +296,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 9, "guide": "A short slice. The imports are already in the file.", "text": "    items := []int{1, 2, 3}"},
-            {"mode": "ghost", "line": 10, "guide": "`slices.Grow(items, 10)` makes sure 10 more items fit. The length stays the same, and the capacity is at least the length plus 10.", "text": "    items = slices.Grow(items, 10)\n    fmt.Println(len(items))\n    fmt.Println(cap(items) >= 13)"},
+            {"mode": "ghost", "line": 10, "guide": "`slices.Grow(items, 10)` makes sure 10 more items fit. The length stays the same, and the capacity is at least the length plus 10.", "notes": [{"on": "slices.Grow(items, 10)", "text": "Makes room for 10 more appends in advance."}], "text": "    items = slices.Grow(items, 10)\n    fmt.Println(len(items))\n    fmt.Println(cap(items) >= 13)"},
             {"mode": "ghost", "line": 13, "guide": "Appending up to that room never needs a new array, so the capacity does not change.", "text": "    before := cap(items)\n    for i := 0; i < 10; i++ {\n        items = append(items, i)\n    }\n    fmt.Println(len(items), cap(items) == before)"}
           ],
           "output": {

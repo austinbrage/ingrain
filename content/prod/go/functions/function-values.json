@@ -153,7 +153,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Two functions to choose from.", "text": "func double(n int) int {\n    return n * 2\n}\n\nfunc triple(n int) int {\n    return n * 3\n}\n"},
-            {"mode": "ghost", "line": 13, "guide": "The result type is a function type. Return a function by its name, with no parentheses.", "notes": [{"on": "string) func(int) int", "text": "The result is itself a function."}], "text": "func pick(name string) func(int) int {\n    if name == \"double\" {\n        return double\n    }\n    return triple\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "The result type is a function type. Return a function by its name, with no parentheses.", "notes": [{"on": "string) func(int) int", "text": "The result is itself a function."}, {"on": "return double", "text": "Returns the function itself, it is not called."}], "text": "func pick(name string) func(int) int {\n    if name == \"double\" {\n        return double\n    }\n    return triple\n}\n"},
             {"mode": "ghost", "line": 20, "guide": "Store what comes back, then call it.", "text": "func main() {\n    f := pick(\"double\")\n    g := pick(\"triple\")\n    fmt.Println(f(7), g(7))\n}"}
           ],
           "output": {
@@ -248,7 +248,7 @@
             {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A named type, and the default function.", "text": "type Step func(int) int\n"},
             {"mode": "ghost", "line": 7, "guide": "The function to use when none is given.", "text": "func double(n int) int {\n    return n * 2\n}\n"},
             {"mode": "ghost", "line": 11, "guide": "A function value that holds nothing is nil. Take a function in and give one back.", "notes": [{"on": "f == nil", "text": "The only comparison a function value allows."}], "text": "func orDouble(f Step) Step {\n    if f == nil {\n        return double\n    }\n    return f\n}\n"},
-            {"mode": "ghost", "line": 18, "guide": "A variable with no function starts as nil. Never call it while it is nil.", "text": "func main() {\n    var f Step\n    fmt.Println(f == nil)\n    g := orDouble(f)\n    fmt.Println(g == nil)\n    fmt.Println(g(5))\n}"}
+            {"mode": "ghost", "line": 18, "guide": "A variable with no function starts as nil. Never call it while it is nil.", "notes": [{"on": "var f Step", "text": "A function variable with no value starts as nil."}], "text": "func main() {\n    var f Step\n    fmt.Println(f == nil)\n    g := orDouble(f)\n    fmt.Println(g == nil)\n    fmt.Println(g(5))\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -263,8 +263,8 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A function to hand over.", "text": "func double(n int) int {\n    return n * 2\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "It replaces each value with what the function returns. A slice shares its values with the caller, so the caller sees the change.", "notes": [{"on": "nums[i] = f(n)", "text": "Writes into the caller's slice."}], "text": "func mapInts(nums []int, f func(int) int) {\n    for i, n := range nums {\n        nums[i] = f(n)\n    }\n}\n"},
-            {"mode": "ghost", "line": 15, "guide": "Pass a named function, then a function literal written right in the call.", "text": "func main() {\n    values := []int{1, 2, 3}\n    mapInts(values, double)\n    fmt.Println(values)\n    mapInts(values, func(n int) int {\n        return n + 1\n    })\n    fmt.Println(values)\n}"}
+            {"mode": "ghost", "line": 9, "guide": "It replaces each value with what the function returns. A slice shares its values with the caller, so the caller sees the change.", "notes": [{"on": "nums[i] = f(n)", "text": "Writes into the caller's slice."}, {"on": "i, n", "text": "Position and value of each item."}], "text": "func mapInts(nums []int, f func(int) int) {\n    for i, n := range nums {\n        nums[i] = f(n)\n    }\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "Pass a named function, then a function literal written right in the call.", "notes": [{"on": "func(n int) int {", "text": "A function literal passed straight in as an argument."}], "text": "func main() {\n    values := []int{1, 2, 3}\n    mapInts(values, double)\n    fmt.Println(values)\n    mapInts(values, func(n int) int {\n        return n + 1\n    })\n    fmt.Println(values)\n}"}
           ],
           "output": {
             "command": "go run main.go",

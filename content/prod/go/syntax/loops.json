@@ -36,7 +36,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A running total.", "text": "    sum := 0"},
-            {"mode": "ghost", "line": 7, "guide": "`for` has three parts: the setup, the condition and the step. The block repeats while the condition is true.", "notes": [{"on": "i <= 4", "text": "Checked before every lap."}, {"on": "i++", "text": "Runs after every lap."}], "text": "    for i := 1; i <= 4; i++ {\n        sum += i\n        fmt.Println(i, sum)\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "`for` has three parts: the setup, the condition and the step. The block repeats while the condition is true.", "notes": [{"on": "i <= 4", "text": "Checked before every lap."}, {"on": "i++", "text": "Runs after every lap."}, {"on": "for", "text": "Go's only loop keyword; this form counts."}, {"on": "i := 1", "text": "Setup: runs once before the first lap."}], "text": "    for i := 1; i <= 4; i++ {\n        sum += i\n        fmt.Println(i, sum)\n    }"},
             {"mode": "ghost", "line": 11, "guide": "This line runs once, after the loop ends.", "text": "    fmt.Println(\"total\", sum)"}
           ],
           "output": {
@@ -84,7 +84,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A counter for the laps.", "text": "    count := 0"},
-            {"mode": "ghost", "line": 7, "guide": "A `for` with nothing after it repeats forever. `break` leaves the loop at once, and the code after it runs.", "notes": [{"on": "break", "text": "Jumps out of the nearest loop."}], "text": "    for {\n        count++\n        fmt.Println(\"tick\", count)\n        if count == 3 {\n            break\n        }\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "A `for` with nothing after it repeats forever. `break` leaves the loop at once, and the code after it runs.", "notes": [{"on": "break", "text": "Jumps out of the nearest loop."}, {"on": "for {", "text": "No check at all: it repeats until a break."}], "text": "    for {\n        count++\n        fmt.Println(\"tick\", count)\n        if count == 3 {\n            break\n        }\n    }"},
             {"mode": "ghost", "line": 14, "guide": "This line runs after the `break`.", "text": "    fmt.Println(\"out of the loop\")"}
           ],
           "output": {
@@ -140,8 +140,8 @@
           "guide": "Repeat a block a fixed number of times with `range`.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`range 3` gives 0, 1 and 2, one value per lap.", "notes": [{"on": "range 3", "text": "Counts up from 0, stopping before 3."}], "text": "    for i := range 3 {\n        fmt.Println(\"round\", i)\n    }"},
-            {"mode": "ghost", "line": 9, "guide": "When you do not need the number, leave the variable out.", "text": "    for range 2 {\n        fmt.Println(\"hi\")\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "`range 3` gives 0, 1 and 2, one value per lap.", "notes": [{"on": "range 3", "text": "Counts up from 0, stopping before 3."}, {"on": "i :=", "text": "Holds the lap number, starting at 0."}], "text": "    for i := range 3 {\n        fmt.Println(\"round\", i)\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "When you do not need the number, leave the variable out.", "notes": [{"on": "for range 2", "text": "Repeats twice, with no counter variable."}], "text": "    for range 2 {\n        fmt.Println(\"hi\")\n    }"},
             {"mode": "ghost", "line": 12, "guide": "Print a last line.", "text": "    fmt.Println(\"done\")"}
           ],
           "output": {
@@ -156,7 +156,7 @@
           "guide": "Walk a string one character at a time.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`range` over a string gives the position and the character, as a `rune`. `string(r)` turns it back into text.", "notes": [{"on": "i, r", "text": "Position first, then the character."}], "text": "    for i, r := range \"go\" {\n        fmt.Println(i, string(r))\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "`range` over a string gives the position and the character, as a `rune`. `string(r)` turns it back into text.", "notes": [{"on": "i, r", "text": "Position first, then the character."}, {"on": "range \"go\"", "text": "Walks the string one character at a time."}], "text": "    for i, r := range \"go\" {\n        fmt.Println(i, string(r))\n    }"},
             {"mode": "ghost", "line": 9, "guide": "Use `_` for a value you do not need. Go would reject an unused variable.", "notes": [{"on": "_", "text": "Throws the position away."}], "text": "    for _, r := range \"hi\" {\n        fmt.Println(string(r))\n    }"},
             {"mode": "ghost", "line": 12, "guide": "Print a last line.", "text": "    fmt.Println(\"done\")"}
           ],
@@ -231,7 +231,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A loop can count down: start high, test with `>` and step with `i--`.", "notes": [{"on": "i--", "text": "Takes one off after every lap."}], "text": "    for i := 3; i > 0; i-- {\n        fmt.Println(i)\n    }"},
             {"mode": "ghost", "line": 9, "guide": "Print a line after the loop.", "text": "    fmt.Println(\"liftoff\")"},
-            {"mode": "ghost", "line": 10, "guide": "The setup and the step can hold two variables each. They move toward each other until the condition fails.", "notes": [{"on": "i, j = i+1, j-1", "text": "Both change together, in one statement."}], "text": "    for i, j := 0, 4; i < j; i, j = i+1, j-1 {\n        fmt.Println(i, j)\n    }"}
+            {"mode": "ghost", "line": 10, "guide": "The setup and the step can hold two variables each. They move toward each other until the condition fails.", "notes": [{"on": "i, j = i+1, j-1", "text": "Both change together, in one statement."}, {"on": "i, j := 0, 4", "text": "Sets up two variables at once."}], "text": "    for i, j := 0, 4; i < j; i, j = i+1, j-1 {\n        fmt.Println(i, j)\n    }"}
           ],
           "output": {
             "command": "go run main.go",

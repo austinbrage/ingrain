@@ -31,7 +31,7 @@
           "guide": "Write a slice of slices and read it.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "The type is `[][]int`. Each inner list is a row, and they can differ in length.", "notes": [{"on": "[][]int", "text": "A slice whose values are slices of int."}], "text": "    rows := [][]int{{1, 2, 3}, {4, 5}, {6}}\n    fmt.Println(rows)"},
+            {"mode": "ghost", "line": 6, "guide": "The type is `[][]int`. Each inner list is a row, and they can differ in length.", "notes": [{"on": "[][]int", "text": "A slice whose values are slices of int."}, {"on": "{4, 5}", "text": "Each row can have its own length."}], "text": "    rows := [][]int{{1, 2, 3}, {4, 5}, {6}}\n    fmt.Println(rows)"},
             {"mode": "ghost", "line": 8, "guide": "Count the rows, then the values of one row.", "text": "    fmt.Println(len(rows), len(rows[1]))"},
             {"mode": "ghost", "line": 9, "guide": "Two indexes: the row, then the place in it.", "text": "    fmt.Println(rows[0][2], rows[1][0])"}
           ],
@@ -47,8 +47,8 @@
           "guide": "Make a grid row by row.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`make` only builds the outer slice. Its rows start empty.", "text": "    grid := make([][]int, 3)"},
-            {"mode": "ghost", "line": 7, "guide": "Make every row, each with its own values.", "text": "    for r := range grid {\n        grid[r] = make([]int, 4)\n    }\n    fmt.Println(grid)"},
+            {"mode": "ghost", "line": 6, "guide": "`make` only builds the outer slice. Its rows start empty.", "notes": [{"on": "make([][]int, 3)", "text": "Makes 3 rows that are still empty."}], "text": "    grid := make([][]int, 3)"},
+            {"mode": "ghost", "line": 7, "guide": "Make every row, each with its own values.", "notes": [{"on": "make([]int, 4)", "text": "Gives each row its own 4 positions."}], "text": "    for r := range grid {\n        grid[r] = make([]int, 4)\n    }\n    fmt.Println(grid)"},
             {"mode": "ghost", "line": 11, "guide": "Set one place and read a row length.", "text": "    grid[1][2] = 7\n    fmt.Println(grid, len(grid[0]))"}
           ],
           "output": {
@@ -63,7 +63,7 @@
           "guide": "Add up each row into a slice of totals.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "One total for each row.", "text": "    grid := [][]int{{1, 2}, {3, 4, 5}}\n    totals := make([]int, len(grid))"},
+            {"mode": "ghost", "line": 6, "guide": "One total for each row.", "notes": [{"on": "len(grid)", "text": "One total for each row."}], "text": "    grid := [][]int{{1, 2}, {3, 4, 5}}\n    totals := make([]int, len(grid))"},
             {"mode": "ghost", "line": 8, "guide": "Walk the rows, then the values of each row.", "text": "    for r, row := range grid {\n        for _, cell := range row {\n            totals[r] += cell\n        }\n    }\n    fmt.Println(totals)"}
           ],
           "output": {
@@ -86,9 +86,9 @@
           "guide": "Change a row, then replace a whole row.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "A row is a slice, so a variable can look at it.", "text": "    grid := [][]int{{1, 2}, {3, 4}}\n    row := grid[0]"},
+            {"mode": "ghost", "line": 6, "guide": "A row is a slice, so a variable can look at it.", "notes": [{"on": "row := grid[0]", "text": "Shares the row instead of copying it."}], "text": "    grid := [][]int{{1, 2}, {3, 4}}\n    row := grid[0]"},
             {"mode": "ghost", "line": 8, "guide": "Changing `row` changes the grid, because they share values.", "text": "    row[1] = 50\n    fmt.Println(grid)"},
-            {"mode": "ghost", "line": 10, "guide": "Replacing the row in the grid does not touch `row`.", "text": "    grid[1] = []int{9}\n    fmt.Println(grid, row)"}
+            {"mode": "ghost", "line": 10, "guide": "Replacing the row in the grid does not touch `row`.", "notes": [{"on": "[]int{9}", "text": "Puts in a new row, and row still sees the old one."}], "text": "    grid[1] = []int{9}\n    fmt.Println(grid, row)"}
           ],
           "output": {
             "command": "go run main.go",

@@ -49,6 +49,10 @@
                 {
                   "on": "bonus := 5",
                   "text": "Gone when the block closes."
+                },
+                {
+                  "on": "{",
+                  "text": "A bare block: it opens a new scope."
                 }
               ],
               "text": "    {\n        bonus := 5\n        fmt.Println(level, bonus)\n    }"
@@ -86,6 +90,16 @@
               "mode": "ghost",
               "line": 7,
               "guide": "Every branch is its own block, so both can declare `grade`: they are two separate variables.",
+              "notes": [
+                {
+                  "on": "grade := \"pass\"",
+                  "text": "Exists only inside this branch."
+                },
+                {
+                  "on": "grade := \"retry\"",
+                  "text": "A separate variable, in the else branch."
+                }
+              ],
               "text": "    if score >= 50 {\n        grade := \"pass\"\n        fmt.Println(grade)\n    } else {\n        grade := \"retry\"\n        fmt.Println(grade)\n    }"
             },
             {
@@ -192,6 +206,16 @@
               "mode": "ghost",
               "line": 7,
               "guide": "Each `case` is its own block, like the branches of an `if`: the two `name` variables never meet.",
+              "notes": [
+                {
+                  "on": "name := \"Mon\"",
+                  "text": "Exists only inside this case."
+                },
+                {
+                  "on": "name := \"Tue\"",
+                  "text": "A separate variable, in the other case."
+                }
+              ],
               "text": "    switch day {\n    case 1:\n        name := \"Mon\"\n        fmt.Println(name)\n    case 2:\n        name := \"Tue\"\n        fmt.Println(name)\n    }"
             },
             {
@@ -469,7 +493,7 @@
               "mode": "ghost",
               "line": 5,
               "guide": "A package-level variable.",
-              "text": "var level = 1\n\n"
+              "text": "var level = 1\n"
             },
             {
               "mode": "ghost",

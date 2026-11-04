@@ -32,7 +32,7 @@
           "guide": "Print a number, then let the function call itself with a smaller one.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The `if` is the base case: it ends the calls. The `else` calls the same function with a smaller number.", "notes": [{"on": "countdown(n-1)", "text": "The function calls itself."}], "text": "func countdown(n int) {\n    if n == 0 {\n        fmt.Println(\"liftoff\")\n    } else {\n        fmt.Println(n)\n        countdown(n-1)\n    }\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "The `if` is the base case: it ends the calls. The `else` calls the same function with a smaller number.", "notes": [{"on": "countdown(n-1)", "text": "The function calls itself."}, {"on": "n == 0", "text": "Base case: the calls stop here."}], "text": "func countdown(n int) {\n    if n == 0 {\n        fmt.Println(\"liftoff\")\n    } else {\n        fmt.Println(n)\n        countdown(n-1)\n    }\n}\n"},
             {"mode": "ghost", "line": 14, "guide": "One call starts the chain.", "text": "func main() {\n    countdown(3)\n}"}
           ],
           "output": {
@@ -47,7 +47,7 @@
           "guide": "Multiply a number by the factorial of the one below it.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. The base case returns a value, and the other case uses the value of the smaller call.", "text": "func factorial(n int) int {\n    if n <= 1 {\n        return 1\n    }\n    return n * factorial(n-1)\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. The base case returns a value, and the other case uses the value of the smaller call.", "notes": [{"on": "n * factorial(n-1)", "text": "Multiplies n by the answer for the smaller number."}], "text": "func factorial(n int) int {\n    if n <= 1 {\n        return 1\n    }\n    return n * factorial(n-1)\n}\n"},
             {"mode": "ghost", "line": 12, "guide": "5 is 5 times 4 times 3 times 2 times 1.", "text": "func main() {\n    fmt.Println(factorial(5))\n    fmt.Println(factorial(1))\n}"}
           ],
           "output": {
@@ -263,7 +263,7 @@
           "guide": "Hide the extra parameter behind a simple entry function.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Callers pass only the number. The helper starts with 0.", "text": "func reverse(n int) int {\n    return reverseWith(n, 0)\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Callers pass only the number. The helper starts with 0.", "notes": [{"on": "reverseWith(n, 0)", "text": "Hands the work to a helper that carries acc."}], "text": "func reverse(n int) int {\n    return reverseWith(n, 0)\n}\n"},
             {"mode": "ghost", "line": 9, "guide": "Each call moves the last digit of `n` onto the end of `acc`.", "notes": [{"on": "acc*10+n%10", "text": "Shift acc left, add the last digit."}], "text": "func reverseWith(n, acc int) int {\n    if n == 0 {\n        return acc\n    }\n    return reverseWith(n/10, acc*10+n%10)\n}\n"},
             {"mode": "ghost", "line": 16, "guide": "The trailing zeros of 1200 end up in front, so they vanish.", "text": "func main() {\n    fmt.Println(reverse(472))\n    fmt.Println(reverse(1200))\n}"}
           ],

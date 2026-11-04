@@ -48,7 +48,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "Push returns the longer stack.", "text": "func push(stack []int, value int) []int {\n    return append(stack, value)\n}\n"},
             {"mode": "ghost", "line": 8, "guide": "Pop returns two things: the shorter stack and the value taken.", "text": "func pop(stack []int) ([]int, int) {\n    last := len(stack) - 1\n    return stack[:last], stack[last]\n}\n"},
-            {"mode": "ghost", "line": 12, "guide": "Both results are stored. Popping the last value leaves an empty slice.", "text": "func main() {\n    var stack []int\n    stack = push(stack, 1)\n    stack = push(stack, 2)\n    stack, value := pop(stack)\n    fmt.Println(value, stack)\n    stack, value = pop(stack)\n    fmt.Println(value, stack, len(stack))\n}"}
+            {"mode": "ghost", "line": 12, "guide": "Both results are stored. Popping the last value leaves an empty slice.", "notes": [{"on": "stack, value := pop(stack)", "text": "Allowed: value is new, and stack is reused."}], "text": "func main() {\n    var stack []int\n    stack = push(stack, 1)\n    stack = push(stack, 2)\n    stack, value := pop(stack)\n    fmt.Println(value, stack)\n    stack, value = pop(stack)\n    fmt.Println(value, stack, len(stack))\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -115,7 +115,7 @@
           "guide": "Keep some values without making a new slice.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Start from an empty piece of the same slice.", "text": "    nums := []int{1, 2, 3, 4, 5, 6}\n    kept := nums[:0]"},
+            {"mode": "ghost", "line": 6, "guide": "Start from an empty piece of the same slice.", "notes": [{"on": "nums[:0]", "text": "Empty, but it reuses the memory of nums."}], "text": "    nums := []int{1, 2, 3, 4, 5, 6}\n    kept := nums[:0]"},
             {"mode": "ghost", "line": 8, "guide": "Each kept value is appended into the space the loop already passed.", "text": "    for _, n := range nums {\n        if n%2 == 0 {\n            kept = append(kept, n)\n        }\n    }"},
             {"mode": "ghost", "line": 13, "guide": "No new storage was needed, but the original was written over on the way. Why the storage is shared comes in the Slice capacity module.", "text": "    fmt.Println(kept)\n    fmt.Println(nums)"}
           ],
@@ -163,7 +163,7 @@
           "guide": "Move the values of a slice one place left.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`copy` works inside one slice. The parts overlap, and each value moves one place left.", "text": "    ranks := []int{1, 2, 3, 4, 5}\n    moved := copy(ranks, ranks[1:])"},
+            {"mode": "ghost", "line": 6, "guide": "`copy` works inside one slice. The parts overlap, and each value moves one place left.", "notes": [{"on": "copy(ranks, ranks[1:])", "text": "Source and target overlap, and copy handles it."}], "text": "    ranks := []int{1, 2, 3, 4, 5}\n    moved := copy(ranks, ranks[1:])"},
             {"mode": "ghost", "line": 8, "guide": "`copy` returns how many values moved. The last value is a leftover.", "text": "    fmt.Println(moved, ranks)"},
             {"mode": "ghost", "line": 9, "guide": "Cut off the leftover.", "text": "    ranks = ranks[:len(ranks)-1]\n    fmt.Println(ranks)"}
           ],

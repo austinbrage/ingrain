@@ -31,9 +31,9 @@
           "guide": "Use keys that are not text.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Whole numbers work as keys, with no quotes.", "text": "    squares := map[int]int{3: 9, 1: 1, 10: 100}\n    squares[2] = 4"},
+            {"mode": "ghost", "line": 6, "guide": "Whole numbers work as keys, with no quotes.", "notes": [{"on": "map[int]int", "text": "Number keys: looked up by value, not position."}], "text": "    squares := map[int]int{3: 9, 1: 1, 10: 100}\n    squares[2] = 4"},
             {"mode": "ghost", "line": 8, "guide": "Printing sorts number keys by value, so 10 comes last.", "text": "    fmt.Println(squares)\n    fmt.Println(squares[10], squares[7])"},
-            {"mode": "ghost", "line": 10, "guide": "A bool is a key too. The index can be any expression of the key type.", "text": "    answers := map[bool]string{true: \"yes\", false: \"no\"}\n    fmt.Println(answers, answers[len(\"go\") == 2])"}
+            {"mode": "ghost", "line": 10, "guide": "A bool is a key too. The index can be any expression of the key type.", "notes": [{"on": "map[bool]string", "text": "Only two possible keys: true and false."}, {"on": "len(\"go\") == 2", "text": "Any expression can be the key; this one is true."}], "text": "    answers := map[bool]string{true: \"yes\", false: \"no\"}\n    fmt.Println(answers, answers[len(\"go\") == 2])"}
           ],
           "output": {
             "command": "go run main.go",
@@ -47,7 +47,7 @@
           "guide": "Use a pair of numbers as one key.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "The key type is an array, so each key is a pair like a point on a grid.", "notes": [{"on": "[2]int{3, 4}", "text": "The pair is the whole key."}], "text": "    seen := map[[2]int]bool{}\n    seen[[2]int{0, 1}] = true\n    seen[[2]int{3, 4}] = true"},
+            {"mode": "ghost", "line": 6, "guide": "The key type is an array, so each key is a pair like a point on a grid.", "notes": [{"on": "map[[2]int]bool", "text": "Arrays can be keys, but slices cannot."}, {"on": "[2]int{3, 4}", "text": "The pair is the whole key."}], "text": "    seen := map[[2]int]bool{}\n    seen[[2]int{0, 1}] = true\n    seen[[2]int{3, 4}] = true"},
             {"mode": "ghost", "line": 9, "guide": "The same values in another order are another key.", "text": "    fmt.Println(seen[[2]int{0, 1}], seen[[2]int{1, 0}])"},
             {"mode": "ghost", "line": 10, "guide": "Printing sorts the keys, pair by pair.", "text": "    fmt.Println(seen, len(seen))"}
           ],
@@ -71,9 +71,9 @@
           "guide": "Store a slice under each key.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "The value type is a slice. Each value is written with just its braces.", "notes": [{"on": "map[string][]string", "text": "Text keys, and a list of text for each."}], "text": "    tags := map[string][]string{\n        \"go\":   {\"fast\", \"simple\"},\n        \"rust\": {\"safe\"},\n    }"},
-            {"mode": "ghost", "line": 10, "guide": "A missing key gives the zero value of a slice: nil, with a length of 0.", "text": "    fmt.Println(len(tags[\"go\"]), tags[\"rust\"])\n    fmt.Println(tags[\"c\"] == nil, len(tags[\"c\"]))"},
-            {"mode": "ghost", "line": 12, "guide": "The slice is stored by reference, so you can set one of its values in place.", "text": "    tags[\"go\"][0] = \"quick\"\n    fmt.Println(tags[\"go\"])"}
+            {"mode": "ghost", "line": 6, "guide": "The value type is a slice. Each value is written with just its braces.", "notes": [{"on": "map[string][]string", "text": "Text keys, and a list of text for each."}, {"on": "{\"fast\", \"simple\"}", "text": "The slice type is left out; Go infers it."}], "text": "    tags := map[string][]string{\n        \"go\":   {\"fast\", \"simple\"},\n        \"rust\": {\"safe\"},\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "A missing key gives the zero value of a slice: nil, with a length of 0.", "notes": [{"on": "tags[\"c\"] == nil", "text": "A missing key gives a nil slice."}], "text": "    fmt.Println(len(tags[\"go\"]), tags[\"rust\"])\n    fmt.Println(tags[\"c\"] == nil, len(tags[\"c\"]))"},
+            {"mode": "ghost", "line": 12, "guide": "The slice is stored by reference, so you can set one of its values in place.", "notes": [{"on": "tags[\"go\"][0]", "text": "Edits the slice stored inside the map."}], "text": "    tags[\"go\"][0] = \"quick\"\n    fmt.Println(tags[\"go\"])"}
           ],
           "output": {
             "command": "go run main.go",

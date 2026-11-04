@@ -32,9 +32,9 @@
           "guide": "Inside `main`, declare two variables with `var` and print them.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`var` declares a variable: its name, then its type, then its value.", "notes": [{"on": "string", "text": "The type goes after the name."}], "text": "    var name string = \"Ana\""},
+            {"mode": "ghost", "line": 6, "guide": "`var` declares a variable: its name, then its type, then its value.", "notes": [{"on": "var", "text": "Makes a variable you can change later."}, {"on": "string", "text": "The type goes after the name."}], "text": "    var name string = \"Ana\""},
             {"mode": "ghost", "line": 7, "guide": "`int` is a whole number.", "text": "    var age int = 30"},
-            {"mode": "ghost", "line": 8, "guide": "`Println` prints its values, separated by a space.", "text": "    fmt.Println(name, age)"}
+            {"mode": "ghost", "line": 8, "guide": "`Println` prints its values, separated by a space.", "notes": [{"on": "name, age", "text": "Prints each value, separated by a space."}], "text": "    fmt.Println(name, age)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -56,7 +56,7 @@
           "guide": "Declare three variables without a value, then print them.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Without a value, a variable starts with the **zero value** of its type: 0, empty text or false.", "text": "    var count int\n    var name string\n    var ok bool"},
+            {"mode": "ghost", "line": 6, "guide": "Without a value, a variable starts with the **zero value** of its type: 0, empty text or false.", "notes": [{"on": "var count int", "text": "With no value, a variable starts at zero."}, {"on": "bool", "text": "Holds either true or false."}], "text": "    var count int\n    var name string\n    var ok bool"},
             {"mode": "ghost", "line": 9, "guide": "The empty text prints as nothing, so there are two spaces in the output.", "text": "    fmt.Println(count, name, ok)"}
           ],
           "output": {
@@ -132,7 +132,7 @@
           "guide": "Declare two variables and swap them in one line.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "You can declare several variables on one line.", "text": "    a, b := 1, 2"},
+            {"mode": "ghost", "line": 6, "guide": "You can declare several variables on one line.", "notes": [{"on": "a, b :=", "text": "Declares two variables in one line."}], "text": "    a, b := 1, 2"},
             {"mode": "ghost", "line": 7, "guide": "Both sides are worked out before the assignment, so this swaps the values.", "notes": [{"on": "b, a", "text": "The right side is read first."}], "text": "    a, b = b, a"},
             {"mode": "copy", "line": 8, "guide": "Print them.", "text": "    fmt.Println(a, b)"}
           ],
@@ -203,7 +203,7 @@
           "guide": "Declare several variables per line, then print them.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Several names can share one type. Both start at 0.", "text": "    var width, height int"},
+            {"mode": "ghost", "line": 6, "guide": "Several names can share one type. Both start at 0.", "notes": [{"on": "width, height", "text": "Two variables of one type in a single line."}], "text": "    var width, height int"},
             {"mode": "ghost", "line": 7, "guide": "Assign both in one line, in order.", "text": "    width, height = 4, 3"},
             {"mode": "ghost", "line": 8, "guide": "`:=` also takes several names, and each one gets the type of its own value.", "text": "    name, age := \"Ana\", 30"},
             {"mode": "copy", "line": 9, "guide": "Print all four.", "text": "    fmt.Println(width, height, name, age)"}
@@ -238,7 +238,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "`_` is the **blank identifier**. It takes the first value and discards it, so only `score` is kept.", "notes": [{"on": "_", "text": "The value is thrown away."}], "text": "    _, score := \"Ana\", 90"},
             {"mode": "ghost", "line": 7, "guide": "Nothing uses `count` yet, and Go would refuse to compile it.", "text": "    count := 3"},
-            {"mode": "ghost", "line": 8, "guide": "Assigning it to `_` counts as a use.", "text": "    _ = count"},
+            {"mode": "ghost", "line": 8, "guide": "Assigning it to `_` counts as a use.", "notes": [{"on": "_ = count", "text": "Counts as a use, so Go does not complain."}], "text": "    _ = count"},
             {"mode": "copy", "line": 9, "guide": "Print the score.", "text": "    fmt.Println(score)"}
           ],
           "output": {
@@ -269,7 +269,7 @@
           "guide": "Declare a variable at the top of the file, outside `main`.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 5, "guide": "Outside a function, every declaration starts with `var`. The short form `:=` only works inside functions.", "notes": [{"on": "var", "text": "Here := would not compile."}], "text": "var language = \"Go\"\n\n"},
+            {"mode": "ghost", "line": 5, "guide": "Outside a function, every declaration starts with `var`. The short form `:=` only works inside functions.", "notes": [{"on": "var", "text": "Here := would not compile."}, {"on": "= \"Go\"", "text": "The type is worked out from the value."}], "text": "var language = \"Go\"\n"},
             {"mode": "ghost", "line": 8, "guide": "Inside `main`, `:=` is fine.", "text": "    version := 1"},
             {"mode": "copy", "line": 9, "guide": "Print both.", "text": "    fmt.Println(language, version)"}
           ],

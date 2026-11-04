@@ -62,7 +62,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "No type is written, so `factor` is an untyped constant: just the number 3.", "text": "    const factor = 3"},
             {"mode": "ghost", "line": 7, "guide": "It fits an `int`...", "text": "    var count int = factor"},
-            {"mode": "ghost", "line": 8, "guide": "...and a `float64`, a number with decimals. A variable could not do this.", "text": "    var ratio float64 = factor"},
+            {"mode": "ghost", "line": 8, "guide": "...and a `float64`, a number with decimals. A variable could not do this.", "notes": [{"on": "float64", "text": "A number type that allows decimals."}], "text": "    var ratio float64 = factor"},
             {"mode": "ghost", "line": 9, "guide": "Both hold 3.", "text": "    fmt.Println(count, ratio)"}
           ],
           "output": {
@@ -85,7 +85,7 @@
           "guide": "Group three constants and let `iota` number them.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`const` with parentheses groups constants. `iota` is 0 on the first line, and a line with no value repeats the one above, so `iota` gives 1, then 2.", "notes": [{"on": "iota", "text": "A counter that grows by one per line."}], "text": "    const (\n        Low = iota\n        Medium\n        High\n    )"},
+            {"mode": "ghost", "line": 6, "guide": "`const` with parentheses groups constants. `iota` is 0 on the first line, and a line with no value repeats the one above, so `iota` gives 1, then 2.", "notes": [{"on": "const (", "text": "Groups several constants in one block."}, {"on": "iota", "text": "A counter that grows by one per line."}, {"on": "Medium", "text": "A name with no value repeats the line above."}], "text": "    const (\n        Low = iota\n        Medium\n        High\n    )"},
             {"mode": "ghost", "line": 11, "guide": "Print the three numbers.", "text": "    fmt.Println(Low, Medium, High)"}
           ],
           "output": {
@@ -138,7 +138,7 @@
           "guide": "Type one constant and mix it with an untyped one.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "A type after the name makes `price` a typed constant: always an `int`.", "text": "    const price int = 20"},
+            {"mode": "ghost", "line": 6, "guide": "A type after the name makes `price` a typed constant: always an `int`.", "notes": [{"on": "int", "text": "A typed constant only mixes with that type."}], "text": "    const price int = 20"},
             {"mode": "ghost", "line": 7, "guide": "No type here, so `tax` is untyped and adapts.", "text": "    const tax = 5"},
             {"mode": "ghost", "line": 8, "guide": "The untyped one takes the `int` type of the other, so they add up.", "text": "    var total int = price + tax"},
             {"mode": "ghost", "line": 9, "guide": "Print the total.", "text": "    fmt.Println(total)"}
@@ -171,7 +171,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "The first constant is a plain number.", "text": "    const minute = 60"},
-            {"mode": "ghost", "line": 7, "guide": "A constant can be an expression on other constants. Go does the math while compiling.", "text": "    const hour = 60 * minute"},
+            {"mode": "ghost", "line": 7, "guide": "A constant can be an expression on other constants. Go does the math while compiling.", "notes": [{"on": "60 * minute", "text": "Worked out while compiling, from another constant."}], "text": "    const hour = 60 * minute"},
             {"mode": "ghost", "line": 8, "guide": "It can build on the one above it too.", "text": "    const day = 24 * hour"},
             {"mode": "ghost", "line": 9, "guide": "Print the results.", "text": "    fmt.Println(hour, day)"}
           ],
@@ -226,7 +226,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "`<<` shifts a number to the left. `1 << iota` is 1, then 2, then 4: it doubles on each line.", "notes": [{"on": "1 << iota", "text": "Doubles on each line."}], "text": "    const (\n        Read = 1 << iota\n        Write\n        Execute\n    )"},
-            {"mode": "ghost", "line": 11, "guide": "A new block starts `iota` again at 0. Multiply it to jump by 10.", "text": "    const (\n        Small = iota * 10\n        Medium\n        Large\n    )"},
+            {"mode": "ghost", "line": 11, "guide": "A new block starts `iota` again at 0. Multiply it to jump by 10.", "notes": [{"on": "iota * 10", "text": "Multiplies the counter: 0, 10, 20."}], "text": "    const (\n        Small = iota * 10\n        Medium\n        Large\n    )"},
             {"mode": "ghost", "line": 16, "guide": "Print both blocks.", "text": "    fmt.Println(Read, Write, Execute)"},
             {"mode": "ghost", "line": 17, "guide": "The second block restarted at 0.", "text": "    fmt.Println(Small, Medium, Large)"}
           ],

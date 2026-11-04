@@ -29,7 +29,7 @@
           "guide": "Declare a function that prints a line, then call it twice.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "`func` declares a function: a name, parentheses and a body in braces. The body does not run yet.", "notes": [{"on": "greet", "text": "You choose the name."}], "text": "func greet() {\n    fmt.Println(\"Hello, Go!\")\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "`func` declares a function: a name, parentheses and a body in braces. The body does not run yet.", "notes": [{"on": "greet", "text": "You choose the name."}, {"on": "func", "text": "Declares a function you can call by name."}], "text": "func greet() {\n    fmt.Println(\"Hello, Go!\")\n}\n"},
             {"mode": "ghost", "line": 9, "guide": "`main` is a function too. Call `greet` by its name with parentheses. Each call runs the body again.", "text": "func main() {\n    greet()\n    greet()\n}"}
           ],
           "output": {
@@ -45,7 +45,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A **parameter** is a name with a type, inside the parentheses. The body uses it like a variable.", "notes": [{"on": "name string", "text": "Callers must pass a string here."}], "text": "func greet(name string) {\n    fmt.Println(\"Hello,\", name)\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "The value you pass in a call is an **argument**. It fills the parameter.", "text": "func main() {\n    greet(\"Ana\")\n    greet(\"Luis\")\n}"}
+            {"mode": "ghost", "line": 9, "guide": "The value you pass in a call is an **argument**. It fills the parameter.", "notes": [{"on": "\"Ana\"", "text": "The argument fills the name parameter."}], "text": "func main() {\n    greet(\"Ana\")\n    greet(\"Luis\")\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -59,7 +59,7 @@
           "guide": "Describe a person with a name and an age.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Separate the parameters with commas. Each one has its own type.", "text": "func describe(name string, age int) {\n    fmt.Println(name, \"is\", age, \"years old\")\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "Separate the parameters with commas. Each one has its own type.", "notes": [{"on": "name string, age int", "text": "Parameters are separated by commas."}], "text": "func describe(name string, age int) {\n    fmt.Println(name, \"is\", age, \"years old\")\n}\n"},
             {"mode": "ghost", "line": 9, "guide": "Arguments go in the same order as the parameters.", "text": "func main() {\n    describe(\"Ana\", 30)\n    describe(\"Luis\", 25)\n}"}
           ],
           "output": {
@@ -82,8 +82,8 @@
           "guide": "Write a function that adds two numbers and gives the sum back.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The type after the parentheses is what the function gives back. `return` sends that value to the caller.", "notes": [{"on": "return", "text": "Ends the function and hands back the value."}], "text": "func add(a int, b int) int {\n    return a + b\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "A call that returns a value can be stored in a variable, like any other value.", "text": "func main() {\n    total := add(2, 3)\n    fmt.Println(total)\n}"}
+            {"mode": "ghost", "line": 5, "guide": "The type after the parentheses is what the function gives back. `return` sends that value to the caller.", "notes": [{"on": "return", "text": "Ends the function and hands back the value."}, {"on": "b int) int", "text": "The type after the parentheses is what comes back."}], "text": "func add(a int, b int) int {\n    return a + b\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "A call that returns a value can be stored in a variable, like any other value.", "notes": [{"on": "add(2, 3)", "text": "The returned value is stored in total."}], "text": "func main() {\n    total := add(2, 3)\n    fmt.Println(total)\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -119,7 +119,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "Neighbor parameters of the same type can share it: write the type once, after the last name.", "notes": [{"on": "width, height int", "text": "Both parameters are ints."}], "text": "func area(width, height int) int {\n    return width * height\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "A call can sit inside another call. The result goes straight to `Println`.", "text": "func main() {\n    fmt.Println(area(3, 4))\n    fmt.Println(area(5, 2))\n}"}
+            {"mode": "ghost", "line": 9, "guide": "A call can sit inside another call. The result goes straight to `Println`.", "notes": [{"on": "area(3, 4)", "text": "The result goes straight into Println."}], "text": "func main() {\n    fmt.Println(area(3, 4))\n    fmt.Println(area(5, 2))\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -141,8 +141,8 @@
           "guide": "Build one function on top of another, with `main` first.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "`main` can call a function written below it. Go reads the whole file before it runs.", "text": "func main() {\n    fmt.Println(quadruple(3))\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "A function can call another one. The inner call runs first, and its result goes to the outer one.", "text": "func quadruple(n int) int {\n    return double(double(n))\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "`main` can call a function written below it. Go reads the whole file before it runs.", "notes": [{"on": "quadruple(3)", "text": "Declared below: order does not matter."}], "text": "func main() {\n    fmt.Println(quadruple(3))\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "A function can call another one. The inner call runs first, and its result goes to the outer one.", "notes": [{"on": "double(double(n))", "text": "The inner call runs first."}], "text": "func quadruple(n int) int {\n    return double(double(n))\n}\n"},
             {"mode": "ghost", "line": 13, "guide": "The helper the others rely on.", "text": "func double(n int) int {\n    return n * 2\n}"}
           ],
           "output": {

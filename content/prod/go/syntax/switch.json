@@ -24,7 +24,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A number to test.", "text": "    day := 3"},
-            {"mode": "ghost", "line": 7, "guide": "`switch` compares `day` with each `case`, from the top. The first match runs its block and the switch ends. `default` runs when nothing matches.", "notes": [{"on": "default", "text": "Runs when no case matches."}], "text": "    switch day {\n    case 1:\n        fmt.Println(\"Monday\")\n    case 2:\n        fmt.Println(\"Tuesday\")\n    case 3:\n        fmt.Println(\"Wednesday\")\n    default:\n        fmt.Println(\"Another day\")\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "`switch` compares `day` with each `case`, from the top. The first match runs its block and the switch ends. `default` runs when nothing matches.", "notes": [{"on": "default", "text": "Runs when no case matches."}, {"on": "switch day", "text": "Compares day with each case below."}, {"on": "case 1:", "text": "Runs when the value equals 1."}], "text": "    switch day {\n    case 1:\n        fmt.Println(\"Monday\")\n    case 2:\n        fmt.Println(\"Tuesday\")\n    case 3:\n        fmt.Println(\"Wednesday\")\n    default:\n        fmt.Println(\"Another day\")\n    }"},
             {"mode": "ghost", "line": 17, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"done\")"}
           ],
           "output": {
@@ -144,7 +144,7 @@
           "guide": "Declare a value in the switch line and compare it.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "The part before the `;` runs first. `size` lives only inside this switch, and the part after the `;` is the value to compare.", "notes": [{"on": "size :=", "text": "Gone after the closing brace."}], "text": "    switch size := len(\"go\"); size {\n    case 1:\n        fmt.Println(\"single\")\n    case 2:\n        fmt.Println(\"pair\")\n    default:\n        fmt.Println(\"long\")\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "The part before the `;` runs first. `size` lives only inside this switch, and the part after the `;` is the value to compare.", "notes": [{"on": "size :=", "text": "Gone after the closing brace."}, {"on": "; size", "text": "After the setup, this is the value to compare."}], "text": "    switch size := len(\"go\"); size {\n    case 1:\n        fmt.Println(\"single\")\n    case 2:\n        fmt.Println(\"pair\")\n    default:\n        fmt.Println(\"long\")\n    }"},
             {"mode": "ghost", "line": 14, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"done\")"}
           ],
           "output": {
@@ -159,7 +159,7 @@
           "guide": "Combine a setup with cases that hold conditions.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "With a setup and no value, the `;` stays and each `case` holds a condition that can use the new variable.", "notes": [{"on": "7 * 2", "text": "An expression works as the setup."}], "text": "    switch n := 7 * 2; {\n    case n > 20:\n        fmt.Println(\"large\")\n    case n > 10:\n        fmt.Println(\"medium\")\n    default:\n        fmt.Println(\"small\")\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "With a setup and no value, the `;` stays and each `case` holds a condition that can use the new variable.", "notes": [{"on": "7 * 2", "text": "An expression works as the setup."}, {"on": "; {", "text": "Nothing to compare after the setup: cases are conditions."}], "text": "    switch n := 7 * 2; {\n    case n > 20:\n        fmt.Println(\"large\")\n    case n > 10:\n        fmt.Println(\"medium\")\n    default:\n        fmt.Println(\"small\")\n    }"},
             {"mode": "ghost", "line": 14, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"checked\")"}
           ],
           "output": {
@@ -184,7 +184,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A number to test.", "text": "    age := 15"},
             {"mode": "ghost", "line": 7, "guide": "`break` jumps out of the switch at once, so the lines left in the case are skipped.", "notes": [{"on": "break", "text": "Ends the whole switch, not just the if."}], "text": "    switch {\n    case age > 0:\n        if age < 18 {\n            fmt.Println(\"minor\")\n            break\n        }\n        fmt.Println(\"adult\")\n    default:\n        fmt.Println(\"invalid\")\n    }"},
-            {"mode": "ghost", "line": 18, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"done\")"}
+            {"mode": "ghost", "line": 17, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"done\")"}
           ],
           "output": {
             "command": "go run main.go",

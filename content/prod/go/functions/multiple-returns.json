@@ -32,8 +32,8 @@
           "guide": "Write a function that gives its two inputs back in reverse order.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "List one type per returned value, in parentheses. `return` gives the values in that order.", "notes": [{"on": "(string, string)", "text": "Two values come back, both strings."}], "text": "func swap(a, b string) (string, string) {\n    return b, a\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "The caller names one variable for each returned value, in order.", "text": "func main() {\n    x, y := swap(\"left\", \"right\")\n    fmt.Println(x, y)\n}"}
+            {"mode": "ghost", "line": 5, "guide": "List one type per returned value, in parentheses. `return` gives the values in that order.", "notes": [{"on": "(string, string)", "text": "Two values come back, both strings."}, {"on": "return b, a", "text": "Gives back two values at once."}], "text": "func swap(a, b string) (string, string) {\n    return b, a\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "The caller names one variable for each returned value, in order.", "notes": [{"on": "x, y :=", "text": "One variable per returned value."}], "text": "func main() {\n    x, y := swap(\"left\", \"right\")\n    fmt.Println(x, y)\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -72,7 +72,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "Quotient and remainder of a division, returned together.", "text": "func divmod(a, b int) (int, int) {\n    return a / b, a % b\n}\n"},
             {"mode": "ghost", "line": 9, "guide": "`_` stands where a value you do not need would go. It discards that value, so no variable is left unused.", "notes": [{"on": "_, r", "text": "The quotient is thrown away."}], "text": "func main() {\n    _, r := divmod(17, 5)\n    fmt.Println(r)\n}"},
-            {"mode": "ghost", "line": 12, "guide": "`_` can sit in any position. Now keep the quotient and drop the remainder.", "text": "    q, _ := divmod(17, 5)\n    fmt.Println(q)\n"}
+            {"mode": "ghost", "line": 12, "guide": "`_` can sit in any position. Now keep the quotient and drop the remainder.", "notes": [{"on": "q, _", "text": "Keeps the quotient and drops the remainder."}], "text": "    q, _ := divmod(17, 5)\n    fmt.Println(q)\n"}
           ],
           "output": {
             "command": "go run main.go",
@@ -120,7 +120,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "The second value is a `bool`: `false` when the first value means nothing.", "notes": [{"on": "(int, bool)", "text": "A number, plus whether it is valid."}], "text": "func safeDivide(a, b int) (int, bool) {\n    if b == 0 {\n        return 0, false\n    }\n    return a / b, true\n}\n"},
-            {"mode": "ghost", "line": 12, "guide": "Assign to variables that already exist with `=`, not `:=`.", "text": "func main() {\n    result, ok := safeDivide(10, 2)\n    fmt.Println(result, ok)\n    result, ok = safeDivide(1, 0)\n    fmt.Println(result, ok)\n}"}
+            {"mode": "ghost", "line": 12, "guide": "Assign to variables that already exist with `=`, not `:=`.", "notes": [{"on": "result, ok =", "text": "Reuses the variables instead of declaring new ones."}], "text": "func main() {\n    result, ok := safeDivide(10, 2)\n    fmt.Println(result, ok)\n    result, ok = safeDivide(1, 0)\n    fmt.Println(result, ok)\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -134,8 +134,8 @@
           "guide": "Use the flag to decide what to print.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Half of a number, and whether it was exact.", "text": "func half(n int) (int, bool) {\n    return n / 2, n % 2 == 0\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "The flag is a `bool`, so it works directly as a condition.", "text": "func main() {\n    h, even := half(7)\n    if even {\n        fmt.Println(\"half is\", h)\n    } else {\n        fmt.Println(7, \"is odd\")\n    }\n}"}
+            {"mode": "ghost", "line": 5, "guide": "Half of a number, and whether it was exact.", "notes": [{"on": "n % 2 == 0", "text": "The comparison itself is the returned flag."}], "text": "func half(n int) (int, bool) {\n    return n / 2, n % 2 == 0\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "The flag is a `bool`, so it works directly as a condition.", "notes": [{"on": "if even", "text": "A bool works as a condition by itself."}], "text": "func main() {\n    h, even := half(7)\n    if even {\n        fmt.Println(\"half is\", h)\n    } else {\n        fmt.Println(7, \"is odd\")\n    }\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -157,7 +157,7 @@
           "guide": "Split a number into its tens and its ones.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Give each result a name. They exist from the start, so you assign them. A bare `return` gives them back.", "notes": [{"on": "return\n", "text": "No values listed: it returns the named ones."}], "text": "func split(total int) (whole, rest int) {\n    whole = total / 10\n    rest = total % 10\n    return\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "Give each result a name. They exist from the start, so you assign them. A bare `return` gives them back.", "notes": [{"on": "return\n", "text": "No values listed: it returns the named ones."}, {"on": "whole, rest int", "text": "Names the two results, both ints."}], "text": "func split(total int) (whole, rest int) {\n    whole = total / 10\n    rest = total % 10\n    return\n}\n"},
             {"mode": "ghost", "line": 11, "guide": "The caller does not see the names. It receives two plain values.", "text": "func main() {\n    tens, ones := split(47)\n    fmt.Println(tens, ones)\n}"}
           ],
           "output": {
@@ -222,7 +222,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "One function returns two numbers, the other takes two.", "text": "func pair() (int, int) {\n    return 9, 4\n}\n"},
             {"mode": "ghost", "line": 9, "guide": "A function that takes two numbers.", "text": "func gap(a, b int) int {\n    return a - b\n}\n"},
-            {"mode": "ghost", "line": 13, "guide": "Put the call inside the other call. Its two values become the two arguments. `Println` takes them too.", "notes": [{"on": "gap(pair())", "text": "pair's two values become gap's arguments."}], "text": "func main() {\n    fmt.Println(gap(pair()))\n    fmt.Println(pair())\n}"}
+            {"mode": "ghost", "line": 13, "guide": "Put the call inside the other call. Its two values become the two arguments. `Println` takes them too.", "notes": [{"on": "gap(pair())", "text": "pair's two values become gap's arguments."}, {"on": "Println(pair())", "text": "Println takes both values too."}], "text": "func main() {\n    fmt.Println(gap(pair()))\n    fmt.Println(pair())\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -251,7 +251,7 @@
           "guide": "Find the first number in a range that a divisor divides, and say whether there is one.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Set the results only when you find a match, then leave with a bare `return`. If nothing matches, the last `return` gives the zeros.", "notes": [{"on": "ok = true", "text": "The flag says the number is valid."}], "text": "func find(k, lo, hi int) (n int, ok bool) {\n    for i := lo; i <= hi; i++ {\n        if i%k == 0 {\n            n = i\n            ok = true\n            return\n        }\n    }\n    return\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "Set the results only when you find a match, then leave with a bare `return`. If nothing matches, the last `return` gives the zeros.", "notes": [{"on": "ok = true", "text": "The flag says the number is valid."}, {"on": "n int, ok bool", "text": "Named results can have different types."}], "text": "func find(k, lo, hi int) (n int, ok bool) {\n    for i := lo; i <= hi; i++ {\n        if i%k == 0 {\n            n = i\n            ok = true\n            return\n        }\n    }\n    return\n}\n"},
             {"mode": "ghost", "line": 16, "guide": "Check each range. The second has no multiple of 7.", "text": "func main() {\n    n, ok := find(7, 10, 20)\n    fmt.Println(n, ok)\n    n, ok = find(7, 15, 20)\n    fmt.Println(n, ok)\n}"}
           ],
           "output": {

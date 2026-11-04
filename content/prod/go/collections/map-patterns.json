@@ -36,7 +36,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "One key stores 0 and the other is missing. A plain lookup cannot tell them apart.", "text": "    prices := map[string]int{\"tea\": 3, \"gum\": 0}\n    fmt.Println(prices[\"gum\"], prices[\"pen\"])"},
             {"mode": "ghost", "line": 8, "guide": "A lookup can give two values: the value, and whether the key exists.", "notes": [{"on": "ok :=", "text": "True when the key is in the map."}], "text": "    price, ok := prices[\"gum\"]\n    fmt.Println(price, ok)"},
-            {"mode": "ghost", "line": 10, "guide": "A missing key gives the zero value and false. Both names exist now, so use `=`.", "text": "    price, ok = prices[\"pen\"]\n    fmt.Println(price, ok)"}
+            {"mode": "ghost", "line": 10, "guide": "A missing key gives the zero value and false. Both names exist now, so use `=`.", "notes": [{"on": "price, ok =", "text": "Assigns again to the same two variables."}], "text": "    price, ok = prices[\"pen\"]\n    fmt.Println(price, ok)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -52,7 +52,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A map with a single entry.", "text": "    stock := map[string]int{\"pen\": 4}"},
             {"mode": "ghost", "line": 7, "guide": "Do the lookup in the `if` and test `ok`. Both names only exist inside the `if`.", "text": "    if qty, ok := stock[\"pen\"]; ok {\n        fmt.Println(\"pen:\", qty)\n    }"},
-            {"mode": "ghost", "line": 10, "guide": "`_` skips the value when only the presence matters. `!ok` means the key is missing.", "text": "    if _, ok := stock[\"ink\"]; !ok {\n        fmt.Println(\"no ink\")\n    }"}
+            {"mode": "ghost", "line": 10, "guide": "`_` skips the value when only the presence matters. `!ok` means the key is missing.", "notes": [{"on": "!ok", "text": "True when the key is missing."}], "text": "    if _, ok := stock[\"ink\"]; !ok {\n        fmt.Println(\"no ink\")\n    }"}
           ],
           "output": {
             "command": "go run main.go",
@@ -76,7 +76,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A map of scores.", "text": "    scores := map[string]int{\n        \"Ana\":   8,\n        \"Eva\":   5,\n        \"Leo\":   9,\n        \"Maria\": 6,\n    }"},
             {"mode": "ghost", "line": 12, "guide": "`range` over a map gives each key and its value. The order is random, but a sum is the same in any order.", "notes": [{"on": "range scores", "text": "Visits every entry, in random order."}], "text": "    total := 0\n    for _, score := range scores {\n        total += score\n    }\n    fmt.Println(total)"},
-            {"mode": "ghost", "line": 17, "guide": "With one variable, `range` gives only the keys. Counting is also safe in any order.", "text": "    short := 0\n    for name := range scores {\n        if len(name) == 3 {\n            short++\n        }\n    }\n    fmt.Println(short)"}
+            {"mode": "ghost", "line": 17, "guide": "With one variable, `range` gives only the keys. Counting is also safe in any order.", "notes": [{"on": "name := range", "text": "One variable gives only the key."}], "text": "    short := 0\n    for name := range scores {\n        if len(name) == 3 {\n            short++\n        }\n    }\n    fmt.Println(short)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -166,7 +166,7 @@
             {"mode": "ghost", "line": 6, "guide": "A list with repeated names.", "text": "    names := []string{\"Ana\", \"Eva\", \"Ana\", \"Leo\", \"Eva\"}"},
             {"mode": "ghost", "line": 7, "guide": "The set remembers the names already seen, and `unique` collects the rest.", "text": "    seen := make(map[string]bool)\n    var unique []string"},
             {"mode": "ghost", "line": 9, "guide": "A name that is not in the set yet is new: mark it and keep it.", "notes": [{"on": "!seen[name]", "text": "True only the first time a name shows up."}], "text": "    for _, name := range names {\n        if !seen[name] {\n            seen[name] = true\n            unique = append(unique, name)\n        }\n    }"},
-            {"mode": "ghost", "line": 16, "guide": "Only the first of each name stays, in order.", "text": "    fmt.Println(unique, len(unique))"}
+            {"mode": "ghost", "line": 15, "guide": "Only the first of each name stays, in order.", "text": "    fmt.Println(unique, len(unique))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -256,10 +256,10 @@
           "guide": "Keep the grades of each student, by subject.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "A map whose values are maps: each student has their own subjects.", "text": "    grades := make(map[string]map[string]int)"},
-            {"mode": "ghost", "line": 7, "guide": "A student with no inner map yet gets one before any write. Writing to a nil map stops the program.", "notes": [{"on": "== nil", "text": "A missing student reads as a nil map."}], "text": "    if grades[\"Ana\"] == nil {\n        grades[\"Ana\"] = make(map[string]int)\n    }\n    grades[\"Ana\"][\"math\"] = 9\n    grades[\"Ana\"][\"art\"] = 7"},
+            {"mode": "ghost", "line": 6, "guide": "A map whose values are maps: each student has their own subjects.", "notes": [{"on": "map[string]map[string]int", "text": "Each value is itself a map."}], "text": "    grades := make(map[string]map[string]int)"},
+            {"mode": "ghost", "line": 7, "guide": "A student with no inner map yet gets one before any write. Writing to a nil map stops the program.", "notes": [{"on": "== nil", "text": "A missing student reads as a nil map."}, {"on": "grades[\"Ana\"][\"math\"]", "text": "The first index finds the inner map, the second its entry."}], "text": "    if grades[\"Ana\"] == nil {\n        grades[\"Ana\"] = make(map[string]int)\n    }\n    grades[\"Ana\"][\"math\"] = 9\n    grades[\"Ana\"][\"art\"] = 7"},
             {"mode": "ghost", "line": 12, "guide": "Or build the whole inner map at once with a literal.", "text": "    grades[\"Eva\"] = map[string]int{\"math\": 6}\n    fmt.Println(grades)"},
-            {"mode": "ghost", "line": 14, "guide": "Reading through a missing student is safe: it gives 0 and adds nothing.", "text": "    fmt.Println(grades[\"Leo\"][\"math\"], len(grades))"}
+            {"mode": "ghost", "line": 14, "guide": "Reading through a missing student is safe: it gives 0 and adds nothing.", "notes": [{"on": "grades[\"Leo\"][\"math\"]", "text": "A missing outer key still reads as 0."}], "text": "    fmt.Println(grades[\"Leo\"][\"math\"], len(grades))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -273,9 +273,9 @@
           "guide": "Check the outer key, then the inner key.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Ana has an art grade of 0, stored on purpose.", "text": "    scores := map[string]map[string]int{\n        \"Ana\": {\"math\": 9, \"art\": 0},\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "Ana has an art grade of 0, stored on purpose.", "notes": [{"on": "\"Ana\": {\"math\"", "text": "The inner map type can be left out here."}], "text": "    scores := map[string]map[string]int{\n        \"Ana\": {\"math\": 9, \"art\": 0},\n    }"},
             {"mode": "ghost", "line": 9, "guide": "Ask for the student first, then for the subject inside. A stored 0 still counts as there.", "text": "    if subjects, ok := scores[\"Ana\"]; ok {\n        if grade, ok := subjects[\"art\"]; ok {\n            fmt.Println(\"art:\", grade)\n        }\n    }"},
-            {"mode": "ghost", "line": 14, "guide": "To check only the inner key, leave the outer lookup inline: a missing student reads as an empty map.", "text": "    if _, ok := scores[\"Leo\"][\"math\"]; !ok {\n        fmt.Println(\"no math for Leo\")\n    }"}
+            {"mode": "ghost", "line": 14, "guide": "To check only the inner key, leave the outer lookup inline: a missing student reads as an empty map.", "notes": [{"on": "scores[\"Leo\"][\"math\"]", "text": "Safe even though Leo is missing."}], "text": "    if _, ok := scores[\"Leo\"][\"math\"]; !ok {\n        fmt.Println(\"no math for Leo\")\n    }"}
           ],
           "output": {
             "command": "go run main.go",

@@ -36,7 +36,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "An array has a fixed length, written in brackets before the type. Without values, every position starts at the zero value.", "notes": [{"on": "[3]int", "text": "The 3 is the length, and it never changes."}], "text": "    var scores [3]int\n    fmt.Println(scores)"},
-            {"mode": "ghost", "line": 8, "guide": "A position is picked with its index in brackets. The first one is 0.", "text": "    scores[0] = 90\n    scores[2] = 75\n    fmt.Println(scores)"}
+            {"mode": "ghost", "line": 8, "guide": "A position is picked with its index in brackets. The first one is 0.", "notes": [{"on": "scores[0]", "text": "Counting starts at 0, so this is the first position."}], "text": "    scores[0] = 90\n    scores[2] = 75\n    fmt.Println(scores)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -154,7 +154,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Three arrays of the same type. Two hold the same values, in the same order.", "text": "    current := [2]int{1, 2}\n    saved := [2]int{1, 2}\n    swapped := [2]int{2, 1}"},
-            {"mode": "ghost", "line": 9, "guide": "`==` compares the values one by one, in order.", "text": "    fmt.Println(current == saved)\n    fmt.Println(current == swapped)"}
+            {"mode": "ghost", "line": 9, "guide": "`==` compares the values one by one, in order.", "notes": [{"on": "current == saved", "text": "Arrays are equal when every position matches."}], "text": "    fmt.Println(current == saved)\n    fmt.Println(current == swapped)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -240,9 +240,9 @@
           "guide": "Write literals that set only some positions.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Fewer values than the length is fine. The positions left over keep the zero value.", "text": "    early := [5]int{1, 2}\n    fmt.Println(early)"},
-            {"mode": "ghost", "line": 8, "guide": "An index and a colon before a value put it in that position.", "notes": [{"on": "3: 30", "text": "Position 3 gets 30."}], "text": "    picked := [5]int{1: 10, 3: 30}\n    fmt.Println(picked)"},
-            {"mode": "ghost", "line": 10, "guide": "With `...` the length reaches the highest position named.", "text": "    tail := [...]int{4: 1}\n    fmt.Println(len(tail))"}
+            {"mode": "ghost", "line": 6, "guide": "Fewer values than the length is fine. The positions left over keep the zero value.", "notes": [{"on": "{1, 2}", "text": "Positions left out stay at zero."}], "text": "    early := [5]int{1, 2}\n    fmt.Println(early)"},
+            {"mode": "ghost", "line": 8, "guide": "An index and a colon before a value put it in that position.", "notes": [{"on": "3: 30", "text": "Position 3 gets 30."}, {"on": "1: 10", "text": "A number before the colon picks the position."}], "text": "    picked := [5]int{1: 10, 3: 30}\n    fmt.Println(picked)"},
+            {"mode": "ghost", "line": 10, "guide": "With `...` the length reaches the highest position named.", "notes": [{"on": "4: 1", "text": "Position 4 is the last, so the length becomes 5."}], "text": "    tail := [...]int{4: 1}\n    fmt.Println(len(tail))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -257,7 +257,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Two lengths make a grid: 2 rows, each with 3 ints.", "notes": [{"on": "[2][3]int", "text": "Rows first, then columns."}], "text": "    var grid [2][3]int\n    fmt.Println(grid)"},
-            {"mode": "ghost", "line": 8, "guide": "The outer loop walks the rows and the inner one the columns. Two indexes pick a cell.", "text": "    for r := 0; r < 2; r++ {\n        for c := 0; c < 3; c++ {\n            grid[r][c] = r*3 + c\n        }\n    }"},
+            {"mode": "ghost", "line": 8, "guide": "The outer loop walks the rows and the inner one the columns. Two indexes pick a cell.", "notes": [{"on": "grid[r][c]", "text": "First the row, then the column."}], "text": "    for r := 0; r < 2; r++ {\n        for c := 0; c < 3; c++ {\n            grid[r][c] = r*3 + c\n        }\n    }"},
             {"mode": "ghost", "line": 13, "guide": "`len` of the grid counts rows, and `len` of one row counts columns.", "text": "    fmt.Println(grid)\n    fmt.Println(grid[1][2], len(grid), len(grid[0]))"}
           ],
           "output": {

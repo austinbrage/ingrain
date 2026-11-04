@@ -22,7 +22,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "The skeleton is already in the file. Start with the name.", "text": "    name := \"Ana\""},
             {"mode": "ghost", "line": 7, "guide": "And a whole number for the age.", "text": "    age := 30"},
-            {"mode": "ghost", "line": 8, "guide": "`Printf` fills each `%` verb with the next value. `%s` is for text and `%d` for whole numbers.", "notes": [{"on": "\\n", "text": "Printf adds no new line, so you add one."}], "text": "    fmt.Printf(\"%s is %d years old\\n\", name, age)"}
+            {"mode": "ghost", "line": 8, "guide": "`Printf` fills each `%` verb with the next value. `%s` is for text and `%d` for whole numbers.", "notes": [{"on": "Printf", "text": "Prints text, filling in the placeholders."}, {"on": "%s", "text": "Placeholder that is replaced by text."}, {"on": "%d", "text": "Placeholder that is replaced by a whole number."}, {"on": "\\n", "text": "Printf adds no new line, so you add one."}], "text": "    fmt.Printf(\"%s is %d years old\\n\", name, age)"}
           ],
           "output": {
             "command": "go run main.go",

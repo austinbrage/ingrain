@@ -36,7 +36,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "`append` takes a slice and the value to add. It returns the longer slice, so store it back.", "notes": [{"on": "append(nums, 3)", "text": "Returns a new slice, so it is stored again."}], "text": "    nums := []int{1, 2}\n    nums = append(nums, 3)\n    fmt.Println(nums)"},
-            {"mode": "ghost", "line": 9, "guide": "Several values can be added in one call.", "text": "    nums = append(nums, 4, 5)\n    fmt.Println(nums, len(nums))"}
+            {"mode": "ghost", "line": 9, "guide": "Several values can be added in one call.", "notes": [{"on": "4, 5", "text": "Adds both values in one call."}], "text": "    nums = append(nums, 4, 5)\n    fmt.Println(nums, len(nums))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -51,7 +51,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A `nil` slice is a fine place to start. It has no values yet.", "text": "    var squares []int"},
-            {"mode": "ghost", "line": 7, "guide": "Each turn of the loop appends one more value.", "text": "    for i := 1; i <= 4; i++ {\n        squares = append(squares, i*i)\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "Each turn of the loop appends one more value.", "notes": [{"on": "append(squares, i*i)", "text": "Each pass adds one more square to the slice."}], "text": "    for i := 1; i <= 4; i++ {\n        squares = append(squares, i*i)\n    }"},
             {"mode": "ghost", "line": 10, "guide": "The loop grew the slice from nothing to four values.", "text": "    fmt.Println(squares, len(squares))"}
           ],
           "output": {
@@ -107,9 +107,9 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "`copy` fills a slice that already exists, so make one as long as the source first.", "text": "    src := []int{1, 2, 3}\n    dst := make([]int, len(src))"},
-            {"mode": "ghost", "line": 8, "guide": "`copy` takes the destination first, then the source. It returns how many values it copied.", "notes": [{"on": "copy(dst, src)", "text": "The destination comes first, the source second."}], "text": "    copied := copy(dst, src)\n    fmt.Println(copied, dst)"},
+            {"mode": "ghost", "line": 8, "guide": "`copy` takes the destination first, then the source. It returns how many values it copied.", "notes": [{"on": "copied :=", "text": "Copy returns how many values it moved."}, {"on": "copy(dst, src)", "text": "The destination comes first, the source second."}], "text": "    copied := copy(dst, src)\n    fmt.Println(copied, dst)"},
             {"mode": "ghost", "line": 10, "guide": "The two slices have their own values now, so changing one leaves the other alone.", "text": "    dst[0] = 99\n    fmt.Println(src, dst)"},
-            {"mode": "ghost", "line": 12, "guide": "`copy` stops at the shorter slice. A destination of 2 gets only 2 values.", "text": "    short := make([]int, 2)\n    copy(short, src)\n    fmt.Println(short)"}
+            {"mode": "ghost", "line": 12, "guide": "`copy` stops at the shorter slice. A destination of 2 gets only 2 values.", "notes": [{"on": "copy(short, src)", "text": "Stops when the shorter slice is full."}], "text": "    short := make([]int, 2)\n    copy(short, src)\n    fmt.Println(short)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -240,7 +240,7 @@
           "guide": "Remove a value, and look at the old slice.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Remove index 1 from `a` and keep the result in `b`.", "text": "    a := []int{1, 2, 3, 4, 5}\n    b := append(a[:1], a[2:]...)"},
+            {"mode": "ghost", "line": 6, "guide": "Remove index 1 from `a` and keep the result in `b`.", "notes": [{"on": "append(a[:1]", "text": "Writes into a's own memory, so a changes too."}], "text": "    a := []int{1, 2, 3, 4, 5}\n    b := append(a[:1], a[2:]...)"},
             {"mode": "ghost", "line": 8, "guide": "`b` is right. But the values moved inside the shared storage, so `a` shows them, with its last value left over. Why the storage is shared comes in the Slice capacity module.", "text": "    fmt.Println(b)\n    fmt.Println(a)"}
           ],
           "output": {

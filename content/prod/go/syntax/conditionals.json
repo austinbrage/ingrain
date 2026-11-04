@@ -21,7 +21,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A number to test.", "text": "    score := 72"},
-            {"mode": "ghost", "line": 7, "guide": "The block after `if` runs when the condition is true. Otherwise the block after `else` runs.", "notes": [{"on": "score >= 50", "text": "No parentheses around the condition."}], "text": "    if score >= 50 {\n        fmt.Println(\"pass\")\n    } else {\n        fmt.Println(\"fail\")\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "The block after `if` runs when the condition is true. Otherwise the block after `else` runs.", "notes": [{"on": "score >= 50", "text": "No parentheses around the condition."}, {"on": "if", "text": "Runs the block only when the check is true."}, {"on": "else", "text": "Runs the block when the check was false."}], "text": "    if score >= 50 {\n        fmt.Println(\"pass\")\n    } else {\n        fmt.Println(\"fail\")\n    }"},
             {"mode": "ghost", "line": 12, "guide": "This line runs after the `if`, whichever path was taken.", "text": "    fmt.Println(\"done\")"}
           ],
           "output": {

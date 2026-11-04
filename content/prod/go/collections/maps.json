@@ -159,9 +159,9 @@
           "guide": "See what a map that was never made can do.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "A `var` with a map type and no value gives a nil map. It prints like an empty one.", "notes": [{"on": "== nil", "text": "Only a nil map is equal to nil."}], "text": "    var ages map[string]int\n    fmt.Println(ages == nil, len(ages), ages)"},
-            {"mode": "ghost", "line": 8, "guide": "Reading a key of a nil map is fine and gives the zero value.", "text": "    fmt.Println(ages[\"Ana\"])"},
-            {"mode": "ghost", "line": 9, "guide": "Deleting from a nil map does nothing and is not an error.", "text": "    delete(ages, \"Ana\")\n    fmt.Println(len(ages))"}
+            {"mode": "ghost", "line": 6, "guide": "A `var` with a map type and no value gives a nil map. It prints like an empty one.", "notes": [{"on": "var ages map[string]int", "text": "No value given, so this map is nil."}, {"on": "== nil", "text": "Only a nil map is equal to nil."}], "text": "    var ages map[string]int\n    fmt.Println(ages == nil, len(ages), ages)"},
+            {"mode": "ghost", "line": 8, "guide": "Reading a key of a nil map is fine and gives the zero value.", "notes": [{"on": "ages[\"Ana\"]", "text": "Reading a nil map is safe: it gives zero."}], "text": "    fmt.Println(ages[\"Ana\"])"},
+            {"mode": "ghost", "line": 9, "guide": "Deleting from a nil map does nothing and is not an error.", "notes": [{"on": "delete(ages", "text": "Deleting from a nil map does nothing."}], "text": "    delete(ages, \"Ana\")\n    fmt.Println(len(ages))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -248,7 +248,7 @@
           "guide": "Pass a map to a function that changes it.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Unlike an array, a map is not copied: the function changes the caller's entries.", "notes": [{"on": "map[string]int", "text": "The whole map type, with no length."}], "text": "func addStock(stock map[string]int) {\n    stock[\"pen\"] += 5\n    stock[\"ink\"] = 1\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "Unlike an array, a map is not copied: the function changes the caller's entries.", "notes": [{"on": "map[string]int", "text": "The whole map type, with no length."}, {"on": "+= 5", "text": "Changes the map the caller passed in."}], "text": "func addStock(stock map[string]int) {\n    stock[\"pen\"] += 5\n    stock[\"ink\"] = 1\n}\n"},
             {"mode": "ghost", "line": 9, "guide": "The new entry and the new count show in `main`.", "text": "func main() {\n    stock := map[string]int{\"pen\": 2}\n    addStock(stock)\n    fmt.Println(stock)\n}"}
           ],
           "output": {
@@ -263,7 +263,7 @@
           "guide": "Assign a map to another variable and change it.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Unlike an array, `b := a` copies no entries.", "text": "    a := map[string]int{\"x\": 1}\n    b := a"},
+            {"mode": "ghost", "line": 6, "guide": "Unlike an array, `b := a` copies no entries.", "notes": [{"on": "b := a", "text": "Not a copy: b is another name for the map."}], "text": "    a := map[string]int{\"x\": 1}\n    b := a"},
             {"mode": "ghost", "line": 8, "guide": "Change the map through `b`.", "text": "    b[\"x\"] = 9\n    b[\"y\"] = 2"},
             {"mode": "ghost", "line": 10, "guide": "`a` and `b` are two names for one map.", "text": "    fmt.Println(a, b)\n    fmt.Println(len(a) == len(b))"}
           ],
@@ -304,7 +304,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "The new map starts empty and has its own entries.", "text": "    src := map[string]int{\"a\": 1, \"b\": 2, \"c\": 3}\n    dst := make(map[string]int)"},
-            {"mode": "ghost", "line": 8, "guide": "Copy the entries of the keys you want, one at a time.", "text": "    for _, key := range []string{\"a\", \"c\"} {\n        dst[key] = src[key]\n    }"},
+            {"mode": "ghost", "line": 8, "guide": "Copy the entries of the keys you want, one at a time.", "notes": [{"on": "[]string{\"a\", \"c\"}", "text": "Only these keys get copied."}], "text": "    for _, key := range []string{\"a\", \"c\"} {\n        dst[key] = src[key]\n    }"},
             {"mode": "ghost", "line": 11, "guide": "Changing the copy leaves the original alone.", "text": "    dst[\"a\"] = 10\n    fmt.Println(src, dst)"}
           ],
           "output": {

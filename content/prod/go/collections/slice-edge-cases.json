@@ -31,7 +31,7 @@
           "guide": "Three ways to get a slice with no values.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "A declared slice, an empty literal and a made one.", "text": "    var a []int\n    b := []int{}\n    c := make([]int, 0)"},
+            {"mode": "ghost", "line": 6, "guide": "A declared slice, an empty literal and a made one.", "notes": [{"on": "[]int{}", "text": "Empty, but not nil."}, {"on": "make([]int, 0)", "text": "A length of 0 gives an empty slice, not nil."}], "text": "    var a []int\n    b := []int{}\n    c := make([]int, 0)"},
             {"mode": "ghost", "line": 9, "guide": "All three have length 0, but only the first is nil. They print the same.", "text": "    fmt.Println(len(a), len(b), len(c))\n    fmt.Println(a == nil, b == nil, c == nil)\n    fmt.Println(a, b, c)"}
           ],
           "output": {
@@ -46,8 +46,8 @@
           "guide": "Loop over a nil slice and see nothing happen.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Ranging over a nil slice is fine: it does zero turns.", "text": "    var items []string\n    for _, item := range items {\n        fmt.Println(item)\n    }"},
-            {"mode": "ghost", "line": 10, "guide": "Its length is 0, and cutting it gives a slice with no values.", "text": "    fmt.Println(\"done\", len(items))\n    fmt.Println(items[:0] == nil)"}
+            {"mode": "ghost", "line": 6, "guide": "Ranging over a nil slice is fine: it does zero turns.", "notes": [{"on": "range items", "text": "On an empty slice the body never runs."}], "text": "    var items []string\n    for _, item := range items {\n        fmt.Println(item)\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Its length is 0, and cutting it gives a slice with no values.", "notes": [{"on": "items[:0]", "text": "Cutting a nil slice still gives nil."}], "text": "    fmt.Println(\"done\", len(items))\n    fmt.Println(items[:0] == nil)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -118,7 +118,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Cut from index 1 and keep the result in the same variable.", "text": "    ids := []int{1, 2, 3, 4, 5}\n    ids = ids[1:]\n    fmt.Println(ids)"},
-            {"mode": "ghost", "line": 9, "guide": "Cut up to the last index to drop the last value.", "text": "    ids = ids[:len(ids)-1]\n    fmt.Println(ids, len(ids))"}
+            {"mode": "ghost", "line": 9, "guide": "Cut up to the last index to drop the last value.", "notes": [{"on": "len(ids)-1", "text": "Stops one before the end, so the last value goes."}], "text": "    ids = ids[:len(ids)-1]\n    fmt.Println(ids, len(ids))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -132,7 +132,7 @@
           "guide": "Take values one by one from the front of a slice.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Read the first value, then drop it from the slice.", "text": "    queue := []string{\"a\", \"b\", \"c\"}\n    next := queue[0]\n    queue = queue[1:]\n    fmt.Println(next, queue)"},
+            {"mode": "ghost", "line": 6, "guide": "Read the first value, then drop it from the slice.", "notes": [{"on": "queue = queue[1:]", "text": "Drops the front value from the slice."}], "text": "    queue := []string{\"a\", \"b\", \"c\"}\n    next := queue[0]\n    queue = queue[1:]\n    fmt.Println(next, queue)"},
             {"mode": "ghost", "line": 10, "guide": "Do it again for the next value.", "text": "    next = queue[0]\n    queue = queue[1:]\n    fmt.Println(next, queue, len(queue))"}
           ],
           "output": {
@@ -155,7 +155,7 @@
           "guide": "Cut a piece out of a piece.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "A piece of a piece. Its indexes count from where it starts.", "text": "    levels := []int{0, 1, 2, 3, 4, 5}\n    mid := levels[1:5]\n    inner := mid[1:3]"},
+            {"mode": "ghost", "line": 6, "guide": "A piece of a piece. Its indexes count from where it starts.", "notes": [{"on": "mid[1:3]", "text": "Indexes count from mid, not from levels."}], "text": "    levels := []int{0, 1, 2, 3, 4, 5}\n    mid := levels[1:5]\n    inner := mid[1:3]"},
             {"mode": "ghost", "line": 9, "guide": "All three look at the same values.", "text": "    fmt.Println(mid, inner)\n    inner[0] = 99\n    fmt.Println(levels)"}
           ],
           "output": {
