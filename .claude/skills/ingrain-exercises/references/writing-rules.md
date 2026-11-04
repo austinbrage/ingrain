@@ -21,6 +21,7 @@ The clearest case is the line every Go program starts with, `package main`: it i
 - **Indent with 4 spaces, never tabs.** `gofmt` uses tabs, but the editor of the exercise types a Tab key as 4 spaces and fills the indentation of a new line with spaces, so a tab in a chunk can never be typed correctly. That `gofmt` would reformat the code to tabs is fine (the author, 2026-11-02): the goal is to learn by seeing, typing and debugging the code
 - A typing exercise is a whole `main.go`: `package main`, the imports and `func main() {` ... `}` come first, as one `auto` chunk (ghost in the first module of the first course), and the other chunks go inside `main`, each at its `line`
 - **Name variables for what they hold,** like a real program: `host`, `port`, `scores`, `stock`, `queue`, `price`. Use `a`, `b`, `x`, `n` or `nums` only when the point is the shape or the math (copy and alias demos, `gcd(a, b)`, `fib(n)`, a bare list of numbers in the first exercise of a concept). `i` and `j` are fine for loop indexes
+- **Check the chunks make a program.** The editor puts each chunk into the file at its `line`, before the line that is there. After writing a typing exercise, assemble the chunks that way and check the result: each chunk's `line` is the number of lines already in the file plus one, up to the closing `}` of `main` (so a last chunk goes at the line where `}` is, not after it). `cargo test --test content` checks this for Go
 - Print with `fmt.Println` while the course has not taught formatting. The `output` command is `go run main.go`
 
 ## Guides
