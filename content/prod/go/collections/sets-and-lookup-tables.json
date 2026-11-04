@@ -184,7 +184,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "`calls` counts how often the real work runs.", "text": "    calls := 0\n    square := func(n int) int {\n        calls++\n        return n * n\n    }"},
-            {"mode": "ghost", "line": 11, "guide": "Look in the cache first. Only on a miss, do the work and store the result.", "notes": [{"on": "; ok", "text": "A hit returns the stored result with no work."}], "text": "    cache := make(map[int]int)\n    get := func(n int) int {\n        if v, ok := cache[n]; ok {\n            return v\n        }\n        v := square(n)\n        cache[n] = v\n        return v\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "Look in the cache first. Only on a miss, do the work and store the result.", "notes": [{"on": "; ok", "text": "A hit returns the stored result with no work."}], "text": "    cache := make(map[int]int)\n    get := func(n int) int {\n        if hit, ok := cache[n]; ok {\n            return hit\n        }\n        result := square(n)\n        cache[n] = result\n        return result\n    }"},
             {"mode": "ghost", "line": 20, "guide": "Three calls, but the work ran only for new inputs.", "text": "    fmt.Println(get(4), get(4), get(5))\n    fmt.Println(\"calls:\", calls)"}
           ],
           "output": {
@@ -200,7 +200,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
             {"mode": "ghost", "line": 5, "guide": "The map comes in as a parameter, so every recursive call shares it. The first two numbers need no cache.", "text": "func fib(n int, memo map[int]int) int {\n    if n < 2 {\n        return n\n    }\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "Return a stored result when there is one. Otherwise work it out, store it, and return it.", "notes": [{"on": "fib(n-1, memo)", "text": "Each result is cached, so none is repeated."}], "text": "    if v, ok := memo[n]; ok {\n        return v\n    }\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\n    return memo[n]"},
+            {"mode": "ghost", "line": 9, "guide": "Return a stored result when there is one. Otherwise work it out, store it, and return it.", "notes": [{"on": "fib(n-1, memo)", "text": "Each result is cached, so none is repeated."}], "text": "    if cached, ok := memo[n]; ok {\n        return cached\n    }\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\n    return memo[n]"},
             {"mode": "ghost", "line": 15, "guide": "Without the cache, `fib(30)` would make over a million calls.", "text": "func main() {\n    memo := make(map[int]int)\n    fmt.Println(fib(30, memo))\n    fmt.Println(len(memo))\n}"}
           ],
           "output": {

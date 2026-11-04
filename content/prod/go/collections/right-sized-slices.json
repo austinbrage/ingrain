@@ -46,8 +46,8 @@
           "guide": "Compare the two ways of calling make.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "The 3 is a length here: the slice already holds 3 zeros.", "notes": [{"on": "make([]int, 3)", "text": "Three zeros already inside."}], "text": "    a := make([]int, 3)\n    a = append(a, 7)\n    fmt.Println(a, len(a))"},
-            {"mode": "ghost", "line": 9, "guide": "Here the 3 is only room, so the slice starts empty.", "text": "    b := make([]int, 0, 3)\n    b = append(b, 7)\n    fmt.Println(b, len(b), cap(b))"}
+            {"mode": "ghost", "line": 6, "guide": "The 3 is a length here: the slice already holds 3 zeros.", "notes": [{"on": "make([]int, 3)", "text": "Three zeros already inside."}], "text": "    filled := make([]int, 3)\n    filled = append(filled, 7)\n    fmt.Println(filled, len(filled))"},
+            {"mode": "ghost", "line": 9, "guide": "Here the 3 is only room, so the slice starts empty.", "text": "    roomy := make([]int, 0, 3)\n    roomy = append(roomy, 7)\n    fmt.Println(roomy, len(roomy), cap(roomy))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -59,7 +59,7 @@
           "id": "labels-with-room",
           "title": "Make room for the labels",
           "guide": "Make `labels` empty with room for every name, then add each label to it.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    names := []string{\"ann\", \"bo\"}\n    labels := make([]string, ___, len(names))\n    for _, n := range names {\n        labels = ___(labels, n+\"!\")\n    }\n    fmt.Println(labels, len(labels))\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    names := []string{\"ann\", \"bo\"}\n    labels := make([]string, ___, len(names))\n    for _, name := range names {\n        labels = ___(labels, name+\"!\")\n    }\n    fmt.Println(labels, len(labels))\n}",
           "gaps": [{"answers": ["0"]}, {"answers": ["append"]}]
         },
         {
@@ -68,7 +68,7 @@
           "id": "make-then-append",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    n := 3\n    s := make([]int, n)\n    for i := 0; i < n; i++ {\n        s = append(s, i)\n    }\n    fmt.Println(s, len(s))\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    size := 3\n    values := make([]int, size)\n    for i := 0; i < size; i++ {\n        values = append(values, i)\n    }\n    fmt.Println(values, len(values))\n}",
           "options": [
             "[0 1 2] 3",
             "[0 0 0] 3",
@@ -76,7 +76,7 @@
             "[0 1 2 0 0 0] 6"
           ],
           "answer": 2,
-          "explanation": "`make([]int, n)` starts with 3 zeros, and the loop adds 0, 1 and 2 after them."
+          "explanation": "`make([]int, size)` starts with 3 zeros, and the loop adds 0, 1 and 2 after them."
         },
         {
           "type": "typing",
@@ -85,8 +85,8 @@
           "guide": "Return a slice built with the room it needs.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The function knows it will keep at most half the numbers, so it makes that room.", "text": "func evensUpTo(n int) []int {\n    out := make([]int, 0, n/2)\n    for i := 1; i <= n; i++ {\n        if i%2 == 0 {\n            out = append(out, i)\n        }\n    }\n    return out\n}\n"},
-            {"mode": "ghost", "line": 14, "guide": "Here the room is used up exactly.", "text": "func main() {\n    e := evensUpTo(6)\n    fmt.Println(e, len(e), cap(e))\n}"}
+            {"mode": "ghost", "line": 5, "guide": "The function knows it will keep at most half the numbers, so it makes that room.", "text": "func evensUpTo(limit int) []int {\n    evens := make([]int, 0, limit/2)\n    for i := 1; i <= limit; i++ {\n        if i%2 == 0 {\n            evens = append(evens, i)\n        }\n    }\n    return evens\n}\n"},
+            {"mode": "ghost", "line": 14, "guide": "Here the room is used up exactly.", "text": "func main() {\n    evens := evensUpTo(6)\n    fmt.Println(evens, len(evens), cap(evens))\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -132,9 +132,9 @@
           "guide": "Find out which appends made new values.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Room for 3, and an append that fits.", "text": "    s := make([]int, 2, 3)\n    t := append(s, 1)\n    t[0] = 9\n    fmt.Println(s[0], t[0])"},
-            {"mode": "ghost", "line": 10, "guide": "Now `t` is full, so this append makes new values. A change to `u` stays in `u`.", "text": "    u := append(t, 2)\n    u[0] = 5\n    fmt.Println(t[0], u[0])"},
-            {"mode": "ghost", "line": 13, "guide": "The new stretch is bigger than the old one.", "text": "    fmt.Println(cap(u) > cap(t))"}
+            {"mode": "ghost", "line": 6, "guide": "Room for 3, and an append that fits.", "text": "    items := make([]int, 2, 3)\n    withOne := append(items, 1)\n    withOne[0] = 9\n    fmt.Println(items[0], withOne[0])"},
+            {"mode": "ghost", "line": 10, "guide": "Now `withOne` is full, so this append makes new values. A change to `withTwo` stays in `withTwo`.", "text": "    withTwo := append(withOne, 2)\n    withTwo[0] = 5\n    fmt.Println(withOne[0], withTwo[0])"},
+            {"mode": "ghost", "line": 13, "guide": "The new stretch is bigger than the old one.", "text": "    fmt.Println(cap(withTwo) > cap(withOne))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -148,8 +148,8 @@
           "guide": "Append inside a function that has room to spare.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The function appends to its own copy of the slice.", "text": "func addNine(nums []int) {\n    nums = append(nums, 9)\n}\n"},
-            {"mode": "ghost", "line": 8, "guide": "The caller still shows 2 values. But the 9 was written into the room behind them.", "notes": [{"on": "data[:3]", "text": "Reaches into the room."}], "text": "func main() {\n    data := make([]int, 2, 4)\n    addNine(data)\n    fmt.Println(data)\n    fmt.Println(data[:3])\n}"}
+            {"mode": "ghost", "line": 5, "guide": "The function appends to its own copy of the slice.", "text": "func addNine(values []int) {\n    values = append(values, 9)\n}\n"},
+            {"mode": "ghost", "line": 8, "guide": "The caller still shows 2 values. But the 9 was written into the room behind them.", "notes": [{"on": "scores[:3]", "text": "Reaches into the room."}], "text": "func main() {\n    scores := make([]int, 2, 4)\n    addNine(scores)\n    fmt.Println(scores)\n    fmt.Println(scores[:3])\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -162,7 +162,7 @@
           "id": "full-then-change",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := make([]int, 2, 2)\n    b := append(a, 1)\n    a[0] = 7\n    fmt.Println(b[0], cap(a))\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    full := make([]int, 2, 2)\n    grown := append(full, 1)\n    full[0] = 7\n    fmt.Println(grown[0], cap(full))\n}",
           "options": [
             "7 2",
             "0 2",
@@ -170,7 +170,7 @@
             "0 3"
           ],
           "answer": 1,
-          "explanation": "`a` is full, so `b` has its own values and the change to `a` does not reach it. `a` keeps its capacity of 2."
+          "explanation": "`full` is full, so `grown` has its own values and the change to `full` does not reach it. `full` keeps its capacity of 2."
         },
         {
           "type": "typing",

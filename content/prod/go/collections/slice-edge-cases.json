@@ -46,7 +46,7 @@
           "guide": "Loop over a nil slice and see nothing happen.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Ranging over a nil slice is fine: it does zero turns.", "text": "    var items []string\n    for _, it := range items {\n        fmt.Println(it)\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "Ranging over a nil slice is fine: it does zero turns.", "text": "    var items []string\n    for _, item := range items {\n        fmt.Println(item)\n    }"},
             {"mode": "ghost", "line": 10, "guide": "Its length is 0, and cutting it gives a slice with no values.", "text": "    fmt.Println(\"done\", len(items))\n    fmt.Println(items[:0] == nil)"}
           ],
           "output": {
@@ -69,8 +69,8 @@
           "guide": "Set the values of a slice to zero.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`clear` sets every value of a slice to its zero value. Cleared through a piece, the original changes too.", "notes": [{"on": "clear(part)", "text": "Zeroes the values, and the length stays."}], "text": "    nums := []int{1, 2, 3, 4}\n    part := nums[:2]\n    clear(part)\n    fmt.Println(nums, len(nums))"},
-            {"mode": "ghost", "line": 10, "guide": "Clearing the whole slice zeroes every value.", "text": "    clear(nums)\n    fmt.Println(nums)"}
+            {"mode": "ghost", "line": 6, "guide": "`clear` sets every value of a slice to its zero value. Cleared through a piece, the original changes too.", "notes": [{"on": "clear(part)", "text": "Zeroes the values, and the length stays."}], "text": "    scores := []int{1, 2, 3, 4}\n    part := scores[:2]\n    clear(part)\n    fmt.Println(scores, len(scores))"},
+            {"mode": "ghost", "line": 10, "guide": "Clearing the whole slice zeroes every value.", "text": "    clear(scores)\n    fmt.Println(scores)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -83,7 +83,7 @@
           "id": "clear-output",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{4, 5, 6, 7}\n    t := s[1:3]\n    clear(t)\n    fmt.Println(len(t), s)\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    scores := []int{4, 5, 6, 7}\n    part := scores[1:3]\n    clear(part)\n    fmt.Println(len(part), scores)\n}",
           "options": [
             "4 [0 0 0 0]",
             "2 [4 0 0 7]",
@@ -91,7 +91,7 @@
             "0 [4 7]"
           ],
           "answer": 1,
-          "explanation": "`t` holds indexes 1 and 2 of `s`. `clear` zeroes those two values and removes nothing, so `t` keeps length 2 and `s` shows the zeros."
+          "explanation": "`part` holds indexes 1 and 2 of `scores`. `clear` zeroes those two values and removes nothing, so `part` keeps length 2 and `scores` shows the zeros."
         }
       ]
     },
@@ -117,8 +117,8 @@
           "guide": "Shrink a slice from both sides.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Cut from index 1 and keep the result in the same variable.", "text": "    nums := []int{1, 2, 3, 4, 5}\n    nums = nums[1:]\n    fmt.Println(nums)"},
-            {"mode": "ghost", "line": 9, "guide": "Cut up to the last index to drop the last value.", "text": "    nums = nums[:len(nums)-1]\n    fmt.Println(nums, len(nums))"}
+            {"mode": "ghost", "line": 6, "guide": "Cut from index 1 and keep the result in the same variable.", "text": "    ids := []int{1, 2, 3, 4, 5}\n    ids = ids[1:]\n    fmt.Println(ids)"},
+            {"mode": "ghost", "line": 9, "guide": "Cut up to the last index to drop the last value.", "text": "    ids = ids[:len(ids)-1]\n    fmt.Println(ids, len(ids))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -155,8 +155,8 @@
           "guide": "Cut a piece out of a piece.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "A piece of a piece. Its indexes count from where it starts.", "text": "    s := []int{0, 1, 2, 3, 4, 5}\n    mid := s[1:5]\n    inner := mid[1:3]"},
-            {"mode": "ghost", "line": 9, "guide": "All three look at the same values.", "text": "    fmt.Println(mid, inner)\n    inner[0] = 99\n    fmt.Println(s)"}
+            {"mode": "ghost", "line": 6, "guide": "A piece of a piece. Its indexes count from where it starts.", "text": "    levels := []int{0, 1, 2, 3, 4, 5}\n    mid := levels[1:5]\n    inner := mid[1:3]"},
+            {"mode": "ghost", "line": 9, "guide": "All three look at the same values.", "text": "    fmt.Println(mid, inner)\n    inner[0] = 99\n    fmt.Println(levels)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -170,9 +170,9 @@
           "guide": "Compare two slices by hand.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "`==` does not work between two slices. Different lengths are never equal.", "text": "func same(a, b []int) bool {\n    if len(a) != len(b) {\n        return false\n    }\n    return true\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "Then compare the values position by position.", "text": "    for i := range a {\n        if a[i] != b[i] {\n            return false\n        }\n    }"},
-            {"mode": "ghost", "line": 16, "guide": "Same values in the same order are equal.", "text": "func main() {\n    x := []int{1, 2}\n    y := []int{1, 2}\n    z := []int{2, 1}\n    fmt.Println(same(x, y), same(x, z))\n}"}
+            {"mode": "ghost", "line": 5, "guide": "`==` does not work between two slices. Different lengths are never equal.", "text": "func same(want, got []int) bool {\n    if len(want) != len(got) {\n        return false\n    }\n    return true\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Then compare the values position by position.", "text": "    for i := range want {\n        if want[i] != got[i] {\n            return false\n        }\n    }"},
+            {"mode": "ghost", "line": 16, "guide": "Same values in the same order are equal.", "text": "func main() {\n    orig := []int{1, 2}\n    dupe := []int{1, 2}\n    rev := []int{2, 1}\n    fmt.Println(same(orig, dupe), same(orig, rev))\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -185,7 +185,7 @@
           "id": "piece-of-piece",
           "title": "A piece of a piece",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{1, 2, 3, 4, 5}\n    t := s[1:3]\n    u := t[1:]\n    u[0] = 9\n    fmt.Println(s, t, u, len(u))\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    scores := []int{1, 2, 3, 4, 5}\n    mid := scores[1:3]\n    tail := mid[1:]\n    tail[0] = 9\n    fmt.Println(scores, mid, tail, len(tail))\n}",
           "options": [
             "[1 2 3 4 5] [2 3] [9] 1",
             "[1 9 3 4 5] [2 3] [9] 1",
@@ -193,7 +193,7 @@
             "[1 2 9 4 5] [2 9] [9] 2"
           ],
           "answer": 2,
-          "explanation": "`t` is s[1:3] and `u` is t[1:], which is s[2:3]. So `u[0]` is `s[2]`. The value shows in all three, and `u` holds one value."
+          "explanation": "`mid` is scores[1:3] and `tail` is mid[1:], which is scores[2:3]. So `tail[0]` is `scores[2]`. The value shows in all three, and `tail` holds one value."
         },
         {
           "type": "quiz",

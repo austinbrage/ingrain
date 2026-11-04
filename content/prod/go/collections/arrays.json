@@ -88,7 +88,7 @@
           "id": "fill-positions",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var a [4]int\n    a[2] = 6\n    a[3] = a[2] + 1\n    fmt.Println(a, len(a))\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var stock [4]int\n    stock[2] = 6\n    stock[3] = stock[2] + 1\n    fmt.Println(stock, len(stock))\n}",
           "options": [
             "[0 6 7 0] 4",
             "[0 0 6 6] 4",
@@ -106,7 +106,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A list of temperatures and a total to grow.", "text": "    temps := [4]int{18, 21, 19, 25}\n    total := 0"},
-            {"mode": "ghost", "line": 8, "guide": "`range` gives the index and the value of each position, as it did with a string.", "text": "    for i, t := range temps {\n        total += t\n        fmt.Println(i, t)\n    }"},
+            {"mode": "ghost", "line": 8, "guide": "`range` gives the index and the value of each position, as it did with a string.", "text": "    for i, temp := range temps {\n        total += temp\n        fmt.Println(i, temp)\n    }"},
             {"mode": "ghost", "line": 12, "guide": "This line runs after the loop.", "text": "    fmt.Println(\"total\", total)"}
           ],
           "output": {
@@ -153,8 +153,8 @@
           "guide": "Check whether two arrays hold the same values.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Three arrays of the same type. Two hold the same values, in the same order.", "text": "    x := [2]int{1, 2}\n    y := [2]int{1, 2}\n    z := [2]int{2, 1}"},
-            {"mode": "ghost", "line": 9, "guide": "`==` compares the values one by one, in order.", "text": "    fmt.Println(x == y)\n    fmt.Println(x == z)"}
+            {"mode": "ghost", "line": 6, "guide": "Three arrays of the same type. Two hold the same values, in the same order.", "text": "    current := [2]int{1, 2}\n    saved := [2]int{1, 2}\n    swapped := [2]int{2, 1}"},
+            {"mode": "ghost", "line": 9, "guide": "`==` compares the values one by one, in order.", "text": "    fmt.Println(current == saved)\n    fmt.Println(current == swapped)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -168,8 +168,8 @@
           "guide": "Pass an array to a function and see what comes back.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The parameter type includes the length. The function gets a copy of the array, so it changes only its own.", "notes": [{"on": "[3]int", "text": "Only a [3]int fits here, not a [4]int."}], "text": "func double(nums [3]int) {\n    for i := 0; i < len(nums); i++ {\n        nums[i] *= 2\n    }\n    fmt.Println(\"inside\", nums)\n}\n"},
-            {"mode": "ghost", "line": 11, "guide": "The array in `main` is the same as before the call.", "text": "func main() {\n    nums := [3]int{1, 2, 3}\n    double(nums)\n    fmt.Println(\"outside\", nums)\n}"}
+            {"mode": "ghost", "line": 5, "guide": "The parameter type includes the length. The function gets a copy of the array, so it changes only its own.", "notes": [{"on": "[3]int", "text": "Only a [3]int fits here, not a [4]int."}], "text": "func double(prices [3]int) {\n    for i := 0; i < len(prices); i++ {\n        prices[i] *= 2\n    }\n    fmt.Println(\"inside\", prices)\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "The array in `main` is the same as before the call.", "text": "func main() {\n    prices := [3]int{1, 2, 3}\n    double(prices)\n    fmt.Println(\"outside\", prices)\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -240,9 +240,9 @@
           "guide": "Write literals that set only some positions.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Fewer values than the length is fine. The positions left over keep the zero value.", "text": "    a := [5]int{1, 2}\n    fmt.Println(a)"},
-            {"mode": "ghost", "line": 8, "guide": "An index and a colon before a value put it in that position.", "notes": [{"on": "3: 30", "text": "Position 3 gets 30."}], "text": "    b := [5]int{1: 10, 3: 30}\n    fmt.Println(b)"},
-            {"mode": "ghost", "line": 10, "guide": "With `...` the length reaches the highest position named.", "text": "    c := [...]int{4: 1}\n    fmt.Println(len(c))"}
+            {"mode": "ghost", "line": 6, "guide": "Fewer values than the length is fine. The positions left over keep the zero value.", "text": "    early := [5]int{1, 2}\n    fmt.Println(early)"},
+            {"mode": "ghost", "line": 8, "guide": "An index and a colon before a value put it in that position.", "notes": [{"on": "3: 30", "text": "Position 3 gets 30."}], "text": "    picked := [5]int{1: 10, 3: 30}\n    fmt.Println(picked)"},
+            {"mode": "ghost", "line": 10, "guide": "With `...` the length reaches the highest position named.", "text": "    tail := [...]int{4: 1}\n    fmt.Println(len(tail))"}
           ],
           "output": {
             "command": "go run main.go",

@@ -214,8 +214,8 @@
           "guide": "Remove a value and see what the original keeps.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "Keep a second name for the same values, then remove index 1.", "text": "    nums := []int{1, 2, 3, 4, 5}\n    whole := nums\n    nums = append(nums[:1], nums[2:]...)"},
-            {"mode": "ghost", "line": 9, "guide": "The result has 4 values, and the room of 5 did not change.", "text": "    fmt.Println(nums, len(nums), cap(nums))"},
+            {"mode": "ghost", "line": 6, "guide": "Keep a second name for the same values, then remove index 1.", "text": "    queue := []int{1, 2, 3, 4, 5}\n    whole := queue\n    queue = append(queue[:1], queue[2:]...)"},
+            {"mode": "ghost", "line": 9, "guide": "The result has 4 values, and the room of 5 did not change.", "text": "    fmt.Println(queue, len(queue), cap(queue))"},
             {"mode": "ghost", "line": 10, "guide": "The values moved left inside the same stretch. The last place still holds its old value.", "text": "    fmt.Println(whole)"}
           ],
           "output": {
@@ -254,9 +254,9 @@
           "guide": "Cut a piece from the middle and cap its room.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "The third number is the end of the room, counted like the second one. `s[1:3:4]` shows 2 values and has room for 3.", "notes": [{"on": "s[1:3:4]", "text": "Room is 4 minus 1."}], "text": "    s := []int{0, 1, 2, 3, 4, 5}\n    p := s[1:3:4]\n    fmt.Println(p, len(p), cap(p))"},
-            {"mode": "ghost", "line": 9, "guide": "This append fits the room, so it reaches `s`.", "text": "    p = append(p, 100)\n    fmt.Println(s)"},
-            {"mode": "ghost", "line": 11, "guide": "The room is now full, so this append makes new values. Changing `p` no longer reaches `s`.", "text": "    p = append(p, 200)\n    p[0] = 9\n    fmt.Println(s, p)"}
+            {"mode": "ghost", "line": 6, "guide": "The third number is the end of the room, counted like the second one. `s[1:3:4]` shows 2 values and has room for 3.", "notes": [{"on": "s[1:3:4]", "text": "Room is 4 minus 1."}], "text": "    s := []int{0, 1, 2, 3, 4, 5}\n    mid := s[1:3:4]\n    fmt.Println(mid, len(mid), cap(mid))"},
+            {"mode": "ghost", "line": 9, "guide": "This append fits the room, so it reaches `s`.", "text": "    mid = append(mid, 100)\n    fmt.Println(s)"},
+            {"mode": "ghost", "line": 11, "guide": "The room is now full, so this append makes new values. Changing `mid` no longer reaches `s`.", "text": "    mid = append(mid, 200)\n    mid[0] = 9\n    fmt.Println(s, mid)"}
           ],
           "output": {
             "command": "go run main.go",

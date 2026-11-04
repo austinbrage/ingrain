@@ -64,7 +64,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "One total for each row.", "text": "    grid := [][]int{{1, 2}, {3, 4, 5}}\n    totals := make([]int, len(grid))"},
-            {"mode": "ghost", "line": 8, "guide": "Walk the rows, then the values of each row.", "text": "    for r, row := range grid {\n        for _, v := range row {\n            totals[r] += v\n        }\n    }\n    fmt.Println(totals)"}
+            {"mode": "ghost", "line": 8, "guide": "Walk the rows, then the values of each row.", "text": "    for r, row := range grid {\n        for _, cell := range row {\n            totals[r] += cell\n        }\n    }\n    fmt.Println(totals)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -76,7 +76,7 @@
           "id": "sum-the-grid",
           "title": "Sum the grid",
           "guide": "Add up every value of the grid.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    grid := [][]int{{1, 2}, {3, 4}}\n    sum := 0\n    for _, row := range ___ {\n        for _, v := range ___ {\n            sum += v\n        }\n    }\n    fmt.Println(sum)\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    grid := [][]int{{1, 2}, {3, 4}}\n    sum := 0\n    for _, row := range ___ {\n        for _, cell := range ___ {\n            sum += cell\n        }\n    }\n    fmt.Println(sum)\n}",
           "gaps": [{"answers": ["grid"]}, {"answers": ["row"]}]
         },
         {

@@ -63,7 +63,7 @@
           "id": "first-big-number",
           "title": "The first big number",
           "guide": "Print the position of the first number above 3, then whether there is one.",
-          "code": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n    nums := []int{2, 8, 5}\n    big := func(n int) bool { return n > 3 }\n    fmt.Println(slices.___(nums, big))\n    fmt.Println(slices.___(nums, big))\n}",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n    sizes := []int{2, 8, 5}\n    big := func(size int) bool { return size > 3 }\n    fmt.Println(slices.___(sizes, big))\n    fmt.Println(slices.___(sizes, big))\n}",
           "gaps": [{"answers": ["IndexFunc"]}, {"answers": ["ContainsFunc"]}]
         },
         {
@@ -122,10 +122,10 @@
           "guide": "Put values into a slice at a chosen position.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 9, "guide": "A slice with a gap in the middle. The imports are already in the file.", "text": "    s := []int{1, 2, 5}"},
-            {"mode": "ghost", "line": 10, "guide": "`slices.Insert` puts values in at an index and returns the new slice. Store the result.", "notes": [{"on": "s = ", "text": "Insert may return a new slice."}], "text": "    s = slices.Insert(s, 2, 3, 4)\n    fmt.Println(s)"},
-            {"mode": "ghost", "line": 12, "guide": "An index equal to the length adds at the end, like `append`.", "text": "    s = slices.Insert(s, len(s), 6)\n    fmt.Println(s)"},
-            {"mode": "ghost", "line": 14, "guide": "Index 0 adds at the front.", "text": "    s = slices.Insert(s, 0, 0)\n    fmt.Println(s)"}
+            {"mode": "ghost", "line": 9, "guide": "A slice with a gap in the middle. The imports are already in the file.", "text": "    ids := []int{1, 2, 5}"},
+            {"mode": "ghost", "line": 10, "guide": "`slices.Insert` puts values in at an index and returns the new slice. Store the result.", "notes": [{"on": "ids = ", "text": "Insert may return a new slice."}], "text": "    ids = slices.Insert(ids, 2, 3, 4)\n    fmt.Println(ids)"},
+            {"mode": "ghost", "line": 12, "guide": "An index equal to the length adds at the end, like `append`.", "text": "    ids = slices.Insert(ids, len(ids), 6)\n    fmt.Println(ids)"},
+            {"mode": "ghost", "line": 14, "guide": "Index 0 adds at the front.", "text": "    ids = slices.Insert(ids, 0, 0)\n    fmt.Println(ids)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -139,9 +139,9 @@
           "guide": "Remove items from a slice by position.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 9, "guide": "Five letters. The imports are already in the file.", "text": "    s := []string{\"a\", \"b\", \"c\", \"d\", \"e\"}"},
-            {"mode": "ghost", "line": 10, "guide": "`slices.Delete(s, 1, 3)` removes the items from index 1 up to, but not including, index 3.", "notes": [{"on": "1, 3", "text": "Like a cut s[1:3], but removed."}], "text": "    s = slices.Delete(s, 1, 3)\n    fmt.Println(s, len(s))"},
-            {"mode": "ghost", "line": 12, "guide": "To remove one item, delete the range from its index to the next.", "text": "    s = slices.Delete(s, 0, 1)\n    fmt.Println(s)"}
+            {"mode": "ghost", "line": 9, "guide": "Five letters. The imports are already in the file.", "text": "    letters := []string{\"a\", \"b\", \"c\", \"d\", \"e\"}"},
+            {"mode": "ghost", "line": 10, "guide": "`slices.Delete(letters, 1, 3)` removes the items from index 1 up to, but not including, index 3.", "notes": [{"on": "1, 3", "text": "Like a cut letters[1:3], but removed."}], "text": "    letters = slices.Delete(letters, 1, 3)\n    fmt.Println(letters, len(letters))"},
+            {"mode": "ghost", "line": 12, "guide": "To remove one item, delete the range from its index to the next.", "text": "    letters = slices.Delete(letters, 0, 1)\n    fmt.Println(letters)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -155,10 +155,10 @@
           "guide": "Call `Delete` and see what the old slice holds.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 9, "guide": "Five numbers. The imports are already in the file.", "text": "    s := []int{1, 2, 3, 4, 5}"},
-            {"mode": "ghost", "line": 10, "guide": "`Delete` returns the shorter slice. Keep it in `t`.", "text": "    t := slices.Delete(s, 1, 3)\n    fmt.Println(t)"},
-            {"mode": "ghost", "line": 12, "guide": "The old `s` still has its length. `Delete` shifted the items left and cleared the freed tail to zero.", "notes": [{"on": "s", "text": "The old tail now holds zeros."}], "text": "    fmt.Println(s)"},
-            {"mode": "ghost", "line": 13, "guide": "Only the returned slice has the right length.", "text": "    fmt.Println(len(t), len(s))"}
+            {"mode": "ghost", "line": 9, "guide": "Five numbers. The imports are already in the file.", "text": "    items := []int{1, 2, 3, 4, 5}"},
+            {"mode": "ghost", "line": 10, "guide": "`Delete` returns the shorter slice. Keep it in `kept`.", "text": "    kept := slices.Delete(items, 1, 3)\n    fmt.Println(kept)"},
+            {"mode": "ghost", "line": 12, "guide": "The old `items` still has its length. `Delete` shifted the items left and cleared the freed tail to zero.", "notes": [{"on": "items", "text": "The old tail now holds zeros."}], "text": "    fmt.Println(items)"},
+            {"mode": "ghost", "line": 13, "guide": "Only the returned slice has the right length.", "text": "    fmt.Println(len(kept), len(items))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -186,7 +186,7 @@
           "id": "insert-and-remove",
           "title": "Add and remove",
           "guide": "Add 9 at index 1, then remove the first two items.",
-          "code": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n    s := []int{1, 2, 3, 4}\n    s = slices.___(s, 1, 9)\n    fmt.Println(s)\n    s = slices.___(s, 0, 2)\n    fmt.Println(s)\n}",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n    ids := []int{1, 2, 3, 4}\n    ids = slices.___(ids, 1, 9)\n    fmt.Println(ids)\n    ids = slices.___(ids, 0, 2)\n    fmt.Println(ids)\n}",
           "gaps": [{"answers": ["Insert"]}, {"answers": ["Delete"]}]
         },
         {
@@ -195,7 +195,7 @@
           "id": "delete-output",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "s := []int{1, 2, 3, 4, 5}\nt := slices.Delete(s, 1, 3)\nfmt.Println(t, s)",
+          "code": "items := []int{1, 2, 3, 4, 5}\nkept := slices.Delete(items, 1, 3)\nfmt.Println(kept, items)",
           "options": [
             "[1 4 5] [1 2 3 4 5]",
             "[1 4 5] [1 4 5]",
@@ -203,7 +203,7 @@
             "[1 4 5] [1 4 5 4 5]"
           ],
           "answer": 2,
-          "explanation": "`Delete` shifts the rest left in the same array and clears the freed tail, so `s` ends with two zeros. Use the returned slice only."
+          "explanation": "`Delete` shifts the rest left in the same array and clears the freed tail, so `items` ends with two zeros. Use the returned slice only."
         }
       ]
     },
@@ -244,7 +244,7 @@
           "id": "compact-output",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "nums := []int{1, 1, 2, 1, 1}\nnums = slices.Compact(nums)\nfmt.Println(nums)",
+          "code": "votes := []int{1, 1, 2, 1, 1}\nvotes = slices.Compact(votes)\nfmt.Println(votes)",
           "options": [
             "[1 2]",
             "[1 2 1]",
@@ -261,10 +261,10 @@
           "guide": "Build new slices from old ones.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 9, "guide": "Two small slices. The imports are already in the file.", "text": "    a := []int{1, 2}\n    b := []int{3}"},
-            {"mode": "ghost", "line": 11, "guide": "`slices.Concat` joins any number of slices into a new one.", "text": "    all := slices.Concat(a, b, a)\n    fmt.Println(all)"},
-            {"mode": "ghost", "line": 13, "guide": "`slices.Repeat` repeats a slice a number of times, in a new slice.", "text": "    fmt.Println(slices.Repeat(b, 3))"},
-            {"mode": "ghost", "line": 14, "guide": "The originals did not change.", "text": "    fmt.Println(a, b)"}
+            {"mode": "ghost", "line": 9, "guide": "Two small slices. The imports are already in the file.", "text": "    first := []int{1, 2}\n    second := []int{3}"},
+            {"mode": "ghost", "line": 11, "guide": "`slices.Concat` joins any number of slices into a new one.", "text": "    all := slices.Concat(first, second, first)\n    fmt.Println(all)"},
+            {"mode": "ghost", "line": 13, "guide": "`slices.Repeat` repeats a slice a number of times, in a new slice.", "text": "    fmt.Println(slices.Repeat(second, 3))"},
+            {"mode": "ghost", "line": 14, "guide": "The originals did not change.", "text": "    fmt.Println(first, second)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -278,10 +278,10 @@
           "guide": "Stop a piece of a slice from overwriting the rest.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 9, "guide": "Five numbers. The imports are already in the file.", "text": "    s := []int{1, 2, 3, 4, 5}"},
-            {"mode": "ghost", "line": 10, "guide": "A piece shares the room of `s`, so `append` on it overwrites `s`.", "text": "    head := s[:2]\n    head = append(head, 99)\n    fmt.Println(s)"},
-            {"mode": "ghost", "line": 13, "guide": "Put the value back. `slices.Clip` cuts the capacity down to the length, like `s[:2:2]`.", "notes": [{"on": "slices.Clip", "text": "No spare room is left."}], "text": "    s[2] = 3\n    head = slices.Clip(s[:2])\n    fmt.Println(len(head), cap(head))"},
-            {"mode": "ghost", "line": 16, "guide": "There is no room left, so `append` makes a new array and `s` is safe.", "text": "    head = append(head, 77)\n    fmt.Println(s, head)"}
+            {"mode": "ghost", "line": 9, "guide": "Five numbers. The imports are already in the file.", "text": "    items := []int{1, 2, 3, 4, 5}"},
+            {"mode": "ghost", "line": 10, "guide": "A piece shares the room of `items`, so `append` on it overwrites `items`.", "text": "    head := items[:2]\n    head = append(head, 99)\n    fmt.Println(items)"},
+            {"mode": "ghost", "line": 13, "guide": "Put the value back. `slices.Clip` cuts the capacity down to the length, like `items[:2:2]`.", "notes": [{"on": "slices.Clip", "text": "No spare room is left."}], "text": "    items[2] = 3\n    head = slices.Clip(items[:2])\n    fmt.Println(len(head), cap(head))"},
+            {"mode": "ghost", "line": 16, "guide": "There is no room left, so `append` makes a new array and `items` is safe.", "text": "    head = append(head, 77)\n    fmt.Println(items, head)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -295,9 +295,9 @@
           "guide": "Ask for room once, then append without reallocating.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 9, "guide": "A short slice. The imports are already in the file.", "text": "    s := []int{1, 2, 3}"},
-            {"mode": "ghost", "line": 10, "guide": "`slices.Grow(s, 10)` makes sure 10 more items fit. The length stays the same, and the capacity is at least the length plus 10.", "text": "    s = slices.Grow(s, 10)\n    fmt.Println(len(s))\n    fmt.Println(cap(s) >= 13)"},
-            {"mode": "ghost", "line": 13, "guide": "Appending up to that room never needs a new array, so the capacity does not change.", "text": "    before := cap(s)\n    for i := 0; i < 10; i++ {\n        s = append(s, i)\n    }\n    fmt.Println(len(s), cap(s) == before)"}
+            {"mode": "ghost", "line": 9, "guide": "A short slice. The imports are already in the file.", "text": "    items := []int{1, 2, 3}"},
+            {"mode": "ghost", "line": 10, "guide": "`slices.Grow(items, 10)` makes sure 10 more items fit. The length stays the same, and the capacity is at least the length plus 10.", "text": "    items = slices.Grow(items, 10)\n    fmt.Println(len(items))\n    fmt.Println(cap(items) >= 13)"},
+            {"mode": "ghost", "line": 13, "guide": "Appending up to that room never needs a new array, so the capacity does not change.", "text": "    before := cap(items)\n    for i := 0; i < 10; i++ {\n        items = append(items, i)\n    }\n    fmt.Println(len(items), cap(items) == before)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -308,8 +308,8 @@
           "type": "fill-blank",
           "id": "join-or-repeat",
           "title": "Join or repeat",
-          "guide": "Join `a` and `b` into one new slice, then repeat `a` twice.",
-          "code": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n    a := []int{1, 2}\n    b := []int{3, 4}\n    fmt.Println(slices.___(a, b))\n    fmt.Println(slices.___(a, 2))\n}",
+          "guide": "Join `first` and `second` into one new slice, then repeat `first` twice.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"slices\"\n)\n\nfunc main() {\n    first := []int{1, 2}\n    second := []int{3, 4}\n    fmt.Println(slices.___(first, second))\n    fmt.Println(slices.___(first, 2))\n}",
           "gaps": [{"answers": ["Concat"]}, {"answers": ["Repeat"]}]
         }
       ]

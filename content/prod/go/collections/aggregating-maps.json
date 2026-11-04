@@ -51,7 +51,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "The points of each player, in parallel slices.", "text": "    names := []string{\n        \"Ana\", \"Leo\", \"Ana\", \"Leo\", \"Ana\",\n    }\n    points := []int{8, 5, 6, 9, 10}"},
-            {"mode": "ghost", "line": 10, "guide": "An average needs two maps: the sum of each key and how many values it had.", "text": "    sums := make(map[string]int)\n    counts := make(map[string]int)\n    for i, n := range names {\n        sums[n] += points[i]\n        counts[n]++\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "An average needs two maps: the sum of each key and how many values it had.", "text": "    sums := make(map[string]int)\n    counts := make(map[string]int)\n    for i, name := range names {\n        sums[name] += points[i]\n        counts[name]++\n    }"},
             {"mode": "ghost", "line": 16, "guide": "Divide per key. Whole number division drops the rest.", "text": "    fmt.Println(\n        sums[\"Ana\"]/counts[\"Ana\"],\n        sums[\"Leo\"]/counts[\"Leo\"],\n    )"}
           ],
           "output": {
@@ -89,7 +89,7 @@
           "id": "zero-beats-negatives",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    best := map[string]int{}\n    for _, t := range []int{-4, -1, -7} {\n        if t > best[\"Oslo\"] {\n            best[\"Oslo\"] = t\n        }\n    }\n    fmt.Println(best[\"Oslo\"], len(best))\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    best := map[string]int{}\n    for _, temp := range []int{-4, -1, -7} {\n        if temp > best[\"Oslo\"] {\n            best[\"Oslo\"] = temp\n        }\n    }\n    fmt.Println(best[\"Oslo\"], len(best))\n}",
           "options": [
             "-1 1",
             "0 0",
@@ -107,8 +107,8 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Three colors with three different counts.", "text": "    votes := []string{\n        \"red\", \"blue\", \"red\",\n        \"green\", \"red\", \"blue\",\n    }"},
-            {"mode": "ghost", "line": 10, "guide": "The counter you already know.", "text": "    counts := make(map[string]int)\n    for _, v := range votes {\n        counts[v]++\n    }"},
-            {"mode": "ghost", "line": 14, "guide": "Keep the biggest count seen so far. No two counts are equal here, so the random order cannot change the winner.", "notes": [{"on": "n > bestCount", "text": "With a tie, the first one visited would win."}], "text": "    best := \"\"\n    bestCount := 0\n    for name, n := range counts {\n        if n > bestCount {\n            best = name\n            bestCount = n\n        }\n    }\n    fmt.Println(best, bestCount)"}
+            {"mode": "ghost", "line": 10, "guide": "The counter you already know.", "text": "    counts := make(map[string]int)\n    for _, vote := range votes {\n        counts[vote]++\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "Keep the biggest count seen so far. No two counts are equal here, so the random order cannot change the winner.", "notes": [{"on": "count > bestCount", "text": "With a tie, the first one visited would win."}], "text": "    best := \"\"\n    bestCount := 0\n    for name, count := range counts {\n        if count > bestCount {\n            best = name\n            bestCount = count\n        }\n    }\n    fmt.Println(best, bestCount)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -139,7 +139,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Some items are out of stock.", "text": "    stock := map[string]int{\n        \"pen\": 0, \"ink\": 3,\n        \"cap\": 0, \"pad\": 5,\n    }"},
-            {"mode": "ghost", "line": 10, "guide": "Deleting the current key inside its own loop is safe in Go.", "text": "    for name, n := range stock {\n        if n == 0 {\n            delete(stock, name)\n        }\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Deleting the current key inside its own loop is safe in Go.", "text": "    for name, qty := range stock {\n        if qty == 0 {\n            delete(stock, name)\n        }\n    }"},
             {"mode": "ghost", "line": 15, "guide": "Only the items in stock are left.", "text": "    fmt.Println(stock, len(stock))"}
           ],
           "output": {
@@ -193,7 +193,7 @@
           "id": "invert-collision",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    ids := map[string]int{\n        \"red\": 1, \"rose\": 1, \"sky\": 2,\n    }\n    flipped := map[int]string{}\n    for name, n := range ids {\n        flipped[n] = name\n    }\n    fmt.Println(len(flipped), flipped[2])\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    ids := map[string]int{\n        \"red\": 1, \"rose\": 1, \"sky\": 2,\n    }\n    flipped := map[int]string{}\n    for name, id := range ids {\n        flipped[id] = name\n    }\n    fmt.Println(len(flipped), flipped[2])\n}",
           "options": [
             "3 sky",
             "2 rose",

@@ -102,7 +102,7 @@
           "id": "array-key-output",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    m := map[[2]int]string{{1, 2}: \"a\"}\n    k := [2]int{1, 2}\n    m[k] += \"b\"\n    k[0] = 9\n    m[k] = \"c\"\n    fmt.Println(m, len(m))\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    cells := map[[2]int]string{{1, 2}: \"a\"}\n    pos := [2]int{1, 2}\n    cells[pos] += \"b\"\n    pos[0] = 9\n    cells[pos] = \"c\"\n    fmt.Println(cells, len(cells))\n}",
           "options": [
             "map[[9 2]:c] 1",
             "map[[1 2]:ab] 1",
@@ -110,7 +110,7 @@
             "map[[9 2]:abc] 1"
           ],
           "answer": 2,
-          "explanation": "The key is stored as a copy, so changing `k` afterwards does not move the first entry. `[9 2]` is a new key."
+          "explanation": "The key is stored as a copy, so changing `pos` afterwards does not move the first entry. `[9 2]` is a new key."
         }
       ]
     },
@@ -175,7 +175,7 @@
           "id": "clear-or-nil",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    m := map[string]int{\"a\": 1}\n    n := m\n    m = nil\n    n[\"b\"] = 2\n    fmt.Println(len(m), len(n), m == nil)\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    cache := map[string]int{\"a\": 1}\n    alias := cache\n    cache = nil\n    alias[\"b\"] = 2\n    fmt.Println(len(cache), len(alias),\n        cache == nil)\n}",
           "options": [
             "0 0 true",
             "0 2 true",
@@ -183,7 +183,7 @@
             "0 1 true"
           ],
           "answer": 1,
-          "explanation": "`m = nil` only changes the variable `m`. `n` still holds the map, which takes the new entry and now has 2."
+          "explanation": "`cache = nil` only changes the variable `cache`. `alias` still holds the map, which takes the new entry and now has 2."
         }
       ]
     }

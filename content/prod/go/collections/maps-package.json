@@ -33,7 +33,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 10, "guide": "A map of ages. The imports of `maps` and `slices` are already in the file.", "text": "    ages := map[string]int{\n        \"Eva\": 31,\n        \"Ana\": 28,\n        \"Leo\": 40,\n    }"},
             {"mode": "ghost", "line": 15, "guide": "`maps.Keys` gives the keys in random order. `slices.Sorted` turns them into a sorted slice.", "notes": [{"on": "slices.Sorted(", "text": "Collects the keys and puts them in order."}], "text": "    keys := slices.Sorted(maps.Keys(ages))\n    fmt.Println(keys)"},
-            {"mode": "ghost", "line": 17, "guide": "Loop over the sorted keys and look each one up. The order is always the same.", "text": "    for _, k := range keys {\n        fmt.Println(k, ages[k])\n    }"}
+            {"mode": "ghost", "line": 17, "guide": "Loop over the sorted keys and look each one up. The order is always the same.", "text": "    for _, name := range keys {\n        fmt.Println(name, ages[name])\n    }"}
           ],
           "output": {
             "command": "go run main.go",
@@ -122,7 +122,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 9, "guide": "Three items with their stock. The imports are already in the file.", "text": "    stock := map[string]int{\n        \"pen\": 0,\n        \"ink\": 5,\n        \"pad\": 0,\n    }"},
-            {"mode": "ghost", "line": 14, "guide": "A rule for `maps`: it gets the key and the value of an entry, and says true to remove it.", "notes": [{"on": "n == 0", "text": "True for the items out of stock."}], "text": "    soldOut := func(k string, n int) bool {\n        return n == 0\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "A rule for `maps`: it gets the key and the value of an entry, and says true to remove it.", "notes": [{"on": "qty == 0", "text": "True for the items out of stock."}], "text": "    soldOut := func(item string, qty int) bool {\n        return qty == 0\n    }"},
             {"mode": "ghost", "line": 17, "guide": "`maps.DeleteFunc` removes every entry for which the rule is true.", "text": "    maps.DeleteFunc(stock, soldOut)\n    fmt.Println(stock)"}
           ],
           "output": {
@@ -138,9 +138,9 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 10, "guide": "Ages, two of them equal. The imports are already in the file.", "text": "    ages := map[string]int{\n        \"Eva\": 31,\n        \"Ana\": 28,\n        \"Leo\": 31,\n    }"},
-            {"mode": "ghost", "line": 15, "guide": "`maps.Values` gives the values in random order. `slices.Sorted` makes them a sorted slice, keeping equal ones.", "text": "    vals := slices.Sorted(maps.Values(ages))\n    fmt.Println(vals)"},
+            {"mode": "ghost", "line": 15, "guide": "`maps.Values` gives the values in random order. `slices.Sorted` makes them a sorted slice, keeping equal ones.", "text": "    sortedAges := slices.Sorted(maps.Values(ages))\n    fmt.Println(sortedAges)"},
             {"mode": "ghost", "line": 17, "guide": "`slices.Collect` gathers keys or values into a slice with no fixed order. Sort it yourself.", "notes": [{"on": "slices.Collect", "text": "Gathers into a slice, in random order."}], "text": "    keys := slices.Collect(maps.Keys(ages))\n    slices.Sort(keys)\n    fmt.Println(keys)"},
-            {"mode": "ghost", "line": 20, "guide": "A collected slice can use any `slices` helper, like `Max`.", "text": "    all := slices.Collect(maps.Values(ages))\n    fmt.Println(slices.Max(all))"}
+            {"mode": "ghost", "line": 20, "guide": "A collected slice can use any `slices` helper, like `Max`.", "text": "    allAges := slices.Collect(maps.Values(ages))\n    fmt.Println(slices.Max(allAges))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -151,8 +151,8 @@
           "type": "fill-blank",
           "id": "copy-and-drop",
           "title": "Copy, then drop",
-          "guide": "Write the entries of `b` into `a`, then remove from `b` every entry the rule `over` accepts.",
-          "code": "package main\n\nimport \"maps\"\n\nfunc main() {\n    a := map[string]int{\"x\": 1}\n    b := map[string]int{\"x\": 2, \"y\": 3}\n    maps.___(a, b)\n    over := func(k string, n int) bool {\n        return n > 2\n    }\n    maps.___(b, over)\n}",
+          "guide": "Write the entries of `extra` into `base`, then remove from `extra` every entry the rule `over` accepts.",
+          "code": "package main\n\nimport \"maps\"\n\nfunc main() {\n    base := map[string]int{\"x\": 1}\n    extra := map[string]int{\"x\": 2, \"y\": 3}\n    maps.___(base, extra)\n    over := func(key string, count int) bool {\n        return count > 2\n    }\n    maps.___(extra, over)\n}",
           "gaps": [{"answers": ["Copy"]}, {"answers": ["DeleteFunc"]}]
         },
         {
@@ -161,7 +161,7 @@
           "id": "copy-output",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "a := map[string]int{\"x\": 1, \"y\": 2}\nb := map[string]int{\"y\": 5}\nmaps.Copy(a, b)\nfmt.Println(a, b)",
+          "code": "base := map[string]int{\"x\": 1, \"y\": 2}\nextra := map[string]int{\"y\": 5}\nmaps.Copy(base, extra)\nfmt.Println(base, extra)",
           "options": [
             "map[x:1 y:2] map[y:5]",
             "map[y:5] map[y:5]",
@@ -169,7 +169,7 @@
             "map[x:1 y:5] map[y:5]"
           ],
           "answer": 3,
-          "explanation": "`Copy` writes `b` into `a`: `y` is overwritten and `x` stays. `b` is only read, so it does not change."
+          "explanation": "`Copy` writes `extra` into `base`: `y` is overwritten and `x` stays. `extra` is only read, so it does not change."
         }
       ]
     },
@@ -195,7 +195,7 @@
             {"mode": "ghost", "line": 11, "guide": "How many times each word was seen. The imports are already in the file.", "text": "    counts := map[string]int{\n        \"go\": 3,\n        \"rs\": 5,\n        \"py\": 3,\n        \"c\": 1,\n    }"},
             {"mode": "ghost", "line": 17, "guide": "Gather the keys into a slice. Their order is random for now.", "text": "    keys := slices.Collect(maps.Keys(counts))"},
             {"mode": "ghost", "line": 18, "guide": "The rule reads `counts` to compare two keys: the higher count first, and the letters when counts tie.", "notes": [{"on": "counts[b], counts[a]", "text": "b first: higher counts go first."}], "text": "    slices.SortFunc(keys, func(a, b string) int {\n        return cmp.Or(\n            cmp.Compare(counts[b], counts[a]),\n            cmp.Compare(a, b),\n        )\n    })\n    fmt.Println(keys)"},
-            {"mode": "ghost", "line": 25, "guide": "Walk the ranking and look up each count.", "text": "    for _, k := range keys {\n        fmt.Println(k, counts[k])\n    }"}
+            {"mode": "ghost", "line": 25, "guide": "Walk the ranking and look up each count.", "text": "    for _, word := range keys {\n        fmt.Println(word, counts[word])\n    }"}
           ],
           "output": {
             "command": "go run main.go",
@@ -210,8 +210,8 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"maps\"\n    \"slices\"\n)\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 10, "guide": "The counts of two days. The imports are already in the file.", "text": "    mon := map[string]int{\"go\": 2, \"rs\": 1}\n    tue := map[string]int{\"go\": 1, \"py\": 4}"},
-            {"mode": "ghost", "line": 12, "guide": "Start from a clone of `mon`, then add each count of `tue`.", "text": "    total := maps.Clone(mon)\n    for k, n := range tue {\n        total[k] += n\n    }"},
-            {"mode": "ghost", "line": 16, "guide": "Print the totals in key order.", "text": "    keys := slices.Sorted(maps.Keys(total))\n    for _, k := range keys {\n        fmt.Println(k, total[k])\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Start from a clone of `mon`, then add each count of `tue`.", "text": "    total := maps.Clone(mon)\n    for word, count := range tue {\n        total[word] += count\n    }"},
+            {"mode": "ghost", "line": 16, "guide": "Print the totals in key order.", "text": "    keys := slices.Sorted(maps.Keys(total))\n    for _, word := range keys {\n        fmt.Println(word, total[word])\n    }"},
             {"mode": "ghost", "line": 20, "guide": "`mon` is untouched.", "text": "    fmt.Println(mon)"}
           ],
           "output": {
@@ -225,7 +225,7 @@
           "id": "ranked-keys-purpose",
           "title": "What is it for?",
           "guide": "Read the code, then pick what it is for.",
-          "code": "keys := slices.Collect(maps.Keys(m))\nslices.SortFunc(keys, func(a, b string) int {\n    return cmp.Compare(m[b], m[a])\n})",
+          "code": "keys := slices.Collect(maps.Keys(hits))\nslices.SortFunc(keys, func(a, b string) int {\n    return cmp.Compare(hits[b], hits[a])\n})",
           "options": [
             "Lists the keys, highest value first",
             "Lists the keys in alphabetical order",

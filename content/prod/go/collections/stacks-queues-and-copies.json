@@ -46,9 +46,9 @@
           "guide": "Wrap the stack operations in two functions.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Push returns the longer stack.", "text": "func push(stack []int, v int) []int {\n    return append(stack, v)\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "Push returns the longer stack.", "text": "func push(stack []int, value int) []int {\n    return append(stack, value)\n}\n"},
             {"mode": "ghost", "line": 8, "guide": "Pop returns two things: the shorter stack and the value taken.", "text": "func pop(stack []int) ([]int, int) {\n    last := len(stack) - 1\n    return stack[:last], stack[last]\n}\n"},
-            {"mode": "ghost", "line": 12, "guide": "Both results are stored. Popping the last value leaves an empty slice.", "text": "func main() {\n    var s []int\n    s = push(s, 1)\n    s = push(s, 2)\n    s, v := pop(s)\n    fmt.Println(v, s)\n    s, v = pop(s)\n    fmt.Println(v, s, len(s))\n}"}
+            {"mode": "ghost", "line": 12, "guide": "Both results are stored. Popping the last value leaves an empty slice.", "text": "func main() {\n    var stack []int\n    stack = push(stack, 1)\n    stack = push(stack, 2)\n    stack, value := pop(stack)\n    fmt.Println(value, stack)\n    stack, value = pop(stack)\n    fmt.Println(value, stack, len(stack))\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -85,7 +85,7 @@
           "id": "stack-then-queue",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\nfunc main() {\n    s := []int{1, 2, 3}\n    s = s[:len(s)-1]\n    s = append(s, 4)\n    s = s[1:]\n    fmt.Println(s, len(s))\n}",
+          "code": "package main\n\nimport \"fmt\"\nfunc main() {\n    items := []int{1, 2, 3}\n    items = items[:len(items)-1]\n    items = append(items, 4)\n    items = items[1:]\n    fmt.Println(items, len(items))\n}",
           "options": [
             "[2 3 4] 3",
             "[1 2 4] 3",
@@ -133,7 +133,7 @@
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Appending to a `nil` slice builds a new one with the same values.", "notes": [{"on": "[]int(nil)", "text": "A nil slice of ints to append onto."}], "text": "    src := []int{1, 2, 3}\n    clone := append([]int(nil), src...)"},
             {"mode": "ghost", "line": 8, "guide": "It is a real copy: the two slices do not share values.", "text": "    clone[0] = 99\n    fmt.Println(src, clone)"},
-            {"mode": "ghost", "line": 10, "guide": "Cloning nothing gives nothing: the result is still `nil`.", "text": "    var none []int\n    c := append([]int(nil), none...)\n    fmt.Println(c == nil, len(c))"}
+            {"mode": "ghost", "line": 10, "guide": "Cloning nothing gives nothing: the result is still `nil`.", "text": "    var none []int\n    empty := append([]int(nil), none...)\n    fmt.Println(empty == nil, len(empty))"}
           ],
           "output": {
             "command": "go run main.go",
@@ -163,9 +163,9 @@
           "guide": "Move the values of a slice one place left.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`copy` works inside one slice. The parts overlap, and each value moves one place left.", "text": "    nums := []int{1, 2, 3, 4, 5}\n    n := copy(nums, nums[1:])"},
-            {"mode": "ghost", "line": 8, "guide": "`copy` returns how many values moved. The last value is a leftover.", "text": "    fmt.Println(n, nums)"},
-            {"mode": "ghost", "line": 9, "guide": "Cut off the leftover.", "text": "    nums = nums[:len(nums)-1]\n    fmt.Println(nums)"}
+            {"mode": "ghost", "line": 6, "guide": "`copy` works inside one slice. The parts overlap, and each value moves one place left.", "text": "    ranks := []int{1, 2, 3, 4, 5}\n    moved := copy(ranks, ranks[1:])"},
+            {"mode": "ghost", "line": 8, "guide": "`copy` returns how many values moved. The last value is a leftover.", "text": "    fmt.Println(moved, ranks)"},
+            {"mode": "ghost", "line": 9, "guide": "Cut off the leftover.", "text": "    ranks = ranks[:len(ranks)-1]\n    fmt.Println(ranks)"}
           ],
           "output": {
             "command": "go run main.go",
@@ -177,8 +177,8 @@
           "id": "shift-and-trim",
           "title": "Shift and trim",
           "guide": "Shift the values one place left, then keep only the values that moved.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    nums := []int{1, 2, 3, 4}\n    n := ___(nums, nums[1:])\n    nums = nums[:___]\n    fmt.Println(n, nums)\n}",
-          "gaps": [{"answers": ["copy"]}, {"answers": ["n"]}]
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    ranks := []int{1, 2, 3, 4}\n    moved := ___(ranks, ranks[1:])\n    ranks = ranks[:___]\n    fmt.Println(moved, ranks)\n}",
+          "gaps": [{"answers": ["copy"]}, {"answers": ["moved"]}]
         },
         {
           "type": "quiz",

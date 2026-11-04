@@ -31,8 +31,8 @@
           "guide": "Return the changed copy and store it.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The function returns an array of the same type it receives. `range` with only an index skips the value.", "notes": [{"on": "[3]int {", "text": "The result is an array too."}], "text": "func triple(nums [3]int) [3]int {\n    for i := range nums {\n        nums[i] *= 3\n    }\n    return nums\n}\n"},
-            {"mode": "ghost", "line": 11, "guide": "The caller replaces its array with the one it got back.", "text": "func main() {\n    nums := [3]int{1, 2, 3}\n    nums = triple(nums)\n    fmt.Println(nums)\n}"}
+            {"mode": "ghost", "line": 5, "guide": "The function returns an array of the same type it receives. `range` with only an index skips the value.", "notes": [{"on": "[3]int {", "text": "The result is an array too."}], "text": "func triple(scores [3]int) [3]int {\n    for i := range scores {\n        scores[i] *= 3\n    }\n    return scores\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "The caller replaces its array with the one it got back.", "text": "func main() {\n    scores := [3]int{1, 2, 3}\n    scores = triple(scores)\n    fmt.Println(scores)\n}"}
           ],
           "output": {
             "command": "go run main.go",
@@ -43,9 +43,9 @@
           "type": "fill-blank",
           "id": "hand-it-back",
           "title": "Hand it back",
-          "guide": "Make the function give its array back, and store the result so `n` changes.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc zero(n [3]int) [3]int {\n    n[0] = 9\n    ___ n\n}\n\nfunc main() {\n    n := [3]int{1, 2, 3}\n    ___ = zero(n)\n    fmt.Println(n)\n}",
-          "gaps": [{"answers": ["return"]}, {"answers": ["n"]}]
+          "guide": "Make the function give its array back, and store the result so `stock` changes.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc zero(stock [3]int) [3]int {\n    stock[0] = 9\n    ___ stock\n}\n\nfunc main() {\n    stock := [3]int{1, 2, 3}\n    ___ = zero(stock)\n    fmt.Println(stock)\n}",
+          "gaps": [{"answers": ["return"]}, {"answers": ["stock"]}]
         },
         {
           "type": "quiz",
@@ -53,7 +53,7 @@
           "id": "range-copy",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := [3]int{1, 2, 3}\n    sum := 0\n    for _, v := range a {\n        a[2] = 10\n        sum += v\n    }\n    fmt.Println(sum, a)\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    levels := [3]int{1, 2, 3}\n    sum := 0\n    for _, level := range levels {\n        levels[2] = 10\n        sum += level\n    }\n    fmt.Println(sum, levels)\n}",
           "options": [
             "13 [1 2 10]",
             "6 [1 2 3]",
@@ -61,7 +61,7 @@
             "13 [1 2 3]"
           ],
           "answer": 2,
-          "explanation": "`range` walks a copy of the array, so `v` at the last position is still 3 and the sum is 6. The change reaches `a` itself."
+          "explanation": "`range` walks a copy of the array, so `level` at the last position is still 3 and the sum is 6. The change reaches `levels` itself."
         },
         {
           "type": "quiz",
@@ -69,7 +69,7 @@
           "id": "past-the-end",
           "title": "What does it print?",
           "guide": "Read the code, then pick what happens.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := [3]int{10, 20, 30}\n    for i := 0; i <= len(a); i++ {\n        fmt.Println(a[i])\n    }\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    scores := [3]int{10, 20, 30}\n    for i := 0; i <= len(scores); i++ {\n        fmt.Println(scores[i])\n    }\n}",
           "options": [
             "10, 20, 30",
             "10, 20, 30, then a panic",
@@ -77,7 +77,7 @@
             "A compile error"
           ],
           "answer": 1,
-          "explanation": "The last index is 2, so `i <= len(a)` reaches 3. The index is a variable, so the compiler cannot see it and the program panics when it runs."
+          "explanation": "The last index is 2, so `i <= len(scores)` reaches 3. The index is a variable, so the compiler cannot see it and the program panics when it runs."
         }
       ]
     }

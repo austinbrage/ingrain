@@ -51,7 +51,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A map with a single entry.", "text": "    stock := map[string]int{\"pen\": 4}"},
-            {"mode": "ghost", "line": 7, "guide": "Do the lookup in the `if` and test `ok`. Both names only exist inside the `if`.", "text": "    if n, ok := stock[\"pen\"]; ok {\n        fmt.Println(\"pen:\", n)\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "Do the lookup in the `if` and test `ok`. Both names only exist inside the `if`.", "text": "    if qty, ok := stock[\"pen\"]; ok {\n        fmt.Println(\"pen:\", qty)\n    }"},
             {"mode": "ghost", "line": 10, "guide": "`_` skips the value when only the presence matters. `!ok` means the key is missing.", "text": "    if _, ok := stock[\"ink\"]; !ok {\n        fmt.Println(\"no ink\")\n    }"}
           ],
           "output": {
@@ -64,8 +64,8 @@
           "id": "have-or-none",
           "title": "Have it or not",
           "guide": "Check if the key exists, print its value when it does, and take the other branch when it does not.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    stock := map[string]int{\"pen\": 4}\n    if n, found := stock[\"pen\"]; ___ {\n        fmt.Println(\"have\", ___)\n    } ___ {\n        fmt.Println(\"none\")\n    }\n}",
-          "gaps": [{"answers": ["found"]}, {"answers": ["n"]}, {"answers": ["else"]}]
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    stock := map[string]int{\"pen\": 4}\n    if qty, found := stock[\"pen\"]; ___ {\n        fmt.Println(\"have\", ___)\n    } ___ {\n        fmt.Println(\"none\")\n    }\n}",
+          "gaps": [{"answers": ["found"]}, {"answers": ["qty"]}, {"answers": ["else"]}]
         },
         {
           "type": "typing",
@@ -89,7 +89,7 @@
           "id": "lookup-output",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    m := map[string]int{\"a\": 0, \"b\": 2}\n    v, ok := m[\"a\"]\n    w, found := m[\"c\"]\n    total := 0\n    for _, n := range m {\n        total += n\n    }\n    fmt.Println(v, ok, w, found, total)\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    stock := map[string]int{\"a\": 0, \"b\": 2}\n    qty, ok := stock[\"a\"]\n    spare, found := stock[\"c\"]\n    total := 0\n    for _, units := range stock {\n        total += units\n    }\n    fmt.Println(qty, ok, spare, found, total)\n}",
           "options": [
             "0 false 0 false 2",
             "0 true 0 false 2",
@@ -97,7 +97,7 @@
             "0 true 0 false 0"
           ],
           "answer": 1,
-          "explanation": "`a` is stored with 0, so `ok` is true. `c` is missing, so `w` is 0 and `found` is false. The sum is 0 + 2."
+          "explanation": "`a` is stored with 0, so `ok` is true. `c` is missing, so `spare` is 0 and `found` is false. The sum is 0 + 2."
         }
       ]
     },
@@ -124,7 +124,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A list of votes, some repeated.", "text": "    votes := []string{\"red\", \"blue\", \"red\", \"red\", \"blue\"}"},
-            {"mode": "ghost", "line": 7, "guide": "Each vote adds 1 to its own count. The first time, the count starts from 0.", "notes": [{"on": "counts[v]++", "text": "Creates the key when it is new."}], "text": "    counts := make(map[string]int)\n    for _, v := range votes {\n        counts[v]++\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "Each vote adds 1 to its own count. The first time, the count starts from 0.", "notes": [{"on": "counts[vote]++", "text": "Creates the key when it is new."}], "text": "    counts := make(map[string]int)\n    for _, vote := range votes {\n        counts[vote]++\n    }"},
             {"mode": "ghost", "line": 11, "guide": "The counts, and a lookup of a value that never appeared.", "text": "    fmt.Println(counts)\n    fmt.Println(counts[\"red\"], counts[\"green\"])"}
           ],
           "output": {
@@ -137,8 +137,8 @@
           "id": "count-words",
           "title": "Count the words",
           "guide": "Walk over the words, count each one, then print how many different words there are and the count of one.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    words := []string{\"go\", \"rs\", \"go\"}\n    counts := make(map[string]int)\n    for _, w ___ words {\n        counts[___]++\n    }\n    fmt.Println(___(counts), counts[\"go\"])\n}",
-          "gaps": [{"answers": ["range"]}, {"answers": ["w"]}, {"answers": ["len"]}]
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    words := []string{\"go\", \"rs\", \"go\"}\n    counts := make(map[string]int)\n    for _, word ___ words {\n        counts[___]++\n    }\n    fmt.Println(___(counts), counts[\"go\"])\n}",
+          "gaps": [{"answers": ["range"]}, {"answers": ["word"]}, {"answers": ["len"]}]
         },
         {
           "type": "typing",
@@ -179,7 +179,7 @@
           "id": "counter-and-set",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    nums := []int{3, 1, 3, 2, 3}\n    counts := map[int]int{}\n    for _, n := range nums {\n        counts[n]++\n    }\n    c, ok := counts[5]\n    fmt.Println(len(counts), counts[3], c, ok)\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    ratings := []int{3, 1, 3, 2, 3}\n    counts := map[int]int{}\n    for _, rating := range ratings {\n        counts[rating]++\n    }\n    fives, ok := counts[5]\n    fmt.Println(len(counts), counts[3], fives, ok)\n}",
           "options": [
             "5 3 0 false",
             "3 3 0 true",
@@ -187,7 +187,7 @@
             "3 1 0 false"
           ],
           "answer": 2,
-          "explanation": "`counts` has one key for each different number: 3, 1 and 2. The number 3 appears three times. The key 5 is missing, so `c` is 0 and `ok` is false."
+          "explanation": "`counts` has one key for each different number: 3, 1 and 2. The number 3 appears three times. The key 5 is missing, so `fives` is 0 and `ok` is false."
         }
       ]
     },
@@ -239,7 +239,7 @@
           "id": "group-not-stored",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    m := map[string][]int{\"a\": {1}}\n    s := m[\"a\"]\n    s = append(s, 2)\n    t := m[\"b\"]\n    t = append(t, 3)\n    fmt.Println(m, len(s), len(t))\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    groups := map[string][]int{\"a\": {1}}\n    grown := groups[\"a\"]\n    grown = append(grown, 2)\n    fresh := groups[\"b\"]\n    fresh = append(fresh, 3)\n    fmt.Println(groups, len(grown), len(fresh))\n}",
           "options": [
             "map[a:[1 2] b:[3]] 2 1",
             "map[a:[1]] 2 1",
@@ -247,7 +247,7 @@
             "map[a:[1]] 1 1"
           ],
           "answer": 1,
-          "explanation": "`append` returns a new slice, and nothing stores it in `m`. The map still holds `[1]` and has no `b`. Only the local `s` and `t` grew."
+          "explanation": "`append` returns a new slice, and nothing stores it in `groups`. The map still holds `[1]` and has no `b`. Only the local `grown` and `fresh` grew."
         },
         {
           "type": "typing",
@@ -274,7 +274,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Ana has an art grade of 0, stored on purpose.", "text": "    scores := map[string]map[string]int{\n        \"Ana\": {\"math\": 9, \"art\": 0},\n    }"},
-            {"mode": "ghost", "line": 9, "guide": "Ask for the student first, then for the subject inside. A stored 0 still counts as there.", "text": "    if subjects, ok := scores[\"Ana\"]; ok {\n        if n, ok := subjects[\"art\"]; ok {\n            fmt.Println(\"art:\", n)\n        }\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "Ask for the student first, then for the subject inside. A stored 0 still counts as there.", "text": "    if subjects, ok := scores[\"Ana\"]; ok {\n        if grade, ok := subjects[\"art\"]; ok {\n            fmt.Println(\"art:\", grade)\n        }\n    }"},
             {"mode": "ghost", "line": 14, "guide": "To check only the inner key, leave the outer lookup inline: a missing student reads as an empty map.", "text": "    if _, ok := scores[\"Leo\"][\"math\"]; !ok {\n        fmt.Println(\"no math for Leo\")\n    }"}
           ],
           "output": {
@@ -288,15 +288,15 @@
           "id": "nested-purpose",
           "title": "What is it for?",
           "guide": "Read the code, then pick what it is for.",
-          "code": "func count(\n    m map[string]map[string]int,\n    a, b string,\n) {\n    if m[a] == nil {\n        m[a] = map[string]int{}\n    }\n    m[a][b]++\n}",
+          "code": "func count(\n    sales map[string]map[string]int,\n    city, item string,\n) {\n    if sales[city] == nil {\n        sales[city] = map[string]int{}\n    }\n    sales[city][item]++\n}",
           "options": [
-            "Removes the key b from the map of a",
-            "Copies the map of a under the key b",
-            "Makes a new inner map for every key of m",
-            "Counts how many times b occurs under a"
+            "Removes the key item from the map of city",
+            "Copies the map of city under the key item",
+            "Makes a new inner map for every key of sales",
+            "Counts how many times item occurs under city"
           ],
           "answer": 3,
-          "explanation": "The inner map of `a` is made when it is missing, and then the count of `b` inside it goes up by one. The first call for any pair works."
+          "explanation": "The inner map of `city` is made when it is missing, and then the count of `item` inside it goes up by one. The first call for any pair works."
         }
       ]
     }
