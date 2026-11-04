@@ -20,6 +20,7 @@ The clearest case is the line every Go program starts with, `package main`: it i
 ## Go code
 - **Indent with 4 spaces, never tabs.** `gofmt` uses tabs, but the editor of the exercise types a Tab key as 4 spaces and fills the indentation of a new line with spaces, so a tab in a chunk can never be typed correctly. That `gofmt` would reformat the code to tabs is fine (the author, 2026-11-02): the goal is to learn by seeing, typing and debugging the code
 - A typing exercise is a whole `main.go`: `package main`, the imports and `func main() {` ... `}` come first, as one `auto` chunk (ghost in the first module of the first course), and the other chunks go inside `main`, each at its `line`
+- **Name variables for what they hold,** like a real program: `host`, `port`, `scores`, `stock`, `queue`, `price`. Use `a`, `b`, `x`, `n` or `nums` only when the point is the shape or the math (copy and alias demos, `gcd(a, b)`, `fib(n)`, a bare list of numbers in the first exercise of a concept). `i` and `j` are fine for loop indexes
 - Print with `fmt.Println` while the course has not taught formatting. The `output` command is `go run main.go`
 
 ## Guides
@@ -31,6 +32,7 @@ The clearest case is the line every Go program starts with, `package main`: it i
 
 ## Notes
 A note is a hint under a piece of code, shown while the user types it.
+- **New syntax gets a note.** The learner reads the code they are typing, not the guide above it, so the note is where a piece is explained. Put one on every new piece of syntax the first time it appears, and on each new form of it (`[1:3]`, then `[:2]` and `[3:]` each get their own). Do not note a piece the learner has already typed, and do not note every line: a chunk with one note on its new piece is the norm
 - **Only where the user needs one.** Many chunks need none. A piece of the course's own API that does something non-obvious (like `ratatui::run`) is worth one
 - **Plain text, one short sentence,** about 60 characters. No markdown, no backticks. It does not repeat the name of its anchor
 - **Written for the user's goal:** what the piece does for the app, never where it comes from or how the library is organized. If the user would ask "what is this and why do I need it?", the note answers that in a few words
