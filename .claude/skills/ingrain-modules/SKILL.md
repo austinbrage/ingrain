@@ -37,8 +37,10 @@ The shape of `course.json`:
 - **Mastery is the measure:** completing all the modules of the course must let the user master the course. No fewer, and none that the course does not need. There is no fixed number
 - **Module sections** group related modules, stacked from the easiest concepts to the hardest. A section has a name that says what its modules share (`Foundations`, `Data types`)
 - **The tier of a section is the difficulty of its concepts,** not the shape of the exercises (`docs/course-structure.md`, "Tiers"): `basic`, `medium` or `advanced`. Decide it **from your own knowledge of the language or the library**: how many other concepts a concept needs first, how abstract it is, how easy it is to get wrong. Do not match it to a list of examples
+- **A section is cohesive:** every module in it fits the section's name and tier. When you add or move a module, check it against its section. If it does not fit, rename the section so the name covers all its modules, move the module to the section where it belongs, or make a new section for it (a module that is a rare topic goes to its own section with the medium tier, not into a basic one). Check the sections after a split too: a section must never become a pile of unrelated modules
 - **The order is the order of study** inside a section and across sections, and it follows what depends on what
-- **One session per module, for now:** `"sessions": 1`. The exercises skill changes it when a module needs more
+- **One session per module to start:** `"sessions": 1`. The exercises skill raises it up to 3 when a module needs more, and asks this skill for more modules when a concept needs more than 3 sessions
+- **A module made by splitting a concept** is named for its theme (`Slices in functions`, `Maps of maps`), never `Slices 2`. Each one is still one concept
 - A core course covers the language itself, nothing tied to an external library. An ecosystem course covers its own library
 
 ## Writing
@@ -46,12 +48,16 @@ The shape of `course.json`:
 - **To change a module that exists** (rename, move, remove, change a tier), the user names it in a request. Change only what the request asks and leave everything else exactly as it is
 - Keep every existing id, and the `id` of the course
 
+## Called by the exercises skill
+When `ingrain-exercises` needs more modules because a concept does not fit in 3 sessions, it calls this skill with a request: the modules to add, the module they go right after, and the tier. Add them right after that module, in its section when they fit it, or in a section of their own, with the right tier, when they do not (rare topics get a medium section of their own). Each starts with `"sessions": 1` and has no file. Do not touch the module they follow. This skill never calls `ingrain-exercises` back
+
 ## Modifying: be careful
 - **Never rename or reuse the id of a module that has a file.** The saved progress points at `<language>/<course>/<module>`
 - **Never remove a module that has a file.** A module with content stays in the list. If the request asks for it, say you did not, and why
 - A module with **no file** has no content and no progress, so it can be renamed, moved or removed freely
 - Names, tiers and the names of the sections can change freely. Reordering is allowed, but say so: it changes the order in which users study
 - Keep `sessions` as it is for a module that has a file: the number must match its file
+- Adding a module next to a module that has a file is allowed, and leaves the existing one exactly as it is
 - If the request would remove, rename or reorder modules that exist, say exactly what will change and ask before writing
 
 ## Finish

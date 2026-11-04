@@ -39,6 +39,8 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
 
 ## What the exercises must be
 - **The user must master the concept.** A module has as many exercises as that takes, from a few to many. There is no fixed number: decide from the course and the module
+- **Mastery is checked against a list, not felt.** Before writing a module, list everything the concept involves in real use: its operations, its common traps and bugs, its idioms and the standard-library helpers people reach for. Each item gets an exercise, or is left out on purpose because a later module covers it (name that module). After drafting, check the exercises against the list and add what is missing. Mastery means the user can use the concept in real code and avoid its traps, not only recognize its basics
+- **A module has at most 3 sessions.** A rich concept (slices, maps, interfaces, concurrency) gets up to 3, each on a theme, and you change the module's `sessions` number in `course.json`. When the mastery list needs more than 3, never add a 4th: split the concept into more modules (see "When a module needs more than 3 sessions")
 - **Combine every type of exercise when possible,** and do not force it: typing exercises, quizzes of every kind (`purpose`, `output`, `compiler`, `error`) and fill-blanks. Alternate them
 - **The author likes the `compiler` and `error` quizzes the least.** Write them rarely, and only when the lesson is the message itself or a layout rule that one word cannot show (the place of a brace, the scope of a variable). The `error` quiz is the weakest: its answer is almost always "A compile error".
 - **A fill-blank repeats an established pattern.** It is never the first contact with something new. Use it only for a piece the user has already met and practiced: typed in an earlier exercise of the module, or in a module before it. Check the earlier exercises before writing one, and if the piece has not been typed yet, write a typing exercise (or leave the slot to a quiz) instead
@@ -50,7 +52,13 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
 - **Do not repeat what other exercises already teach.** Before you create an exercise, read the titles, the guides and the code of the other exercises of the module, and of the modules before it. Each exercise is about one specific thing that none of them covers. When you write a whole module, check its exercises against each other the same way, so no two practice the same point
 - **Use only what the user has learned:** the concept of the module, and what the modules before it taught. An exercise never needs something that comes later in the course
 - **Intros are as long as the concept is hard.** An easy concept (conditionals) gets a short intro, one slide, or none. A hard concept (concurrency) gets longer texts, more slides and snippets, and pseudo code in a snippet is welcome for a new concept. A module intro says what the user is about to see, and the session intro explains how the concept works in the abstract and what the short guides cannot (`references/writing-rules.md`, "Intros")
-- **Sessions:** group the exercises in sessions of about 4 to 6. A module that needs more gets more sessions (`session-2`, ...), and you update its `sessions` number in the course's `course.json` to match, and say so
+- **Sessions:** group the exercises in sessions of about 4 to 6. A module that needs more gets more sessions (`session-2`, `session-3`), up to 3, and you update its `sessions` number in the course's `course.json` to match, and say so
+
+## When a module needs more than 3 sessions
+- **A module that has no exercises yet (modes 1 and 3):** split it while you write. Write the first 3 sessions in this module. For the rest of the mastery list, call the `ingrain-modules` skill (`<language> <layer> <course> <request>`: read the layer from the course's entry in `content/prod/<language>/catalog.json`, and put in the request the modules to add, the module they follow and the tier) to add new modules right after this one in `course.json`, in the same section only if they fit it, or in a new cohesive section with its own tier (rare topics get a medium section of their own, never into a basic one), then write each new module with this skill, in order. Say which modules you added
+- **Whole-course mode:** modules added during the loop are queued: run them right after the module that created them, in order, before the next module of the original list. Re-read `course.json` after every module
+- **A module that already has exercises:** never split it on your own. Splitting moves exercises to another file, and the saved progress points at them. Report "needs a split" with the proposed modules and which exercises move, and change nothing. Only a prompt that names the module and asks for the split can do it
+- `ingrain-modules` never calls this skill back: this skill writes the exercises of the modules it added
 
 ## Writing
 - Ids are slugs, unique inside their session. The tier of the module only says how hard the concept is: it does not change the shape of the exercises
@@ -71,5 +79,7 @@ A pass does not mean the content is good. Read each program as a compiler would,
 Then report:
 - what you wrote or changed, exercise by exercise, and what you left as it was
 - every warning: an exercise that exists and had no prompt, a module that looked complete
+- the mastery list: each item of it, and the exercise that covers it, or the later module that does, or "not covered" with the reason
 - for each session, whether it got a fill-blank, and if not, why (no established piece to repeat)
 - any session count you changed in `course.json`
+- every module you added with `ingrain-modules`, and every existing module that "needs a split"
