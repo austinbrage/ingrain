@@ -8,7 +8,7 @@
         "code": "x = 1\nf = function that uses x\nx = 2\nf()    sees x as 2"
       },
       {
-        "text": "Two sessions:\n\n- **Session 1:** a closure and the variables it captures\n- **Session 2:** functions that build closures, and closures passed to other functions"
+        "text": "Three sessions:\n\n- **Session 1:** a closure and the variables it captures\n- **Session 2:** functions that build closures, and closures passed to other functions\n- **Session 3:** closures in loops, and closures that share or keep state"
       }
     ]
   },
@@ -208,6 +208,127 @@
           ],
           "answer": 2,
           "explanation": "`inc` and `get` capture the same variable `n`. Two calls of `inc` make it 2, and `get` reads that same variable."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Loops and shared state",
+        "slides": [
+          {
+            "text": "Since Go 1.22, each lap of a `for` loop has **its own variable**. A closure made inside the loop captures the variable of its lap, so every closure keeps a different value, even when you call them after the loop ends.\n\nThe snippet is pseudo code.",
+            "code": "lap 0: i = 0, make f0 using i\nlap 1: i = 1, make f1 using i\nlap 2: i = 2, make f2 using i\n\nafter the loop:\nf0() is 0, f1() is 1, f2() is 2"
+          },
+          {
+            "text": "To keep the closures of a loop you need somewhere to put them. An **array** is a list with a fixed size written in its type: `[3]T` holds exactly 3 values of type `T`. You fill it by index, like a slice.",
+            "code": "var names [2]string\nnames[0] = \"go\"\nnames[1] = \"rust\""
+          },
+          {
+            "text": "Several closures can capture **the same variable**: if a function returns two of them, one can change it and the other can read it. A closure can also take parameters and keep a total or a position between calls, which makes a small generator.\n\nThe snippet is pseudo code.",
+            "code": "make():\n    n = 0\n    inc = function that changes n\n    get = function that reads n\n    return inc, get"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "loop-closures",
+          "title": "One variable per lap",
+          "guide": "Make a closure in each lap of a loop and call them all afterwards.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Each lap makes a function that returns its own `i`.", "notes": [{"on": "[3]func() int", "text": "An array: exactly 3 slots, each holding a function."}, {"on": "return i", "text": "Each function keeps the i of its own lap."}], "text": "func main() {\n    var funcs [3]func() int\n    for i := range 3 {\n        funcs[i] = func() int {\n            return i\n        }\n    }\n    for _, f := range funcs {\n        fmt.Println(f())\n    }\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0\n1\n2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "lap-values",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output. The loop has three parts.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var funcs [3]func() int\n    for i := 0; i < 3; i++ {\n        funcs[i] = func() int {\n            return i * 10\n        }\n    }\n    fmt.Println(funcs[0](), funcs[2]())\n}",
+          "options": [
+            "30 30",
+            "20 20",
+            "0 20",
+            "0 10"
+          ],
+          "answer": 2,
+          "explanation": "Each lap of the loop has its own `i`, and every closure keeps the one from its lap. So `funcs[0]` returns 0 and `funcs[2]` returns 20."
+        },
+        {
+          "type": "typing",
+          "id": "counter-pair",
+          "title": "Increment and get",
+          "guide": "Return two closures that share one variable.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `inc` and `get` both use the same `count`.", "notes": [{"on": "return inc, get", "text": "Two closures, one shared count."}], "text": "func newCounter() (func(), func() int) {\n    count := 0\n    inc := func() {\n        count++\n    }\n    get := func() int {\n        return count\n    }\n    return inc, get\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "Each call of `newCounter` makes its own `count`.", "text": "func main() {\n    inc, get := newCounter()\n    inc()\n    inc()\n    fmt.Println(get())\n    _, other := newCounter()\n    fmt.Println(other())\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2\n0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "counter-pair-gaps",
+          "title": "Two closures, one count",
+          "guide": "Fill the word that types the second result, the variable `inc` changes and the closure that is returned last.",
+          "code": "package main\n\nimport \"fmt\"\nfunc newCounter() (func(), ___() int) {\n    n := 0\n    inc := func() { ___++ }\n    get := func() int { return n }\n    return inc, ___\n}\nfunc main() {\n    inc, get := newCounter()\n    inc()\n    fmt.Println(get())\n}",
+          "gaps": [
+            {
+              "answers": [
+                "func"
+              ]
+            },
+            {
+              "answers": [
+                "n"
+              ]
+            },
+            {
+              "answers": [
+                "get"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "running-total",
+          "title": "Add up between calls",
+          "guide": "A closure that takes a value and keeps a running total.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. The closure takes a parameter and also keeps `sum` between calls.", "notes": [{"on": "sum += n", "text": "n is new on each call, sum survives it."}], "text": "func newTotal() func(int) int {\n    sum := 0\n    return func(n int) int {\n        sum += n\n        return sum\n    }\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Every call adds to the same total.", "text": "func main() {\n    add := newTotal()\n    fmt.Println(add(5))\n    fmt.Println(add(10))\n    fmt.Println(add(1))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "5\n15\n16"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "sequence-generator",
+          "title": "A sequence generator",
+          "guide": "Build a function that hands out the next value on each call.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. The start and the step are parameters the closure keeps.", "notes": [{"on": "current := next", "text": "Keeps the value to return before moving forward."}], "text": "func sequence(start, step int) func() int {\n    next := start\n    return func() int {\n        current := next\n        next += step\n        return current\n    }\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Two generators run apart from each other.", "text": "func main() {\n    s := sequence(10, 5)\n    for range 3 {\n        fmt.Println(s())\n    }\n    t := sequence(0, 1)\n    fmt.Println(t(), s())\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10\n15\n20\n0 25"
+          }
         }
       ]
     }

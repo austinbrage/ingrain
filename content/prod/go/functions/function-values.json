@@ -193,6 +193,118 @@
           "explanation": "`run(half, 9)` calls `half` with 9. Both are ints, so `9 / 2` is 4. Then `run(inc, a)` calls `inc` with 4 and gets 5."
         }
       ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Types, nil and helpers",
+        "slides": [
+          {
+            "text": "A long function type is tiring to repeat. A **type declaration** gives it a name, and the name works anywhere the full type does: in a variable, a parameter or a result.",
+            "code": "type Op func(int, int) int\n\nvar op Op\nfunc run(op Op) Op"
+          },
+          {
+            "text": "A function variable that was never assigned is **nil**. You may compare it with `nil`, and that is the only comparison functions allow. Calling a nil function crashes the program, so check first.\n\nThe snippet is pseudo code.",
+            "code": "f = nothing yet\nif f is nil {\n    use a default\n}"
+          },
+          {
+            "text": "Passing functions around lets you write one loop and change its behavior. A function can take a slice and a function, and change each value, combine them into one value, or keep only the ones a function accepts. These are the helpers other languages ship ready-made."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "named-function-type",
+          "title": "Name a function type",
+          "guide": "Give a function type a name, then use it for a variable and a parameter.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A function type can have a name of its own.", "notes": [{"on": "type Op", "text": "Op now stands for the whole function type."}], "text": "type Op func(int, int) int\n"},
+            {"mode": "ghost", "line": 7, "guide": "Two functions that fit the type.", "text": "func add(a, b int) int {\n    return a + b\n}\n\nfunc subtract(a, b int) int {\n    return a - b\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "The parameter uses the name instead of spelling the type out.", "notes": [{"on": "op Op", "text": "Any function of type Op fits here."}], "text": "func run(op Op, a, b int) int {\n    return op(a, b)\n}\n"},
+            {"mode": "ghost", "line": 19, "guide": "The variable has the named type. Assign any matching function.", "text": "func main() {\n    var op Op = add\n    fmt.Println(run(op, 8, 3))\n    op = subtract\n    fmt.Println(run(op, 8, 3))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "11\n5"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "named-type-gaps",
+          "title": "Declare and use the name",
+          "guide": "Fill the word that declares a new type, the type name of the parameter and the function to pass.",
+          "code": "package main\n\nimport \"fmt\"\n\n___ Transform func(int) int\n\nfunc double(n int) int { return n * 2 }\nfunc apply(f ___, n int) int {\n    return f(n)\n}\n\nfunc main() {\n    fmt.Println(apply(___, 4))\n}",
+          "gaps": [{ "answers": ["type"] }, { "answers": ["Transform"] }, { "answers": ["double"] }]
+        },
+        {
+          "type": "typing",
+          "id": "nil-function",
+          "title": "A function that is not set",
+          "guide": "Check a function value for nil, and fall back to a default.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A named type, and the default function.", "text": "type Step func(int) int\n"},
+            {"mode": "ghost", "line": 7, "guide": "The function to use when none is given.", "text": "func double(n int) int {\n    return n * 2\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "A function value that holds nothing is nil. Take a function in and give one back.", "notes": [{"on": "f == nil", "text": "The only comparison a function value allows."}], "text": "func orDouble(f Step) Step {\n    if f == nil {\n        return double\n    }\n    return f\n}\n"},
+            {"mode": "ghost", "line": 18, "guide": "A variable with no function starts as nil. Never call it while it is nil.", "text": "func main() {\n    var f Step\n    fmt.Println(f == nil)\n    g := orDouble(f)\n    fmt.Println(g == nil)\n    fmt.Println(g(5))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse\n10"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "map-ints",
+          "title": "Change every number",
+          "guide": "Write a function that applies another function to each number of a slice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A function to hand over.", "text": "func double(n int) int {\n    return n * 2\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "It replaces each value with what the function returns. A slice shares its values with the caller, so the caller sees the change.", "notes": [{"on": "nums[i] = f(n)", "text": "Writes into the caller's slice."}], "text": "func mapInts(nums []int, f func(int) int) {\n    for i, n := range nums {\n        nums[i] = f(n)\n    }\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "Pass a named function, then a function literal written right in the call.", "text": "func main() {\n    values := []int{1, 2, 3}\n    mapInts(values, double)\n    fmt.Println(values)\n    mapInts(values, func(n int) int {\n        return n + 1\n    })\n    fmt.Println(values)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[2 4 6]\n[3 5 7]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "reduce-ints",
+          "title": "Fold into one value",
+          "guide": "Write a function that combines all the numbers of a slice into one value.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A function type, and one function of it.", "text": "type Op func(int, int) int\n"},
+            {"mode": "ghost", "line": 7, "guide": "The combining function.", "text": "func add(a, b int) int {\n    return a + b\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "Start from a seed, then combine the result so far with each number.", "notes": [{"on": "op(result, n)", "text": "The caller decides how two values combine."}], "text": "func reduceInts(nums []int, seed int, op Op) int {\n    result := seed\n    for _, n := range nums {\n        result = op(result, n)\n    }\n    return result\n}\n"},
+            {"mode": "ghost", "line": 19, "guide": "The same loop adds with one function and multiplies with another. The seed fits the operation.", "text": "func main() {\n    values := []int{2, 3, 4}\n    fmt.Println(reduceInts(values, 0, add))\n    mul := func(a, b int) int {\n        return a * b\n    }\n    fmt.Println(reduceInts(values, 1, mul))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "9\n24"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "function-with-two-results",
+          "title": "A function with two results",
+          "guide": "Take a function that returns two values, and use only the good ones.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A function that returns a value and a flag.", "text": "func evenHalf(n int) (int, bool) {\n    return n / 2, n%2 == 0\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "The parameter type lists both results. Call it and keep the value only when the flag is true.", "notes": [{"on": "(int, bool))", "text": "The function you pass must return both."}], "text": "func sum(xs []int, f func(int) (int, bool)) int {\n    total := 0\n    for _, n := range xs {\n        v, ok := f(n)\n        if ok {\n            total += v\n        }\n    }\n    return total\n}\n"},
+            {"mode": "ghost", "line": 20, "guide": "Pass the function by name, as with any other.", "text": "func main() {\n    values := []int{4, 7, 10, 3}\n    fmt.Println(sum(values, evenHalf))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "7"
+          }
+        }
+      ]
     }
   ]
 }

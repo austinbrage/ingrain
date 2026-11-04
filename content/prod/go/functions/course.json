@@ -6,17 +6,17 @@
       "tier": "basic",
       "modules": [
         { "id": "declaring-functions", "name": "Declaring functions", "sessions": 2 },
-        { "id": "multiple-returns", "name": "Multiple returns", "sessions": 2 },
+        { "id": "multiple-returns", "name": "Multiple returns", "sessions": 3 },
         { "id": "variadic-functions", "name": "Variadic functions", "sessions": 2 },
-        { "id": "recursion", "name": "Recursion", "sessions": 2 }
+        { "id": "recursion", "name": "Recursion", "sessions": 3 }
       ]
     },
     {
       "name": "Function values",
       "tier": "medium",
       "modules": [
-        { "id": "function-values", "name": "Function values", "sessions": 2 },
-        { "id": "closures", "name": "Closures", "sessions": 2 },
+        { "id": "function-values", "name": "Function values", "sessions": 3 },
+        { "id": "closures", "name": "Closures", "sessions": 3 },
         { "id": "defer", "name": "Defer", "sessions": 2 }
       ]
     }

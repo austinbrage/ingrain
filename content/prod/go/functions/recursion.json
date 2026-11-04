@@ -4,7 +4,7 @@
     "title": "Recursion",
     "slides": [
       {
-        "text": "A function can call itself. Each call gets its own copy of the parameters and works on a smaller version of the problem, until a case so small it needs no more calls. You will count down, multiply, add and trace what runs when.\n\nThe snippet is pseudo code, not Go.",
+        "text": "A function can call itself. Each call gets its own copy of the parameters and works on a smaller version of the problem, until a case so small it needs no more calls. You will count down, multiply, add and trace what runs when, then make two functions call each other and carry a result in a parameter.\n\nThe snippet is pseudo code, not Go.",
         "code": "solve(problem):\n    if the problem is tiny:\n        give the answer\n    otherwise:\n        solve(a smaller problem)"
       }
     ]
@@ -179,6 +179,113 @@
           ],
           "answer": 1,
           "explanation": "The print comes after the recursive call, so nothing is printed until the deepest call, `up(1)`, finishes. The numbers come out as the calls return: 1, then 2, then 3."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Beyond one function",
+        "slides": [
+          {
+            "text": "Two functions can call each other. `a` calls `b` and `b` calls `a`, until one of them reaches a base case. Go lets you declare functions in any order, so neither has to come first.\n\nThe snippet is pseudo code.",
+            "code": "a(n):\n    if n is tiny: answer\n    otherwise: b(n - 1)\n\nb(n):\n    if n is tiny: answer\n    otherwise: a(n - 1)"
+          },
+          {
+            "text": "A parameter can carry the work done so far. This **accumulator** starts at a known value, grows with every call, and the base case returns it. A small entry function often starts it, so callers do not have to.\n\nThe snippet is pseudo code.",
+            "code": "f(n, so_far):\n    if n is tiny:\n        return so_far\n    return f(n - 1, so_far + n)"
+          },
+          {
+            "text": "A recursive function can return several values, like any function. Each call gets a pair from the smaller call and builds its own pair from it.\n\nA function with no base case, or one that never reaches it, keeps calling until the program crashes with a stack overflow. Go stops it for you, but the output is an error, not a result."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "even-odd",
+          "title": "Two functions, one chain",
+          "guide": "Decide whether a number is even or odd with two functions that call each other.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. 0 is even. Any other number is even when the one below it is odd.", "notes": [{"on": "isOdd(n-1)", "text": "Declared below: order does not matter."}], "text": "func isEven(n int) bool {\n    if n == 0 {\n        return true\n    }\n    return isOdd(n-1)\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "0 is not odd. Any other number is odd when the one below it is even.", "text": "func isOdd(n int) bool {\n    if n == 0 {\n        return false\n    }\n    return isEven(n-1)\n}\n"},
+            {"mode": "ghost", "line": 19, "guide": "Each call hands the work to the other function.", "text": "func main() {\n    fmt.Println(isEven(4))\n    fmt.Println(isOdd(7))\n    fmt.Println(isEven(7))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\ntrue\nfalse"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "ping-pong",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "func ping(n int) {\n    if n > 0 {\n        fmt.Println(\"ping\", n)\n        pong(n-1)\n    }\n}\n\nfunc pong(n int) {\n    if n > 0 {\n        fmt.Println(\"pong\", n)\n        ping(n-1)\n    }\n}\nfunc main() { ping(3) }",
+          "options": [
+            "ping 3, pong 3, ping 3",
+            "ping 3, pong 2, ping 1, pong 0",
+            "ping 3, ping 2, ping 1",
+            "ping 3, pong 2, ping 1"
+          ],
+          "answer": 3,
+          "explanation": "`ping(3)` prints, then calls `pong(2)`, which prints and calls `ping(1)`. That prints and calls `pong(0)`, where the condition is false and nothing happens."
+        },
+        {
+          "type": "typing",
+          "id": "running-total",
+          "title": "Carry the total along",
+          "guide": "Pass the sum so far as a parameter, and return it at the end.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. `total` grows with every call. The base case just returns it.", "notes": [{"on": "total+n", "text": "The new total goes down the chain."}], "text": "func addUp(n, total int) int {\n    if n == 0 {\n        return total\n    }\n    return addUp(n-1, total+n)\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "The first call starts the total at 0.", "text": "func main() {\n    fmt.Println(addUp(4, 0))\n    fmt.Println(addUp(10, 0))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10\n55"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "factorial-total",
+          "title": "Multiply as you go",
+          "guide": "Fill what the base case returns and what the running product is multiplied by.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc factAcc(n, acc int) int {\n    if n == 0 {\n        return ___\n    }\n    return factAcc(n-1, acc*___)\n}\n\nfunc main() {\n    fmt.Println(factAcc(5, 1))\n}",
+          "gaps": [{ "answers": ["acc"] }, { "answers": ["n"] }]
+        },
+        {
+          "type": "typing",
+          "id": "reverse-digits",
+          "title": "Reverse a number",
+          "guide": "Hide the extra parameter behind a simple entry function.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Callers pass only the number. The helper starts with 0.", "text": "func reverse(n int) int {\n    return reverseWith(n, 0)\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Each call moves the last digit of `n` onto the end of `acc`.", "notes": [{"on": "acc*10+n%10", "text": "Shift acc left, add the last digit."}], "text": "func reverseWith(n, acc int) int {\n    if n == 0 {\n        return acc\n    }\n    return reverseWith(n/10, acc*10+n%10)\n}\n"},
+            {"mode": "ghost", "line": 16, "guide": "The trailing zeros of 1200 end up in front, so they vanish.", "text": "func main() {\n    fmt.Println(reverse(472))\n    fmt.Println(reverse(1200))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "274\n21"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "digit-stats",
+          "title": "Count and add the digits",
+          "guide": "Return two values from a recursive function.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A one-digit number has 1 digit, and its sum is itself. Otherwise take the pair of the smaller number and add this digit to it.", "notes": [{"on": "count, sum := digitStats(n/10)", "text": "The pair for the number without its last digit."}], "text": "func digitStats(n int) (int, int) {\n    if n < 10 {\n        return 1, n\n    }\n    count, sum := digitStats(n/10)\n    return count+1, sum+n%10\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "A call can also feed its two values straight into `Println`.", "text": "func main() {\n    count, sum := digitStats(472)\n    fmt.Println(count, sum)\n    fmt.Println(digitStats(5))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3 13\n1 5"
+          }
         }
       ]
     }
