@@ -4,7 +4,7 @@
     "title": "Variables",
     "slides": [
       {
-        "text": "A variable is a named place that holds a value. Here you declare variables with `var` and with `:=`, see which value they start with, change them, and meet two errors Go reports before the program runs."
+        "text": "A variable is a named place that holds a value. Here you declare variables with `var` and with `:=`, see which value they start with, change them, meet two errors Go reports before the program runs, and declare several variables at once."
       }
     ]
   },
@@ -155,6 +155,128 @@
           ],
           "answer": 2,
           "explanation": "Go refuses to compile a variable that is declared and never used."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Declaring more at once",
+        "slides": [
+          {
+            "text": "You can declare several variables in one go: group them in a `var ( ... )` block, or put several names on one line.",
+            "code": "var (\n    host string\n    port int\n)\nvar x, y int\nm, n := 1, \"a\""
+          },
+          {
+            "text": "Go makes you use every variable, so it gives you `_`, the **blank identifier**: a place that takes a value and throws it away.\n\n`:=` has two rules. It needs at least one **new** name on its left side, and it only works inside a function. At the top of a file, use `var`."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "var-block",
+          "title": "Group with var",
+          "guide": "Declare three variables in one `var` block, then print them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "One `var` with parentheses declares many variables, one per line. `admin` has no value, so it starts as false.", "notes": [{"on": "var (", "text": "No need to repeat var on each line."}], "text": "    var (\n        name string = \"Ana\"\n        age int = 30\n        admin bool\n    )"},
+            {"mode": "copy", "line": 11, "guide": "Print them.", "text": "    fmt.Println(name, age, admin)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Ana 30 false"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "complete-var-block",
+          "title": "Complete the block",
+          "guide": "Fill the gaps of the grouped declaration.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    ___ (\n        city string = \"Lima\"\n        year int = 2024\n        ready ___ = true\n    )\n    fmt.Println(city, year, ready)\n}",
+          "gaps": [{ "answers": ["var"] }, { "answers": ["bool"] }]
+        },
+        {
+          "type": "typing",
+          "id": "several-on-a-line",
+          "title": "Several on one line",
+          "guide": "Declare several variables per line, then print them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Several names can share one type. Both start at 0.", "text": "    var width, height int"},
+            {"mode": "ghost", "line": 7, "guide": "Assign both in one line, in order.", "text": "    width, height = 4, 3"},
+            {"mode": "ghost", "line": 8, "guide": "`:=` also takes several names, and each one gets the type of its own value.", "text": "    name, age := \"Ana\", 30"},
+            {"mode": "copy", "line": 9, "guide": "Print all four.", "text": "    fmt.Println(width, height, name, age)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4 3 Ana 30"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "assign-order-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var a, b int\n    a, b = 5, a\n    fmt.Println(a, b)\n}",
+          "options": [
+            "5 5",
+            "5 0",
+            "0 0",
+            "it does not compile"
+          ],
+          "answer": 1,
+          "explanation": "The right side is worked out first, while `a` is still 0. Then `a` becomes 5 and `b` becomes 0."
+        },
+        {
+          "type": "typing",
+          "id": "blank-identifier",
+          "title": "Ignore a value",
+          "guide": "Throw a value away with `_`, and use it to satisfy the compiler.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`_` is the **blank identifier**. It takes the first value and discards it, so only `score` is kept.", "notes": [{"on": "_", "text": "The value is thrown away."}], "text": "    _, score := \"Ana\", 90"},
+            {"mode": "ghost", "line": 7, "guide": "Nothing uses `count` yet, and Go would refuse to compile it.", "text": "    count := 3"},
+            {"mode": "ghost", "line": 8, "guide": "Assigning it to `_` counts as a use.", "text": "    _ = count"},
+            {"mode": "copy", "line": 9, "guide": "Print the score.", "text": "    fmt.Println(score)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "90"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "one-new-variable",
+          "title": "One new variable",
+          "guide": "Use `:=` with one old name and one new name.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Both names are new.", "text": "    host, port := \"localhost\", 8080"},
+            {"mode": "ghost", "line": 7, "guide": "`:=` needs at least one new name on the left. `secure` is new, so `port` is only updated, not redeclared.", "notes": [{"on": "secure", "text": "The one new name that makes := legal."}], "text": "    port, secure := 9090, true"},
+            {"mode": "copy", "line": 8, "guide": "Print all three.", "text": "    fmt.Println(host, port, secure)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "localhost 9090 true"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "package-level-var",
+          "title": "Outside a function",
+          "guide": "Declare a variable at the top of the file, outside `main`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 5, "guide": "Outside a function, every declaration starts with `var`. The short form `:=` only works inside functions.", "notes": [{"on": "var", "text": "Here := would not compile."}], "text": "var language = \"Go\"\n\n"},
+            {"mode": "ghost", "line": 8, "guide": "Inside `main`, `:=` is fine.", "text": "    version := 1"},
+            {"mode": "copy", "line": 9, "guide": "Print both.", "text": "    fmt.Println(language, version)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Go 1"
+          }
         }
       ]
     }

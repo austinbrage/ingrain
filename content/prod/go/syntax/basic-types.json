@@ -294,6 +294,266 @@
           "gaps": [{ "answers": ["true", "false"] }]
         }
       ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Sizes and surprises",
+        "slides": [
+          {
+            "text": "Whole numbers come in fixed sizes. A bigger size holds more but takes more space, and a value that does not fit wraps around instead of failing. Unsigned types start at 0 and reach twice as high. The snippet is a map of the ranges, not Go.",
+            "code": "int8    -128 to 127\nuint8   0 to 255\nint16   -32768 to 32767\nint32   about -2 to 2 billion\nint64   about -9 to 9 quintillion"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "sized-integers",
+          "title": "Sized integers",
+          "guide": "Declare whole numbers of every size.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "`int8` takes 8 bits and holds -128 to 127. That is its whole range.",
+              "text": "    var small int8 = -128"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "`int16` holds up to 32767.",
+              "text": "    var medium int16 = 30000"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "`int32` reaches about 2 billion. `int64` reaches about 9 quintillion, so 5 billion fits.",
+              "text": "    var large int32 = 100000\n    var huge int64 = 5000000000"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`uint` is the unsigned twin of `int`: never negative. `int` and `uint` have the size of the machine, 64 bits on most.",
+              "notes": [
+                {
+                  "on": "uint",
+                  "text": "Zero or more, never negative."
+                }
+              ],
+              "text": "    var count uint = 7"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Print them all.",
+              "text": "    fmt.Println(small, medium)\n    fmt.Println(large, huge, count)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "-128 30000\n100000 5000000000 7"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "byte-is-uint8",
+          "title": "Byte is uint8",
+          "guide": "Use `byte`, another name for `uint8`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "`byte` is used for raw data. A character like `'G'` is just the number 71, which fits.",
+              "text": "    var letter byte = 'G'"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "`byte` and `uint8` are the same type, so no conversion is needed.",
+              "text": "    var number uint8 = letter"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Both print as numbers. `rune` is the same kind of name for `int32`.",
+              "text": "    fmt.Println(letter, number)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "71 71"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "match-the-sizes",
+          "title": "Match the sizes",
+          "guide": "An `int` and an `int64` do not mix. Convert `a` so both sides of the sum match.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var a int = 5\n    var b int64 = 7\n    total := ___(a) + b\n    fmt.Println(total)\n}",
+          "gaps": [{ "answers": ["int64"] }]
+        },
+        {
+          "type": "typing",
+          "id": "signed-wrap",
+          "title": "Wrap around",
+          "guide": "Push values past the range of an `int8`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "200 is above 127, so it wraps: 200 - 256 = -56. `big` is a variable, so Go lets it through.",
+              "text": "    big := 200\n    small := int8(big)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "The highest value an `int8` holds.",
+              "text": "    var top int8 = 127"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "One past the maximum wraps to the minimum. Go gives no warning.",
+              "text": "    top = top + 1"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Print both results.",
+              "text": "    fmt.Println(small, top)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "-56 -128"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "cut-toward-zero",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    x := -2.7\n    fmt.Println(int(x))\n}",
+          "options": [
+            "-3",
+            "-2.7",
+            "2",
+            "-2"
+          ],
+          "answer": 3,
+          "explanation": "Converting to `int` cuts off the decimals, toward zero. It never rounds, not even a negative number."
+        },
+        {
+          "type": "typing",
+          "id": "float-constant-to-int",
+          "title": "A whole decimal constant",
+          "guide": "Put whole-valued decimal constants into `int` variables.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "`3.0` is a constant with nothing after the point, so it fits an `int`. `2.5` would not compile: the `.5` would be lost.",
+              "text": "    var whole int = 3.0"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "A named constant works the same way, since constants have no type until used.",
+              "text": "    const rows = 4.0\n    var count int = rows"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Both print as whole numbers.",
+              "text": "    fmt.Println(whole, count)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3 4"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "number-to-character",
+          "title": "A number as a string",
+          "guide": "Convert an `int` to a `string` and see what you get.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A whole number.",
+              "text": "    code := 72"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "An `int` turned into a `string` gives the character with that number, not the digits. 72 is `H`.",
+              "notes": [
+                {
+                  "on": "string(",
+                  "text": "Gives a character, not the digits."
+                }
+              ],
+              "text": "    fmt.Println(string(code))"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "The number itself is unchanged. To get the text \"72\" you use `strconv`, in a later course.",
+              "text": "    fmt.Println(code)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "H\n72"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "string-of-an-int",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    n := 97\n    fmt.Println(string(n))\n}",
+          "options": [
+            "97",
+            "a",
+            "\"97\"",
+            "it does not compile"
+          ],
+          "answer": 1,
+          "explanation": "An `int` converted to `string` becomes the character with that number, and 97 is `a`. For the text \"97\", `strconv` comes in a later course."
+        }
+      ]
     }
+
   ]
 }

@@ -1,0 +1,607 @@
+{
+  "id": "scope",
+  "intro": {
+    "title": "Scope and shadowing",
+    "slides": [
+      {
+        "text": "Scope is where a name can be used. Every variable lives in a block, and this module shows how far it reaches, how a new variable can hide another with the same name, and which variables live for the whole file.\n\nThree sessions: blocks, shadowing, then the package level and the setup of `if`, `switch` and `for`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Blocks",
+        "slides": [
+          {
+            "text": "A **block** is the code between a pair of braces: a function, an `if`, a loop, a `case` or braces on their own. A variable lives from its declaration to the closing brace of its block.\n\nThe snippet is pseudo code, not Go.",
+            "code": "open a block\n    make a box\n    use the box        ok\nclose the block\nuse the box            error"
+          },
+          {
+            "text": "A block sees what its outer blocks declared, never the other way around. Two blocks next to each other do not see each other, so each can use the same name."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "plain-block",
+          "title": "A block of its own",
+          "guide": "Open a block with a pair of braces and declare a variable inside it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Declared in `main`, `level` lives until the closing brace of `main`.",
+              "text": "    level := 1"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Braces alone make a **block**. `bonus` exists only inside it, but the block can still see `level`.",
+              "notes": [
+                {
+                  "on": "bonus := 5",
+                  "text": "Gone when the block closes."
+                }
+              ],
+              "text": "    {\n        bonus := 5\n        fmt.Println(level, bonus)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Here only `level` is left.",
+              "text": "    fmt.Println(level)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1 5\n1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "if-body-scope",
+          "title": "Variables inside an if",
+          "guide": "Declare a variable inside each branch of an if.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A value to test.",
+              "text": "    score := 72"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Every branch is its own block, so both can declare `grade`: they are two separate variables.",
+              "text": "    if score >= 50 {\n        grade := \"pass\"\n        fmt.Println(grade)\n    } else {\n        grade := \"retry\"\n        fmt.Println(grade)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`grade` is gone here, `score` is not.",
+              "text": "    fmt.Println(score)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "pass\n72"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "still-in-scope",
+          "title": "What is still there?",
+          "guide": "Print the one variable that still exists after the `if`.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\n    lives := 3\n    if lives > 0 {\n        bonus := 10\n        fmt.Println(lives + bonus)\n    }\n    fmt.Println(___)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "lives"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "loop-body-scope",
+          "title": "Variables in a loop",
+          "guide": "Declare a variable inside a loop body and keep a result outside it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Declared before the loop, so it survives it.",
+              "text": "    last := 0"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "`square` is a new variable on every lap. `last = square` assigns to the outer one.",
+              "notes": [
+                {
+                  "on": "square := i * i",
+                  "text": "Created again at the start of every lap."
+                }
+              ],
+              "text": "    for i := 1; i <= 3; i++ {\n        square := i * i\n        last = square\n        fmt.Println(i, square)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "The loop is over: `i` and `square` are gone, `last` holds the final value.",
+              "text": "    fmt.Println(last)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1 1\n2 4\n3 9\n9"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "reset-every-lap",
+          "title": "What does it print?",
+          "guide": "Pick the output.",
+          "kind": "output",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\n    for i := 1; i <= 3; i++ {\n        total := 0\n        total += i\n        fmt.Println(total)\n    }\n}",
+          "options": [
+            "1, 3, 6",
+            "1, 2, 3",
+            "0, 0, 0",
+            "6"
+          ],
+          "answer": 1,
+          "explanation": "`total` is declared inside the body, so every lap starts a new one at 0. Nothing carries over between laps."
+        },
+        {
+          "type": "typing",
+          "id": "case-scope",
+          "title": "Each case is a block",
+          "guide": "Declare a variable inside two different cases.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "The value the switch looks at.",
+              "text": "    day := 2"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Each `case` is its own block, like the branches of an `if`: the two `name` variables never meet.",
+              "text": "    switch day {\n    case 1:\n        name := \"Mon\"\n        fmt.Println(name)\n    case 2:\n        name := \"Tue\"\n        fmt.Println(name)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "Only `day` is visible after the switch.",
+              "text": "    fmt.Println(day)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Tue\n2"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Shadowing",
+        "slides": [
+          {
+            "text": "Inside a block, `:=` always makes a new variable, even when the name already exists outside. The new one **shadows** the outer one until the block ends, and the outer one keeps its value.\n\nThe snippet is pseudo code, not Go.",
+            "code": "outer x = 1\nopen a block\n    new x = 2    hides the outer\nclose the block\nx is 1 again"
+          },
+          {
+            "text": "`=` makes nothing: it changes the variable that already exists. Mixing them up is the classic scope bug: write `:=` where `=` was meant and the outer variable never changes.\n\nA new variable exists only after its own line, so its right side still reads the outer one."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "shadow-in-block",
+          "title": "Hide a variable",
+          "guide": "Declare a variable with the same name inside a block.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "The outer variable.",
+              "text": "    x := 1"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "`:=` inside the block creates a **new** `x` that hides the outer one until the block ends.",
+              "notes": [
+                {
+                  "on": "x := 2",
+                  "text": "A new variable, not a change to the old one."
+                }
+              ],
+              "text": "    {\n        x := 2\n        fmt.Println(\"inner\", x)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The block is over. The outer `x` was never touched.",
+              "text": "    fmt.Println(\"outer\", x)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "inner 2\nouter 1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "assign-in-block",
+          "title": "Change the outer one",
+          "guide": "Change the outer variable from inside a block.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "The outer variable.",
+              "text": "    balance := 100"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Without the colon, `=` finds the existing `balance` and changes it.",
+              "notes": [
+                {
+                  "on": "balance = 50",
+                  "text": "No new variable: this is the outer one."
+                }
+              ],
+              "text": "    {\n        balance = 50\n        fmt.Println(\"inner\", balance)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The change outlives the block.",
+              "text": "    fmt.Println(\"outer\", balance)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "inner 50\nouter 50"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "keep-the-change",
+          "title": "Keep the result",
+          "guide": "Store the last `i` whose square is above 10 in the `found` declared before the loop.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\n    found := 0\n    for i := 1; i <= 5; i++ {\n        if i*i > 10 {\n            found ___ i\n        }\n    }\n    fmt.Println(found)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "="
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "total-bug",
+          "title": "What does it print?",
+          "guide": "Pick the output. Watch the colon.",
+          "kind": "output",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\n    total := 0\n    for i := 1; i <= 3; i++ {\n        total := total + i\n        fmt.Println(total)\n    }\n    fmt.Println(total)\n}",
+          "options": [
+            "1, 2, 3, then 0",
+            "1, 3, 6, then 6",
+            "1, 3, 6, then 0",
+            "1, 2, 3, then 6"
+          ],
+          "answer": 0,
+          "explanation": "`total := total + i` makes a new `total` on every lap, built from the outer one, which stays 0. After the loop the outer `total` is still 0."
+        },
+        {
+          "type": "typing",
+          "id": "new-vars-in-block",
+          "title": "All new in a block",
+          "guide": "Mix a new and an existing variable in a block.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Two outer variables.",
+              "text": "    host, port := \"localhost\", 80"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "In a new block, **every** name on the left of `:=` is new, even `host`. Only `port`, with `=`, is the outer one.",
+              "notes": [
+                {
+                  "on": "host, secure :=",
+                  "text": "Both names are new in this block."
+                }
+              ],
+              "text": "    {\n        host, secure := \"example.com\", true\n        port = 8080\n        fmt.Println(host, port, secure)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`host` is back to the outer one. `port` was really changed.",
+              "text": "    fmt.Println(host, port)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "example.com 8080 true\nlocalhost 8080"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "unused-shadow",
+          "title": "What happens when it runs?",
+          "guide": "Pick what Go does with this program.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\n    count := 0\n    for i := 0; i < 3; i++ {\n        count := count + 1\n    }\n    fmt.Println(count)\n}",
+          "options": [
+            "It prints 3",
+            "It prints 0",
+            "It does not compile: the inner count is unused",
+            "It does not compile: count is declared twice"
+          ],
+          "answer": 2,
+          "explanation": "The inner `count` is a new variable that nothing reads, and Go rejects unused variables. The outer `count` would not have changed anyway."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Package level and setup statements",
+        "slides": [
+          {
+            "text": "A variable declared outside every function is visible in the whole file, in any order, and from every block. A local variable with the same name hides it, as any other shadowing."
+          },
+          {
+            "text": "The setup of an `if`, a `switch` or a `for` is a small block around the whole statement. The variable lives in every branch and is gone after the closing brace.\n\nA variable declared before a `for` is not part of that block, so the loop can use it with `=` and it lives on."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "declared-after-main",
+          "title": "Declared after main",
+          "guide": "Use a package-level variable that is written below `main`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "`counter` is not declared yet in this file. That is fine.",
+              "text": "    fmt.Println(counter)"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "A package-level variable is visible inside every block, and the changes stay.",
+              "text": "    for i := 0; i < 3; i++ {\n        counter++\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The loop changed the package-level variable.",
+              "text": "    fmt.Println(counter)"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Package-level names can be declared in any order, even below the code that uses them.",
+              "notes": [
+                {
+                  "on": "var counter",
+                  "text": "Visible in the whole file."
+                }
+              ],
+              "text": "\nvar counter = 10"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10\n13"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "local-hides-package",
+          "title": "A local hides the package one",
+          "guide": "Hide a package-level variable inside a block.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A package-level variable.",
+              "text": "var level = 1\n\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Here `level` is the package one.",
+              "text": "    fmt.Println(\"package\", level)"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The local `level` hides the package one inside the block, the same as shadowing a local.",
+              "notes": [
+                {
+                  "on": "level := 5",
+                  "text": "Hides the package-level one."
+                }
+              ],
+              "text": "    {\n        level := 5\n        fmt.Println(\"block\", level)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "The package-level variable was never changed.",
+              "text": "    fmt.Println(\"package\", level)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "package 1\nblock 5\npackage 1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "if-init-chain",
+          "title": "One variable per branch",
+          "guide": "Declare a variable in the setup of an `if` and another in an `else if`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A variable from the setup lives in the whole chain: later branches still see `n`, and `m` is seen by what follows it.",
+              "notes": [
+                {
+                  "on": "m := n * 2;",
+                  "text": "Can read n from the first setup."
+                }
+              ],
+              "text": "    if n := 7; n < 5 {\n        fmt.Println(\"small\", n)\n    } else if m := n * 2; m < 20 {\n        fmt.Println(\"medium\", n, m)\n    } else {\n        fmt.Println(\"large\", n, m)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "medium 7 14"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "setup-condition",
+          "title": "Use the setup variable",
+          "guide": "Use the variable of the setup in the condition.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\n    if size := 3 * 4; ___ > 10 {\n        fmt.Println(\"big\", size)\n    }\n}",
+          "gaps": [
+            {
+              "answers": [
+                "size"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "switch-init-shadow",
+          "title": "Hide it in a switch",
+          "guide": "Hide an outer variable with the setup of a switch.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "The outer variable.",
+              "text": "    n := 1"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "The setup makes a new `n` for the whole switch. It is built from the outer `n`, and then hides it.",
+              "notes": [
+                {
+                  "on": "n := n + 10;",
+                  "text": "New variable, built from the old one."
+                }
+              ],
+              "text": "    switch n := n + 10; {\n    case n > 10:\n        fmt.Println(\"switch\", n)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The switch is over and the outer `n` is back.",
+              "text": "    fmt.Println(\"outer\", n)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "switch 11\nouter 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "counter-after-loop",
+          "title": "What does it print?",
+          "guide": "Pick the output. Look where `i` is declared.",
+          "kind": "output",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\n    sum := 0\n    i := 0\n    for i = 1; i <= 3; i++ {\n        sum += i\n    }\n    fmt.Println(sum, i)\n}",
+          "options": [
+            "6 3",
+            "6 4",
+            "6 0",
+            "It does not compile"
+          ],
+          "answer": 1,
+          "explanation": "`i` is declared before the loop and the loop only assigns it with `=`, so it survives. The loop stops when `i` reaches 4."
+        }
+      ]
+    }
+  ]
+}

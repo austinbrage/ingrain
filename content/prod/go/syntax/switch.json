@@ -6,6 +6,9 @@
       {
         "text": "A `switch` compares one value against several cases and runs the first one that matches. It replaces a long `else if` chain. In Go a case ends by itself, with no `break`.\n\nThe snippet is pseudo code, not Go.",
         "code": "look at a value\n    if it is A, do this\n    if it is B or C, do that\n    if nothing matches, do the other"
+      },
+      {
+        "text": "Two sessions:\n\n- **Session 1:** cases on a value, lists of values, a switch with no value and `fallthrough`\n- **Session 2:** a setup statement, `break` inside a case and the order of the cases"
       }
     ]
   },
@@ -116,6 +119,93 @@
             "command": "go run main.go",
             "text": "good\nrated\n2"
           }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Init, break and order",
+        "slides": [
+          {
+            "text": "Like `if`, a `switch` can start with a short statement, then a `;`. The variable it declares exists only inside the switch, and it can be the value that the cases compare.\n\nThe snippet is pseudo code, not Go.",
+            "code": "switch setup; value {\n    case A: ...\n}\n\nswitch setup; {\n    case condition: ...\n}"
+          },
+          {
+            "text": "A `break` inside a case ends the switch early, which helps when a case has a check halfway through. Cases are tried from the top, and `default` runs last wherever it is written."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "init-switch",
+          "title": "Switch with a setup",
+          "guide": "Declare a value in the switch line and compare it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The part before the `;` runs first. `size` lives only inside this switch, and the part after the `;` is the value to compare.", "notes": [{"on": "size :=", "text": "Gone after the closing brace."}], "text": "    switch size := len(\"go\"); size {\n    case 1:\n        fmt.Println(\"single\")\n    case 2:\n        fmt.Println(\"pair\")\n    default:\n        fmt.Println(\"long\")\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"done\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "pair\ndone"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "init-tagless",
+          "title": "Setup and conditions",
+          "guide": "Combine a setup with cases that hold conditions.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "With a setup and no value, the `;` stays and each `case` holds a condition that can use the new variable.", "notes": [{"on": "7 * 2", "text": "An expression works as the setup."}], "text": "    switch n := 7 * 2; {\n    case n > 20:\n        fmt.Println(\"large\")\n    case n > 10:\n        fmt.Println(\"medium\")\n    default:\n        fmt.Println(\"small\")\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"checked\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "medium\nchecked"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "setup-and-default",
+          "title": "Complete the switch",
+          "guide": "Compare the value from the setup, and catch every other value.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    switch score := 8 * 2; ___ {\n    case 16:\n        fmt.Println(\"sixteen\")\n    ___:\n        fmt.Println(\"other\")\n    }\n}",
+          "gaps": [{ "answers": ["score"] }, { "answers": ["default"] }]
+        },
+        {
+          "type": "typing",
+          "id": "break-in-case",
+          "title": "Leave a case early",
+          "guide": "Use `break` to end the switch before the case finishes.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A number to test.", "text": "    age := 15"},
+            {"mode": "ghost", "line": 7, "guide": "`break` jumps out of the switch at once, so the lines left in the case are skipped.", "notes": [{"on": "break", "text": "Ends the whole switch, not just the if."}], "text": "    switch {\n    case age > 0:\n        if age < 18 {\n            fmt.Println(\"minor\")\n            break\n        }\n        fmt.Println(\"adult\")\n    default:\n        fmt.Println(\"invalid\")\n    }"},
+            {"mode": "ghost", "line": 18, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"done\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "minor\ndone"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "default-first",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\nfunc main() {\n    x := 5\n    switch {\n    default:\n        fmt.Println(\"other\")\n    case x > 3:\n        fmt.Println(\"big\")\n    case x > 1:\n        fmt.Println(\"small\")\n    }\n}",
+          "options": [
+            "other",
+            "big\nsmall",
+            "other\nbig",
+            "big"
+          ],
+          "answer": 3,
+          "explanation": "`default` runs only when no case matches, wherever it is written. The first true case, `x > 3`, runs and ends the switch."
         }
       ]
     }

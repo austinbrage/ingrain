@@ -8,7 +8,7 @@
         "code": "repeat while the condition holds\n    do this\n    maybe skip to the next lap\n    maybe stop the loop early"
       },
       {
-        "text": "Two sessions:\n\n- **Session 1:** the counter, the condition, the loop with no end and `break`\n- **Session 2:** `range`, `continue` and loops inside loops"
+        "text": "Three sessions:\n\n- **Session 1:** the counter, the condition, the loop with no end and `break`\n- **Session 2:** `range`, `continue` and loops inside loops\n- **Session 3:** counting down, two variables, labels and `switch` inside a loop"
       }
     ]
   },
@@ -204,6 +204,115 @@
           ],
           "answer": 0,
           "explanation": "`break` leaves only the inner loop. The outer loop goes on, so each `i` prints once, with `j` equal to 1."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Labels, two variables and switch",
+        "slides": [
+          {
+            "text": "A loop can count down, and it can hold two variables in its setup and its step.\n\nA **label** names a loop. `break label` and `continue label` act on that loop, not only on the innermost one.\n\nThe snippet is pseudo code, not Go.",
+            "code": "outer: for each row\n    for each column\n        if done\n            stop outer\n        if skip\n            next lap of outer"
+          },
+          {
+            "text": "A `break` inside a `switch` ends only the switch, even when the switch sits in a loop. To leave the loop from there, break to the label of the loop."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "countdown-and-pairs",
+          "title": "Count down and meet in the middle",
+          "guide": "Count down, then move two variables in one loop.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A loop can count down: start high, test with `>` and step with `i--`.", "notes": [{"on": "i--", "text": "Takes one off after every lap."}], "text": "    for i := 3; i > 0; i-- {\n        fmt.Println(i)\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "Print a line after the loop.", "text": "    fmt.Println(\"liftoff\")"},
+            {"mode": "ghost", "line": 10, "guide": "The setup and the step can hold two variables each. They move toward each other until the condition fails.", "notes": [{"on": "i, j = i+1, j-1", "text": "Both change together, in one statement."}], "text": "    for i, j := 0, 4; i < j; i, j = i+1, j-1 {\n        fmt.Println(i, j)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\n2\n1\nliftoff\n0 4\n1 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "continue-keeps-counting",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    laps := 0\n    for i := 0; i < 5; i++ {\n        laps++\n        if i%2 == 1 {\n            continue\n        }\n        fmt.Println(i, laps)\n    }\n}",
+          "options": [
+            "0 1\n2 2\n4 3",
+            "0 1\n1 2\n2 3\n3 4\n4 5",
+            "0 1\n2 3\n4 5",
+            "0 0\n2 1\n4 2"
+          ],
+          "answer": 2,
+          "explanation": "`continue` skips only the print. `laps` already grew on every lap, and the step `i++` still runs, so odd laps count but print nothing."
+        },
+        {
+          "type": "typing",
+          "id": "labeled-break",
+          "title": "Break out of both loops",
+          "guide": "Name the outer loop with a label and leave it from inside.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A label is a name followed by a colon, placed before a `for`. `break outer` ends the loop with that name, not just the innermost one.", "notes": [{"on": "outer:", "text": "Names the loop right below it."}, {"on": "break outer", "text": "Ends both loops at once."}], "text": "outer:\n    for i := 1; i <= 3; i++ {\n        for j := 1; j <= 3; j++ {\n            if i*j == 4 {\n                fmt.Println(\"found\", i, j)\n                break outer\n            }\n            fmt.Println(i, j)\n        }\n    }"},
+            {"mode": "ghost", "line": 16, "guide": "This line runs once both loops are over.", "text": "    fmt.Println(\"done\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1 1\n1 2\n1 3\n2 1\nfound 2 2\ndone"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "labeled-continue",
+          "title": "Skip to the next outer lap",
+          "guide": "Jump to the next lap of the outer loop from inside.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`continue outer` abandons the inner loop and starts the next lap of the loop named `outer`. A plain `continue` would only skip the inner lap.", "notes": [{"on": "continue outer", "text": "The inner loop is dropped, the outer one goes on."}], "text": "outer:\n    for i := 1; i <= 3; i++ {\n        for j := 1; j <= 3; j++ {\n            if j == i {\n                continue outer\n            }\n            fmt.Println(i, j)\n        }\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "Print a last line.", "text": "    fmt.Println(\"done\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 1\n3 1\n3 2\ndone"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "continue-the-outer",
+          "title": "Skip to the outer loop",
+          "guide": "When `j` passes `i`, go to the next lap of the outer loop.",
+          "code": "package main\nimport \"fmt\"\n\nfunc main() {\nouter:\n    for i := 1; i <= 3; i++ {\n        for j := 1; j <= 3; j++ {\n            if j > i {\n                continue ___\n            }\n            fmt.Println(i, j)\n        }\n    }\n}",
+          "gaps": [
+            {
+              "answers": [
+                "outer"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "switch-in-loop",
+          "title": "Break inside a switch",
+          "guide": "A `break` in a switch inside a loop, and the label that leaves the loop.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Inside a `switch`, a plain `break` ends only the switch. The loop carries on with the next lap.", "notes": [{"on": "break", "text": "Leaves the switch, not the loop."}], "text": "    for i := 1; i <= 4; i++ {\n        switch i {\n        case 3:\n            break\n        default:\n            fmt.Println(\"lap\", i)\n        }\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "Mark where the second loop starts.", "text": "    fmt.Println(\"labeled\")"},
+            {"mode": "ghost", "line": 15, "guide": "To leave the loop from inside a switch, label the loop and break to the label.", "notes": [{"on": "break loop", "text": "Ends the loop, not only the switch."}], "text": "loop:\n    for i := 1; i <= 4; i++ {\n        switch i {\n        case 3:\n            break loop\n        default:\n            fmt.Println(\"lap\", i)\n        }\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "lap 1\nlap 2\nlap 4\nlabeled\nlap 1\nlap 2"
+          }
         }
       ]
     }

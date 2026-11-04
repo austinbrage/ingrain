@@ -4,8 +4,8 @@
     "title": "Operators",
     "slides": [
       {
-        "text": "Operators combine values into new ones. Here you do arithmetic, update a variable in place, compare values and join conditions with logic. The snippet is a map of the operators, not Go.",
-        "code": "arithmetic  + - * / %\ncompare     == != < <= > >=\nlogic       && || !\nupdate      += -= *= /= ++ --"
+        "text": "Operators combine values into new ones. Here you do arithmetic, update a variable in place, compare values, join conditions with logic, work on bits and join strings. The snippet is a map of the operators, not Go.",
+        "code": "arithmetic  + - * / %\ncompare     == != < <= > >=\nlogic       && || !\nupdate      += -= *= /= ++ --\nbits        & | ^ &^ << >>\ntext        +"
       }
     ]
   },
@@ -103,6 +103,148 @@
           ],
           "answer": 1,
           "explanation": "`&&` binds tighter than `||`, so the first line is `open || (broken && ready)`: true. The parentheses in the second change the grouping: `true && false` is false."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Bits, signs and shortcuts",
+        "slides": [
+          {
+            "text": "A number is stored as bits. Bitwise operators work on each bit of two numbers at once. The snippet is pseudo code, with 12 and 10 written in bits.",
+            "code": "12     = 1100\n10     = 1010\n\n12 & 10 = 1000   both bits 1\n12 | 10 = 1110   either bit 1\n12 ^ 10 = 0110   only one bit 1\n12 &^ 10 = 0100  bits of 12 not in 10"
+          },
+          {
+            "text": "Shifts slide all the bits. `<<` moves them left, which doubles the number for each place. `>>` moves them right, which halves it and drops the rest.",
+            "code": "0011 << 1 = 0110\n0011 << 2 = 1100\n1100 >> 2 = 0011"
+          },
+          {
+            "text": "Two more things to know: `%` keeps the sign of its **left** side, and `&&` and `||` stop early. When the left side already decides the answer, the right side never runs. Last, `+` also joins strings."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "bit-operators",
+          "title": "Bitwise operators",
+          "guide": "Combine the bits of two numbers.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "In bits, 12 is `1100` and 10 is `1010`.", "text": "    a := 12\n    b := 10"},
+            {"mode": "ghost", "line": 8, "guide": "`&` keeps the bits that are 1 in both: `1000`. `|` keeps the bits that are 1 in either: `1110`. `^` keeps the bits that are 1 in only one: `0110`.", "notes": [{"on": "a^b", "text": "Xor: a bit that differs between the two."}], "text": "    fmt.Println(a&b, a|b, a^b)"},
+            {"mode": "ghost", "line": 9, "guide": "`&^` clears from `a` every bit that is 1 in `b`: `1100` becomes `0100`.", "notes": [{"on": "&^", "text": "And not: a single operator in Go."}], "text": "    fmt.Println(a&^b)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "8 14 6\n4"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "shift-bits",
+          "title": "Shift the bits",
+          "guide": "Move the bits of a number left and right.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two numbers to shift.", "text": "    n := 3\n    m := 20"},
+            {"mode": "ghost", "line": 8, "guide": "`n << 1` moves the bits one place left, so the number doubles. `n << 3` doubles it three times.", "text": "    fmt.Println(n<<1, n<<3)"},
+            {"mode": "ghost", "line": 9, "guide": "`>>` moves the bits right. Each place halves the number, and the bits that fall off are lost.", "text": "    fmt.Println(m>>1, m>>2)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "6 24\n10 5"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "shift-left",
+          "title": "Shift left",
+          "guide": "Shift `n` left by two bits, so the program prints 12.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    n := 3\n    fmt.Println(n ___ 2)\n}",
+          "gaps": [{ "answers": ["<<"] }]
+        },
+        {
+          "type": "typing",
+          "id": "remainder-sign",
+          "title": "Remainder of a negative",
+          "guide": "See which sign `%` gives when a number is negative.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A negative number and a positive one.", "text": "    a := -7\n    b := 3"},
+            {"mode": "ghost", "line": 8, "guide": "`/` cuts toward zero, so `-7 / 3` is -2. The remainder is what is left: -1.", "text": "    fmt.Println(a/b, a%b)"},
+            {"mode": "ghost", "line": 9, "guide": "The sign of `%` follows the **left** side. A positive left side gives a positive result, and the right side's sign does not matter.", "notes": [{"on": "a%-b", "text": "Left is negative, so the result is too."}], "text": "    fmt.Println(-a%b, a%-b)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "-2 -1\n1 -1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "short-circuit",
+          "title": "Stop early",
+          "guide": "Guard a division so it never runs when `b` is zero.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`b` is zero, so `a / b` would crash the program.", "text": "    a := 10\n    b := 0"},
+            {"mode": "ghost", "line": 8, "guide": "`&&` is false as soon as its left side is false, so the right side is never evaluated. There is no division, and no crash.", "notes": [{"on": "b != 0 &&", "text": "The guard: it goes on the left."}], "text": "    ok := b != 0 && a/b > 1\n    fmt.Println(ok)"},
+            {"mode": "ghost", "line": 10, "guide": "`||` does the same when its left side is true: the right side is skipped.", "text": "    skip := b == 0 || a/b > 1\n    fmt.Println(skip)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "false\ntrue"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "guard-purpose",
+          "title": "Why this order?",
+          "guide": "Read the code, then pick what `b != 0 &&` is for.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := 10\n    b := 0\n    ok := b != 0 && a/b > 1\n    fmt.Println(ok)\n}",
+          "options": [
+            "Checks that b is a valid number before it is used",
+            "Makes both comparisons run, so each one is checked",
+            "Skips a/b when b is zero, so it cannot crash",
+            "Turns the result of a/b into a bool"
+          ],
+          "answer": 2,
+          "explanation": "When `b != 0` is false, `&&` already knows the result and never evaluates `a/b`. Swap the sides and the division runs first."
+        },
+        {
+          "type": "typing",
+          "id": "join-strings",
+          "title": "Join strings",
+          "guide": "Build a sentence by joining strings with `+`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two strings to join.", "text": "    first := \"Hello\"\n    second := \"Go\""},
+            {"mode": "ghost", "line": 8, "guide": "On strings, `+` joins them into a new string. Spaces and punctuation are strings too.", "text": "    greeting := first + \", \" + second"},
+            {"mode": "ghost", "line": 9, "guide": "`+=` works on strings as well: it adds to the end.", "text": "    greeting += \"!\""},
+            {"mode": "ghost", "line": 10, "guide": "Print the result.", "text": "    fmt.Println(greeting)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello, Go!"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "plus-on-text",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"5\"+\"5\", 5+5)\n}",
+          "options": [
+            "10 10",
+            "10 55",
+            "55 55",
+            "55 10"
+          ],
+          "answer": 3,
+          "explanation": "`+` on two strings joins them: \"55\". On two numbers it adds: 10."
         }
       ]
     }

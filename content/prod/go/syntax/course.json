@@ -6,11 +6,11 @@
       "tier": "basic",
       "modules": [
         { "id": "program-structure", "name": "Program structure", "sessions": 2 },
-        { "id": "variables", "name": "Variables", "sessions": 2 },
+        { "id": "variables", "name": "Variables", "sessions": 3 },
         { "id": "printing-values", "name": "Printing values", "sessions": 1 },
-        { "id": "constants", "name": "Constants", "sessions": 1 },
-        { "id": "basic-types", "name": "Basic types", "sessions": 2 },
-        { "id": "operators", "name": "Operators", "sessions": 1 }
+        { "id": "constants", "name": "Constants", "sessions": 2 },
+        { "id": "basic-types", "name": "Basic types", "sessions": 3 },
+        { "id": "operators", "name": "Operators", "sessions": 2 }
       ]
     },
     {
@@ -18,8 +18,15 @@
       "tier": "basic",
       "modules": [
         { "id": "conditionals", "name": "Conditionals", "sessions": 1 },
-        { "id": "switch", "name": "Switch", "sessions": 1 },
-        { "id": "loops", "name": "Loops", "sessions": 2 }
+        { "id": "switch", "name": "Switch", "sessions": 2 },
+        { "id": "loops", "name": "Loops", "sessions": 3 }
+      ]
+    },
+    {
+      "name": "Scope",
+      "tier": "basic",
+      "modules": [
+        { "id": "scope", "name": "Scope and shadowing", "sessions": 3 }
       ]
     }
   ]
