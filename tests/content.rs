@@ -388,6 +388,48 @@ fn balanced(text: &str) -> bool {
     open.is_empty()
 }
 
+// The file the chunks make, as the editor builds it, has code only inside functions: a line outside
+// every bracket starts a declaration or closes one. A chunk whose `line` is one too far leaves a
+// statement after the `}` of `main`. Returns the file line of the first such code
+fn code_outside_function(typing: &Typing) -> Option<usize> {
+    let mut file: Vec<&str> = Vec::new();
+
+    for chunk in &typing.chunks {
+        let at = chunk.line.saturating_sub(1).min(file.len());
+        file.splice(at..at, chunk.text.split('\n'));
+    }
+
+    let mut depth: i32 = 0;
+
+    for (index, line) in file.iter().enumerate() {
+        let starts = [
+            "package", "import", "func", "var", "const", "type", "}", ")",
+        ];
+        let text = line.trim();
+
+        if depth == 0 && !text.is_empty() && !starts.iter().any(|word| text.starts_with(word)) {
+            return Some(index + 1);
+        }
+
+        let mut in_string = false;
+        let mut chars = line.chars();
+
+        while let Some(c) = chars.next() {
+            match c {
+                '\\' if in_string => {
+                    chars.next();
+                }
+                '"' => in_string = !in_string,
+                '(' | '[' | '{' if !in_string => depth += 1,
+                ')' | ']' | '}' if !in_string => depth -= 1,
+                _ => {}
+            }
+        }
+    }
+
+    None
+}
+
 // The chunks of a typing exercise are well formed: each `line` is a place in the file as it is
 // when the chunk starts, a ghost chunk has a guide, the code is balanced, and each note is plain
 // text on a piece of the chunk that occurs once
@@ -431,6 +473,14 @@ fn chunk_problems(place: &str, typing: &Typing) -> Vec<String> {
                 ));
             }
         }
+    }
+
+    if place.starts_with("go/")
+        && let Some(line) = code_outside_function(typing)
+    {
+        problems.push(format!(
+            "{place}: line {line} of the file is code outside a function"
+        ));
     }
 
     problems
@@ -933,6 +983,21 @@ mod checks_of_the_checks {
         assert_eq!(second_too_far.len(), 1);
         assert!(second_too_far[0].contains("chunk 2: the line 4"));
         assert!(check(&format!("{first}, {}", second(3))).is_empty());
+    }
+
+    #[test]
+    fn the_chunk_check_catches_code_after_the_end_of_main() {
+        let main = r#"{ "mode": "auto", "line": 1, "text": "func main() {\n}" }"#;
+        let body = |line: u32| {
+            format!(r#"{{ "mode": "ghost", "line": {line}, "guide": "G", "text": "    x := 1" }}"#)
+        };
+        let check = |chunks: &str| chunk_problems("go/x/y", &typing("Short.", chunks));
+
+        let after_main = check(&format!("{main}, {}", body(3)));
+
+        assert_eq!(after_main.len(), 1);
+        assert!(after_main[0].contains("line 3 of the file is code outside a function"));
+        assert!(check(&format!("{main}, {}", body(2))).is_empty());
     }
 
     #[test]
