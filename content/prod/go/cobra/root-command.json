@@ -1,0 +1,367 @@
+{
+ "id": "root-command",
+ "intro": {
+  "title": "The root command",
+  "slides": [
+   {
+    "text": "Cobra builds command-line programs: tools you run from the terminal by name, like `git status`. Every action is a **command**, a plain Go value with a name, a description and a function to run.\n\nThe snippet is pseudo code, not Go.",
+    "code": "command:\n    name: hello\n    description: says hello\n    action: print a greeting"
+   },
+   {
+    "text": "Two sessions:\n\n- **Session 1:** build a command, give it an action and start it\n- **Session 2:** describe it with `Short`, `Long` and `Use`, and declare it as the root of the program"
+   }
+  ]
+ },
+ "sessions": [
+  {
+   "id": "session-1",
+   "intro": {
+    "title": "A command that runs",
+    "slides": [
+     {
+      "text": "A command is described by a `cobra.Command` struct. Three fields are enough to start:\n\n- `Use`: the name\n- `Short`: a one-line description\n- `Run`: the function that does the work",
+      "code": "cmd := &cobra.Command{\n    Use:   \"app\",\n    Short: \"What it does\",\n}"
+     },
+     {
+      "text": "`Run` is a function with two parameters. `cmd` is the command being run, and `args` holds the extra words typed after its name. This module leaves `args` alone.",
+      "code": "Run: func(\n    cmd *cobra.Command,\n    args []string,\n) {\n    // the work\n},"
+     },
+     {
+      "text": "Building a command does nothing by itself. `Execute` reads what the user typed and runs the command. It returns an error, and `main` turns that into an exit code: 1 means failure.\n\nThe snippet is pseudo code, not Go.",
+      "code": "Execute:\n    read the command line\n    find the command\n    run its Run function\n    return an error if it failed"
+     }
+    ]
+   },
+   "exercises": [
+    {
+     "type": "typing",
+     "id": "first-command",
+     "title": "Your first command",
+     "guide": "Describe a command, give it an action and start it.",
+     "chunks": [
+      {
+       "mode": "auto",
+       "line": 1,
+       "text": "package main\n\nfunc main() {\n}"
+      },
+      {
+       "mode": "ghost",
+       "line": 3,
+       "guide": "Import cobra, plus `fmt` to print and `os` to exit.",
+       "notes": [
+        {
+         "on": "github.com/spf13/cobra",
+         "text": "The command-line library this course is about"
+        }
+       ],
+       "text": "import (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n"
+      },
+      {
+       "mode": "ghost",
+       "line": 11,
+       "guide": "Describe the command: its name, a one-line summary and what it does when run.",
+       "notes": [
+        {
+         "on": "&cobra.Command",
+         "text": "A pointer to the struct that describes one command"
+        },
+        {
+         "on": "Use",
+         "text": "The name the user types to run it"
+        },
+        {
+         "on": "Run:",
+         "text": "The function cobra calls when the command runs"
+        }
+       ],
+       "text": "    rootCmd := &cobra.Command{\n        Use:   \"hello\",\n        Short: \"Says hello\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"hello from cobra\")\n        },\n    }"
+      },
+      {
+       "mode": "ghost",
+       "line": 18,
+       "guide": "Building the command runs nothing. Start it, and exit with 1 if it fails.",
+       "notes": [
+        {
+         "on": "Execute",
+         "text": "Reads the command line and runs the command"
+        }
+       ],
+       "text": "    if err := rootCmd.Execute(); err != nil {\n        os.Exit(1)\n    }"
+      }
+     ],
+     "output": {
+      "command": "go run main.go",
+      "text": "hello from cobra"
+     }
+    },
+    {
+     "type": "quiz",
+     "id": "what-runs",
+     "title": "What does it print?",
+     "guide": "Read the code, then pick the output.",
+     "kind": "output",
+     "code": "cmd := &cobra.Command{\n    Use:   \"demo\",\n    Short: \"Prints a number\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(42)\n    },\n}\ncmd.Execute()",
+     "options": [
+      "Prints a number",
+      "Nothing, Execute only checks the command",
+      "42",
+      "Prints a number, then 42"
+     ],
+     "answer": 2,
+     "explanation": "`Short` is only a description. `Execute` runs the command, and `Run` is the only thing that prints."
+    },
+    {
+     "type": "typing",
+     "id": "named-run",
+     "title": "A named Run function",
+     "guide": "Move the work into a function and hand it to the command.",
+     "chunks": [
+      {
+       "mode": "auto",
+       "line": 1,
+       "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+      },
+      {
+       "mode": "ghost",
+       "line": 10,
+       "guide": "A `Run` function is a normal function with this signature.",
+       "notes": [
+        {
+         "on": "args []string",
+         "text": "The extra words typed after the command name"
+        }
+       ],
+       "text": "func greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"welcome aboard\")\n}\n"
+      },
+      {
+       "mode": "ghost",
+       "line": 15,
+       "guide": "The imports are already in the file. Point `Run` at the function.",
+       "notes": [
+        {
+         "on": "Run:   greet",
+         "text": "The function itself, without parentheses"
+        }
+       ],
+       "text": "    rootCmd := &cobra.Command{\n        Use:   \"welcome\",\n        Short: \"Welcomes you\",\n        Run:   greet,\n    }"
+      },
+      {
+       "mode": "ghost",
+       "line": 20,
+       "guide": "Start the command, as before.",
+       "text": "    if err := rootCmd.Execute(); err != nil {\n        os.Exit(1)\n    }"
+      }
+     ],
+     "output": {
+      "command": "go run main.go",
+      "text": "welcome aboard"
+     }
+    },
+    {
+     "type": "fill-blank",
+     "id": "command-fields",
+     "title": "Fill the command",
+     "guide": "Name the command, point to its action and start it.",
+     "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc bye(cmd *cobra.Command, args []string) {}\n\nfunc main() {\n    byeCmd := &cobra.Command{\n        ___:   \"bye\",\n        Short: \"Says goodbye\",\n        ___:   bye,\n    }\n    byeCmd.___()\n}",
+     "gaps": [
+      {
+       "answers": [
+        "Use"
+       ]
+      },
+      {
+       "answers": [
+        "Run"
+       ]
+      },
+      {
+       "answers": [
+        "Execute"
+       ]
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "id": "error-shown",
+     "title": "Where is the error?",
+     "guide": "Pick why the code never prints err.",
+     "code": "if err := rootCmd.Execute(); err != nil {\n    os.Exit(1)\n}",
+     "options": [
+      "os.Exit(1) prints the error before it exits",
+      "Go prints every error that reaches main",
+      "The error is lost, so the code should print it",
+      "Cobra already printed it before Execute returned"
+     ],
+     "answer": 3,
+     "explanation": "Cobra writes the error to the screen itself. The code only gives the shell the exit code 1, so printing `err` again would show it twice."
+    }
+   ]
+  },
+  {
+   "id": "session-2",
+   "intro": {
+    "title": "Describing the command",
+    "slides": [
+     {
+      "text": "Every command has two descriptions. `Short` is a single line. `Long` is a fuller text, shown in the command's own help.\n\nThe fields of the struct are ordinary values, so a `Run` function can read them through `cmd`."
+     },
+     {
+      "text": "Only the first word of `Use` is the name. Whatever follows is a hint about the arguments the command takes. `cmd.Name()` returns just the first word.",
+      "code": "Use: \"copy <from> <to>\""
+     },
+     {
+      "text": "Real programs declare the root command as a package-level variable, so `main` only has to start it. A package-level variable uses `var`, because `:=` works only inside functions."
+     }
+    ]
+   },
+   "exercises": [
+    {
+     "type": "typing",
+     "id": "short-and-long",
+     "title": "Short and Long",
+     "guide": "Describe the command twice, then read it back.",
+     "chunks": [
+      {
+       "mode": "auto",
+       "line": 1,
+       "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := rootCmd.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"
+      },
+      {
+       "mode": "ghost",
+       "line": 11,
+       "guide": "The imports and `Execute` are in the file. Add a summary and a full description.",
+       "notes": [
+        {
+         "on": "Long:",
+         "text": "The full text, shown in this command's help"
+        },
+        {
+         "on": "cmd.Long",
+         "text": "Run can read the fields of its own command"
+        }
+       ],
+       "text": "    rootCmd := &cobra.Command{\n        Use:   \"team\",\n        Short: \"Greets the team\",\n        Long:  \"Greets every member of the team by name.\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(cmd.Long)\n        },\n    }"
+      }
+     ],
+     "output": {
+      "command": "go run main.go",
+      "text": "Greets every member of the team by name."
+     }
+    },
+    {
+     "type": "quiz",
+     "id": "short-vs-long",
+     "title": "Short and Long",
+     "guide": "Pick what the two descriptions are for.",
+     "kind": "purpose",
+     "code": "cmd := &cobra.Command{\n    Use:   \"deploy\",\n    Short: \"Ships the app\",\n    Long:  \"Builds, uploads and restarts it.\",\n}",
+     "options": [
+      "Short is the name, Long adds its arguments",
+      "The first and the last line it prints",
+      "A one-line summary and a fuller description",
+      "The least and the most time it may run"
+     ],
+     "answer": 2,
+     "explanation": "`Short` is a one-line summary of the command. `Long` is a fuller description, shown in the command's own help."
+    },
+    {
+     "type": "typing",
+     "id": "command-name",
+     "title": "The name in Use",
+     "guide": "Give the command arguments in Use, and print its name.",
+     "chunks": [
+      {
+       "mode": "auto",
+       "line": 1,
+       "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := rootCmd.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"
+      },
+      {
+       "mode": "ghost",
+       "line": 11,
+       "guide": "Add the arguments to `Use`, then print the name and the whole `Use`.",
+       "notes": [
+        {
+         "on": "\"backup [folder]\"",
+         "text": "Only the first word is the name; the rest is a hint"
+        },
+        {
+         "on": "cmd.Name()",
+         "text": "Gives just the first word of Use"
+        }
+       ],
+       "text": "    rootCmd := &cobra.Command{\n        Use: \"backup [folder]\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(cmd.Name())\n            fmt.Println(cmd.Use)\n        },\n    }"
+      }
+     ],
+     "output": {
+      "command": "go run main.go",
+      "text": "backup\nbackup [folder]"
+     }
+    },
+    {
+     "type": "typing",
+     "id": "root-variable",
+     "title": "The root variable",
+     "guide": "Declare the command outside main, so main stays small.",
+     "chunks": [
+      {
+       "mode": "auto",
+       "line": 1,
+       "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := rootCmd.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"
+      },
+      {
+       "mode": "ghost",
+       "line": 10,
+       "guide": "`main` already starts `rootCmd`. Declare it above, at package level.",
+       "notes": [
+        {
+         "on": "var rootCmd",
+         "text": "Outside main, so every function in the file can reach it"
+        }
+       ],
+       "text": "var rootCmd = &cobra.Command{\n    Use:   \"clock\",\n    Short: \"Tells the time of day\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(\"it is noon\")\n    },\n}\n"
+      }
+     ],
+     "output": {
+      "command": "go run main.go",
+      "text": "it is noon"
+     }
+    },
+    {
+     "type": "fill-blank",
+     "id": "root-pattern",
+     "title": "Fill the root",
+     "guide": "Declare the command at package level, then start it.",
+     "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc run(cmd *cobra.Command, args []string) {}\n\n___ rootCmd = &cobra.Command{\n    Use: \"ping\",\n    Run: run,\n}\n\nfunc main() {\n    rootCmd.___()\n}",
+     "gaps": [
+      {
+       "answers": [
+        "var"
+       ]
+      },
+      {
+       "answers": [
+        "Execute"
+       ]
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "id": "no-run",
+     "title": "No Run",
+     "guide": "Pick what happens when you run it.",
+     "code": "rootCmd := &cobra.Command{\n    Use:   \"tool\",\n    Short: \"A toolbox\",\n}\nrootCmd.Execute()",
+     "options": [
+      "Cobra shows the help of the command",
+      "Nothing happens and the program exits quietly",
+      "The program panics because Run is nil",
+      "It does not compile without a Run field"
+     ],
+     "answer": 0,
+     "explanation": "A command with no `Run` has nothing to execute, so cobra shows its help text instead of failing."
+    }
+   ]
+  }
+ ]
+}

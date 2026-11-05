@@ -1,0 +1,49 @@
+{
+  "id": "cobra",
+  "module_sections": [
+    {
+      "name": "Commands",
+      "tier": "basic",
+      "modules": [
+        { "id": "root-command", "name": "Root command", "sessions": 2 },
+        { "id": "subcommands", "name": "Subcommands", "sessions": 2 },
+        { "id": "flags", "name": "Flags", "sessions": 3 }
+      ]
+    },
+    {
+      "name": "Input",
+      "tier": "medium",
+      "modules": [
+        { "id": "persistent-flags", "name": "Persistent flags", "sessions": 2 },
+        { "id": "required-flags", "name": "Required flags and groups", "sessions": 3 },
+        { "id": "positional-arguments", "name": "Positional arguments", "sessions": 3 }
+      ]
+    },
+    {
+      "name": "Command lifecycle",
+      "tier": "medium",
+      "modules": [
+        { "id": "run-with-errors", "name": "Run with errors", "sessions": 3 },
+        { "id": "hooks", "name": "Hooks", "sessions": 3 },
+        { "id": "output-and-context", "name": "Output and context", "sessions": 3 }
+      ]
+    },
+    {
+      "name": "Polishing a CLI",
+      "tier": "medium",
+      "modules": [
+        { "id": "help-and-usage", "name": "Help and usage", "sessions": 3 },
+        { "id": "aliases-and-groups", "name": "Aliases and groups", "sessions": 4 },
+        { "id": "project-layout", "name": "Project layout", "sessions": 3 }
+      ]
+    },
+    {
+      "name": "Completion and testing",
+      "tier": "advanced",
+      "modules": [
+        { "id": "shell-completion", "name": "Shell completion", "sessions": 3 },
+        { "id": "testing-commands", "name": "Testing commands", "sessions": 3 }
+      ]
+    }
+  ]
+}

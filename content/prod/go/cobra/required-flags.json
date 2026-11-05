@@ -1,0 +1,274 @@
+{
+  "id": "required-flags",
+  "intro": {
+    "title": "Required flags",
+    "slides": [
+      {"text": "A flag is optional by default. A **required** flag makes the command stop with an error when the user leaves it out, before `Run` starts.\n\nThe snippet is pseudo code, not Go.", "code": "app --name Ana  ->  Run starts\napp             ->  error"},
+      {"text": "Three sessions:\n\n- **Session 1:** marking a flag as required and what it does\n- **Session 2:** where a required flag applies\n- **Session 3:** rules over a group of flags"}
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Marking a flag",
+        "slides": [
+          {"text": "A command can refuse to run until the user sets a flag. You mark a flag as required by its name, after you define it.\n\nThe call can return an error, like many calls in Go.", "code": "cmd.MarkFlagRequired(\"path\")"},
+          {"text": "When a flag is missing, cobra reports it as an error and the command does not run. Your `main` still decides what the program does when `Execute` fails."}
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "mark-required",
+          "title": "Require a flag",
+          "guide": "Make the `name` flag required.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "A `greet` command that prints the `name` flag.", "text": "    var name string\n\n    cmd := &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"hello\", name)\n        },\n    }"},
+            {"mode": "ghost", "line": 19, "guide": "Define the flag, then mark it as required.", "notes": [{"on": "MarkFlagRequired", "text": "Execute stops with an error if it is missing."}], "text": "    cmd.Flags().StringVar(&name, \"name\", \"\", \"who to greet\")\n    cmd.MarkFlagRequired(\"name\")"},
+            {"mode": "auto", "line": 21, "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go --name Ana",
+            "text": "hello Ana"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "more-than-one",
+          "title": "More than one",
+          "guide": "Make both the `host` and the `port` required.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "A `connect` command that prints a host and a port.", "text": "    var host string\n    var port int\n\n    cmd := &cobra.Command{\n        Use: \"connect\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"connecting to\", host, port)\n        },\n    }"},
+            {"mode": "ghost", "line": 20, "guide": "Each required flag gets its own call.", "text": "    cmd.Flags().StringVar(&host, \"host\", \"\", \"server host\")\n    cmd.Flags().IntVar(&port, \"port\", 0, \"server port\")\n    cmd.MarkFlagRequired(\"host\")\n    cmd.MarkFlagRequired(\"port\")"},
+            {"mode": "auto", "line": 24, "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go --host localhost --port 8080",
+            "text": "connecting to localhost 8080"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "check-the-mark",
+          "title": "Check the mark",
+          "guide": "Mark the flag as required and handle the error of the call.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "A `deploy` command that prints a region.", "text": "    var region string\n\n    cmd := &cobra.Command{\n        Use: \"deploy\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"deploying to\", region)\n        },\n    }"},
+            {"mode": "ghost", "line": 19, "guide": "Marking a flag returns an error. Stop the program if it fails.", "notes": [{"on": "err != nil", "text": "It fails when no flag has that name yet."}], "text": "    cmd.Flags().StringVarP(&region, \"region\", \"r\", \"\", \"target region\")\n    if err := cmd.MarkFlagRequired(\"region\"); err != nil {\n        fmt.Println(err)\n        os.Exit(1)\n    }"},
+            {"mode": "auto", "line": 24, "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go -r eu",
+            "text": "deploying to eu"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "missing-message",
+          "title": "What does it print first?",
+          "guide": "The program runs as `go run main.go`, with no flags. Pick the first line it prints.",
+          "code": "func main() {\n    cmd := &cobra.Command{\n        Use: \"deploy\",\n        Run: func(c *cobra.Command, a []string) {\n            fmt.Println(\"deploying\")\n        },\n    }\n    cmd.Flags().String(\"env\", \"\", \"target\")\n    cmd.Flags().String(\"version\", \"\", \"release\")\n    cmd.MarkFlagRequired(\"version\")\n    cmd.MarkFlagRequired(\"env\")\n    cmd.Execute()\n}",
+          "options": ["deploying", "Error: required flag(s) \"version\" not set", "Error: required flag(s) \"env\", \"version\" not set", "Error: flag needs an argument: --env"],
+          "answer": 2,
+          "explanation": "Cobra checks every required flag before `Run`, and reports all the missing ones in one error, in alphabetical order. `Run` never starts."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "default-is-not-set",
+          "title": "What does it print?",
+          "guide": "The program runs as `go run main.go`, with no flags.",
+          "code": "func main() {\n    var port int\n\n    cmd := &cobra.Command{\n        Use: \"serve\",\n        Run: func(c *cobra.Command, a []string) {\n            fmt.Println(\"port\", port)\n        },\n    }\n    cmd.Flags().IntVar(&port, \"port\", 8080, \"\")\n    cmd.MarkFlagRequired(\"port\")\n    cmd.Execute()\n}",
+          "options": ["port 8080", "Error: required flag(s) \"port\" not set", "port 0", "Error: invalid argument \"8080\" for \"--port\""],
+          "answer": 1,
+          "explanation": "A required flag must be given by the user. Its default value does not count, so the command stops before `Run`."
+        },
+        {
+          "type": "fill-blank",
+          "id": "mark-the-city",
+          "title": "Mark the flag",
+          "guide": "Fill the method that makes the `city` flag required.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    var city string\n    cmd := &cobra.Command{Use: \"weather\"}\n    cmd.Flags().StringVar(&city, \"city\", \"\", \"\")\n    cmd.___(\"city\")\n    cmd.Execute()\n}",
+          "gaps": [{"answers": ["MarkFlagRequired"]}]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Where it applies",
+        "slides": [
+          {"text": "A required flag is a rule of one flag. These exercises answer three questions: what counts as set, which command checks the rule, and how flags shared by subcommands fit in."},
+          {"text": "A required flag is satisfied when the user passes it, whatever its value. A flag shared with subcommands has its own form of the mark.", "code": "root.MarkPersistentFlagRequired(\"token\")"}
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "empty-value",
+          "title": "An empty value",
+          "guide": "Give a required flag an empty value and see that it still counts as set.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "A `deploy` command that prints the `env` between quotes.", "text": "    var env string\n\n    cmd := &cobra.Command{\n        Use: \"deploy\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Printf(\"env=%q\\n\", env)\n        },\n    }"},
+            {"mode": "ghost", "line": 19, "guide": "Define the flag and require it.", "notes": [{"on": "MarkFlagRequired", "text": "Passing --env= is enough: the rule asks if it was given, not if it has text."}], "text": "    cmd.Flags().StringVar(&env, \"env\", \"\", \"target environment\")\n    cmd.MarkFlagRequired(\"env\")"},
+            {"mode": "auto", "line": 21, "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go --env=",
+            "text": "env=\"\""
+          }
+        },
+        {
+          "type": "typing",
+          "id": "required-on-build",
+          "title": "Required on a subcommand",
+          "guide": "Require a flag on a subcommand, not on the root.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "A root with a `build` subcommand that prints a target.", "text": "    var target string\n\n    root := &cobra.Command{Use: \"app\"}\n    build := &cobra.Command{\n        Use: \"build\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"building for\", target)\n        },\n    }"},
+            {"mode": "ghost", "line": 20, "guide": "The flag belongs to `build`, so mark it there.", "text": "    build.Flags().StringVar(&target, \"target\", \"\", \"OS to build for\")\n    build.MarkFlagRequired(\"target\")"},
+            {"mode": "ghost", "line": 22, "guide": "Add the subcommand to the root.", "text": "    root.AddCommand(build)"},
+            {"mode": "auto", "line": 23, "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go build --target linux",
+            "text": "building for linux"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "other-command",
+          "title": "What does it print?",
+          "guide": "The program runs as `go run main.go status`.",
+          "code": "func main() {\n    root := &cobra.Command{Use: \"app\"}\n    deploy := &cobra.Command{Use: \"deploy\"}\n    status := &cobra.Command{\n        Use: \"status\",\n        Run: func(c *cobra.Command, a []string) {\n            fmt.Println(\"all good\")\n        },\n    }\n    deploy.Flags().String(\"env\", \"\", \"target\")\n    deploy.MarkFlagRequired(\"env\")\n    root.AddCommand(deploy, status)\n    root.Execute()\n}",
+          "options": ["all good", "Error: required flag(s) \"env\" not set", "The help text of app"],
+          "answer": 0,
+          "explanation": "The requirement belongs to the `deploy` command, where the flag lives. `status` runs without it."
+        },
+        {
+          "type": "typing",
+          "id": "required-everywhere",
+          "title": "Required for every subcommand",
+          "guide": "Make a flag shared by all subcommands required.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "A root with a `show` subcommand that prints a user.", "text": "    var user string\n\n    root := &cobra.Command{Use: \"app\"}\n    show := &cobra.Command{\n        Use: \"show\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"showing for\", user)\n        },\n    }"},
+            {"mode": "ghost", "line": 20, "guide": "A shared flag needs the persistent form of the mark.", "notes": [{"on": "MarkPersistentFlagRequired", "text": "Every subcommand now needs this flag."}], "text": "    root.AddCommand(show)\n    root.PersistentFlags().StringVar(&user, \"user\", \"\", \"account\")\n    root.MarkPersistentFlagRequired(\"user\")"},
+            {"mode": "auto", "line": 23, "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go show --user ana",
+            "text": "showing for ana"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "mark-the-user",
+          "title": "Share and require",
+          "guide": "Fill the call that defines a flag every subcommand inherits, and the call that makes it required.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    var user string\n    root := &cobra.Command{Use: \"app\"}\n    pf := root.___()\n    pf.StringVar(&user, \"user\", \"\", \"\")\n    root.___(\"user\")\n    root.Execute()\n}",
+          "gaps": [{"answers": ["PersistentFlags"]}, {"answers": ["MarkPersistentFlagRequired"]}]
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Rules over flags",
+        "slides": [
+          {"text": "Sometimes the rule is about several flags at once. Cobra has three, each by the names of the flags.\n\nThe snippet is pseudo code, not Go.", "code": "together:   all of them or none\nexclusive:  at most one of them\none-required: at least one of them"},
+          {"text": "A rule looks the flags up by name when you add it, so the flags must exist first. Rules can be combined on the same flags."}
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "all-or-none",
+          "title": "Flags that go together",
+          "guide": "Make a certificate and its key go together.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "A `serve` command that prints a line.", "text": "    cmd := &cobra.Command{\n        Use: \"serve\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"tls on\")\n        },\n    }"},
+            {"mode": "ghost", "line": 17, "guide": "Two flags that make a pair.", "text": "    cmd.Flags().String(\"cert\", \"\", \"TLS certificate\")\n    cmd.Flags().String(\"key\", \"\", \"TLS key\")"},
+            {"mode": "ghost", "line": 19, "guide": "Add a rule over the pair.", "notes": [{"on": "MarkFlagsRequiredTogether", "text": "A rule over a group of flags, by name."}], "text": "    cmd.MarkFlagsRequiredTogether(\"cert\", \"key\")"},
+            {"mode": "auto", "line": 20, "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go --cert server.pem --key server.key",
+            "text": "tls on"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "pair-not-given",
+          "title": "What does it print?",
+          "guide": "The program runs as `go run main.go`, with no flags.",
+          "code": "func main() {\n    cmd := &cobra.Command{\n        Use: \"login\",\n        Run: func(c *cobra.Command, a []string) {\n            fmt.Println(\"welcome\")\n        },\n    }\n    cmd.Flags().String(\"user\", \"\", \"name\")\n    cmd.Flags().String(\"pass\", \"\", \"secret\")\n    cmd.MarkFlagsRequiredTogether(\"user\", \"pass\")\n    cmd.Execute()\n}",
+          "options": ["welcome", "Error: required flag(s) \"pass\", \"user\" not set", "Error: flag needs an argument: --user"],
+          "answer": 0,
+          "explanation": "A together group is all or nothing. Giving none of the flags is fine; giving only one of them is an error."
+        },
+        {
+          "type": "typing",
+          "id": "one-or-the-other",
+          "title": "Flags that exclude each other",
+          "guide": "Make two output formats impossible to use together.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "An `export` command that prints a line.", "text": "    cmd := &cobra.Command{\n        Use: \"export\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"exporting\")\n        },\n    }"},
+            {"mode": "ghost", "line": 17, "guide": "Two switches for the output format.", "text": "    cmd.Flags().Bool(\"json\", false, \"as JSON\")\n    cmd.Flags().Bool(\"yaml\", false, \"as YAML\")"},
+            {"mode": "ghost", "line": 19, "guide": "At most one of them can be set.", "notes": [{"on": "MarkFlagsMutuallyExclusive", "text": "Setting both is an error."}], "text": "    cmd.MarkFlagsMutuallyExclusive(\"json\", \"yaml\")"},
+            {"mode": "auto", "line": 20, "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go --json",
+            "text": "exporting"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "exactly-one",
+          "title": "Exactly one of two",
+          "guide": "Require one source, and only one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "A `fetch` command that prints a line.", "text": "    cmd := &cobra.Command{\n        Use: \"fetch\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"reading input\")\n        },\n    }"},
+            {"mode": "ghost", "line": 17, "guide": "Two ways to give the input.", "text": "    cmd.Flags().String(\"file\", \"\", \"read a file\")\n    cmd.Flags().String(\"url\", \"\", \"read a URL\")"},
+            {"mode": "ghost", "line": 19, "guide": "Two rules together: at least one, and at most one.", "notes": [{"on": "MarkFlagsOneRequired", "text": "At least one of them must be set."}], "text": "    cmd.MarkFlagsOneRequired(\"file\", \"url\")\n    cmd.MarkFlagsMutuallyExclusive(\"file\", \"url\")"},
+            {"mode": "auto", "line": 21, "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go --url example.com",
+            "text": "reading input"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "group-before-flags",
+          "title": "What happens?",
+          "guide": "Read the order of the lines, then pick what the program does at startup.",
+          "code": "func main() {\n    cmd := &cobra.Command{Use: \"export\"}\n    cmd.MarkFlagsMutuallyExclusive(\"json\", \"yaml\")\n    cmd.Flags().Bool(\"json\", false, \"as JSON\")\n    cmd.Flags().Bool(\"yaml\", false, \"as YAML\")\n    cmd.Execute()\n}",
+          "options": ["It panics: the flags do not exist yet", "The call creates the two flags itself", "The rule is applied once the flags are defined", "Execute returns an error when it runs"],
+          "answer": 0,
+          "explanation": "A group rule looks the flags up by name at the call, and panics when one is missing. Define the flags first."
+        },
+        {
+          "type": "fill-blank",
+          "id": "name-the-rules",
+          "title": "Name the rules",
+          "guide": "Fill the two rules: `cert` and `key` must be given together, and `json` and `yaml` must never be given together.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    cmd := &cobra.Command{Use: \"export\"}\n    cmd.Flags().String(\"cert\", \"\", \"TLS cert\")\n    cmd.Flags().String(\"key\", \"\", \"TLS key\")\n    cmd.Flags().Bool(\"json\", false, \"as JSON\")\n    cmd.Flags().Bool(\"yaml\", false, \"as YAML\")\n    cmd.___(\"cert\", \"key\")\n    cmd.___(\"json\", \"yaml\")\n    cmd.Execute()\n}",
+          "gaps": [{"answers": ["MarkFlagsRequiredTogether"]}, {"answers": ["MarkFlagsMutuallyExclusive"]}]
+        }
+      ]
+    }
+  ]
+}

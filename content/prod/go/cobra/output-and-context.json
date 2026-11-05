@@ -1,0 +1,323 @@
+{
+  "id": "output-and-context",
+  "intro": {
+    "title": "Output and context",
+    "slides": [
+      {
+        "text": "A command does more than run code. It prints results, warns, reads input and waits for a stop signal. Cobra gives it a tool for each."
+      },
+      {
+        "text": "Three sessions:\n\n- **Session 1:** where a command writes: stdout, stderr and writers\n- **Session 2:** input, JSON output and the context a command starts with\n- **Session 3:** values, deadlines and Ctrl-C through the context"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Two streams",
+        "slides": [
+          {
+            "text": "A program has two output streams. **stdout** carries its result. **stderr** carries warnings and errors. A pipe or `>` takes only stdout, so the result stays clean."
+          },
+          {
+            "text": "`cmd.Println`, `cmd.Printf` and `cmd.Print` write to **stderr** by default. `cmd.PrintErrln` is the same on purpose. Results go to the writer of `cmd.OutOrStdout()`, and warnings to `cmd.ErrOrStderr()`.\n\nThe snippet is pseudo code.",
+            "code": "cmd.Println(...)  -> stderr\nOutOrStdout()     -> stdout\nErrOrStderr()     -> stderr"
+          },
+          {
+            "text": "Both methods return an `io.Writer`, so `fmt.Fprintln(writer, ...)` prints to them. A helper that takes an `io.Writer` then works with any of them."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "print-with-cmd",
+          "title": "Print through the command",
+          "guide": "Print two lines with the command's own print methods.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 9, "guide": "The imports and `main` are already in the file. The command has its own print methods, so `fmt` is not needed.", "notes": [{"on": "cmd.Println", "text": "Prints to stderr by default, not stdout."}], "text": "var root = &cobra.Command{\n    Use: \"scan\",\n    Run: func(cmd *cobra.Command, args []string) {\n        cmd.Println(\"scanning\")\n        cmd.Printf(\"found %d files\\n\", 3)\n    },\n}\n"}
+          ],
+          "output": {"command": "go run main.go", "text": "scanning\nfound 3 files"}
+        },
+        {
+          "type": "quiz",
+          "id": "where-it-goes",
+          "title": "What reaches the file?",
+          "guide": "The program runs as `scan > out.txt`, which saves only stdout. What does `out.txt` hold?",
+          "code": "var root = &cobra.Command{\n    Use: \"scan\",\n    Run: func(cmd *cobra.Command, args []string) {\n        cmd.Println(\"scanning\")\n        fmt.Println(\"3 files\")\n    },\n}",
+          "options": [
+            "Only scanning",
+            "Only 3 files",
+            "Both lines",
+            "Nothing, it stays empty"
+          ],
+          "answer": 1,
+          "explanation": "`fmt.Println` writes to stdout, so it lands in the file. `cmd.Println` writes to stderr by default, and `>` does not redirect stderr."
+        },
+        {
+          "type": "typing",
+          "id": "write-to-stdout",
+          "title": "Write the result to stdout",
+          "guide": "Print each user to the command's output, the one a pipe reads.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 10, "guide": "The imports and `main` are already in the file. `Fprintln` writes to the writer you give it.", "notes": [{"on": "cmd.OutOrStdout()", "text": "The command's output writer, stdout by default."}], "text": "var root = &cobra.Command{\n    Use: \"export\",\n    Run: func(cmd *cobra.Command, args []string) {\n        users := []string{\"ana\", \"bo\"}\n        for _, user := range users {\n            fmt.Fprintln(cmd.OutOrStdout(), user)\n        }\n    },\n}\n"}
+          ],
+          "output": {"command": "go run main.go", "text": "ana\nbo"}
+        },
+        {
+          "type": "typing",
+          "id": "warnings-to-stderr",
+          "title": "Keep warnings apart",
+          "guide": "Print names to the output, and report the empty one on the error stream.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 10, "guide": "The imports and `main` are already in the file. Keep two writers, one for results and one for warnings.", "notes": [{"on": "cmd.ErrOrStderr()", "text": "The command's error writer, stderr by default."}], "text": "var root = &cobra.Command{\n    Use: \"list\",\n    Run: func(cmd *cobra.Command, args []string) {\n        out := cmd.OutOrStdout()\n        errOut := cmd.ErrOrStderr()\n        names := []string{\"a.txt\", \"\", \"b.txt\"}\n        for _, name := range names {\n            if name == \"\" {\n                fmt.Fprintln(errOut, \"empty name\")\n                continue\n            }\n            fmt.Fprintln(out, name)\n        }\n    },\n}\n"}
+          ],
+          "output": {"command": "go run main.go", "text": "a.txt\nempty name\nb.txt"}
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-streams",
+          "title": "Pick the right stream",
+          "guide": "Send the total to the normal output, and the disk warning to the error stream.",
+          "code": "var root = &cobra.Command{\n    Use: \"sum\",\n    Run: func(cmd *cobra.Command, args []string) {\n        total := 42\n        fmt.Fprintln(cmd.___(), total)\n        fmt.Fprintln(cmd.___(), \"full\")\n    },\n}",
+          "gaps": [
+            {
+              "answers": [
+                "OutOrStdout"
+              ]
+            },
+            {
+              "answers": [
+                "ErrOrStderr"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "write-to-a-writer",
+          "title": "A helper that takes a writer",
+          "guide": "Write the report in a helper that takes any writer, and hand it the command's output.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"io\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 11, "guide": "The imports and `main` are already in the file. The helper knows nothing about cobra.", "notes": [{"on": "w io.Writer", "text": "Accepts stdout, a file or any other writer."}], "text": "func printReport(w io.Writer, name string, total int) {\n    fmt.Fprintf(w, \"report: %s\\n\", name)\n    fmt.Fprintf(w, \"total: %d\\n\", total)\n}\n"},
+            {"mode": "ghost", "line": 16, "guide": "Call the helper with the command's output writer.", "text": "var root = &cobra.Command{\n    Use: \"report\",\n    Run: func(cmd *cobra.Command, args []string) {\n        out := cmd.OutOrStdout()\n        printReport(out, \"march\", 42)\n    },\n}\n"}
+          ],
+          "output": {"command": "go run main.go", "text": "report: march\ntotal: 42"}
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Input and context",
+        "slides": [
+          {
+            "text": "`cmd.InOrStdin()` returns the reader a command should read from, stdin by default. Output meant for other programs, like JSON, goes to `cmd.OutOrStdout()`."
+          },
+          {
+            "text": "Every command carries a **context**: a value that can say stop, and can carry data. `cmd.Context()` returns it. `Execute` starts with an empty one, and `ExecuteContext(ctx)` starts with yours.\n\nThe snippet is pseudo code.",
+            "code": "main makes ctx\n  -> root.ExecuteContext(ctx)\n     -> any command: cmd.Context()"
+          },
+          {
+            "text": "A context can carry a value too. `context.WithValue` returns a copy that holds it, and `Value(key)` reads it back. Subcommands receive the same context as the root.\n\nThe snippet is pseudo code.",
+            "code": "ctx2 = WithValue(ctx, key, value)\nvalue = ctx2.Value(key)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "read-stdin",
+          "title": "Read from the command's input",
+          "guide": "Read lines from the command's input and print each one in uppercase.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n    \"strings\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 12, "guide": "The imports and `main` are already in the file. A scanner reads the input line by line.", "notes": [{"on": "cmd.InOrStdin()", "text": "The command's input reader, stdin by default."}], "text": "var root = &cobra.Command{\n    Use: \"shout\",\n    Run: func(cmd *cobra.Command, args []string) {\n        input := bufio.NewScanner(cmd.InOrStdin())\n        for input.Scan() {\n            line := strings.ToUpper(input.Text())\n            fmt.Fprintln(cmd.OutOrStdout(), line)\n        }\n    },\n}\n"}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "json-output",
+          "title": "Print JSON for other programs",
+          "guide": "Encode a struct as JSON onto the command's output.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"encoding/json\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 10, "guide": "The imports and `main` are already in the file. The tags name the JSON keys.", "text": "type result struct {\n    Name  string `json:\"name\"`\n    Files int    `json:\"files\"`\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "The encoder writes to the command's output. A failure goes to the error stream.", "notes": [{"on": "cmd.PrintErrln(err)", "text": "Print method for stderr."}], "text": "var root = &cobra.Command{\n    Use: \"stats\",\n    Run: func(cmd *cobra.Command, args []string) {\n        data := result{Name: \"src\", Files: 12}\n        enc := json.NewEncoder(cmd.OutOrStdout())\n        if err := enc.Encode(data); err != nil {\n            cmd.PrintErrln(err)\n        }\n    },\n}\n"}
+          ],
+          "output": {"command": "go run main.go", "text": "{\"name\":\"src\",\"files\":12}"}
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "mixed-streams",
+          "title": "What shows on the terminal?",
+          "guide": "The program runs as `run 2>/dev/null`, which hides stderr. What shows?",
+          "code": "var root = &cobra.Command{\n    Use: \"run\",\n    Run: func(cmd *cobra.Command, args []string) {\n        out := cmd.OutOrStdout()\n        errOut := cmd.ErrOrStderr()\n        fmt.Fprintln(out, \"a\")\n        fmt.Fprintln(errOut, \"b\")\n        fmt.Fprintln(out, \"c\")\n        cmd.Println(\"d\")\n    },\n}",
+          "options": [
+            "a, b, c, d",
+            "a, c, d",
+            "a, c",
+            "b, d"
+          ],
+          "answer": 2,
+          "explanation": "`a` and `c` go to stdout. `b` goes to stderr, and so does `cmd.Println`, so `d` is hidden as well."
+        },
+        {
+          "type": "typing",
+          "id": "pass-a-context",
+          "title": "Start a command with a context",
+          "guide": "Cancel a context, start the command with it and read it inside.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"context\"\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n"},
+            {"mode": "ghost", "line": 11, "guide": "The imports are already in the file. `Err` says why a context ended.", "notes": [{"on": "cmd.Context()", "text": "The context the command was started with."}], "text": "var root = &cobra.Command{\n    Use: \"job\",\n    Run: func(cmd *cobra.Command, args []string) {\n        err := cmd.Context().Err()\n        fmt.Fprintln(cmd.OutOrStdout(), err)\n    },\n}\n"},
+            {"mode": "ghost", "line": 19, "guide": "Make a context and cancel it at once. Start the command with it.", "notes": [{"on": "context.WithCancel", "text": "A context you can end by calling cancel."}, {"on": "ExecuteContext", "text": "Like Execute, but hands ctx to the command."}], "text": "func main() {\n    ctx, cancel := context.WithCancel(context.Background())\n    cancel()\n    if err := root.ExecuteContext(ctx); err != nil {\n        os.Exit(1)\n    }\n}"}
+          ],
+          "output": {"command": "go run main.go", "text": "context canceled"}
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-context",
+          "title": "Hand over and read the context",
+          "guide": "Start the command with `ctx`, and read the context inside `Run`.",
+          "code": "var root = &cobra.Command{\n    Run: func(cmd *cobra.Command, args []string) {\n        if cmd.___().Err() != nil {\n            fmt.Println(\"stopped\")\n        }\n    },\n}\n\nfunc main() {\n    base := context.Background()\n    ctx, cancel := context.WithCancel(base)\n    cancel()\n    root.___(ctx)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Context"
+              ]
+            },
+            {
+              "answers": [
+                "ExecuteContext"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "context-values",
+          "title": "Carry a value to a subcommand",
+          "guide": "Store a user in the context and read it in a subcommand.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"context\"\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n"},
+            {"mode": "ghost", "line": 11, "guide": "The imports are already in the file. A key of its own type cannot clash with another package's keys.", "notes": [{"on": "type ctxKey string", "text": "Private key type, so keys never clash."}], "text": "type ctxKey string\n\nconst userKey ctxKey = \"user\"\n"},
+            {"mode": "ghost", "line": 15, "guide": "The subcommand reads the value by its key.", "notes": [{"on": "Value(userKey)", "text": "Reads back what was stored under the key."}], "text": "var show = &cobra.Command{\n    Use: \"show\",\n    Run: func(cmd *cobra.Command, args []string) {\n        user := cmd.Context().Value(userKey)\n        fmt.Fprintln(cmd.OutOrStdout(), user)\n    },\n}\n"},
+            {"mode": "ghost", "line": 23, "guide": "Add the subcommand, store the user in the context and start the command with it.", "notes": [{"on": "context.WithValue", "text": "A copy of base that also holds the value."}], "text": "func main() {\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(show)\n    base := context.Background()\n    ctx := context.WithValue(base, userKey, \"ana\")\n    if err := root.ExecuteContext(ctx); err != nil {\n        os.Exit(1)\n    }\n}"}
+          ],
+          "output": {"command": "go run main.go show", "text": "ana"}
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Context in practice",
+        "slides": [
+          {
+            "text": "A hook can swap the context with `cmd.SetContext(ctx)`. `Run` then sees the new one, which makes a hook the place to set up what every command needs."
+          },
+          {
+            "text": "A context can end by itself. `context.WithTimeout` makes a child that is cancelled after a time. `ctx.Done()` is a channel that closes when that happens, and `ctx.Err()` says why."
+          },
+          {
+            "text": "`signal.NotifyContext` makes a context that the operating system cancels on a signal, such as Ctrl-C. A command that waits on its context can stop cleanly."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "why-a-key-type",
+          "title": "Why a type for the key?",
+          "guide": "Pick what the type of the key is for.",
+          "code": "type ctxKey string\n\nconst userKey ctxKey = \"user\"\n\nctx := context.WithValue(base, userKey, \"ana\")",
+          "options": [
+            "Makes reading the value back faster",
+            "Stops another package from using the same key",
+            "Lets the value change after it is stored",
+            "Makes subcommands see the value"
+          ],
+          "answer": 1,
+          "explanation": "A key of a type declared in your package is never equal to a key from another package, even if both hold the same string. Two packages cannot overwrite each other's values."
+        },
+        {
+          "type": "typing",
+          "id": "set-context-in-hook",
+          "title": "Add to the context in a hook",
+          "guide": "In a hook, store a user in the context. Then read it in `Run`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"context\"\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n"},
+            {"mode": "copy", "line": 11, "guide": "Copy the key from before.", "text": "type ctxKey string\n\nconst userKey ctxKey = \"user\"\n"},
+            {"mode": "ghost", "line": 15, "guide": "The hook runs before `Run` and can replace the context. `Run` then sees the new one.", "notes": [{"on": "cmd.SetContext(ctx)", "text": "Replaces the command's context with ctx."}], "text": "var root = &cobra.Command{\n    Use: \"greet\",\n    PreRun: func(cmd *cobra.Command, _ []string) {\n        base := cmd.Context()\n        ctx := context.WithValue(base, userKey, \"ana\")\n        cmd.SetContext(ctx)\n    },\n    Run: func(cmd *cobra.Command, _ []string) {\n        user := cmd.Context().Value(userKey)\n        fmt.Fprintln(cmd.OutOrStdout(), \"hi\", user)\n    },\n}\n"},
+            {"mode": "ghost", "line": 28, "guide": "Run it the usual way, no context needed.", "text": "func main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"}
+          ],
+          "output": {"command": "go run main.go", "text": "hi ana"}
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-set-context",
+          "title": "Replace the context",
+          "guide": "Give the command its new context in the hook, and read it in `Run`.",
+          "code": "var root = &cobra.Command{\n    Use: \"greet\",\n    PreRun: func(cmd *cobra.Command, _ []string) {\n        ctx := cmd.Context()\n        ctx = context.WithValue(ctx, userKey, 7)\n        cmd.___(ctx)\n    },\n    Run: func(cmd *cobra.Command, _ []string) {\n        id := cmd.___().Value(userKey)\n        fmt.Println(id)\n    },\n}",
+          "gaps": [
+            {
+              "answers": [
+                "SetContext"
+              ]
+            },
+            {
+              "answers": [
+                "Context"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "timeout",
+          "title": "Stop after a deadline",
+          "guide": "Race a slow job against a deadline taken from the command's context.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"context\"\n    \"fmt\"\n    \"os\"\n    \"time\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 12, "guide": "The imports and `main` are already in the file. The deadline comes first, so the job never finishes.", "notes": [{"on": "context.WithTimeout", "text": "Like WithCancel, but ends itself after the time."}, {"on": "ctx.Done()", "text": "Closes when the context is cancelled or times out."}], "text": "var root = &cobra.Command{\n    Use: \"wait\",\n    Run: func(cmd *cobra.Command, _ []string) {\n        ctx, cancel := context.WithTimeout(\n            cmd.Context(),\n            50*time.Millisecond,\n        )\n        defer cancel()\n        out := cmd.OutOrStdout()\n        select {\n        case <-time.After(time.Second):\n            fmt.Fprintln(out, \"done\")\n        case <-ctx.Done():\n            fmt.Fprintln(out, ctx.Err())\n        }\n    },\n}\n"}
+          ],
+          "output": {"command": "go run main.go", "text": "context deadline exceeded"}
+        },
+        {
+          "type": "typing",
+          "id": "stop-on-ctrl-c",
+          "title": "Stop on Ctrl-C",
+          "guide": "Build a context that Ctrl-C cancels, and wait on it inside the command.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"context\"\n    \"fmt\"\n    \"os\"\n    \"os/signal\"\n\n    \"github.com/spf13/cobra\"\n)\n"},
+            {"mode": "ghost", "line": 12, "guide": "The imports are already in the file. The command waits until its context ends.", "notes": [{"on": "<-cmd.Context().Done()", "text": "Blocks until the context is cancelled."}], "text": "var root = &cobra.Command{\n    Use: \"serve\",\n    Run: func(cmd *cobra.Command, _ []string) {\n        out := cmd.ErrOrStderr()\n        fmt.Fprintln(out, \"Ctrl-C stops me\")\n        <-cmd.Context().Done()\n        fmt.Fprintln(out, \"stopping\")\n    },\n}\n"},
+            {"mode": "ghost", "line": 22, "guide": "Make a context that Ctrl-C cancels, and start the command with it.", "notes": [{"on": "signal.NotifyContext", "text": "Cancels ctx when the user presses Ctrl-C."}, {"on": "stop()", "text": "Stops listening for the signal."}], "text": "func main() {\n    ctx, stop := signal.NotifyContext(\n        context.Background(),\n        os.Interrupt,\n    )\n    err := root.ExecuteContext(ctx)\n    stop()\n    if err != nil {\n        os.Exit(1)\n    }\n}"}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "notify-context",
+          "title": "What is it for?",
+          "guide": "Pick what this setup is for.",
+          "code": "ctx, stop := signal.NotifyContext(\n    context.Background(),\n    os.Interrupt,\n)\nerr := root.ExecuteContext(ctx)\nstop()",
+          "options": [
+            "Exits the program as soon as Ctrl-C is pressed",
+            "Prints a message when the command ends",
+            "Runs the command again after Ctrl-C",
+            "Cancels the command's context on Ctrl-C"
+          ],
+          "answer": 3,
+          "explanation": "The context ends when the interrupt signal arrives, so the command can notice `Done()` and clean up. The program does not exit by itself."
+        }
+      ]
+    }
+  ]
+}

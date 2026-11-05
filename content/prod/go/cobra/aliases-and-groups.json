@@ -1,0 +1,746 @@
+{
+  "id": "aliases-and-groups",
+  "intro": {
+    "title": "Aliases and groups",
+    "slides": [
+      {
+        "text": "A CLI with many commands needs a good front door. In this module you control **how commands are named and found**, which ones stay out of sight, and how the help list is organized."
+      },
+      {
+        "text": "Four sessions:\n\n- **Session 1:** aliases, other names for one command\n- **Session 2:** how cobra finds a command, and what it suggests when nothing fits\n- **Session 3:** retiring flags, and tuning the lookup and its hints\n- **Session 4:** groups in the help list"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Aliases",
+        "slides": [
+          {
+            "text": "A command has one name, the first word of its `Use`. An **alias** is another name that runs the same command.",
+            "code": "var installCmd = &cobra.Command{\n    Use:     \"install\",\n    Aliases: []string{\"i\", \"add\"},\n    Run:     run,\n}"
+          },
+          {
+            "text": "The rest of `Use`, after the name, only describes the arguments in the usage line. It never becomes part of the name or of an alias."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "alias-basics",
+          "title": "A shorter name",
+          "guide": "Make `list` run when the user types `ls` too.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Create the root command that holds the subcommands.",
+              "text": "    root := &cobra.Command{Use: \"app\"}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "A `list` command that also answers to another name.",
+              "notes": [
+                {
+                  "on": "Aliases:",
+                  "text": "Other names that run this command"
+                }
+              ],
+              "text": "    list := &cobra.Command{\n        Use:     \"list\",\n        Aliases: []string{\"ls\"},\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"listing items\")\n        },\n    }\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "Add the command, then run the app.",
+              "text": "    root.AddCommand(list)\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go ls",
+            "text": "listing items"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "called-as",
+          "title": "Which name was typed",
+          "guide": "Print the name of a command and the name the user typed to run it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    root := &cobra.Command{Use: \"app\"}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "The root is already in the file. The command knows its own name and the one that was used.",
+              "notes": [
+                {
+                  "on": "cmd.Name()",
+                  "text": "The name the command was defined with"
+                },
+                {
+                  "on": "cmd.CalledAs()",
+                  "text": "The name or alias the user typed"
+                }
+              ],
+              "text": "    remove := &cobra.Command{\n        Use:     \"remove\",\n        Aliases: []string{\"rm\", \"del\"},\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(cmd.Name())\n            fmt.Println(cmd.CalledAs())\n        },\n    }\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "Add the command, then run the app.",
+              "text": "    root.AddCommand(remove)\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go rm",
+            "text": "remove\nrm"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "alias-fill",
+          "title": "Name the aliases",
+          "guide": "Make `ls` and `l` run `list`, and print the name that was typed.",
+          "code": "var listCmd = &cobra.Command{\n    Use:     \"list\",\n    ___: []___{\"ls\", \"l\"},\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(cmd.___())\n    },\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Aliases"
+              ]
+            },
+            {
+              "answers": [
+                "string"
+              ]
+            },
+            {
+              "answers": [
+                "CalledAs"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "name-and-args",
+          "title": "Name and arguments",
+          "guide": "Show `[name]` in the usage line without making it part of the name.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    root := &cobra.Command{Use: \"app\"}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Words after the first one in `Use` only describe the arguments.",
+              "notes": [
+                {
+                  "on": "\"remove [name]\"",
+                  "text": "Only the first word is the command name"
+                }
+              ],
+              "text": "    remove := &cobra.Command{\n        Use:     \"remove [name]\",\n        Aliases: []string{\"rm\", \"delete\"},\n        Args:    cobra.ExactArgs(1),\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"removing\", args[0])\n        },\n    }\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "Add the command, then run the app.",
+              "text": "    root.AddCommand(remove)\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go delete cache",
+            "text": "removing cache"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "nested-aliases",
+          "title": "Which line runs it?",
+          "guide": "The command tree is below. Pick the line that runs `migrate`.",
+          "code": "db := &cobra.Command{\n    Use:     \"database\",\n    Aliases: []string{\"db\"},\n}\nmigrate := &cobra.Command{\n    Use:     \"migrate\",\n    Aliases: []string{\"mg\"},\n    Run:     run,\n}\ndb.AddCommand(migrate)\nroot.AddCommand(db)",
+          "options": [
+            "app mg",
+            "app db migrate mg",
+            "app database mig",
+            "app db mg"
+          ],
+          "answer": 3,
+          "explanation": "A command is found one level at a time. `db` is looked up under `app`, then `mg` under `db`. An alias never skips the parent, and a shortened name is not an alias."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Finding commands",
+        "slides": [
+          {
+            "text": "By default a word must match a name or an alias exactly. Cobra can be told to be more forgiving, and it helps when nothing matches.\n\nThe snippet is pseudo code.",
+            "code": "typed word:\n    name or alias?  run it\n    prefix matching on and\n    only one name starts\n    with it?        run it\n    otherwise       error and hints"
+          },
+          {
+            "text": "Two switches loosen the lookup: one ignores the case of the word, the other accepts the start of a name. Both are variables of the `cobra` package, set once before the app runs."
+          },
+          {
+            "text": "When nothing fits, cobra suggests names that look alike. For old or different words that it cannot guess, a command lists its own."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "case-insensitive",
+          "title": "Ignore the case",
+          "guide": "Let `app LIST` run the `list` command.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "A switch of the whole package: it applies to every command of the program.",
+              "notes": [
+                {
+                  "on": "EnableCaseInsensitive",
+                  "text": "Command names match in any case"
+                }
+              ],
+              "text": "    cobra.EnableCaseInsensitive = true\n"
+            },
+            {
+              "mode": "auto",
+              "line": 13,
+              "text": "    root := &cobra.Command{Use: \"app\"}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "The command needs nothing special: the switch does the work.",
+              "text": "    list := &cobra.Command{\n        Use: \"list\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"showing items\")\n        },\n    }\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "Add the command, then run the app.",
+              "text": "    root.AddCommand(list)\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go LIST",
+            "text": "showing items"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "prefix-matching",
+          "title": "Shorten a name",
+          "guide": "Let a unique start of a name run its command.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Another package switch: the start of a name is enough while it fits one command.",
+              "notes": [
+                {
+                  "on": "EnablePrefixMatching",
+                  "text": "A unique beginning of a name runs it"
+                }
+              ],
+              "text": "    cobra.EnablePrefixMatching = true\n"
+            },
+            {
+              "mode": "auto",
+              "line": 13,
+              "text": "    root := &cobra.Command{Use: \"app\"}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "One function that prints the name of the command that runs.",
+              "text": "    show := func(cmd *cobra.Command, args []string) {\n        fmt.Println(cmd.Name())\n    }\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Both commands share `show` as their `Run`.",
+              "notes": [
+                {
+                  "on": "Use: \"build\", Run: show",
+                  "text": "A function value can be used as Run"
+                }
+              ],
+              "text": "    root.AddCommand(\n        &cobra.Command{Use: \"build\", Run: show},\n        &cobra.Command{Use: \"serve\", Run: show},\n    )\n"
+            },
+            {
+              "mode": "auto",
+              "line": 24,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go ser",
+            "text": "serve"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "prefix-ambiguity",
+          "title": "What happens?",
+          "guide": "`show` prints the command name. The user types `app sta`. What happens?",
+          "code": "cobra.EnablePrefixMatching = true\nroot := &cobra.Command{Use: \"app\"}\nroot.AddCommand(\n    &cobra.Command{Use: \"status\", Run: show},\n    &cobra.Command{Use: \"start\", Run: show},\n    &cobra.Command{Use: \"stop\", Run: show},\n)",
+          "options": [
+            "It prints start",
+            "It prints status",
+            "It prints start and status",
+            "An error: unknown command \"sta\""
+          ],
+          "answer": 3,
+          "explanation": "`sta` begins both `status` and `start`, so it is ambiguous and cobra matches neither. It reports an unknown command."
+        },
+        {
+          "type": "typing",
+          "id": "suggest-for",
+          "title": "Point old names here",
+          "guide": "Make `delete` lead to `remove`: typing it must not run the command, only suggest it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    root := &cobra.Command{Use: \"app\"}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Words that should lead here, without running the command.",
+              "notes": [
+                {
+                  "on": "SuggestFor:",
+                  "text": "Typing one of these only shows a Did you mean hint"
+                }
+              ],
+              "text": "    remove := &cobra.Command{\n        Use:        \"remove\",\n        SuggestFor: []string{\"delete\", \"erase\"},\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"removing items\")\n        },\n    }\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "Add the command, then run the app.",
+              "text": "    root.AddCommand(remove)\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go delete",
+            "text": "Error: unknown command \"delete\" for \"app\"\n\nDid you mean this?\n\tremove\n\nRun 'app --help' for usage.\nexit status 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "alias-or-suggestion",
+          "title": "What does this code do?",
+          "guide": "Read the code, then pick what it does.",
+          "code": "var removeCmd = &cobra.Command{\n    Use:        \"remove\",\n    Aliases:    []string{\"rm\"},\n    SuggestFor: []string{\"delete\"},\n    Run:        run,\n}",
+          "options": [
+            "Runs on both rm and delete",
+            "Runs on rm, and only suggests remove for delete",
+            "Makes rm and delete the only valid names"
+          ],
+          "answer": 1,
+          "explanation": "An alias is another name that runs the command. `SuggestFor` only adds a word to the \"Did you mean\" hint, so the user still has to type `remove` or `rm`."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Retire flags, tune hints",
+        "slides": [
+          {
+            "text": "A flag can be retired like a command. It keeps working, it leaves the help, and it warns the user who still types it, with a text that points to its replacement."
+          },
+          {
+            "text": "Cobra also lets you work with the lookup itself. A command can look a list of words up without running anything, and when a word matches nothing, the command suggests the names that look alike.\n\nThe suggestions are decided by the command that does the lookup, not by the one being suggested. The snippet is pseudo code.",
+            "code": "unknown word, in the parent:\n    hints off?  none\n    for each child:\n        few edits from name?   suggest\n        word in SuggestFor?    suggest"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "deprecated-flag",
+          "title": "Retire a flag",
+          "guide": "Keep the `--user` flag working, but tell users to move to `--name`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The imports are already in the file. A command with two flags, one of them the old one.",
+              "text": "    root := &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"Hello\")\n        },\n    }\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "The new flag and the old one that it replaces.",
+              "text": "    root.Flags().String(\"name\", \"world\", \"who to greet\")\n    root.Flags().String(\"user\", \"\", \"who to greet\")\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "The text says what to use now.",
+              "notes": [
+                {
+                  "on": "MarkDeprecated",
+                  "text": "Hides the flag and warns when someone uses it"
+                }
+              ],
+              "text": "    root.Flags().MarkDeprecated(\"user\", \"use --name instead\")\n"
+            },
+            {
+              "mode": "auto",
+              "line": 23,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go --user Ana",
+            "text": "Flag --user has been deprecated, use --name instead\nHello"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "flag-help-listing",
+          "title": "What does help list?",
+          "guide": "Pick what `app --help` shows for these flags.",
+          "code": "f := root.Flags()\nf.String(\"format\", \"text\", \"output format\")\nf.StringP(\"out\", \"o\", \"\", \"output file\")\nf.String(\"fmt\", \"\", \"old name of format\")\nf.MarkShorthandDeprecated(\"out\", \"use --out\")\nf.MarkDeprecated(\"fmt\", \"use --format\")",
+          "options": [
+            "--format, --out and --fmt, each with its message",
+            "--format and --out, and --out shows no -o",
+            "--format only",
+            "--format and --out, and --out keeps its -o"
+          ],
+          "answer": 1,
+          "explanation": "A deprecated flag is left out of the help, but only its shorthand is hidden when just the shorthand is deprecated. Both still work when typed, and both warn."
+        },
+        {
+          "type": "typing",
+          "id": "find-command",
+          "title": "Find a command",
+          "guide": "Ask the root which command a list of words leads to, without running anything.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The imports are already in the file. A root with `remove`, which also answers to `rm`.",
+              "text": "    root := &cobra.Command{Use: \"app\"}\n    remove := &cobra.Command{\n        Use:     \"remove\",\n        Aliases: []string{\"rm\"},\n    }\n    root.AddCommand(remove)\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Look the words up the way `Execute` does, and print what comes back.",
+              "notes": [
+                {
+                  "on": "root.Find",
+                  "text": "Returns the command the words lead to, and the words left"
+                }
+              ],
+              "text": "    found, rest, err := root.Find([]string{\"rm\", \"cache\"})\n    if err != nil {\n        fmt.Println(err)\n        return\n    }\n    fmt.Println(found.Name(), rest)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "remove [cache]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "suggestion-distance",
+          "title": "Hints for bigger typos",
+          "guide": "Make the app suggest `version` when someone types `vrsn`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The imports are already in the file. Let the root suggest names that are 3 edits away.",
+              "notes": [
+                {
+                  "on": "SuggestionsMinimumDistance",
+                  "text": "How many edits away a name can be and still be suggested"
+                }
+              ],
+              "text": "    root := &cobra.Command{\n        Use:                        \"app\",\n        SuggestionsMinimumDistance: 3,\n    }\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "The command that the typo is close to.",
+              "text": "    root.AddCommand(&cobra.Command{\n        Use: \"version\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"v1.0.0\")\n        },\n    })\n"
+            },
+            {
+              "mode": "auto",
+              "line": 23,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go vrsn",
+            "text": "Error: unknown command \"vrsn\" for \"app\"\n\nDid you mean this?\n\tversion\n\nRun 'app --help' for usage.\nexit status 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "suggestions-scope",
+          "title": "What happens?",
+          "guide": "The user types `app delete`. What does the app print?",
+          "code": "root := &cobra.Command{Use: \"app\"}\nremove := &cobra.Command{\n    Use:                \"remove\",\n    SuggestFor:         []string{\"delete\"},\n    DisableSuggestions: true,\n    Run:                run,\n}\nroot.AddCommand(remove)\nroot.Execute()",
+          "options": [
+            "Only the error: unknown command \"delete\"",
+            "The error, and a hint that suggests remove",
+            "It runs remove",
+            "Nothing: DisableSuggestions removes the command"
+          ],
+          "answer": 1,
+          "explanation": "The word is looked up in the root, so the root decides about hints. `DisableSuggestions` on `remove` only affects the words typed after `remove`."
+        },
+        {
+          "type": "fill-blank",
+          "id": "retire-and-tune",
+          "title": "Retire and tune",
+          "guide": "Let the root suggest names up to 3 edits away, and retire the whole `--out` flag.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    root := &cobra.Command{\n        Use: \"app\",\n        ___: 3,\n    }\n    f := root.Flags()\n    f.String(\"out\", \"\", \"output file\")\n    f.___(\"out\", \"use --file instead\")\n    root.Execute()\n}",
+          "gaps": [
+            {
+              "answers": [
+                "SuggestionsMinimumDistance"
+              ]
+            },
+            {
+              "answers": [
+                "MarkDeprecated"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-4",
+      "intro": {
+        "title": "Groups",
+        "slides": [
+          {
+            "text": "With many subcommands, the help list is one long block. **Groups** split it into blocks with a title each.\n\nThe snippet is pseudo code.",
+            "code": "define a group: an id, a title\ngive a command the group's id\n\nhelp prints:\n    title of the group\n        its commands"
+          },
+          {
+            "text": "Groups appear in the order they are added. Commands without a group go to a block of their own, after the groups."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "group-basics",
+          "title": "Group a command",
+          "guide": "Define a group, then put the `add` command in it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    root := &cobra.Command{Use: \"app\"}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "A group has an ID to refer to it and a title for the help.",
+              "notes": [
+                {
+                  "on": "AddGroup",
+                  "text": "Defines a titled block for the help list"
+                }
+              ],
+              "text": "    root.AddGroup(&cobra.Group{\n        ID:    \"manage\",\n        Title: \"Management Commands:\",\n    })\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "A command joins a group by its ID.",
+              "notes": [
+                {
+                  "on": "GroupID:",
+                  "text": "The ID of a group defined on its parent"
+                }
+              ],
+              "text": "    add := &cobra.Command{\n        Use:     \"add\",\n        GroupID: \"manage\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"adding item\")\n        },\n    }\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 26,
+              "guide": "Add the command, then run the app.",
+              "text": "    root.AddCommand(add)\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go add",
+            "text": "adding item"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "group-fill",
+          "title": "Fill the group",
+          "guide": "Define the `manage` group and put `add` in it.",
+          "code": "root.___(&cobra.Group{\n    ___:    \"manage\",\n    Title: \"Management Commands:\",\n})\n\nadd := &cobra.Command{\n    Use:     \"add\",\n    ___: \"manage\",\n}\nroot.AddCommand(add)",
+          "gaps": [
+            {
+              "answers": [
+                "AddGroup"
+              ]
+            },
+            {
+              "answers": [
+                "ID"
+              ]
+            },
+            {
+              "answers": [
+                "GroupID"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "group-purpose",
+          "title": "What does this code do?",
+          "guide": "Read the code, then pick what it does.",
+          "code": "root.AddGroup(&cobra.Group{\n    ID:    \"files\",\n    Title: \"Files:\",\n})\ncopy := &cobra.Command{\n    Use:     \"copy\",\n    GroupID: \"files\",\n    Run:     run,\n}\nversion := &cobra.Command{\n    Use: \"version\",\n    Run: run,\n}",
+          "options": [
+            "Limits copy to the files group, disables version",
+            "Shows copy and version together under Files:",
+            "Lists copy under Files: and version in the rest"
+          ],
+          "answer": 2,
+          "explanation": "The group only changes how the help is laid out. Commands with no group go to the \"Additional Commands:\" block."
+        },
+        {
+          "type": "typing",
+          "id": "help-group",
+          "title": "Place the help command",
+          "guide": "Define two groups and put the built-in `help` command in one. Then read the help of the app.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    root := &cobra.Command{Use: \"app\"}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Groups show in the order they are added. The help command joins one by ID.",
+              "notes": [
+                {
+                  "on": "SetHelpCommandGroupID",
+                  "text": "Puts the built-in help command in a group"
+                }
+              ],
+              "text": "    root.AddGroup(\n        &cobra.Group{ID: \"work\", Title: \"Work:\"},\n        &cobra.Group{ID: \"info\", Title: \"Info:\"},\n    )\n    root.SetHelpCommandGroupID(\"info\")\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "A command in the first group.",
+              "text": "    root.AddCommand(&cobra.Command{\n        Use:     \"status\",\n        Short:   \"Show the status\",\n        GroupID: \"work\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"all good\")\n        },\n    })"
+            },
+            {
+              "mode": "auto",
+              "line": 27,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go --help",
+            "text": "Usage:\n  app [command]\n\nWork:\n  status      Show the status\n\nInfo:\n  help        Help about any command\n\nAdditional Commands:\n  completion  Generate the autocompletion script for the specified shell\n\nFlags:\n  -h, --help   help for app\n\nUse \"app [command] --help\" for more information about a command."
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "group-scope",
+          "title": "What happens?",
+          "guide": "The app runs `app db migrate`. What happens?",
+          "code": "root.AddGroup(&cobra.Group{\n    ID:    \"work\",\n    Title: \"Work:\",\n})\n\ndb := &cobra.Command{Use: \"db\"}\nmigrate := &cobra.Command{\n    Use:     \"migrate\",\n    GroupID: \"work\",\n    Run:     run,\n}\ndb.AddCommand(migrate)\nroot.AddCommand(db)",
+          "options": [
+            "It runs, and migrate shows under Work: in help",
+            "It panics: db has no group with that ID",
+            "It runs, and migrate goes to the extra block",
+            "It does not compile"
+          ],
+          "answer": 1,
+          "explanation": "A group belongs to the command that adds it. The parent of `migrate` is `db`, which has no `work` group, so cobra panics when the app executes."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,522 @@
+{
+  "id": "testing-commands",
+  "intro": {
+    "title": "Testing commands",
+    "slides": [
+      {
+        "text": "A cobra command can run inside a program, with no terminal: you give it arguments, catch what it prints and read the error it returns.\n\nThat is all a test of a CLI needs. You will build it step by step, in plain programs that print a result.\n\nA real test lives in a `_test.go` file. Here the single `main.go` editor stands in for it: each program runs the command and prints the result."
+      },
+      {
+        "text": "Three sessions:\n\n- **Session 1:** run a command in memory and test a flag\n- **Session 2:** several cases, errors and bad arguments\n- **Session 3:** subcommands, input and help text"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Run it in memory",
+        "slides": [
+          {
+            "text": "A test drives a command the way a user would, but in memory. The output goes to a buffer and the arguments come from a list.\n\nThe snippet is pseudo code.",
+            "code": "cmd = build the command\noutput -> a buffer\nargs -> [\"greet\", \"--name\", \"Ana\"]\nrun cmd\ncompare the buffer to the expected text"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "build-and-capture",
+          "title": "Run a command in memory",
+          "guide": "Build a command, run it in code and read what it printed.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A function that builds the command. It writes to the command's own output, not straight to the terminal.",
+              "notes": [
+                {
+                  "on": "cmd.OutOrStdout()",
+                  "text": "The writer a test can swap for a buffer"
+                }
+              ],
+              "text": "func newGreetCmd() *cobra.Command {\n    return &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Fprintln(cmd.OutOrStdout(), \"hello\")\n        },\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 20,
+              "guide": "Collect the output in a buffer and give the command its arguments.",
+              "notes": [
+                {
+                  "on": "cmd.SetOut(buf)",
+                  "text": "Sends the command's output into the buffer"
+                },
+                {
+                  "on": "cmd.SetArgs([]string{})",
+                  "text": "The arguments to run with, so os.Args is never read"
+                }
+              ],
+              "text": "    cmd := newGreetCmd()\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs([]string{})"
+            },
+            {
+              "mode": "ghost",
+              "line": 24,
+              "guide": "Run the command, then print what the buffer caught.",
+              "text": "    cmd.Execute()\n    fmt.Print(buf.String())"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "hello"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "run-helper",
+          "title": "A run helper",
+          "guide": "Wrap the three steps in a function every test can call.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc newGreetCmd() *cobra.Command {\n    return &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Fprintln(cmd.OutOrStdout(), \"hello\")\n        },\n    }\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "The command and the imports are already in the file. The helper returns the output and the error.",
+              "notes": [
+                {
+                  "on": "(string, error)",
+                  "text": "A test needs both the text and the failure"
+                }
+              ],
+              "text": "func run(cmd *cobra.Command, args []string) (string, error) {\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs(args)\n    err := cmd.Execute()\n    return buf.String(), err\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 28,
+              "guide": "Call the helper with a fresh command.",
+              "text": "    out, err := run(newGreetCmd(), []string{})\n    fmt.Print(out)\n    fmt.Println(\"error:\", err)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "hello\nerror: <nil>"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "set-out-and-args",
+          "title": "Prepare the command",
+          "guide": "Send the output to the buffer, then give the command the arguments to run with.",
+          "code": "package main\n\nimport (\n    \"bytes\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    cmd := &cobra.Command{Use: \"app\"}\n    buf := new(bytes.Buffer)\n    cmd.___(buf)\n    cmd.___([]string{})\n    cmd.Execute()\n}",
+          "gaps": [
+            {
+              "answers": [
+                "SetOut"
+              ]
+            },
+            {
+              "answers": [
+                "SetArgs"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "leaked-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "func main() {\n    cmd := &cobra.Command{\n        Use: \"app\",\n        Run: func(c *cobra.Command, _ []string) {\n            fmt.Println(\"hello\")\n        },\n    }\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs([]string{})\n    cmd.Execute()\n    fmt.Printf(\"captured: [%s]\\n\", buf.String())\n}",
+          "options": [
+            "captured: [hello]",
+            "hello, then captured: []",
+            "captured: []",
+            "hello, then captured: [hello]"
+          ],
+          "answer": 1,
+          "explanation": "`fmt.Println` writes straight to the terminal, so `SetOut` never sees it and the buffer stays empty. Writing to `cmd.OutOrStdout()` is what lets a test catch the text."
+        },
+        {
+          "type": "typing",
+          "id": "flag-in-test",
+          "title": "Test a flag",
+          "guide": "Pass a flag through the arguments and check the output.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc run(cmd *cobra.Command, args []string) (string, error) {\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs(args)\n    err := cmd.Execute()\n    return buf.String(), err\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "The imports and the helper are already in the file. The command greets whoever `--name` says.",
+              "text": "func newGreetCmd() *cobra.Command {\n    var name string\n    cmd := &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Fprintln(cmd.OutOrStdout(), \"hello\", name)\n        },\n    }\n    cmd.Flags().StringVar(&name, \"name\", \"world\", \"who to greet\")\n    return cmd\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 31,
+              "guide": "Flags go in the argument list, as on a real command line.",
+              "text": "    out, _ := run(newGreetCmd(), []string{\"--name\", \"Ana\"})\n    fmt.Print(out)"
+            },
+            {
+              "mode": "ghost",
+              "line": 33,
+              "guide": "With no flag, the default shows.",
+              "text": "    out, _ = run(newGreetCmd(), []string{})\n    fmt.Print(out)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "hello Ana\nhello world"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Cases and errors",
+        "slides": [
+          {
+            "text": "`Execute` returns the error instead of exiting. Only `main` turns an error into an exit code, so a test can read the error and move on.",
+            "code": "func main() {\n    err := newRootCmd().Execute()\n    if err != nil {\n        os.Exit(1)\n    }\n}"
+          },
+          {
+            "text": "Cobra can print an error and the usage by itself. A test usually silences both and checks the returned error, the way a user of the command never would.\n\nTo catch that text instead, `SetErr` sends the command's error output to a buffer, as `SetOut` does for the normal output."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "table-of-cases",
+          "title": "A table of cases",
+          "guide": "Check several runs with one loop, each on a fresh command.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc newGreetCmd() *cobra.Command {\n    var name string\n    cmd := &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Fprintln(cmd.OutOrStdout(), \"hello\", name)\n        },\n    }\n    cmd.Flags().StringVar(&name, \"name\", \"world\", \"who to greet\")\n    return cmd\n}\n\nfunc run(cmd *cobra.Command, args []string) (string, error) {\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs(args)\n    err := cmd.Execute()\n    return buf.String(), err\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 31,
+              "guide": "The command, the flag and the helper are in the file. List the arguments and the output each run should give.",
+              "text": "    cases := []struct {\n        args []string\n        want string\n    }{\n        {[]string{\"--name\", \"Ana\"}, \"hello Ana\\n\"},\n        {[]string{}, \"hello world\\n\"},\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 38,
+              "guide": "Run every case and compare. The command is built inside the loop.",
+              "notes": [
+                {
+                  "on": "newGreetCmd()",
+                  "text": "A new command per case, so no flag value carries over"
+                }
+              ],
+              "text": "    for _, tc := range cases {\n        out, _ := run(newGreetCmd(), tc.args)\n        if out == tc.want {\n            fmt.Println(\"PASS\")\n        } else {\n            fmt.Printf(\"FAIL %q\\n\", out)\n        }\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "PASS\nPASS"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "error-from-run",
+          "title": "Test a failing command",
+          "guide": "Make the command fail and check the error that Execute returns.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bytes\"\n    \"errors\"\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc run(cmd *cobra.Command, args []string) (string, error) {\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs(args)\n    err := cmd.Execute()\n    return buf.String(), err\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "The helper is already in the file. The command always fails with an error.",
+              "notes": [
+                {
+                  "on": "SilenceUsage",
+                  "text": "Stops cobra printing the usage after an error"
+                },
+                {
+                  "on": "SilenceErrors",
+                  "text": "Stops cobra printing the error, so the test reads it"
+                }
+              ],
+              "text": "func newGreetCmd() *cobra.Command {\n    return &cobra.Command{\n        Use:           \"greet\",\n        SilenceUsage:  true,\n        SilenceErrors: true,\n        RunE: func(cmd *cobra.Command, args []string) error {\n            return errors.New(\"no name given\")\n        },\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 31,
+              "guide": "A failing run returns the error and prints nothing to the buffer.",
+              "text": "    out, err := run(newGreetCmd(), []string{})\n    fmt.Printf(\"out=%q\\n\", out)\n    fmt.Println(\"err:\", err)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "out=\"\"\nerr: no name given"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "bad-arguments",
+          "title": "Test the arguments check",
+          "guide": "Run a command with the wrong number of arguments, then the right one.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc run(cmd *cobra.Command, args []string) (string, error) {\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs(args)\n    err := cmd.Execute()\n    return buf.String(), err\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "The helper is already in the file. The command wants exactly one argument.",
+              "text": "func newGreetCmd() *cobra.Command {\n    return &cobra.Command{\n        Use:           \"greet <name>\",\n        Args:          cobra.ExactArgs(1),\n        SilenceUsage:  true,\n        SilenceErrors: true,\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Fprintln(cmd.OutOrStdout(), \"hello\", args[0])\n        },\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 31,
+              "guide": "Too few arguments: the error comes from cobra, before the command runs.",
+              "text": "    _, err := run(newGreetCmd(), []string{})\n    fmt.Println(err)"
+            },
+            {
+              "mode": "ghost",
+              "line": 33,
+              "guide": "With one argument the command runs.",
+              "text": "    out, err := run(newGreetCmd(), []string{\"Ana\"})\n    fmt.Print(out)\n    fmt.Println(err)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "accepts 1 arg(s), received 0\nhello Ana\n<nil>"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "exact-args-silence",
+          "title": "Guard the arguments",
+          "guide": "Require exactly one argument, and keep cobra from printing the usage when it fails.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    cmd := &cobra.Command{\n        Use:   \"greet <name>\",\n        ___:   cobra.ExactArgs(1),\n        ___: true,\n        Run:   func(*cobra.Command, []string) {},\n    }\n    cmd.SetArgs([]string{})\n    cmd.Execute()\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Args"
+              ]
+            },
+            {
+              "answers": [
+                "SilenceUsage"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "unknown-flag",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "func main() {\n    cmd := &cobra.Command{\n        Use:           \"app\",\n        SilenceErrors: true,\n        SilenceUsage:  true,\n        Run: func(*cobra.Command, []string) {},\n    }\n    cmd.SetArgs([]string{\"--verbose\"})\n    err := cmd.Execute()\n    fmt.Println(err)\n}",
+          "options": [
+            "<nil>",
+            "Error: unknown flag: --verbose",
+            "unknown flag: --verbose",
+            "unknown command \"--verbose\" for \"app\""
+          ],
+          "answer": 2,
+          "explanation": "The command declares no `--verbose` flag, so parsing fails and `Execute` returns the parse error. The `Error:` prefix is added only when cobra prints the error itself, and that is silenced."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "The whole tree",
+        "slides": [
+          {
+            "text": "A real test goes through the root command, with the arguments a user types, and can also feed it input and ask for its help.\n\nA command keeps its own state: flags, arguments and buffers. Think about how you build the ones a test uses."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "through-the-root",
+          "title": "Test a subcommand",
+          "guide": "Reach a subcommand the way a user does, through the root command.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc newGreetCmd() *cobra.Command {\n    return &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Fprintln(cmd.OutOrStdout(), \"hello\")\n        },\n    }\n}\n\nfunc run(cmd *cobra.Command, args []string) (string, error) {\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs(args)\n    err := cmd.Execute()\n    return buf.String(), err\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 27,
+              "guide": "The subcommand and the helper are already in the file. A function builds the whole tree, fresh every call.",
+              "notes": [
+                {
+                  "on": "root.AddCommand",
+                  "text": "Attaches greet, so the arguments can name it"
+                }
+              ],
+              "text": "func newRootCmd() *cobra.Command {\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(newGreetCmd())\n    return root\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 34,
+              "guide": "The first argument picks the subcommand.",
+              "text": "    out, err := run(newRootCmd(), []string{\"greet\"})\n    fmt.Print(out)\n    fmt.Println(\"error:\", err)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "hello\nerror: <nil>"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "reused-command",
+          "title": "What does it print?",
+          "guide": "`newGreetCmd` has a `--name` flag that defaults to `world`. Read the code, then pick the output.",
+          "code": "func main() {\n    cmd := newGreetCmd()\n\n    out, _ := run(cmd, []string{\"--name\", \"Ana\"})\n    fmt.Print(out)\n\n    out, _ = run(cmd, []string{})\n    fmt.Print(out)\n}",
+          "options": [
+            "hello Ana, then hello world",
+            "hello Ana, then hello",
+            "hello world, then hello world",
+            "hello Ana, then hello Ana"
+          ],
+          "answer": 3,
+          "explanation": "Flag values live inside the command and nothing resets them. The second run parses no flags, so `name` keeps the \"Ana\" the first run set. A fresh command per run avoids it."
+        },
+        {
+          "type": "typing",
+          "id": "fake-input",
+          "title": "Feed the command input",
+          "guide": "Give a command that reads input some text, with no keyboard.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"bytes\"\n    \"fmt\"\n    \"strings\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc run(cmd *cobra.Command, args []string) (string, error) {\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs(args)\n    err := cmd.Execute()\n    return buf.String(), err\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 20,
+              "guide": "The helper is already in the file. The command reads one line, from its own input.",
+              "notes": [
+                {
+                  "on": "cmd.InOrStdin()",
+                  "text": "The input the command reads, so a test can replace it"
+                }
+              ],
+              "text": "func newAskCmd() *cobra.Command {\n    return &cobra.Command{\n        Use: \"ask\",\n        Run: func(cmd *cobra.Command, args []string) {\n            scanner := bufio.NewScanner(cmd.InOrStdin())\n            scanner.Scan()\n            fmt.Fprintln(cmd.OutOrStdout(), \"hello\", scanner.Text())\n        },\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 32,
+              "guide": "Replace the keyboard with a reader.",
+              "notes": [
+                {
+                  "on": "cmd.SetIn",
+                  "text": "Feeds the command this text as its input"
+                }
+              ],
+              "text": "    cmd := newAskCmd()\n    cmd.SetIn(strings.NewReader(\"Ana\\n\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 34,
+              "guide": "Run it as before.",
+              "text": "    out, _ := run(cmd, []string{})\n    fmt.Print(out)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "hello Ana"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "set-in",
+          "title": "Replace the input",
+          "guide": "Give the command the reader as its input.",
+          "code": "package main\n\nimport (\n    \"strings\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    cmd := &cobra.Command{Use: \"ask\"}\n    in := strings.NewReader(\"Ana\\n\")\n    cmd.___(in)\n    cmd.SetArgs([]string{})\n    cmd.Execute()\n}",
+          "gaps": [
+            {
+              "answers": [
+                "SetIn"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "help-text",
+          "title": "Test the help",
+          "guide": "Ask for help and check that the output holds what you expect.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n    \"strings\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc newGreetCmd() *cobra.Command {\n    return &cobra.Command{\n        Use:   \"greet\",\n        Short: \"Say hello\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Fprintln(cmd.OutOrStdout(), \"hello\")\n        },\n    }\n}\n\nfunc run(cmd *cobra.Command, args []string) (string, error) {\n    buf := new(bytes.Buffer)\n    cmd.SetOut(buf)\n    cmd.SetArgs(args)\n    err := cmd.Execute()\n    return buf.String(), err\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 30,
+              "guide": "The command, with a short description, and the helper are in the file. Ask for help like a user.",
+              "notes": [
+                {
+                  "on": "\"--help\"",
+                  "text": "Cobra adds this flag itself and prints to the output"
+                }
+              ],
+              "text": "    out, err := run(newGreetCmd(), []string{\"--help\"})\n    fmt.Println(err)"
+            },
+            {
+              "mode": "ghost",
+              "line": 32,
+              "guide": "Check for pieces of the text, not all of it.",
+              "text": "    fmt.Println(strings.Contains(out, \"Usage:\"))\n    fmt.Println(strings.Contains(out, \"Say hello\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "<nil>\ntrue\ntrue"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "why-a-constructor",
+          "title": "Why a function?",
+          "guide": "Read the code, then pick what it is for.",
+          "code": "func newRootCmd() *cobra.Command {\n    var verbose bool\n\n    root := &cobra.Command{Use: \"app\"}\n    root.Flags().BoolVar(\n        &verbose, \"verbose\", false, \"more output\",\n    )\n    root.AddCommand(newGreetCmd())\n\n    return root\n}",
+          "options": [
+            "Registers the command once for the whole program",
+            "Runs the command and returns its output",
+            "Builds a fresh command, so each test starts clean"
+          ],
+          "answer": 2,
+          "explanation": "Every call returns a new command with its own flags and subcommands, so no test inherits the state of another. A package-level variable would be shared by all of them."
+        }
+      ]
+    }
+  ]
+}

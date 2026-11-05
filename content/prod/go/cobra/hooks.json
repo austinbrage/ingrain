@@ -1,0 +1,683 @@
+{
+  "id": "hooks",
+  "intro": {
+    "title": "Hooks",
+    "slides": [
+      {
+        "text": "A command has one main function, `Run`. **Hooks** are extra functions cobra calls around it, so setup and cleanup live apart from the command's own work.\n\nThe snippet is pseudo code.",
+        "code": "hook runs\nthe command runs\nhook runs"
+      },
+      {
+        "text": "Three sessions:\n\n- **Session 1:** the plain and persistent hooks around `Run`\n- **Session 2:** hooks on subcommands: what they inherit and what they replace\n- **Session 3:** hooks that fail, and setup for every command"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Hooks around Run",
+        "slides": [
+          {
+            "text": "A command has two pairs of hooks: `PreRun` and `PostRun`, and the persistent `PersistentPreRun` and `PersistentPostRun`. Each is a field of the command and a function with the same signature as `Run`."
+          },
+          {
+            "text": "Cobra calls every hook at a fixed point of the run. To see the order, the hooks in these exercises print a line, so the output is the order."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "pre-run",
+          "title": "Run a hook before Run",
+          "guide": "Add a function that cobra calls just before the command's `Run`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A hook is a plain function with the same signature as `Run`.",
+              "text": "func prepare(cmd *cobra.Command, args []string) {\n    fmt.Println(\"preparing\")\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "The command's own function.",
+              "text": "func run(cmd *cobra.Command, args []string) {\n    fmt.Println(\"running\")\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Plug both in. `PreRun` is the hook that comes before `Run`.",
+              "notes": [
+                {
+                  "on": "PreRun:",
+                  "text": "Called before the command's main function"
+                }
+              ],
+              "text": "    root := &cobra.Command{\n        Use:    \"app\",\n        PreRun: prepare,\n        Run:    run,\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 24,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "preparing\nrunning"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "post-run",
+          "title": "Run a hook after Run",
+          "guide": "Add a hook that runs after the command, and a helper that builds hooks.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Name the shape every hook has, so the helper below stays short.",
+              "notes": [
+                {
+                  "on": "type hook",
+                  "text": "Gives that function shape a short name"
+                }
+              ],
+              "text": "type hook func(*cobra.Command, []string)\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "A helper that builds a hook printing a message. The output will show the order.",
+              "notes": [
+                {
+                  "on": "return func",
+                  "text": "Returns a hook that prints when it runs"
+                }
+              ],
+              "text": "func say(s string) hook {\n    return func(*cobra.Command, []string) {\n        fmt.Println(s)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Three hooks in a row. `PostRun` is the one that comes after `Run`.",
+              "notes": [
+                {
+                  "on": "PostRun:",
+                  "text": "Called after the command's main function"
+                }
+              ],
+              "text": "    root := &cobra.Command{\n        Use:     \"app\",\n        PreRun:  say(\"before\"),\n        Run:     say(\"running\"),\n        PostRun: say(\"after\"),\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 25,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "before\nrunning\nafter"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "pre-or-post",
+          "title": "Place the hooks",
+          "guide": "Fill the field names so each hook runs at the place its text says. Use plain hooks.",
+          "code": "root := &cobra.Command{\n    Use:     \"app\",\n    ___: say(\"after\"),\n    ___:    say(\"before\"),\n    ___:     say(\"running\"),\n}",
+          "gaps": [
+            {
+              "answers": [
+                "PostRun"
+              ]
+            },
+            {
+              "answers": [
+                "PreRun"
+              ]
+            },
+            {
+              "answers": [
+                "Run"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "persistent-order",
+          "title": "Persistent hooks",
+          "guide": "Wrap `Run` with every hook: the plain pair and the persistent pair.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Rebuild the hook helper from the last exercise.",
+              "text": "type hook func(*cobra.Command, []string)\n\nfunc say(s string) hook {\n    return func(*cobra.Command, []string) {\n        fmt.Println(s)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "The persistent hooks sit outside the plain ones. Subcommands will inherit them.",
+              "notes": [
+                {
+                  "on": "PersistentPreRun:",
+                  "text": "A hook that subcommands inherit"
+                }
+              ],
+              "text": "    root := &cobra.Command{\n        Use:               \"app\",\n        PersistentPreRun:  say(\"persistent pre\"),\n        PreRun:            say(\"pre\"),\n        Run:               say(\"run\"),\n        PostRun:           say(\"post\"),\n        PersistentPostRun: say(\"persistent post\"),\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 27,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "persistent pre\npre\nrun\npost\npersistent post"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "which-order",
+          "title": "Which order?",
+          "guide": "`say` prints its text on its own line. Pick the order the lines come out.",
+          "code": "root := &cobra.Command{\n    Use:               \"app\",\n    PersistentPostRun: say(\"a\"),\n    PostRun:           say(\"b\"),\n    Run:               say(\"c\"),\n    PreRun:            say(\"d\"),\n    PersistentPreRun:  say(\"e\"),\n}\nroot.Execute()",
+          "options": [
+            "a b c d e",
+            "e d c a b",
+            "e d c b a",
+            "d e c b a"
+          ],
+          "answer": 2,
+          "explanation": "The order is fixed by cobra: persistent pre, pre, Run, post, persistent post. Where the fields sit in the struct changes nothing."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Hooks and subcommands",
+        "slides": [
+          {
+            "text": "Commands form a tree. A **persistent** hook belongs to its command and to every subcommand below it. A plain hook belongs only to the command that declares it.\n\nThe snippet is pseudo code.",
+            "code": "root    persistent hook\n  build    Run\n  test     Run"
+          },
+          {
+            "text": "When two levels of the tree both define the same hook, one of them wins. The exercises show which one, and how to keep both."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "inherit-hook",
+          "title": "Inherit a hook",
+          "guide": "Put a persistent hook on the root and run a subcommand.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\ntype hook func(*cobra.Command, []string)\n\nfunc say(s string) hook {\n    return func(*cobra.Command, []string) {\n        fmt.Println(s)\n    }\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "A persistent hook on the root is inherited by every subcommand.",
+              "notes": [
+                {
+                  "on": "PersistentPreRun:",
+                  "text": "Also runs for every command below the root"
+                }
+              ],
+              "text": "    root := &cobra.Command{\n        Use:              \"app\",\n        PersistentPreRun: say(\"setup\"),\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 23,
+              "guide": "A subcommand with no hook of its own.",
+              "text": "    serve := &cobra.Command{\n        Use: \"serve\",\n        Run: say(\"serving\"),\n    }\n    root.AddCommand(serve)"
+            },
+            {
+              "mode": "auto",
+              "line": 28,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go serve",
+            "text": "setup\nserving"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "plain-hooks-stay",
+          "title": "Plain hooks stay put",
+          "guide": "Hang a plain hook and a persistent one on the root, then run a subcommand.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\ntype hook func(*cobra.Command, []string)\n\nfunc say(s string) hook {\n    return func(*cobra.Command, []string) {\n        fmt.Println(s)\n    }\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "`PreRun` on the root is a plain hook, `PersistentPostRun` is persistent.",
+              "notes": [
+                {
+                  "on": "PreRun:",
+                  "text": "Only for the command that declares it"
+                }
+              ],
+              "text": "    root := &cobra.Command{\n        Use:               \"app\",\n        PreRun:            say(\"root pre\"),\n        PersistentPostRun: say(\"root post\"),\n    }"
+            },
+            {
+              "mode": "copy",
+              "line": 24,
+              "guide": "Add the subcommand.",
+              "text": "    build := &cobra.Command{\n        Use: \"build\",\n        Run: say(\"building\"),\n    }\n    root.AddCommand(build)"
+            },
+            {
+              "mode": "auto",
+              "line": 29,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go build",
+            "text": "building\nroot post"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "inherit-and-register",
+          "title": "Inherit and register",
+          "guide": "Make the start hook run for every subcommand, and add `serve` under the root.",
+          "code": "root := &cobra.Command{\n    Use:               \"app\",\n    ___: say(\"start\"),\n    PersistentPostRun: say(\"stop\"),\n}\nserve := &cobra.Command{\n    Use: \"serve\",\n    Run: say(\"serving\"),\n}\nroot.___(serve)",
+          "gaps": [
+            {
+              "answers": [
+                "PersistentPreRun"
+              ]
+            },
+            {
+              "answers": [
+                "AddCommand"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "two-levels",
+          "title": "Two persistent hooks",
+          "guide": "The user runs `app child`. `say` prints its text on its own line.",
+          "code": "root := &cobra.Command{\n    Use:              \"app\",\n    PersistentPreRun: say(\"root\"),\n}\nchild := &cobra.Command{\n    Use:              \"child\",\n    PersistentPreRun: say(\"child\"),\n    Run:              say(\"run\"),\n}\nroot.AddCommand(child)",
+          "options": [
+            "root, child, run",
+            "child, run",
+            "root, run",
+            "child, root, run"
+          ],
+          "answer": 1,
+          "explanation": "A command runs the nearest persistent hook, walking up the tree. The child has its own, so the root's is not called."
+        },
+        {
+          "type": "typing",
+          "id": "keep-parent-hook",
+          "title": "Keep the parent's hook",
+          "guide": "Give the child its own persistent hook and still run the root's.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\ntype hook func(*cobra.Command, []string)\n\nfunc say(s string) hook {\n    return func(*cobra.Command, []string) {\n        fmt.Println(s)\n    }\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "A child's own persistent hook replaces the parent's. Call the parent's by hand to keep it.",
+              "notes": [
+                {
+                  "on": "cmd.Parent()",
+                  "text": "The command one level up in the tree"
+                },
+                {
+                  "on": "parent.PersistentPreRun(",
+                  "text": "Calls the parent's hook by hand"
+                }
+              ],
+              "text": "func setup(cmd *cobra.Command, args []string) {\n    parent := cmd.Parent()\n    parent.PersistentPreRun(parent, args)\n    fmt.Println(\"child setup\")\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 25,
+              "text": "    root := &cobra.Command{\n        Use:              \"app\",\n        PersistentPreRun: say(\"root setup\"),\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 29,
+              "guide": "The root is already in the file. Give the child the new hook.",
+              "notes": [
+                {
+                  "on": "PersistentPreRun: setup",
+                  "text": "Replaces the root's hook for this command"
+                }
+              ],
+              "text": "    child := &cobra.Command{\n        Use:              \"child\",\n        PersistentPreRun: setup,\n        Run:              say(\"running\"),\n    }\n    root.AddCommand(child)"
+            },
+            {
+              "mode": "auto",
+              "line": 35,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go child",
+            "text": "root setup\nchild setup\nrunning"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "running-command",
+          "title": "Which command runs?",
+          "guide": "Print the name of the running command from inside persistent hooks.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\ntype hook func(*cobra.Command, []string)\n\nfunc say(s string) hook {\n    return func(*cobra.Command, []string) {\n        fmt.Println(s)\n    }\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "The hook receives the command being run. Print its name.",
+              "notes": [
+                {
+                  "on": "cmd.Name()",
+                  "text": "The name of the command that is running"
+                }
+              ],
+              "text": "func setup(cmd *cobra.Command, args []string) {\n    fmt.Println(\"starting\", cmd.Name())\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "The matching hook for the end.",
+              "text": "func done(cmd *cobra.Command, args []string) {\n    fmt.Println(\"finished\", cmd.Name())\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 27,
+              "guide": "Both hooks go on the root.",
+              "text": "    root := &cobra.Command{\n        Use:               \"app\",\n        PersistentPreRun:  setup,\n        PersistentPostRun: done,\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 32,
+              "text": "    build := &cobra.Command{\n        Use: \"build\",\n        Run: say(\"building\"),\n    }\n    root.AddCommand(build)"
+            },
+            {
+              "mode": "auto",
+              "line": 37,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go build",
+            "text": "starting build\nbuilding\nfinished build"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Failing hooks and setup",
+        "slides": [
+          {
+            "text": "Every hook has an `E` version that returns an `error`: `PreRunE`, `PostRunE` and the persistent ones. Cobra reports that error the way it does for `RunE`.\n\nFlags are parsed before any hook runs, so a hook can already read them."
+          },
+          {
+            "text": "Outside the tree, `cobra.OnInitialize` registers functions for the whole program, and `cobra.OnFinalize` registers the ones that run at the very end. Both are calls, not fields.",
+            "code": "cobra.OnInitialize(loadConfig)\ncobra.OnFinalize(closeFiles)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "pre-run-error",
+          "title": "A hook that can fail",
+          "guide": "Reject a bad flag value before `Run`, with `PreRunE`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\ntype hook func(*cobra.Command, []string)\n\nfunc say(s string) hook {\n    return func(*cobra.Command, []string) {\n        fmt.Println(s)\n    }\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "A variable for the port flag.",
+              "text": "var port int\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 20,
+              "guide": "The `E` version of a hook returns an error. A non-nil one stops the command.",
+              "notes": [
+                {
+                  "on": "error {",
+                  "text": "A non-nil error ends the command here"
+                }
+              ],
+              "text": "func check(cmd *cobra.Command, _ []string) error {\n    if port < 1024 {\n        return fmt.Errorf(\"port %d is low\", port)\n    }\n    return nil\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 28,
+              "guide": "Plug the check in as `PreRunE`, the plain hook that returns an error.",
+              "notes": [
+                {
+                  "on": "PreRunE:",
+                  "text": "Runs before the command and can stop it"
+                }
+              ],
+              "text": "    root := &cobra.Command{\n        Use:          \"app\",\n        SilenceUsage: true,\n        PreRunE:      check,\n        Run:          say(\"serving\"),\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 34,
+              "guide": "The flag is parsed before any hook runs, so the check can read it.",
+              "text": "    root.Flags().IntVar(\n        &port, \"port\", 8080, \"listen port\",\n    )"
+            },
+            {
+              "mode": "auto",
+              "line": 37,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go --port 80",
+            "text": "Error: port 80 is low\nexit status 1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "error-hook",
+          "title": "Fail from a hook",
+          "guide": "Fill the return type, the success value and the plain hook that can return an error.",
+          "code": "func check(cmd *cobra.Command, _ []string) ___ {\n    if port < 1024 {\n        return fmt.Errorf(\"port %d is low\", port)\n    }\n    return ___\n}\n\nroot := &cobra.Command{\n    Use: \"app\",\n    ___: check,\n    Run: say(\"serving\"),\n}",
+          "gaps": [
+            {
+              "answers": [
+                "error"
+              ]
+            },
+            {
+              "answers": [
+                "nil"
+              ]
+            },
+            {
+              "answers": [
+                "PreRunE"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "failing-run",
+          "title": "Does close run?",
+          "guide": "`say` prints its text on its own line, and `fail` returns an error. What prints?",
+          "code": "func fail(cmd *cobra.Command, _ []string) error {\n    fmt.Println(\"running\")\n    return fmt.Errorf(\"boom\")\n}\n\nroot := &cobra.Command{\n    Use:           \"app\",\n    SilenceErrors: true,\n    SilenceUsage:  true,\n    PreRun:        say(\"open\"),\n    RunE:          fail,\n    PostRun:       say(\"close\"),\n}\nroot.Execute()",
+          "options": [
+            "open, running, close",
+            "open, close",
+            "open, running, boom",
+            "open, running"
+          ],
+          "answer": 3,
+          "explanation": "The post hooks run only after `Run` succeeds. When `RunE` returns an error, they are skipped, so cleanup placed there does not happen on failure."
+        },
+        {
+          "type": "typing",
+          "id": "guard-subcommands",
+          "title": "Guard every subcommand",
+          "guide": "Stop any subcommand when the `TOKEN` variable is missing.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\ntype hook func(*cobra.Command, []string)\n\nfunc say(s string) hook {\n    return func(*cobra.Command, []string) {\n        fmt.Println(s)\n    }\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "A check that fails when the environment has no token.",
+              "text": "func guard(cmd *cobra.Command, _ []string) error {\n    if os.Getenv(\"TOKEN\") == \"\" {\n        return fmt.Errorf(\"TOKEN is not set\")\n    }\n    return nil\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 26,
+              "guide": "Plug the check in as a persistent hook, so every subcommand passes through it.",
+              "notes": [
+                {
+                  "on": "PersistentPreRunE:",
+                  "text": "Inherited by subcommands, and can stop them"
+                }
+              ],
+              "text": "    root := &cobra.Command{\n        Use:               \"app\",\n        SilenceUsage:      true,\n        PersistentPreRunE: guard,\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 31,
+              "guide": "A subcommand with no check of its own.",
+              "text": "    root.AddCommand(&cobra.Command{\n        Use: \"deploy\",\n        Run: say(\"deploying\"),\n    })"
+            },
+            {
+              "mode": "auto",
+              "line": 35,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "TOKEN= go run main.go deploy",
+            "text": "Error: TOKEN is not set\nexit status 1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "init-and-finalize",
+          "title": "Run for every command",
+          "guide": "Register functions that run around the hooks of any command.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\ntype hook func(*cobra.Command, []string)\n\nfunc say(s string) hook {\n    return func(*cobra.Command, []string) {\n        fmt.Println(s)\n    }\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Runs before the hooks of whatever command is executed. A place to load config.",
+              "notes": [
+                {
+                  "on": "cobra.OnInitialize(",
+                  "text": "Not a field: a call that covers every command"
+                }
+              ],
+              "text": "    cobra.OnInitialize(func() {\n        fmt.Println(\"loading config\")\n    })"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "Its counterpart runs after everything else.",
+              "notes": [
+                {
+                  "on": "cobra.OnFinalize(",
+                  "text": "Runs last, once the command is done"
+                }
+              ],
+              "text": "    cobra.OnFinalize(func() {\n        fmt.Println(\"closing\")\n    })"
+            },
+            {
+              "mode": "ghost",
+              "line": 25,
+              "guide": "A hook and `Run` between the two.",
+              "text": "    root := &cobra.Command{\n        Use:    \"app\",\n        PreRun: say(\"checking\"),\n        Run:    say(\"serving\"),\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 30,
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "loading config\nchecking\nserving\nclosing"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "help-skips-hooks",
+          "title": "Hooks and --help",
+          "guide": "The user runs `app --help`. What happens to the hooks?",
+          "code": "root := &cobra.Command{\n    Use:              \"app\",\n    PersistentPreRun: say(\"setup\"),\n    PreRun:           say(\"check\"),\n    Run:              say(\"running\"),\n}\nroot.Execute()",
+          "options": [
+            "Setup, check and running, then the help",
+            "Setup, then the help text",
+            "Only the help text: no hook and no Run",
+            "Check and running, then the help text"
+          ],
+          "answer": 2,
+          "explanation": "Cobra sees the help flag before it calls any hook, prints the help and stops. Neither the hooks nor `Run` are reached."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "id": "help-and-usage",
+  "intro": {"title": "Help and usage", "slides": [{"text": "Cobra writes the help of every command for you. What you set on a command (a summary, a description, examples, flags) is what people read when they ask for help."}, {"text": "Two texts come out of it. The **help** is the full screen shown by `--help`. The **usage** is its short part: the usage line, the examples and the flags.\n\nThe snippet is pseudo code.", "code": "help  = description\n      + usage\nusage = usage line\n      + examples\n      + flags"}]},
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {"title": "Describing a command", "slides": [{"text": "Every field you set lands in a fixed place of the help screen. Cobra only fills the layout in.\n\nThe snippet is the shape of that text, with each part named.", "code": "<description>\n\nUsage:\n  <usage line> [flags]\n\nExamples:\n  <examples>\n\nFlags:\n  <flags and their text>"}, {"text": "The flags come with the text you gave them, and with their default when it is not empty. The commands of a parent are listed by their short summary."}]},
+      "exercises": [
+        {"type": "typing", "id": "long-in-help", "title": "Long in the help", "guide": "Set both descriptions, then see which one `--help` shows.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Hello\")\n}\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 15, "guide": "Create the root command. Its **Short** is a one-line summary.", "notes": [{"on": "Short", "text": "One line that says what the command does"}], "text": "    root := &cobra.Command{\n        Use:   \"app\",\n        Short: \"Say hello\",\n        Run:   greet,\n    }"},
+            {"mode": "ghost", "line": 18, "guide": "Add a longer description. When it is set, `--help` shows it instead of the short one.", "notes": [{"on": "Long", "text": "Opens the command's own help screen"}], "text": "        Long:  \"Say hello to someone by name.\","}
+          ],
+          "output": {"command": "go run main.go --help", "text": "Say hello to someone by name.\n\nUsage:\n  app [flags]\n\nFlags:\n  -h, --help   help for app"}
+        },
+        {"type": "typing", "id": "example-field", "title": "Examples in the help", "guide": "Show how the command is called. Add the arguments to `Use` and a couple of examples.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Hello\")\n}\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 15, "guide": "The first word of `Use` is the command name. Words after it only document the arguments.", "notes": [{"on": "[name]", "text": "Square brackets mark an optional argument"}], "text": "    root := &cobra.Command{\n        Use:     \"greet [name]\",\n        Short:   \"Greets someone by name\",\n        Run:     greet,\n    }"},
+            {"mode": "ghost", "line": 18, "guide": "Add usage examples. Cobra prints them as they are, so start each line with spaces.", "notes": [{"on": "Example", "text": "Appears under Examples in the help"}], "text": "        Example: \"  greet Ana\\n  greet Luz\","}
+          ],
+          "output": {"command": "go run main.go --help", "text": "Greets someone by name\n\nUsage:\n  greet [name] [flags]\n\nExamples:\n  greet Ana\n  greet Luz\n\nFlags:\n  -h, --help   help for greet"}
+        },
+        {"type": "typing", "id": "flag-usage", "title": "Flags in the help", "guide": "Add two flags and read how `--help` lists them with their text and default.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Hello\")\n}\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "copy", "line": 15, "guide": "Copy the command. It has no Short.", "text": "    root := &cobra.Command{\n        Use: \"greet\",\n        Run: greet,\n    }"},
+            {"mode": "ghost", "line": 19, "guide": "The last text of each flag is the description `--help` shows next to it.", "notes": [{"on": "\"who to greet\"", "text": "The help column for this flag"}, {"on": "\"world\"", "text": "The default, which the help adds for you"}], "text": "    root.Flags().StringP(\n        \"name\", \"n\", \"world\",\n        \"who to greet\",\n    )\n    root.Flags().Bool(\n        \"shout\", false, \"print in capitals\",\n    )"}
+          ],
+          "output": {"command": "go run main.go --help", "text": "Usage:\n  greet [flags]\n\nFlags:\n  -h, --help          help for greet\n  -n, --name string   who to greet (default \"world\")\n      --shout         print in capitals"}
+        },
+        {"type": "fill-blank", "id": "example-and-flag", "title": "Examples and a flag", "guide": "Fill the field that holds the usage examples, and the method that adds a string flag with a letter.", "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    root := &cobra.Command{\n        Use:     \"greet [name]\",\n        ___:     \"  greet Ana\",\n    }\n    root.Flags().___(\n        \"name\", \"n\", \"world\", \"who to greet\",\n    )\n    root.Execute()\n}", "gaps": [{"answers": ["Example"]}, {"answers": ["StringP"]}]},
+        {"type": "typing", "id": "usage-placeholder", "title": "Name the value", "guide": "Rename the value of a flag in the help by wrapping a word of its text in backticks.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Hello\")\n}\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "copy", "line": 15, "guide": "Copy the command.", "text": "    root := &cobra.Command{\n        Use:   \"greet\",\n        Short: \"Say hi\",\n        Run:   greet,\n    }"},
+            {"mode": "ghost", "line": 20, "guide": "A word in backticks becomes the name of the value in the help, in place of its type.", "notes": [{"on": "`file`", "text": "Shown as the value name and as plain text"}], "text": "    root.Flags().StringP(\n        \"file\", \"f\", \"\",\n        \"read names from `file`\",\n    )"}
+          ],
+          "output": {"command": "go run main.go --help", "text": "Say hi\n\nUsage:\n  greet [flags]\n\nFlags:\n  -f, --file file   read names from file\n  -h, --help        help for greet"}
+        },
+        {"type": "quiz", "id": "short-in-the-list", "title": "Where does Short show up?", "guide": "Pick where the `Short` of `serve` is printed.", "code": "root := &cobra.Command{Use: \"app\"}\nroot.AddCommand(&cobra.Command{\n    Use:   \"serve\",\n    Short: \"Start the server\",\n    Long:  \"Start the server and wait\\n\" +\n        \"for requests until stopped.\",\n    Run:   serve,\n})\nroot.Execute()", "options": ["At the top of serve --help, next to Long", "In the command list of app --help", "In the usage line of serve", "In the flag list of app --help"], "answer": 1, "explanation": "The parent lists each command with its `Short`. The help of `serve` itself starts with its `Long`, because it has one."}
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {"title": "Asking for help", "slides": [{"text": "Help is on without any code: `--help` and `-h` on every command, and a `help` command on a command with subcommands."}, {"text": "From the code you can print the help or only the usage, or take the usage as a string to build your own message. A command can also carry a version, which gets its own flag."}, {"text": "`--version` prints the command name and the version, like `greet version 1.2.0`. `SetVersionTemplate` replaces that text with a template of your own, as in this pseudo code, filled from the command: `{{.Version}}` becomes the version.", "code": "template: v{{.Version}}\nresult:   v1.2.0"}]},
+      "exercises": [
+        {"type": "typing", "id": "help-when-empty", "title": "Help from the code", "guide": "When no name is passed, print the command's help from inside its function.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 10, "guide": "With no name, show the help and stop. Otherwise greet the name.", "notes": [{"on": "cmd.Help()", "text": "Prints the same text as --help"}], "text": "func greet(cmd *cobra.Command, args []string) {\n    if len(args) == 0 {\n        cmd.Help()\n        return\n    }\n    fmt.Println(\"Hello,\", args[0])\n}\n"},
+            {"mode": "ghost", "line": 19, "guide": "Create the root command. It takes an optional name.", "text": "    root := &cobra.Command{\n        Use:   \"greet [name]\",\n        Short: \"Greets someone by name\",\n        Run:   greet,\n    }"}
+          ],
+          "output": {"command": "go run main.go", "text": "Greets someone by name\n\nUsage:\n  greet [name] [flags]\n\nFlags:\n  -h, --help   help for greet"}
+        },
+        {"type": "typing", "id": "usage-string", "title": "The usage as text", "guide": "A missing flag deserves a message and the usage, not the whole help. Get the usage as a string.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 10, "guide": "Read the flag. When it is empty, print a message and then the usage text.", "notes": [{"on": "UsageString", "text": "Returns the usage text instead of printing it"}, {"on": "fmt.Print(", "text": "Print, not Println: the text ends in a newline"}], "text": "func greet(cmd *cobra.Command, args []string) {\n    name, _ := cmd.Flags().GetString(\"name\")\n    if name == \"\" {\n        fmt.Println(\"name is required\")\n        fmt.Print(cmd.UsageString())\n        return\n    }\n    fmt.Println(\"Hello,\", name)\n}\n"},
+            {"mode": "ghost", "line": 21, "guide": "Create the command and its `--name` flag.", "text": "    root := &cobra.Command{\n        Use: \"greet\",\n        Run: greet,\n    }\n    root.Flags().StringP(\n        \"name\", \"n\", \"\", \"who to greet\",\n    )"}
+          ],
+          "output": {"command": "go run main.go", "text": "name is required\nUsage:\n  greet [flags]\n\nFlags:\n  -h, --help          help for greet\n  -n, --name string   who to greet"}
+        },
+        {"type": "typing", "id": "version-flag", "title": "A version flag", "guide": "Give the command a version, then print it with `--version`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Hello\")\n}\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 15, "guide": "Setting a version adds a `--version` flag to the command.", "notes": [{"on": "Version", "text": "Adds the --version flag"}], "text": "    root := &cobra.Command{\n        Use:     \"greet\",\n        Version: \"1.2.0\",\n        Run:     greet,\n    }"},
+            {"mode": "ghost", "line": 20, "guide": "Change how the version is printed. The template is filled with the command's fields.", "notes": [{"on": "{{.Version}}", "text": "Placeholder filled with the command's Version"}], "text": "    root.SetVersionTemplate(\"v{{.Version}}\\n\")"}
+          ],
+          "output": {"command": "go run main.go --version", "text": "v1.2.0"}
+        },
+        {"type": "fill-blank", "id": "help-and-version", "title": "Help and version", "guide": "Give the command a number that adds a `--version` flag, and print the full help from inside the function.", "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    root := &cobra.Command{\n        ___: \"1.2.0\",\n        Run: func(c *cobra.Command, _ []string) {\n            c.___()\n        },\n    }\n    root.Execute()\n}", "gaps": [{"answers": ["Version"]}, {"answers": ["Help"]}]},
+        {"type": "quiz", "id": "two-ways-to-help", "title": "Two ways to ask for help", "guide": "Pick the true statement about getting the help of `greet`.", "code": "root := &cobra.Command{Use: \"app\"}\nroot.AddCommand(&cobra.Command{\n    Use:   \"greet\",\n    Short: \"Say hello\",\n    Run:   greet,\n})\nroot.Execute()", "options": ["Both print the same help", "Only app greet --help", "Only app help greet", "Neither: greet must define its own help"], "answer": 0, "explanation": "Every command gets a `--help` flag, and a root with subcommands also gets a `help` command. Neither needs any code."}
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {"title": "Shaping the help", "slides": [{"text": "Some things should not show in the help: a command for you only, a flag nobody should use, an old name on its way out. Cobra can hide or retire them without deleting code."}, {"text": "When the built-in text is not what you want, give Cobra your own function for the help, or keep the layout and change a template.\n\nA template is text with placeholders in double braces, filled from the command. The snippet is pseudo code.", "code": "template: Usage: {{ usage line }}\nresult:   Usage: greet [flags]"}]},
+      "exercises": [
+        {"type": "typing", "id": "hidden-command", "title": "A hidden command", "guide": "Add a visible command and a hidden one, then run the hidden one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc show(cmd *cobra.Command, args []string) {\n    fmt.Println(\"running\", cmd.Name())\n}\n\nfunc main() {\n    root := &cobra.Command{Use: \"app\"}\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 16, "guide": "A normal command: it will be listed in the help of `app`.", "text": "    root.AddCommand(&cobra.Command{\n        Use:   \"status\",\n        Short: \"Show the status\",\n        Run:   show,\n    })"},
+            {"mode": "ghost", "line": 21, "guide": "A command for developers. Keep it out of the help lists. It still runs when called by name.", "notes": [{"on": "Hidden", "text": "Left out of the help, but still works"}], "text": "    root.AddCommand(&cobra.Command{\n        Use:    \"debug\",\n        Short:  \"Print debug info\",\n        Hidden: true,\n        Run:    show,\n    })"}
+          ],
+          "output": {"command": "go run main.go debug", "text": "running debug"}
+        },
+        {"type": "typing", "id": "hidden-flag", "title": "A hidden flag", "guide": "Add a flag that works but is left out of the help.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Hello\")\n}\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "copy", "line": 15, "guide": "Copy the command.", "text": "    root := &cobra.Command{\n        Use:   \"greet\",\n        Short: \"Say hi\",\n        Run:   greet,\n    }"},
+            {"mode": "ghost", "line": 20, "guide": "Add two flags, then hide the second one from the help.", "notes": [{"on": "MarkHidden", "text": "Leaves the flag out of the help, still usable"}], "text": "    root.Flags().String(\n        \"name\", \"world\", \"who to greet\",\n    )\n    root.Flags().Bool(\n        \"trace\", false, \"print traces\",\n    )\n    root.Flags().MarkHidden(\"trace\")"}
+          ],
+          "output": {"command": "go run main.go --help", "text": "Say hi\n\nUsage:\n  greet [flags]\n\nFlags:\n  -h, --help          help for greet\n      --name string   who to greet (default \"world\")"}
+        },
+        {"type": "fill-blank", "id": "hide-from-help", "title": "Hide from the help", "guide": "Keep the `debug` command out of the help lists, and keep the `trace` flag out of the help.", "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(&cobra.Command{\n        Use:    \"debug\",\n        ___:    true,\n    })\n    root.Flags().Bool(\"trace\", false, \"\")\n    root.Flags().___(\"trace\")\n    root.Execute()\n}", "gaps": [{"answers": ["Hidden"]}, {"answers": ["MarkHidden"]}]},
+        {"type": "typing", "id": "deprecated-command", "title": "A deprecated command", "guide": "Retire an old command: it stays but points to its replacement.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Hello\")\n}\n\nfunc main() {\n    root := &cobra.Command{Use: \"app\"}\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "copy", "line": 16, "guide": "Copy the new command.", "text": "    root.AddCommand(&cobra.Command{\n        Use: \"greet\",\n        Run: greet,\n    })"},
+            {"mode": "ghost", "line": 20, "guide": "The old name keeps working. Its message tells the user what to use now.", "notes": [{"on": "Deprecated", "text": "Hides the command and warns when it runs"}], "text": "    root.AddCommand(&cobra.Command{\n        Use:        \"hello\",\n        Short:      \"Say hello\",\n        Deprecated: \"use greet instead\",\n        Run:        greet,\n    })"}
+          ],
+          "output": {"command": "go run main.go hello", "text": "Command \"hello\" is deprecated, use greet instead\nHello"}
+        },
+        {"type": "typing", "id": "help-func", "title": "Your own help", "guide": "Replace the help of the command with a function of your own.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Hello\")\n}\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "ghost", "line": 14, "guide": "Cobra calls this function instead of printing its help. It gets the command that was asked about.", "notes": [{"on": "cmd.Short", "text": "Fields of the command can be used here"}], "text": "func help(cmd *cobra.Command, args []string) {\n    fmt.Println(cmd.Short)\n    fmt.Println(\"Pass a name, nothing else.\")\n}\n"},
+            {"mode": "copy", "line": 20, "guide": "Copy the command.", "text": "    root := &cobra.Command{\n        Use:   \"greet\",\n        Short: \"Say hi\",\n        Run:   greet,\n    }"},
+            {"mode": "ghost", "line": 25, "guide": "Use the function as the help of this command.", "notes": [{"on": "SetHelpFunc", "text": "Replaces what --help prints"}], "text": "    root.SetHelpFunc(help)"}
+          ],
+          "output": {"command": "go run main.go --help", "text": "Say hi\nPass a name, nothing else."}
+        },
+        {"type": "typing", "id": "usage-template", "title": "Your own usage", "guide": "Keep the help layout but change the usage part with a template.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc greet(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Hello\")\n}\n\nfunc main() {\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "copy", "line": 15, "guide": "Copy the command.", "text": "    root := &cobra.Command{\n        Use:   \"greet\",\n        Short: \"Say hi\",\n        Run:   greet,\n    }"},
+            {"mode": "ghost", "line": 20, "guide": "A template is text with placeholders in double braces. Cobra fills them from the command.", "notes": [{"on": "{{.UseLine}}", "text": "The usage line, like greet [flags]"}, {"on": "FlagUsages", "text": "The flags, laid out as in the help"}], "text": "    root.SetUsageTemplate(\n        \"Usage: {{.UseLine}}\\n\\n\" +\n        \"{{.LocalFlags.FlagUsages}}\",\n    )"}
+          ],
+          "output": {"command": "go run main.go --help", "text": "Say hi\n\nUsage: greet [flags]\n\n  -h, --help   help for greet"}
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "id": "subcommands",
+  "intro": {
+    "title": "Subcommands",
+    "slides": [
+      {
+        "text": "Big tools are split into **subcommands**: `git commit`, `docker run`, `go build`. Each one does one job, and each has its own code.\n\nIn cobra, the root command is the tool and every subcommand hangs from it, like a tree. The sketch below is not Go.",
+        "code": "app\n├── greet           app greet\n└── config          app config\n    └── set         app config set"
+      },
+      {
+        "text": "Two sessions:\n\n- **Session 1:** create a subcommand, attach it to the root and read its name\n- **Session 2:** subcommands inside subcommands, deeper trees and listing the children of a command"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Adding subcommands",
+        "slides": [
+          {
+            "text": "A subcommand is a `*cobra.Command`, built the same way as the root: it has its own `Use` and its own `Run`."
+          },
+          {
+            "text": "A command does not become a subcommand by existing. You must attach it with `AddCommand`, on the command that will be its parent.\n\nOnly the first word of `Use` is the name you type. The rest is usage text.",
+            "code": "serve := &cobra.Command{Use: \"serve\"}\nroot.AddCommand(serve)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "first-subcommand",
+          "title": "Add a subcommand",
+          "guide": "Create a subcommand and attach it to the root.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "The imports are already in the file. Create the root command, named `app`.", "text": "    root := &cobra.Command{Use: \"app\"}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Create the `greet` subcommand. It is a command like the root, with its own `Run`.", "notes": [{"on": "\"greet\"", "text": "The word typed after the app name to run it"}], "text": "    greet := &cobra.Command{\n        Use:   \"greet\",\n        Short: \"Say hello\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"hello\")\n        },\n    }\n"},
+            {"mode": "ghost", "line": 21, "guide": "Attach it to the root, so `app greet` works.", "notes": [{"on": "AddCommand", "text": "Makes greet a subcommand of root"}], "text": "    root.AddCommand(greet)\n"},
+            {"mode": "ghost", "line": 23, "guide": "Run the root command, and exit with 1 on an error.", "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go greet",
+            "text": "hello"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "attach-bye",
+          "title": "Attach the command",
+          "guide": "Fill the method that attaches `bye` to the root, and the field that sets the word typed to run it.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    root := &cobra.Command{Use: \"app\"}\n    bye := &cobra.Command{___: \"bye\"}\n    root.___(bye)\n    root.Execute()\n}",
+          "gaps": [
+            {"answers": ["Use"]},
+            {"answers": ["AddCommand"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "two-subcommands",
+          "title": "Two subcommands",
+          "guide": "Share one `Run` between two subcommands, and add both at once.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "A function that prints the name of the command that ran.", "notes": [{"on": "cmd.Name()", "text": "The first word of the Use field"}], "text": "func say(cmd *cobra.Command, args []string) {\n    fmt.Println(cmd.Name())\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "Create the root and the `up` and `down` subcommands. Both use `say`.", "text": "    root := &cobra.Command{Use: \"app\"}\n    up := &cobra.Command{Use: \"up\", Run: say}\n    down := &cobra.Command{Use: \"down\", Run: say}\n"},
+            {"mode": "ghost", "line": 19, "guide": "One call can attach several subcommands.", "notes": [{"on": "up, down", "text": "AddCommand takes as many commands as you give it"}], "text": "    root.AddCommand(up, down)\n"},
+            {"mode": "auto", "line": 21, "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go down",
+            "text": "down"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "which-exist",
+          "title": "Which commands run?",
+          "guide": "Read the code, then pick what you can run from the terminal.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc noop(*cobra.Command, []string) {}\n\nvar ping = &cobra.Command{Use: \"ping\", Run: noop}\nvar pong = &cobra.Command{Use: \"pong\", Run: noop}\n\nfunc main() {\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(ping)\n    root.Execute()\n}",
+          "options": ["`app ping` and `app pong`", "Only `app ping`", "Only `app pong`", "Neither, since the root has no Run"],
+          "answer": 1,
+          "explanation": "A command is a subcommand only once it is attached. `pong` exists as a variable, but the root never learned about it."
+        },
+        {
+          "type": "typing",
+          "id": "command-path",
+          "title": "Name and path",
+          "guide": "Print the name and the full path of a subcommand.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "The root is `app`. In `Use`, only the first word is the name.", "notes": [{"on": "\"info [topic]\"", "text": "Words after the name are only usage text"}, {"on": "cmd.CommandPath()", "text": "The whole chain of commands, from the root"}], "text": "    root := &cobra.Command{Use: \"app\"}\n\n    info := &cobra.Command{\n        Use: \"info [topic]\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(cmd.Name())\n            fmt.Println(cmd.CommandPath())\n        },\n    }\n"},
+            {"mode": "auto", "line": 21, "text": "    root.AddCommand(info)\n\n    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go info",
+            "text": "info\napp info"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "root-with-run",
+          "title": "What does `app` run?",
+          "guide": "Read the code, then pick what runs when you type `app` alone.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc home(*cobra.Command, []string)  {}\nfunc other(*cobra.Command, []string) {}\n\nfunc main() {\n    root := &cobra.Command{Use: \"app\", Run: home}\n    sub := &cobra.Command{Use: \"sub\", Run: other}\n    root.AddCommand(sub)\n    root.Execute()\n}",
+          "options": ["other, the only subcommand", "Neither, it shows the help", "home", "home, then other"],
+          "answer": 2,
+          "explanation": "With no subcommand typed, cobra runs the root's own `Run`. The help appears only when the root has no `Run`."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Nesting and structure",
+        "slides": [
+          {
+            "text": "Any command can hold subcommands, not only the root. A command that only groups others usually has no `Run`: when you run it alone, cobra shows its help."
+          },
+          {
+            "text": "Every command knows its parent, so `CommandPath` joins the names from the root down, however deep the tree is. `Commands()` goes the other way: it returns the subcommands a command holds, sorted by name.",
+            "code": "kids := cmd.Commands()"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "nested-subcommands",
+          "title": "Nested subcommands",
+          "guide": "Build `app config set`: a subcommand inside a subcommand.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "Create the root and `config`, a parent with no `Run` of its own.", "text": "    root := &cobra.Command{Use: \"app\"}\n    config := &cobra.Command{Use: \"config\"}\n"},
+            {"mode": "ghost", "line": 14, "guide": "Create `set`. It prints its full path.", "text": "    set := &cobra.Command{\n        Use: \"set\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(cmd.CommandPath())\n        },\n    }\n"},
+            {"mode": "ghost", "line": 21, "guide": "Build the tree from the bottom: `set` under `config`, then `config` under the root.", "notes": [{"on": "config.AddCommand(set)", "text": "Any command can hold subcommands, not only the root"}], "text": "    config.AddCommand(set)\n    root.AddCommand(config)\n"},
+            {"mode": "ghost", "line": 24, "guide": "Run the root command.", "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go config set",
+            "text": "app config set"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "parent-without-run",
+          "title": "What does `app config` do?",
+          "guide": "Read the code, then pick what happens when you run `app config`.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc noop(*cobra.Command, []string) {}\n\nfunc main() {\n    root := &cobra.Command{Use: \"app\"}\n    config := &cobra.Command{Use: \"config\"}\n    get := &cobra.Command{Use: \"get\", Run: noop}\n    config.AddCommand(get)\n    root.AddCommand(config)\n    root.Execute()\n}",
+          "options": ["Shows help that lists get", "Runs get, since it is the only child", "Fails because config has no Run", "Runs nothing and prints nothing"],
+          "answer": 0,
+          "explanation": "A command without a `Run` cannot do any work, so cobra shows its help, which lists its subcommands."
+        },
+        {
+          "type": "fill-blank",
+          "id": "place-the-commands",
+          "title": "Place the commands",
+          "guide": "Build `app config get`. Fill the command that each `AddCommand` call is made on.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc main() {\n    root := &cobra.Command{Use: \"app\"}\n    config := &cobra.Command{Use: \"config\"}\n    get := &cobra.Command{Use: \"get\"}\n    ___.AddCommand(get)\n    ___.AddCommand(config)\n    root.Execute()\n}",
+          "gaps": [
+            {"answers": ["config"]},
+            {"answers": ["root"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "deep-tree",
+          "title": "A tree three levels deep",
+          "guide": "Build `app db migrate up` and `down`, two siblings that share one `Run`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 10, "guide": "Print the full path of the command that ran.", "text": "func show(cmd *cobra.Command, args []string) {\n    fmt.Println(cmd.CommandPath())\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "Only the two leaves have a `Run`.", "text": "    root := &cobra.Command{Use: \"app\"}\n    db := &cobra.Command{Use: \"db\"}\n    migrate := &cobra.Command{Use: \"migrate\"}\n    up := &cobra.Command{Use: \"up\", Run: show}\n    down := &cobra.Command{Use: \"down\", Run: show}\n"},
+            {"mode": "ghost", "line": 21, "guide": "Attach from the bottom: the leaves first, the root last.", "notes": [{"on": "db.AddCommand(migrate)", "text": "Each command has one parent, however deep it sits"}], "text": "    migrate.AddCommand(up, down)\n    db.AddCommand(migrate)\n    root.AddCommand(db)\n"},
+            {"mode": "auto", "line": 25, "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go db migrate down",
+            "text": "app db migrate down"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "list-children",
+          "title": "List the children",
+          "guide": "Make `config` print the names of its own subcommands.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 11, "guide": "The root of the tool.", "text": "    root := &cobra.Command{Use: \"app\"}\n"},
+            {"mode": "ghost", "line": 13, "guide": "The parent walks over its subcommands in its `Run`.", "notes": [{"on": "cmd.Commands()", "text": "The subcommands of this command, sorted by name"}], "text": "    config := &cobra.Command{\n        Use: \"config\",\n        Run: func(cmd *cobra.Command, args []string) {\n            for _, child := range cmd.Commands() {\n                fmt.Println(child.Name())\n            }\n        },\n    }\n"},
+            {"mode": "ghost", "line": 22, "guide": "Two children for `config`.", "text": "    get := &cobra.Command{Use: \"get\"}\n    set := &cobra.Command{Use: \"set\"}\n"},
+            {"mode": "ghost", "line": 25, "guide": "Build the tree from the bottom.", "text": "    config.AddCommand(get, set)\n    root.AddCommand(config)\n"},
+            {"mode": "auto", "line": 28, "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go config",
+            "text": "get\nset"
+          }
+        }
+      ]
+    }
+  ]
+}

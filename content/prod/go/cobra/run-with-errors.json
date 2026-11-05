@@ -1,0 +1,618 @@
+{
+  "id": "run-with-errors",
+  "intro": {
+    "title": "Run with errors",
+    "slides": [
+      {
+        "text": "A command does real work, and real work fails: a server is down, a file is missing, a value makes no sense. `Run` has nowhere to send the failure. `RunE` does: it returns an `error`, and cobra carries it back to `main`.\n\nThe snippet is pseudo code, not Go.",
+        "code": "RunE(cmd, args):\n    do the work\n    if it failed: return the error\n    return nil\n\nExecute():\n    run the command\n    return what RunE returned"
+      },
+      {
+        "text": "`nil` means success, any other error means failure. If a command sets both `Run` and `RunE`, cobra runs `RunE`."
+      },
+      {
+        "text": "Three sessions:\n\n- **Session 1:** return an error and exit with a failing code\n- **Session 2:** control what cobra prints when a command fails\n- **Session 3:** exit codes, `os.Exit` and checking input"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Returning an error",
+        "slides": [
+          {
+            "text": "A `RunE` function has the same two parameters as `Run`, plus a result of type `error`. Return `nil` when it worked, or an error when it did not. The function is often a named one, and the command points at it.",
+            "code": "func run(\n    cmd *cobra.Command,\n    args []string,\n) error {\n    return nil\n}"
+          },
+          {
+            "text": "When `RunE` returns an error, cobra prints `Error:` and the message to stderr, then the usage of the command. The usage helps after a mistyped flag, but it is noise when the work itself failed. `SilenceUsage: true` on the command turns it off."
+          },
+          {
+            "text": "Cobra does not end the program: `Execute` returns the error, so `main` checks it and exits. A nonzero exit code is how a shell or a script knows the command failed.\n\nThe snippet is pseudo code, not Go.",
+            "code": "err = Execute()\nif err is not nil:\n    exit with code 1"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "run-e",
+          "title": "A run that returns an error",
+          "guide": "Write the function that does the work, and attach it to the command.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The package and the import are already in the file. The function returns an `error`: `nil` when all went well.",
+              "notes": [
+                {
+                  "on": "_ *cobra.Command, _ []string",
+                  "text": "Cobra passes the command and its arguments"
+                },
+                {
+                  "on": "return nil",
+                  "text": "nil tells cobra the command worked"
+                }
+              ],
+              "text": "func run(_ *cobra.Command, _ []string) error {\n    fmt.Println(\"deployed\")\n    return nil\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "Attach the function with `RunE`, then execute.",
+              "notes": [
+                {
+                  "on": "RunE: run",
+                  "text": "Like Run, but for a function that returns an error"
+                }
+              ],
+              "text": "    cmd := &cobra.Command{\n        Use:  \"deploy\",\n        RunE: run,\n    }\n    cmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "deployed"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "fail-with-error",
+          "title": "Fail with an error",
+          "guide": "Return an error from the command, and exit with a failing code.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"errors\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The package and the imports are already in the file. Return an error instead of `nil`.",
+              "text": "func run(_ *cobra.Command, _ []string) error {\n    return errors.New(\"no server set\")\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "Build the command. Cobra prints the usage after an error unless you ask it not to.",
+              "notes": [
+                {
+                  "on": "SilenceUsage: true",
+                  "text": "Without it, cobra prints the usage after the error"
+                }
+              ],
+              "text": "    cmd := &cobra.Command{\n        Use:          \"deploy\",\n        SilenceUsage: true,\n        RunE:         run,\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 20,
+              "guide": "`Execute` returns the error. Exit with a failing code when there is one.",
+              "notes": [
+                {
+                  "on": "cmd.Execute()",
+                  "text": "Returns the error that RunE returned"
+                },
+                {
+                  "on": "os.Exit(1)",
+                  "text": "A nonzero code tells the shell the command failed"
+                }
+              ],
+              "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Error: no server set\nexit status 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "print-before-fail",
+          "title": "What does it print?",
+          "guide": "`pack` uses `run` as its `RunE`, with `SilenceUsage` on. It starts with no arguments.",
+          "code": "func run(_ *cobra.Command, args []string) error {\n    fmt.Println(\"packing\")\n    if len(args) == 0 {\n        return errors.New(\"no files\")\n    }\n    fmt.Println(\"packed\")\n    return nil\n}",
+          "options": [
+            "packing, then packed",
+            "packing, then Error: no files",
+            "Error: no files",
+            "packing, Error: no files, then packed"
+          ],
+          "answer": 1,
+          "explanation": "`packing` prints before the check. The `return` leaves `run` right there, so `packed` never prints, and cobra then prints the error."
+        },
+        {
+          "type": "typing",
+          "id": "hand-over-the-work",
+          "title": "Pass the work to a function",
+          "guide": "Let `RunE` pass its argument to a plain function and return the error.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The package and the imports are already in the file. A plain function does the work and returns an error.",
+              "text": "func connect(host string) error {\n    return fmt.Errorf(\"%s is down\", host)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`RunE` only passes the first argument on and returns whatever comes back.",
+              "text": "func run(_ *cobra.Command, args []string) error {\n    return connect(args[0])\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "`ExactArgs(1)` makes sure `args[0]` exists.",
+              "text": "    cmd := &cobra.Command{\n        Use:          \"ping\",\n        SilenceUsage: true,\n        Args:         cobra.ExactArgs(1),\n        RunE:         run,\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 25,
+              "guide": "Execute, and exit when it fails.",
+              "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go db1",
+            "text": "Error: db1 is down\nexit status 1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "run-e-gaps",
+          "title": "Complete the command",
+          "guide": "Fill the type a `RunE` function returns, and the field that holds it.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc run(_ *cobra.Command, _ []string) ___ {\n    return nil\n}\n\nfunc main() {\n    cmd := &cobra.Command{Use: \"sync\", ___: run}\n    cmd.Execute()\n}",
+          "gaps": [
+            {
+              "answers": [
+                "error"
+              ]
+            },
+            {
+              "answers": [
+                "RunE"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Who prints what",
+        "slides": [
+          {
+            "text": "Cobra checks the arguments and the flags before it calls `RunE`. If they are wrong, an error plus the usage is the right answer: the user typed it badly. If `RunE` fails later, the typing was fine, so the usage is noise.\n\nThe snippet is pseudo code, not Go.",
+            "code": "check arguments and flags\n    wrong: error and usage\ncall RunE\n    fails: error only"
+          },
+          {
+            "text": "A command can switch the usage off by itself, at the first line of its function, once the input was accepted. Anything that fails from then on prints no usage."
+          },
+          {
+            "text": "`SilenceErrors` stops cobra from printing the `Error:` line. Then `main` prints the error its own way, with its own prefix. Print it in one place only: if cobra prints it too, the user reads it twice.\n\nBoth settings, put on the root command, also apply to every subcommand, and an error from a subcommand comes back from the root `Execute`."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "usage-in-run",
+          "title": "Silence the usage inside run",
+          "guide": "Switch the usage off at the first line of `run`, when the input was already accepted.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"errors\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The package and the imports are already in the file. Cobra has checked the arguments by the time `run` starts.",
+              "notes": [
+                {
+                  "on": "cmd.SilenceUsage = true",
+                  "text": "The input was fine, so a failure now needs no usage"
+                }
+              ],
+              "text": "func run(cmd *cobra.Command, _ []string) error {\n    cmd.SilenceUsage = true\n    return errors.New(\"host unreachable\")\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "A wrong number of arguments is cobra's error and still shows the usage.",
+              "text": "    cmd := &cobra.Command{\n        Use:  \"fetch\",\n        Args: cobra.ExactArgs(1),\n        RunE: run,\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "Execute, and exit when it fails.",
+              "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go example.com",
+            "text": "Error: host unreachable\nexit status 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "bad-arguments",
+          "title": "What does cobra print?",
+          "guide": "`sync` starts with no arguments. Pick what cobra prints.",
+          "code": "func run(cmd *cobra.Command, _ []string) error {\n    cmd.SilenceUsage = true\n    return errors.New(\"disk full\")\n}\n\nvar sync = &cobra.Command{\n    Use:  \"sync\",\n    Args: cobra.ExactArgs(1),\n    RunE: run,\n}",
+          "options": [
+            "Error: disk full",
+            "Error: disk full, then the usage text",
+            "An error about the arguments, then the usage text",
+            "Only an error about the arguments, no usage text"
+          ],
+          "answer": 2,
+          "explanation": "`ExactArgs(1)` fails before `run` starts, so `SilenceUsage` is never set. Cobra prints the arguments error and the usage."
+        },
+        {
+          "type": "fill-blank",
+          "id": "quiet-run",
+          "title": "Quiet failure",
+          "guide": "Keep the usage out of a failure, and report success.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc run(cmd *cobra.Command, _ []string) error {\n    cmd.___ = true\n    return ___\n}\n\nfunc main() {\n    cmd := &cobra.Command{Use: \"fetch\", RunE: run}\n    cmd.Execute()\n}",
+          "gaps": [
+            {
+              "answers": [
+                "SilenceUsage"
+              ]
+            },
+            {
+              "answers": [
+                "nil"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "own-error-line",
+          "title": "Print the error yourself",
+          "guide": "Silence cobra's error line and print your own in `main`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"errors\"\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The package and the imports are already in the file.",
+              "text": "func run(_ *cobra.Command, _ []string) error {\n    return errors.New(\"disk full\")\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "Turn off the usage and the `Error:` line.",
+              "notes": [
+                {
+                  "on": "SilenceErrors: true",
+                  "text": "Cobra stops printing the Error line itself"
+                }
+              ],
+              "text": "    cmd := &cobra.Command{\n        Use:           \"backup\",\n        SilenceUsage:  true,\n        SilenceErrors: true,\n        RunE:          run,\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "Now `main` reports the error, in its own words.",
+              "notes": [
+                {
+                  "on": "os.Stderr",
+                  "text": "Errors go to stderr, apart from normal output"
+                }
+              ],
+              "text": "    if err := cmd.Execute(); err != nil {\n        fmt.Fprintln(os.Stderr, \"backup:\", err)\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "backup: disk full\nexit status 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "printed-twice",
+          "title": "What does it print?",
+          "guide": "`run` always returns the error `disk full`.",
+          "code": "var backup = &cobra.Command{\n    Use:          \"backup\",\n    SilenceUsage: true,\n    RunE:         run,\n}\n\nfunc main() {\n    if err := backup.Execute(); err != nil {\n        fmt.Println(\"failed:\", err)\n    }\n}",
+          "options": [
+            "failed: disk full",
+            "Error: disk full",
+            "failed: disk full, then Error: disk full",
+            "Error: disk full, then failed: disk full"
+          ],
+          "answer": 3,
+          "explanation": "`Execute` prints `Error: disk full` before it returns, because `SilenceErrors` is off. Then `main` prints its own line, so the user reads the error twice."
+        },
+        {
+          "type": "typing",
+          "id": "subcommand-error",
+          "title": "Errors climb to the root",
+          "guide": "Fail inside a subcommand and let the root command exit.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"errors\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The package and the imports are already in the file.",
+              "text": "func run(_ *cobra.Command, _ []string) error {\n    return errors.New(\"no server set\")\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "A subcommand with a function that fails.",
+              "text": "    deploy := &cobra.Command{\n        Use:  \"deploy\",\n        RunE: run,\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Silence the usage on the root and add the subcommand.",
+              "notes": [
+                {
+                  "on": "SilenceUsage: true",
+                  "text": "Set on the root, it applies to every subcommand"
+                }
+              ],
+              "text": "    root := &cobra.Command{\n        Use:          \"app\",\n        SilenceUsage: true,\n    }\n    root.AddCommand(deploy)"
+            },
+            {
+              "mode": "ghost",
+              "line": 24,
+              "guide": "Executing the root returns the error of the subcommand that ran.",
+              "text": "    if err := root.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go deploy",
+            "text": "Error: no server set\nexit status 1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Failing well",
+        "slides": [
+          {
+            "text": "A program that fails should exit with a nonzero code. Cobra never picks it: `main` does. `1` is the usual one, and different failures can get different codes that scripts can tell apart.\n\nThe snippet is pseudo code, not Go.",
+            "code": "err = Execute()\nif err is the missing-config error:\n    exit with 2\nelse if err is not nil:\n    exit with 1"
+          },
+          {
+            "text": "Do not call `os.Exit` inside a command function. It ends the program on the spot: deferred calls do not run and `Execute` never returns. Return the error and let `main` exit."
+          },
+          {
+            "text": "Cobra's own errors, like a mistyped flag, wrong arguments or an unknown subcommand, come back from `Execute` the same way. One `if err != nil` in `main` covers them all. A function can also check its input first and return early."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "exit-codes",
+          "title": "Pick the exit code",
+          "guide": "Exit with a different code for one kind of failure.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"errors\"\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The package and the imports are already in the file. A package error names the failure.",
+              "text": "var errNoConfig = errors.New(\"no config file\")\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "`run` wraps it with the name of the command.",
+              "text": "func run(_ *cobra.Command, _ []string) error {\n    return fmt.Errorf(\"deploy: %w\", errNoConfig)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "A command that uses `run`.",
+              "text": "    cmd := &cobra.Command{\n        Use:          \"deploy\",\n        SilenceUsage: true,\n        RunE:         run,\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 23,
+              "guide": "`main` chooses the code: 2 for this failure, 1 for any other.",
+              "notes": [
+                {
+                  "on": "errors.Is",
+                  "text": "Finds the error even when it is wrapped"
+                }
+              ],
+              "text": "    if err := cmd.Execute(); err != nil {\n        if errors.Is(err, errNoConfig) {\n            os.Exit(2)\n        }\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Error: deploy: no config file\nexit status 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "exit-in-run",
+          "title": "What does it print?",
+          "guide": "`clean` starts with no arguments. Pick what the program prints.",
+          "code": "var clean = &cobra.Command{\n    Use: \"clean\",\n    Run: func(_ *cobra.Command, args []string) {\n        defer fmt.Println(\"cleanup\")\n        if len(args) == 0 {\n            os.Exit(1)\n        }\n        fmt.Println(\"done\")\n    },\n}",
+          "options": [
+            "Nothing from the program itself",
+            "cleanup",
+            "done",
+            "cleanup, then done"
+          ],
+          "answer": 0,
+          "explanation": "`os.Exit` ends the program on the spot, so the deferred `cleanup` never runs. Returning an error from `RunE` lets the function finish and `main` do the exit."
+        },
+        {
+          "type": "typing",
+          "id": "check-the-port",
+          "title": "Validate before working",
+          "guide": "Reject a bad flag value with an error before the work starts.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The package and the imports are already in the file. The flag lands in a package variable.",
+              "text": "var port int\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Check the value first and return early with an error. Only a valid port gets the work.",
+              "text": "func run(_ *cobra.Command, _ []string) error {\n    if port < 1024 {\n        return fmt.Errorf(\"port %d is reserved\", port)\n    }\n    fmt.Println(\"listening on\", port)\n    return nil\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "The command, and the flag that fills `port`.",
+              "text": "    cmd := &cobra.Command{\n        Use:          \"serve\",\n        SilenceUsage: true,\n        RunE:         run,\n    }\n    cmd.Flags().IntVar(&port, \"port\",\n        8080, \"tcp port\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 28,
+              "guide": "Execute, and exit when it fails.",
+              "text": "    if err := cmd.Execute(); err != nil {\n        os.Exit(1)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go --port 80",
+            "text": "Error: port 80 is reserved\nexit status 1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "check-err",
+          "title": "Check the error in one call",
+          "guide": "Let cobra's helper print the error and exit.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"errors\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The package and the import are already in the file.",
+              "text": "func run(_ *cobra.Command, _ []string) error {\n    return errors.New(\"offline\")\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Silence both messages: the helper prints the error.",
+              "text": "    cmd := &cobra.Command{\n        Use:           \"sync\",\n        SilenceUsage:  true,\n        SilenceErrors: true,\n        RunE:          run,\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 20,
+              "guide": "One call replaces the `if` and the exit.",
+              "notes": [
+                {
+                  "on": "cobra.CheckErr",
+                  "text": "Prints Error: and the message, then exits with 1"
+                }
+              ],
+              "text": "    cobra.CheckErr(cmd.Execute())"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Error: offline\nexit status 1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "check-err-gaps",
+          "title": "The helper and its partner",
+          "guide": "Stop cobra from printing the error, since the next line reports it and exits.",
+          "code": "package main\n\nimport \"github.com/spf13/cobra\"\n\nfunc run(_ *cobra.Command, _ []string) error {\n    return nil\n}\n\nfunc main() {\n    cmd := &cobra.Command{RunE: run}\n    cmd.___ = true\n    cobra.___(cmd.Execute())\n}",
+          "gaps": [
+            {
+              "answers": [
+                "SilenceErrors"
+              ]
+            },
+            {
+              "answers": [
+                "CheckErr"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "wrapped-compare",
+          "title": "Which exit status?",
+          "guide": "`cmd` runs `run`, and the usage is off. Pick the exit status `go run` shows.",
+          "code": "var errNoConfig = errors.New(\"no config\")\nfunc run(_ *cobra.Command, _ []string) error {\n    return fmt.Errorf(\"load: %w\", errNoConfig)\n}\n\nfunc main() {\n    err := cmd.Execute()\n    if err == errNoConfig {\n        os.Exit(2)\n    }\n    if err != nil {\n        os.Exit(1)\n    }\n}",
+          "options": [
+            "exit status 2",
+            "exit status 1",
+            "exit status 3",
+            "No exit status"
+          ],
+          "answer": 1,
+          "explanation": "`Execute` returns the wrapped error, not `errNoConfig` itself, so `==` is false. Only `errors.Is` finds the error inside the wrapping."
+        }
+      ]
+    }
+  ]
+}

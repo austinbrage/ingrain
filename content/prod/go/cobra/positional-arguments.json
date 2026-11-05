@@ -1,0 +1,627 @@
+{
+  "id": "positional-arguments",
+  "intro": {
+    "title": "Positional arguments",
+    "slides": [
+      {
+        "text": "Positional arguments are the words after the command that are not flags. Cobra hands them to `Run` as a slice of strings, and can check them before `Run` starts.\n\nThe sketch is not Go.",
+        "code": "$ app resize photo.png 800\ncommand: resize\nargs:    [photo.png 800]"
+      },
+      {
+        "text": "Three sessions:\n\n- **Session 1:** reading `args`\n- **Session 2:** the ready-made checks in `Args`\n- **Session 3:** your own checks, flags beside arguments and corner cases"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Reading args",
+        "slides": [
+          {
+            "text": "Cobra fills `args` with the words typed after the command, flags removed. It is an ordinary `[]string`, so you read it with an index, `len` and `range`.\n\nThe user may type any number of words, or none."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "read-args",
+          "title": "Read the first argument",
+          "guide": "Greet whoever is named on the command line.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Every word typed after the command lands in `args`. Read the first one with an index.",
+              "notes": [
+                {
+                  "on": "args[0]",
+                  "text": "The first word typed after the command name"
+                },
+                {
+                  "on": "greet <name>",
+                  "text": "After the name, Use documents the arguments in the help"
+                }
+              ],
+              "text": "    rootCmd := &cobra.Command{\n        Use:   \"greet <name>\",\n        Short: \"Greet someone\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"Hello,\", args[0])\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Execute reads the terminal's words and fills `args` for you.",
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go alice",
+            "text": "Hello, alice"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "all-args",
+          "title": "Every argument",
+          "guide": "Greet as many people as the user names.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`args` is a plain slice: count it, then loop over it.",
+              "notes": [
+                {
+                  "on": "[names...]",
+                  "text": "Brackets and dots only describe the arguments in help"
+                }
+              ],
+              "text": "    rootCmd := &cobra.Command{\n        Use:   \"greet [names...]\",\n        Short: \"Greet everyone\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(len(args), \"names\")\n            for _, name := range args {\n                fmt.Println(\"Hi,\", name)\n            }\n        },\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 20,
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go ann bob",
+            "text": "2 names\nHi, ann\nHi, bob"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "use-is-text",
+          "title": "What does it print?",
+          "guide": "The user runs `greet` with no words after it.",
+          "code": "var cmd = &cobra.Command{\n    Use: \"greet <name>\",\n    Run: func(c *cobra.Command, args []string) {\n        fmt.Println(len(args))\n    },\n}",
+          "options": [
+            "1",
+            "Error: requires 1 arg",
+            "0",
+            "A panic"
+          ],
+          "answer": 2,
+          "explanation": "`<name>` appears only in the help text. Nothing checks it, so `args` is empty and `len(args)` is 0."
+        },
+        {
+          "type": "typing",
+          "id": "optional-arg",
+          "title": "An argument with a default",
+          "guide": "Greet the name given, or the world when none is.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Indexing an empty `args` panics, so check its length before reading `args[0]`.",
+              "notes": [
+                {
+                  "on": "len(args) > 0",
+                  "text": "True only when the user typed at least one word"
+                }
+              ],
+              "text": "func greet(cmd *cobra.Command, args []string) {\n    name := \"world\"\n    if len(args) > 0 {\n        name = args[0]\n    }\n    fmt.Println(\"Hello,\", name)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "Hand the function to the command by name.",
+              "notes": [
+                {
+                  "on": "Run:   greet",
+                  "text": "Passes the function itself, cobra calls it for you"
+                }
+              ],
+              "text": "    rootCmd := &cobra.Command{\n        Use:   \"greet [name]\",\n        Short: \"Greet someone\",\n        Run:   greet,\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 23,
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello, world"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "guard-args",
+          "title": "Guard the first argument",
+          "guide": "Use the first word as the name when there is one.",
+          "code": "package main\nimport \"fmt\"\nimport \"github.com/spf13/cobra\"\nvar cmd = &cobra.Command{\n    Use: \"bye [name]\",\n    Run: func(c *cobra.Command, args []string) {\n        name := \"friend\"\n        if ___(args) > 0 {\n            ___ = args[0]\n        }\n        fmt.Println(\"Bye,\", name)\n    },\n}\nfunc main() { cmd.Execute() }",
+          "gaps": [
+            {
+              "answers": [
+                "len"
+              ]
+            },
+            {
+              "answers": [
+                "name"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Checking the count",
+        "slides": [
+          {
+            "text": "A command can check its arguments before `Run` starts, with its `Args` field. When the check fails, cobra prints the error with the usage and `Run` does not start.\n\nThe snippet is pseudo code.",
+            "code": "Args: <check the words>\nRun:  <starts only if the check passes>"
+          },
+          {
+            "text": "Cobra ships ready-made checks, all under `cobra`:\n\n- `NoArgs`: no words\n- `ExactArgs(n)`: exactly n\n- `MinimumNArgs(n)`: at least n\n- `MaximumNArgs(n)`: at most n\n- `RangeArgs(min, max)`: between min and max"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "exact-args",
+          "title": "Exactly two arguments",
+          "guide": "Copy needs a source and a destination, nothing more or less.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A command that reads two arguments.",
+              "text": "    rootCmd := &cobra.Command{\n        Use:   \"copy <src> <dst>\",\n        Short: \"Copy a file\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"Copy\", args[0], \"->\", args[1])\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Check the count before `Run` starts.",
+              "notes": [
+                {
+                  "on": "cobra.ExactArgs(2)",
+                  "text": "Rejects the call unless exactly 2 words come"
+                }
+              ],
+              "text": "        Args:  cobra.ExactArgs(2),"
+            },
+            {
+              "mode": "auto",
+              "line": 18,
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go a.txt b.txt",
+            "text": "Copy a.txt -> b.txt"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "wrong-count",
+          "title": "One argument too few",
+          "guide": "The user runs `rename a.txt`. What happens?",
+          "code": "var cmd = &cobra.Command{\n    Use:  \"rename <old> <new>\",\n    Args: cobra.ExactArgs(2),\n    Run: func(c *cobra.Command, args []string) {\n        fmt.Println(args[0], args[1])\n    },\n}",
+          "options": [
+            "Run starts and panics at args[1]",
+            "Cobra prompts for the missing argument",
+            "Cobra shows the usage and still starts Run",
+            "Cobra reports the count and Run never starts"
+          ],
+          "answer": 3,
+          "explanation": "`ExactArgs(2)` runs before `Run`. With one word it returns an error, cobra prints it with the usage, and `Run` never starts, so `args[1]` is never read."
+        },
+        {
+          "type": "typing",
+          "id": "min-args",
+          "title": "One or more arguments",
+          "guide": "Remove every file the user names, and refuse an empty call.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Loop over every file named.",
+              "text": "func remove(cmd *cobra.Command, args []string) {\n    for _, file := range args {\n        fmt.Println(\"Removing\", file)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "Require at least one file.",
+              "notes": [
+                {
+                  "on": "cobra.MinimumNArgs(1)",
+                  "text": "Accepts one word or more, rejects none"
+                }
+              ],
+              "text": "    rootCmd := &cobra.Command{\n        Use:  \"remove <file>...\",\n        Args: cobra.MinimumNArgs(1),\n        Run:  remove,\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 21,
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go a.txt b.txt",
+            "text": "Removing a.txt\nRemoving b.txt"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "min-fill",
+          "title": "Require at least one",
+          "guide": "The command needs one or more names. Loop over all of them.",
+          "code": "package main\nimport \"fmt\"\nimport \"github.com/spf13/cobra\"\nvar cmd = &cobra.Command{\n    Use:  \"tag <name>...\",\n    Args: cobra.___(1),\n    Run: func(c *cobra.Command, args []string) {\n        for _, name := range ___ {\n            fmt.Println(\"Tag:\", name)\n        }\n    },\n}\nfunc main() { cmd.Execute() }",
+          "gaps": [
+            {
+              "answers": [
+                "MinimumNArgs"
+              ]
+            },
+            {
+              "answers": [
+                "args"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "range-args",
+          "title": "Between one and two",
+          "guide": "Back up a folder to an optional destination.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The destination is optional, so it needs a default.",
+              "text": "func backup(cmd *cobra.Command, args []string) {\n    dest := \"backup\"\n    if len(args) == 2 {\n        dest = args[1]\n    }\n    fmt.Println(\"Backing up\", args[0], \"to\", dest)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "Allow one or two words, no fewer and no more.",
+              "notes": [
+                {
+                  "on": "cobra.RangeArgs(1, 2)",
+                  "text": "Both limits are included: 1 or 2 words pass"
+                }
+              ],
+              "text": "    rootCmd := &cobra.Command{\n        Use:  \"backup <src> [dest]\",\n        Args: cobra.RangeArgs(1, 2),\n        Run:  backup,\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 23,
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go notes",
+            "text": "Backing up notes to backup"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "no-args",
+          "title": "What is Args for here?",
+          "guide": "Read the code, then pick what `Args` does.",
+          "code": "var versionCmd = &cobra.Command{\n    Use:  \"version\",\n    Args: cobra.NoArgs,\n    Run: func(c *cobra.Command, args []string) {\n        fmt.Println(\"app v1.0\")\n    },\n}",
+          "options": [
+            "Rejects any word typed after the command",
+            "Hides the command from the help output",
+            "Stops the command from reading flags",
+            "Makes the command read its words from stdin"
+          ],
+          "answer": 0,
+          "explanation": "`NoArgs` fails the check when any word comes after `version`, so a typo like `app version now` is an error instead of being ignored."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Your own rules",
+        "slides": [
+          {
+            "text": "When the ready-made checks are not enough, write your own: a function that looks at the words and returns an error to reject them, or nil to accept. Checks can also be combined.\n\nThe snippet is pseudo code.",
+            "code": "check(command, words):\n    if the words are wrong:\n        return an error\n    return nothing"
+          },
+          {
+            "text": "Before your check runs, cobra takes the flags out of the command line. Only the words left reach `args`."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "custom-check",
+          "title": "Your own check",
+          "guide": "Accept only one numeric port.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "An `Args` check is a function that returns an error to reject the words, or nil to accept them.",
+              "notes": [
+                {
+                  "on": "func port(cmd *cobra.Command, args []string) error",
+                  "text": "Cobra calls this before Run, an error stops the command"
+                },
+                {
+                  "on": "strconv.Atoi(args[0])",
+                  "text": "Fails when the word is not a whole number"
+                }
+              ],
+              "text": "func port(cmd *cobra.Command, args []string) error {\n    if len(args) != 1 {\n        return fmt.Errorf(\"need exactly one port\")\n    }\n    if _, err := strconv.Atoi(args[0]); err != nil {\n        return fmt.Errorf(\"%q is not a port\", args[0])\n    }\n    return nil\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "Give the function to `Args`, by name.",
+              "notes": [
+                {
+                  "on": "Args: port",
+                  "text": "No parentheses: cobra calls the function itself"
+                }
+              ],
+              "text": "    rootCmd := &cobra.Command{\n        Use:  \"serve <port>\",\n        Args: port,\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"Listening on :\" + args[0])\n        },\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 28,
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go 8080",
+            "text": "Listening on :8080"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "flag-and-args",
+          "title": "Flags beside arguments",
+          "guide": "Greet a name as many times as a flag says.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The name is an argument. How many times is a flag.",
+              "text": "    var times int\n    rootCmd := &cobra.Command{\n        Use:  \"greet <name>\",\n        Args: cobra.ExactArgs(1),\n        Run: func(cmd *cobra.Command, args []string) {\n            for i := 0; i < times; i++ {\n                fmt.Println(\"Hello,\", args[0])\n            }\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 20,
+              "guide": "Register the flag. `ExactArgs(1)` counts only the name, never the flag.",
+              "text": "    rootCmd.Flags().IntVar(\n        &times, \"times\", 1, \"repeat\",\n    )"
+            },
+            {
+              "mode": "auto",
+              "line": 23,
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go alice --times 2",
+            "text": "Hello, alice\nHello, alice"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "flag-value",
+          "title": "What does it print?",
+          "guide": "The user runs `app --name bob alice carol`.",
+          "code": "var name string\nvar rootCmd = &cobra.Command{\n    Use: \"app\",\n    Run: func(c *cobra.Command, args []string) {\n        fmt.Println(len(args), name)\n    },\n}\n\nfunc main() {\n    rootCmd.Flags().StringVar(\n        &name, \"name\", \"\", \"who\",\n    )\n    rootCmd.Execute()\n}",
+          "options": [
+            "3 bob",
+            "2 alice",
+            "3 alice",
+            "2 bob"
+          ],
+          "answer": 3,
+          "explanation": "The flag takes the next word as its value, so `bob` is `name`. Only `alice` and `carol` are left in `args`."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "dash-dash",
+          "title": "What does it print?",
+          "guide": "The user runs `app -- --verbose hi`.",
+          "code": "var rootCmd = &cobra.Command{\n    Use: \"app\",\n    Run: func(c *cobra.Command, args []string) {\n        fmt.Println(args)\n    },\n}\n\nfunc main() {\n    rootCmd.Flags().Bool(\"verbose\", false, \"\")\n    rootCmd.Execute()\n}",
+          "options": [
+            "[hi]",
+            "[verbose hi]",
+            "[--verbose hi]",
+            "Error: unknown flag: --verbose"
+          ],
+          "answer": 2,
+          "explanation": "A bare `--` ends the flags. Everything after it is an argument, even a word that looks like a flag."
+        },
+        {
+          "type": "typing",
+          "id": "valid-args",
+          "title": "Only some words",
+          "guide": "Deploy only to an environment from a fixed list.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Print the environment chosen.",
+              "text": "func deploy(cmd *cobra.Command, args []string) {\n    fmt.Println(\"Deploying to\", args[0])\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "List the words allowed, then require exactly one that is on the list.",
+              "notes": [
+                {
+                  "on": "cobra.MatchAll(",
+                  "text": "Passes only when every check inside passes"
+                },
+                {
+                  "on": "cobra.OnlyValidArgs",
+                  "text": "Rejects any word that is not in ValidArgs"
+                }
+              ],
+              "text": "    rootCmd := &cobra.Command{\n        Use:       \"deploy <env>\",\n        ValidArgs: []string{\"dev\", \"prod\"},\n        Args: cobra.MatchAll(\n            cobra.ExactArgs(1),\n            cobra.OnlyValidArgs,\n        ),\n        Run: deploy,\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 23,
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go prod",
+            "text": "Deploying to prod"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "valid-fill",
+          "title": "Limit the words",
+          "guide": "Accept exactly one word, and only a word from the list.",
+          "code": "package main\nimport \"github.com/spf13/cobra\"\nvar cmd = &cobra.Command{\n    Use: \"light <on|off>\",\n    ___: []string{\"on\", \"off\"},\n    Args: cobra.___(\n        cobra.ExactArgs(1),\n        cobra.___,\n    ),\n    Run: func(c *cobra.Command, a []string) {},\n}\nfunc main() { cmd.Execute() }",
+          "gaps": [
+            {
+              "answers": [
+                "ValidArgs"
+              ]
+            },
+            {
+              "answers": [
+                "MatchAll"
+              ]
+            },
+            {
+              "answers": [
+                "OnlyValidArgs"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "leaf-any",
+          "title": "What does it print?",
+          "guide": "The user runs `app serve fast now`.",
+          "code": "var serveCmd = &cobra.Command{\n    Use: \"serve\",\n    Run: func(c *cobra.Command, args []string) {\n        fmt.Println(len(args))\n    },\n}\n\nfunc main() {\n    rootCmd := &cobra.Command{Use: \"app\"}\n    rootCmd.AddCommand(serveCmd)\n    rootCmd.Execute()\n}",
+          "options": [
+            "0",
+            "2",
+            "Error: unknown command \"fast\" for \"app serve\"",
+            "Error: accepts 0 arg(s), received 2"
+          ],
+          "answer": 1,
+          "explanation": "Without an `Args` field, a command with no subcommands accepts any words. Both reach `args`, so it prints 2."
+        },
+        {
+          "type": "typing",
+          "id": "arbitrary-args",
+          "title": "Any words on a root",
+          "guide": "Echo any words, on a root that also has a subcommand.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A root with subcommands rejects unknown words as an unknown command. `ArbitraryArgs` lets them through to `Run`.",
+              "notes": [
+                {
+                  "on": "cobra.ArbitraryArgs",
+                  "text": "Accepts any number of words, even none"
+                }
+              ],
+              "text": "    rootCmd := &cobra.Command{\n        Use:  \"echo [words...]\",\n        Args: cobra.ArbitraryArgs,\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"Words:\", args)\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Add a subcommand. The words that match its name still go to it.",
+              "text": "    listCmd := &cobra.Command{Use: \"list\"}\n    rootCmd.AddCommand(listCmd)"
+            },
+            {
+              "mode": "auto",
+              "line": 19,
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go hello world",
+            "text": "Words: [hello world]"
+          }
+        }
+      ]
+    }
+  ]
+}

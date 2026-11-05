@@ -1,0 +1,322 @@
+{
+  "id": "persistent-flags",
+  "intro": {
+    "title": "Persistent flags",
+    "slides": [
+      {
+        "text": "A normal flag belongs to one command. A **persistent** flag belongs to a command and to everything below it, so a flag like `--verbose` is declared once on the root and works everywhere. You will share a flag, limit one to a branch of the tree and read an inherited value.\n\nThe snippet is pseudo code.",
+        "code": "root   --verbose   (persistent)\n  serve   accepts --verbose\n  db      accepts --verbose\n    migrate   accepts --verbose"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Shared and local",
+        "slides": [
+          {
+            "text": "The method that owns the flag decides who accepts it: **`Flags()`** is for the command alone, **`PersistentFlags()`** is for the command and all its descendants. The flag can be written before or after the subcommand name."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "persistent-flag",
+          "title": "A flag every command shares",
+          "guide": "Register a flag on the root so its subcommand accepts it too.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A `serve` subcommand that prints the value of a `verbose` variable.",
+              "text": "    var verbose bool\n    serve := &cobra.Command{\n        Use: \"serve\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"verbose:\", verbose)\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "The root command of the app.",
+              "text": "    root := &cobra.Command{Use: \"app\"}"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "Declare the flag on the root with **persistent** flags, so every command below it inherits it.",
+              "notes": [
+                {
+                  "on": "PersistentFlags()",
+                  "text": "Flags added here reach every subcommand."
+                }
+              ],
+              "text": "    root.PersistentFlags().BoolVarP(\n        &verbose, \"verbose\", \"v\",\n        false, \"print more\",\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "Attach `serve` and run. The flag works after `serve`, even though it lives on the root.",
+              "text": "    root.AddCommand(serve)\n    root.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go serve -v",
+            "text": "verbose: true"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "local-and-persistent",
+          "title": "One flag for all, one for one",
+          "guide": "Give the root a flag every command shares and `serve` a flag only it accepts.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "copy",
+              "line": 10,
+              "guide": "Two variables and the root.",
+              "text": "    var env string\n    var port int\n    root := &cobra.Command{Use: \"app\"}"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "`serve` prints both values.",
+              "text": "    serve := &cobra.Command{\n        Use: \"serve\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(env, port)\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "`env` is persistent on the root. `port` is a plain local flag of `serve`.",
+              "notes": [
+                {
+                  "on": "serve.Flags()",
+                  "text": "Local: only serve accepts this flag."
+                }
+              ],
+              "text": "    root.PersistentFlags().StringVar(\n        &env, \"env\", \"dev\", \"target\",\n    )\n    serve.Flags().IntVar(\n        &port, \"port\", 8080, \"port\",\n    )"
+            },
+            {
+              "mode": "copy",
+              "line": 25,
+              "guide": "Attach and run.",
+              "text": "    root.AddCommand(serve)\n    root.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go serve --env prod --port 9000",
+            "text": "prod 9000"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "persistent-or-local",
+          "title": "Which kind of flag",
+          "guide": "`env` must work on every command. `port` is only for `serve`. Fill the two gaps that make that true.",
+          "code": "func main() {\n    var env string\n    var port int\n    root := &cobra.Command{Use: \"app\"}\n    serve := &cobra.Command{Use: \"serve\"}\n    root.___().StringVar(\n        &env, \"env\", \"dev\", \"\",\n    )\n    serve.___().IntVar(\n        &port, \"port\", 80, \"\",\n    )\n    root.AddCommand(serve)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "PersistentFlags"
+              ]
+            },
+            {
+              "answers": [
+                "Flags"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "root-local-flag",
+          "title": "Where does --region work?",
+          "guide": "Pick where the flag is accepted.",
+          "code": "root := &cobra.Command{Use: \"app\"}\nserve := &cobra.Command{Use: \"serve\"}\nroot.Flags().String(\"region\", \"eu\", \"\")\nroot.AddCommand(serve)",
+          "options": [
+            "On the root only",
+            "On the root and on serve",
+            "On serve only",
+            "Nowhere, it needs a Run function"
+          ],
+          "answer": 0,
+          "explanation": "`Flags()` makes a local flag: only the command that owns it accepts it. Subcommands inherit only what is added with `PersistentFlags()`."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "flag-before-subcommand",
+          "title": "Flag before the subcommand",
+          "guide": "The program runs as `go run main.go --env prod serve`.",
+          "code": "var env string\nserve := &cobra.Command{\n    Use: \"serve\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(\"serve\", env)\n    },\n}\nroot := &cobra.Command{Use: \"app\"}\nroot.PersistentFlags().StringVar(\n    &env, \"env\", \"dev\", \"\",\n)\nroot.AddCommand(serve)\nroot.Execute()",
+          "options": [
+            "serve dev",
+            "serve prod",
+            "An error: unknown flag --env",
+            "Nothing is printed"
+          ],
+          "answer": 1,
+          "explanation": "A persistent flag is accepted before or after the subcommand, so `env` is set to `prod` before `serve` runs."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Scope and reading",
+        "slides": [
+          {
+            "text": "A persistent flag travels down, never up and never sideways: it reaches the commands under the one that owns it. A command can read an inherited flag from its own flag set, by name."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "nested-persistent",
+          "title": "A flag for one branch",
+          "guide": "Put a persistent flag on `db`: its `migrate` subcommand inherits it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`migrate` prints a `dryRun` variable.",
+              "text": "    var dryRun bool\n    migrate := &cobra.Command{\n        Use: \"migrate\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"dry run:\", dryRun)\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "`db` owns the flag. It is persistent, so it reaches the commands below `db`.",
+              "notes": [
+                {
+                  "on": "PersistentFlags()",
+                  "text": "Reaches db and its subcommands, not the root."
+                }
+              ],
+              "text": "    db := &cobra.Command{Use: \"db\"}\n    db.PersistentFlags().BoolVar(\n        &dryRun, \"dry-run\", false, \"\",\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "Nest `migrate` under `db`, and `db` under the root.",
+              "text": "    db.AddCommand(migrate)\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(db)"
+            },
+            {
+              "mode": "copy",
+              "line": 24,
+              "guide": "Run it.",
+              "text": "    root.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go db migrate --dry-run",
+            "text": "dry run: true"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "branch-scope",
+          "title": "Who accepts --dry-run?",
+          "guide": "Pick the commands that accept the flag.",
+          "code": "db.PersistentFlags().Bool(\n    \"dry-run\", false, \"\",\n)\ndb.AddCommand(migrate)\nroot.AddCommand(db, serve)",
+          "options": [
+            "db and migrate",
+            "db, migrate and serve",
+            "migrate only",
+            "root, db and migrate"
+          ],
+          "answer": 0,
+          "explanation": "A persistent flag reaches the command that owns it and everything below it. `serve` is a sibling of `db` and the root is above it."
+        },
+        {
+          "type": "typing",
+          "id": "read-by-name",
+          "title": "Read a flag by name",
+          "guide": "Read an inherited flag from inside `Run` with its name, without a variable.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`serve` asks its flag set for `env`. `GetString` returns the value and an error, ignored here.",
+              "notes": [
+                {
+                  "on": "GetString",
+                  "text": "Reads a flag by name, inherited ones included."
+                }
+              ],
+              "text": "    serve := &cobra.Command{\n        Use: \"serve\",\n        Run: func(cmd *cobra.Command, args []string) {\n            env, _ := cmd.Flags().GetString(\"env\")\n            fmt.Println(\"env:\", env)\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "The root declares `env` without a variable to bind.",
+              "text": "    root := &cobra.Command{Use: \"app\"}\n    root.PersistentFlags().String(\n        \"env\", \"dev\", \"target\",\n    )"
+            },
+            {
+              "mode": "copy",
+              "line": 21,
+              "guide": "Attach and run.",
+              "text": "    root.AddCommand(serve)\n    root.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go serve --env prod",
+            "text": "env: prod"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "root-reads-flag",
+          "title": "The root reads it too",
+          "guide": "The root has a `Run` of its own. Fill the gaps so it reads its string flag `name` by name, and declares that flag as persistent, so every subcommand shares it.",
+          "code": "func main() {\n    root := &cobra.Command{\n        Use: \"app\",\n        Run: func(c *cobra.Command, _ []string) {\n            n, _ := c.Flags().___(\"name\")\n            fmt.Println(\"hello\", n)\n        },\n    }\n    root.___().String(\n        \"name\", \"world\", \"\",\n    )\n    root.Execute()\n}",
+          "gaps": [
+            {
+              "answers": [
+                "GetString"
+              ]
+            },
+            {
+              "answers": [
+                "PersistentFlags"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "register-after-attach",
+          "title": "Flag added after AddCommand",
+          "guide": "The program runs as `go run main.go serve --env prod`.",
+          "code": "serve := &cobra.Command{\n    Use: \"serve\",\n    Run: func(cmd *cobra.Command, args []string) {\n        env, _ := cmd.Flags().GetString(\"env\")\n        fmt.Println(env)\n    },\n}\nroot := &cobra.Command{Use: \"app\"}\nroot.AddCommand(serve)\nroot.PersistentFlags().String(\n    \"env\", \"dev\", \"\",\n)\nroot.Execute()",
+          "options": [
+            "dev",
+            "An error: unknown flag --env",
+            "prod",
+            "An empty line"
+          ],
+          "answer": 2,
+          "explanation": "Inherited flags are collected when the command runs, so it does not matter that `env` was added after `AddCommand`."
+        }
+      ]
+    }
+  ]
+}

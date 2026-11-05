@@ -1,0 +1,334 @@
+{
+  "id": "flags",
+  "intro": {
+    "title": "Flags",
+    "slides": [
+      {
+        "text": "A flag is a named option the user passes to a command, like `--name Ana` or `--team=red`. The command declares which flags it accepts, and cobra reads them from the arguments when it runs.\n\nThe snippet is pseudo code, not Go.",
+        "code": "declare flag: name, default, usage\nuser runs: greet --name Ana\ncobra parses the arguments\nRun reads the value: \"Ana\""
+      },
+      {
+        "text": "Every flag has a **name**, a **default** that is used when the user leaves it out, and a **usage** text. They are declared on the flag set of the command, `cmd.Flags()`, before `Execute` runs."
+      },
+      {
+        "text": "Three sessions:\n\n- **Session 1:** string flags, and two ways to read them\n- **Session 2:** bool and number flags, and shorthand letters\n- **Session 3:** lists of values, flags on subcommands and telling a given flag from a default"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "String flags",
+        "slides": [
+          {
+            "text": "A string flag is declared with a name, a default and a usage text. Do it before `Execute`, which is when cobra reads the arguments.",
+            "code": "cmd.Flags().String(\n    \"lang\", \"en\", \"language to use\",\n)"
+          },
+          {
+            "text": "The user passes the value after the name, with a space or an equals sign:\n\n- `app --lang es`\n- `app --lang=es`\n\nWhen the flag is left out, the default stays."
+          },
+          {
+            "text": "There are two ways to get the value:\n\n- ask the flag set by name inside `Run`, with a getter\n- bind the flag to a variable, and read the variable\n\nBoth give the same value."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "read-a-flag",
+          "title": "Read a string flag",
+          "guide": "Declare a flag, then read it inside `Run`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 8, "guide": "The imports and `main` are already in the file. `Run` reads the flag by its name.", "notes": [{"on": "cmd.Flags().GetString", "text": "Reads the value of a string flag by its name."}, {"on": "name, _", "text": "The second result is an error, skipped here."}], "text": "var rootCmd = &cobra.Command{\n    Use: \"greet\",\n    Run: func(cmd *cobra.Command, args []string) {\n        name, _ := cmd.Flags().GetString(\"name\")\n        fmt.Println(\"Hello,\", name)\n    },\n}\n"},
+            {"mode": "ghost", "line": 17, "guide": "Declare the flag before `Execute`: a name, a default and a usage text.", "notes": [{"on": "\"world\"", "text": "Used when the flag is not given."}, {"on": "\"who to greet\"", "text": "Describes the flag to the user."}], "text": "    rootCmd.Flags().String(\"name\", \"world\", \"who to greet\")\n    rootCmd.Execute()"}
+          ],
+          "output": {
+            "command": "go run main.go --name Ana",
+            "text": "Hello, Ana"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "flag-default",
+          "title": "What is the default for?",
+          "guide": "Pick what `\"report.txt\"` does.",
+          "code": "rootCmd.Flags().String(\n    \"out\",\n    \"report.txt\",\n    \"file to write\",\n)",
+          "options": [
+            "The file name that `--out` must always have",
+            "A shorthand that can be typed in place of `--out`",
+            "The value used when `--out` is not given",
+            "The text that describes `--out` to the user"
+          ],
+          "answer": 2,
+          "explanation": "The second argument is the default value. The third one, `\"file to write\"`, is the usage text."
+        },
+        {
+          "type": "typing",
+          "id": "bind-to-variable",
+          "title": "Bind a flag to a variable",
+          "guide": "Let cobra store the flag in a variable.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 8, "guide": "A package variable will hold the flag's value.", "text": "var team string\n"},
+            {"mode": "ghost", "line": 10, "guide": "`Run` reads the variable directly, with no getter.", "text": "var rootCmd = &cobra.Command{\n    Use: \"join\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(\"Joined\", team)\n    },\n}\n"},
+            {"mode": "ghost", "line": 18, "guide": "Same arguments as `String`, with the address of the variable first.", "notes": [{"on": "StringVar", "text": "Stores the value in team when cobra parses."}, {"on": "&team", "text": "The address of team, so cobra can set it."}], "text": "    rootCmd.Flags().StringVar(\n        &team, \"team\", \"blue\", \"team to join\",\n    )\n    rootCmd.Execute()"}
+          ],
+          "output": {
+            "command": "go run main.go --team red",
+            "text": "Joined red"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "bind-the-city",
+          "title": "Bind a city",
+          "guide": "Fill the type of the variable and the method that binds it to the flag.",
+          "code": "var city ___\nvar rootCmd = &cobra.Command{\n    Use: \"weather\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(\"Weather in\", city)\n    },\n}\n\nfunc main() {\n    rootCmd.Flags().___(\n        &city, \"city\", \"Lima\", \"place\",\n    )\n    rootCmd.Execute()\n}",
+          "gaps": [
+            {"answers": ["string"]},
+            {"answers": ["StringVar"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "empty-value",
+          "title": "What does it print?",
+          "guide": "What does `show --lang=` print?",
+          "code": "var rootCmd = &cobra.Command{\n    Use: \"show\",\n    Run: func(cmd *cobra.Command, args []string) {\n        lang, _ := cmd.Flags().GetString(\"lang\")\n        fmt.Println(\"lang=\" + lang)\n    },\n}\n\nfunc main() {\n    rootCmd.Flags().String(\n        \"lang\", \"en\", \"language\",\n    )\n    rootCmd.Execute()\n}",
+          "options": [
+            "lang=en",
+            "lang=",
+            "lang",
+            "An error about a missing value"
+          ],
+          "answer": 1,
+          "explanation": "`--lang=` gives the flag an empty value. Any value the user passes, even an empty one, replaces the default."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Bools, numbers and shorthand",
+        "slides": [
+          {
+            "text": "A bool flag needs no value: giving it turns it on, and it stays off when it is left out. `BoolVar` binds it to a bool variable, with `false` as the default.",
+            "code": "var dryRun bool\ncmd.Flags().BoolVar(\n    &dryRun, \"dry\", false, \"no changes\",\n)"
+          },
+          {
+            "text": "Numbers work the same way, with a number as the default: `Int` and `IntVar`, and also `Float64` and `Duration`, like `30s`. Cobra turns the text into the type, so the variable is already an `int`.",
+            "code": "var workers int\ncmd.Flags().IntVar(\n    &workers, \"workers\", 4, \"jobs\",\n)"
+          },
+          {
+            "text": "A `P` at the end of the method name adds a one-letter name after the long one. The user can then type `-w` instead of `--workers`.",
+            "code": "cmd.Flags().IntVarP(\n    &workers, \"workers\", \"w\", 4, \"jobs\",\n)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "switch-on",
+          "title": "A bool flag",
+          "guide": "A flag with no value: it is on when given.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n    \"strings\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "A bool variable holds the flag.", "text": "var shout bool\n"},
+            {"mode": "ghost", "line": 11, "guide": "Prints a greeting, in capitals when `shout` is on.", "text": "var rootCmd = &cobra.Command{\n    Use: \"hello\",\n    Run: func(cmd *cobra.Command, args []string) {\n        msg := \"Hello, world\"\n        if shout {\n            msg = strings.ToUpper(msg)\n        }\n        fmt.Println(msg)\n    },\n}\n"},
+            {"mode": "ghost", "line": 23, "guide": "Declare a bool flag that starts off.", "notes": [{"on": "BoolVar", "text": "A flag with no value: giving it turns it on."}, {"on": "false", "text": "Off unless the flag appears."}], "text": "    rootCmd.Flags().BoolVar(\n        &shout, \"shout\", false, \"in capitals\",\n    )\n    rootCmd.Execute()"}
+          ],
+          "output": {
+            "command": "go run main.go --shout",
+            "text": "HELLO, WORLD"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "count-flag",
+          "title": "A number flag",
+          "guide": "Read a number from the command line.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 8, "guide": "Prints `ping` as many times as the flag says.", "text": "var times int\n\nvar rootCmd = &cobra.Command{\n    Use: \"ping\",\n    Run: func(cmd *cobra.Command, args []string) {\n        for i := 1; i <= times; i++ {\n            fmt.Println(\"ping\", i)\n        }\n    },\n}\n"},
+            {"mode": "ghost", "line": 20, "guide": "A number flag has a number as default.", "notes": [{"on": "IntVar", "text": "Turns the text into an int for you."}], "text": "    rootCmd.Flags().IntVar(\n        &times, \"times\", 1, \"how many pings\",\n    )\n    rootCmd.Execute()"}
+          ],
+          "output": {
+            "command": "go run main.go --times 3",
+            "text": "ping 1\nping 2\nping 3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "turn-on-verbose",
+          "title": "Declare a bool flag",
+          "guide": "Fill the method that gives the flag set and the one that declares a bool flag.",
+          "code": "var verbose bool\nvar rootCmd = &cobra.Command{\n    Use: \"run\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(\"verbose:\", verbose)\n    },\n}\n\nfunc main() {\n    rootCmd.___().___(\n        &verbose, \"verbose\", false, \"more\",\n    )\n    rootCmd.Execute()\n}",
+          "gaps": [
+            {"answers": ["Flags"]},
+            {"answers": ["BoolVar"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "color-default",
+          "title": "What does it print?",
+          "guide": "What does `show --color false` print?",
+          "code": "var color bool\nvar rootCmd = &cobra.Command{\n    Use: \"show\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(\"color:\", color)\n    },\n}\n\nfunc main() {\n    rootCmd.Flags().BoolVar(\n        &color, \"color\", true, \"use colors\",\n    )\n    rootCmd.Execute()\n}",
+          "options": [
+            "color: false",
+            "color: true",
+            "An error about the extra word"
+          ],
+          "answer": 1,
+          "explanation": "A bool flag never takes the next word as its value, so `--color` alone means `true` and `false` is left as a plain argument. Only `--color=false` turns it off."
+        },
+        {
+          "type": "typing",
+          "id": "one-letter-names",
+          "title": "Shorthand letters",
+          "guide": "Give each flag a one-letter name.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 8, "guide": "`quiet` hides the welcome line.", "text": "var team string\nvar quiet bool\n\nvar rootCmd = &cobra.Command{\n    Use: \"join\",\n    Run: func(cmd *cobra.Command, args []string) {\n        if !quiet {\n            fmt.Println(\"Welcome!\")\n        }\n        fmt.Println(\"Team:\", team)\n    },\n}\n"},
+            {"mode": "ghost", "line": 22, "guide": "The `P` methods take a letter after the long name.", "notes": [{"on": "StringVarP", "text": "The P adds a one-letter name after the long one."}, {"on": "\"t\"", "text": "Lets the user write -t instead of --team."}], "text": "    rootCmd.Flags().StringVarP(\n        &team, \"team\", \"t\", \"blue\", \"your team\",\n    )\n    rootCmd.Flags().BoolVarP(\n        &quiet, \"quiet\", \"q\", false, \"no hello\",\n    )\n    rootCmd.Execute()"}
+          ],
+          "output": {
+            "command": "go run main.go -t red -q",
+            "text": "Team: red"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "grouped-letters",
+          "title": "What does it print?",
+          "guide": "What does `app -lq` print?",
+          "code": "var loud, quiet bool\nvar rootCmd = &cobra.Command{\n    Use: \"app\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(loud, quiet)\n    },\n}\n\nfunc main() {\n    f := rootCmd.Flags()\n    f.BoolVarP(&loud, \"loud\", \"l\", false, \"\")\n    f.BoolVarP(&quiet, \"quiet\", \"q\", false, \"\")\n    rootCmd.Execute()\n}",
+          "options": [
+            "true false",
+            "An error about `-lq`",
+            "true true",
+            "false false"
+          ],
+          "answer": 2,
+          "explanation": "Shorthand letters of bool flags can be grouped: `-lq` is the same as `-l -q`, so both are on."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Lists, scope and what was given",
+        "slides": [
+          {
+            "text": "A string slice flag collects many values into a `[]string`. The user can repeat the flag, or put commas between the values.",
+            "code": "var hosts []string\ncmd.Flags().StringSliceVar(\n    &hosts, \"host\", nil, \"servers\",\n)"
+          },
+          {
+            "text": "Each command has its own flag set, reached with its own `Flags()`. A flag declared on one command is not known by the others."
+          },
+          {
+            "text": "The value of a flag does not tell whether the user typed it: a typed value can equal the default. `Changed` asks the flag set, and is true only when the user gave the flag.",
+            "code": "cmd.Flags().Changed(\"lang\")"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "string-slice",
+          "title": "Many values",
+          "guide": "One flag that can be given many times.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 8, "guide": "`tags` is a slice that the flag fills.", "text": "var tags []string\n\nvar rootCmd = &cobra.Command{\n    Use: \"label\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(len(tags), tags)\n    },\n}\n"},
+            {"mode": "ghost", "line": 18, "guide": "A slice flag has no values unless the user gives them.", "notes": [{"on": "StringSliceVar", "text": "Collects every value, repeated or with commas."}, {"on": "nil", "text": "An empty slice when the flag is not given."}], "text": "    rootCmd.Flags().StringSliceVar(\n        &tags, \"tag\", nil, \"labels to add\",\n    )\n    rootCmd.Execute()"}
+          ],
+          "output": {
+            "command": "go run main.go --tag go --tag cli,tool",
+            "text": "3 [go cli tool]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "flag-on-subcommand",
+          "title": "A flag on a subcommand",
+          "guide": "Declare a flag on the subcommand that uses it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 8, "guide": "The `add` subcommand prints how many it added.", "text": "var copies int\n\nvar addCmd = &cobra.Command{\n    Use: \"add\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(\"added\", copies)\n    },\n}\n"},
+            {"mode": "ghost", "line": 17, "guide": "The root command only groups subcommands.", "text": "var rootCmd = &cobra.Command{Use: \"app\"}\n"},
+            {"mode": "ghost", "line": 20, "guide": "The flag goes on `addCmd`, the command that reads it.", "notes": [{"on": "addCmd.Flags()", "text": "This flag belongs to add, not to the root."}], "text": "    addCmd.Flags().IntVar(\n        &copies, \"copies\", 1, \"how many to add\",\n    )\n    rootCmd.AddCommand(addCmd)\n    rootCmd.Execute()"}
+          ],
+          "output": {
+            "command": "go run main.go add --copies 2",
+            "text": "added 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "flag-owner",
+          "title": "Who accepts the flag?",
+          "guide": "Which commands accept `--copies`?",
+          "code": "addCmd.Flags().IntVar(\n    &copies, \"copies\", 1, \"how many\",\n)\nrootCmd.AddCommand(addCmd)\nrootCmd.AddCommand(listCmd)",
+          "options": [
+            "The root, add and list",
+            "Only the root",
+            "Only add",
+            "add and list"
+          ],
+          "answer": 2,
+          "explanation": "`Flags()` belongs to the command it is called on, here `addCmd`. The root and `listCmd` have their own flag sets."
+        },
+        {
+          "type": "typing",
+          "id": "flag-changed",
+          "title": "Was the flag given?",
+          "guide": "Tell a flag the user typed from a default.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 8, "guide": "Prints a different line when the user gave the flag.", "notes": [{"on": "Changed", "text": "True only when the user typed the flag."}], "text": "var rootCmd = &cobra.Command{\n    Use: \"deploy\",\n    Run: func(cmd *cobra.Command, args []string) {\n        env, _ := cmd.Flags().GetString(\"env\")\n        if cmd.Flags().Changed(\"env\") {\n            fmt.Println(\"given:\", env)\n        } else {\n            fmt.Println(\"default:\", env)\n        }\n    },\n}\n"},
+            {"mode": "ghost", "line": 21, "guide": "Declare the flag with a default.", "text": "    rootCmd.Flags().String(\"env\", \"dev\", \"target\")\n    rootCmd.Execute()"}
+          ],
+          "output": {
+            "command": "go run main.go --env dev",
+            "text": "given: dev"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "changed-out",
+          "title": "Check a given flag",
+          "guide": "Fill the check that the flag was given and the getter of its value.",
+          "code": "var rootCmd = &cobra.Command{\n    Use: \"build\",\n    Run: func(cmd *cobra.Command, args []string) {\n        if cmd.Flags().___(\"to\") {\n            to, _ := cmd.Flags().___(\"to\")\n            fmt.Println(\"copy to\", to)\n        }\n    },\n}\n\nfunc main() {\n    rootCmd.Flags().String(\"to\", \"dist\", \"folder\")\n    rootCmd.Execute()\n}",
+          "gaps": [
+            {"answers": ["Changed"]},
+            {"answers": ["GetString"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "serve-with-flags",
+          "title": "A command with flags",
+          "guide": "Put the kinds of flag together in one command.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 8, "guide": "One variable for each flag.", "text": "var host string\nvar port int\nvar verbose bool\n"},
+            {"mode": "ghost", "line": 12, "guide": "Prints the address, and a line when `verbose` is on.", "text": "var rootCmd = &cobra.Command{\n    Use: \"serve\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Printf(\"%s:%d\\n\", host, port)\n        if verbose {\n            fmt.Println(\"verbose logging\")\n        }\n    },\n}\n"},
+            {"mode": "ghost", "line": 23, "guide": "Keep the flag set in a variable to type less.", "text": "    flags := rootCmd.Flags()\n    flags.StringVar(\n        &host, \"host\", \"localhost\", \"address\",\n    )"},
+            {"mode": "ghost", "line": 27, "guide": "A short letter for `port` and for `verbose`.", "text": "    flags.IntVarP(\n        &port, \"port\", \"p\", 8080, \"tcp port\",\n    )\n    flags.BoolVarP(\n        &verbose, \"verbose\", \"v\", false, \"logs\",\n    )\n    rootCmd.Execute()"}
+          ],
+          "output": {
+            "command": "go run main.go --port 9000 -v",
+            "text": "localhost:9000\nverbose logging"
+          }
+        }
+      ]
+    }
+  ]
+}

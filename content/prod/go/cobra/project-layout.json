@@ -1,0 +1,511 @@
+{
+  "id": "project-layout",
+  "intro": {
+    "title": "Project layout",
+    "slides": [
+      {
+        "text": "A CLI starts as one file and grows. Cobra projects settle on a shape: a thin `main.go` and one file per command inside a `cmd` folder.\n\nThe snippet is a folder sketch, not Go.",
+        "code": "myapp/\n    main.go\n    cmd/\n        root.go\n        greet.go\n        version.go"
+      },
+      {
+        "text": "The editor here holds a single `main.go`, so each file becomes a function: a constructor for the root, one per command, and a short `main`. You will go from global commands to constructors, pass flags and settings down, and finish with a small whole CLI."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Global or constructor",
+        "slides": [
+          {
+            "text": "A global `rootCmd` is built once, when the program starts, and an `init` function can add to it. Every part of the program then shares that single command.\n\nA constructor is a function that returns a new command on each call.\n\nThe snippet is pseudo code.",
+            "code": "global style:\n    one command, made at startup\n\nconstructor style:\n    each call makes a new command"
+          },
+          {
+            "text": "With constructors, each command gets its own function and the root decides what it contains. Nothing is shared by accident.\n\n`Commands()` returns the subcommands a command holds, as a slice."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "global-root",
+          "title": "A global root command",
+          "guide": "Start with the common layout: a global root command and an `init` that wires a subcommand.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A package-level variable holds the root command.",
+              "notes": [
+                {
+                  "on": "var rootCmd",
+                  "text": "One command, created when the program starts."
+                }
+              ],
+              "text": "var rootCmd = &cobra.Command{\n    Use:   \"app\",\n    Short: \"A small CLI\",\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "A second global holds the subcommand.",
+              "text": "var versionCmd = &cobra.Command{\n    Use:   \"version\",\n    Short: \"Print the version\",\n    Run: func(cmd *cobra.Command, args []string) {\n        fmt.Println(\"app v1.0.0\")\n    },\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "Register the subcommand before `main` runs.",
+              "notes": [
+                {
+                  "on": "func init()",
+                  "text": "Runs by itself, before main starts."
+                }
+              ],
+              "text": "func init() {\n    rootCmd.AddCommand(versionCmd)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 26,
+              "guide": "`main` only has to run the root.",
+              "text": "    rootCmd.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go version",
+            "text": "app v1.0.0"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "why-global",
+          "title": "The cost of a global command",
+          "guide": "Pick the problem this code has if the program needs a second, clean root command.",
+          "code": "var rootCmd = &cobra.Command{Use: \"app\"}\n\nfunc init() {\n    rootCmd.AddCommand(versionCmd)\n}",
+          "options": [
+            "init runs after main, so the command is empty",
+            "AddCommand only works inside main",
+            "Every part of the program shares that one command",
+            "A global command cannot have subcommands"
+          ],
+          "answer": 2,
+          "explanation": "`rootCmd` is created once and every file that touches it changes the same value, so you cannot get a fresh copy."
+        },
+        {
+          "type": "typing",
+          "id": "new-root-cmd",
+          "title": "A constructor for the root",
+          "guide": "Replace the global with a function that builds a new root command on every call.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "The function returns the command instead of keeping it in a variable.",
+              "notes": [
+                {
+                  "on": "return &cobra.Command",
+                  "text": "Every call builds a brand new command."
+                }
+              ],
+              "text": "func newRootCmd() *cobra.Command {\n    return &cobra.Command{\n        Use:   \"app\",\n        Short: \"A small CLI\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"app is running\")\n        },\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Call the constructor, then run what it returns.",
+              "text": "    root := newRootCmd()\n    root.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "app is running"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "constructor-signature",
+          "title": "Hand back the root",
+          "guide": "Fill the gaps: return the new command, build the root with the constructor and run it.",
+          "code": "func newRootCmd() *cobra.Command {\n    ___ &cobra.Command{\n        Use:   \"app\",\n        Short: \"A small CLI\",\n    }\n}\n\nfunc main() {\n    root := ___()\n    root.___()\n}",
+          "gaps": [
+            {
+              "answers": [
+                "return"
+              ]
+            },
+            {
+              "answers": [
+                "newRootCmd"
+              ]
+            },
+            {
+              "answers": [
+                "Execute"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "command-per-func",
+          "title": "One function per command",
+          "guide": "Give the subcommand its own constructor and let the root collect it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    root := newRootCmd()\n    root.Execute()\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Same shape as the root constructor, for one subcommand.",
+              "text": "func newVersionCmd() *cobra.Command {\n    return &cobra.Command{\n        Use:   \"version\",\n        Short: \"Print the version\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"app v1.0.0\")\n        },\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "The root builds itself and adds its subcommand.",
+              "notes": [
+                {
+                  "on": "newVersionCmd())",
+                  "text": "The root only asks the constructor for the command."
+                }
+              ],
+              "text": "func newRootCmd() *cobra.Command {\n    root := &cobra.Command{\n        Use:   \"app\",\n        Short: \"A small CLI\",\n    }\n    root.AddCommand(newVersionCmd())\n    return root\n}\n"
+            }
+          ],
+          "output": {
+            "command": "go run main.go version",
+            "text": "app v1.0.0"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "independent-roots",
+          "title": "Two roots",
+          "guide": "What does this print?",
+          "code": "func newRootCmd() *cobra.Command {\n    return &cobra.Command{Use: \"app\"}\n}\n\nfunc main() {\n    a := newRootCmd()\n    b := newRootCmd()\n    sub := &cobra.Command{Use: \"x\"}\n    a.AddCommand(sub)\n    na, nb := len(a.Commands()), len(b.Commands())\n    fmt.Println(na, nb)\n}",
+          "options": [
+            "1 1",
+            "1 0",
+            "0 0"
+          ],
+          "answer": 1,
+          "explanation": "Each call builds a separate command, so the subcommand added to `a` is not in `b`. With a global `rootCmd` they would be the same command."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Flags, logic and settings",
+        "slides": [
+          {
+            "text": "Keep what a command needs next to it. Flag values live in the constructor, and several of them can go into one options struct. The real work sits in plain functions, and shared settings arrive as parameters.\n\nThe snippet is pseudo code.",
+            "code": "newGreetCmd(settings):\n    values = this command's flags\n    when run: greet(values, settings)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "flags-in-constructor",
+          "title": "A flag inside its command",
+          "guide": "Keep a flag and its value inside the constructor of the command that uses them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    newRootCmd().Execute()\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 8,
+              "text": "func newRootCmd() *cobra.Command {\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(newGreetCmd())\n    return root\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "The value of the flag is a local variable of the constructor.",
+              "notes": [
+                {
+                  "on": "var name string",
+                  "text": "No other command can see this value."
+                }
+              ],
+              "text": "func newGreetCmd() *cobra.Command {\n    var name string\n    cmd := &cobra.Command{\n        Use:   \"greet\",\n        Short: \"Greet someone\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"Hello,\", name)\n        },\n    }\n    cmd.Flags().StringVar(&name, \"name\", \"world\", \"who\")\n    return cmd\n}\n"
+            }
+          ],
+          "output": {
+            "command": "go run main.go greet --name Ana",
+            "text": "Hello, Ana"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "greet-logic",
+          "title": "Logic outside the command",
+          "guide": "Write the greeting as a plain function over an options struct, with no cobra in it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A struct will hold everything the greeting needs.",
+              "text": "type greetOptions struct {\n    name  string\n    shout bool\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The logic only reads the options. A command can call it later.",
+              "text": "func greet(opts greetOptions) string {\n    text := \"Hello, \" + opts.name\n    if opts.shout {\n        text += \"!\"\n    }\n    return text\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Call it with options built by hand.",
+              "text": "    opts := greetOptions{name: \"Ana\", shout: true}\n    fmt.Println(greet(opts))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello, Ana!"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "bind-options",
+          "title": "Flags into the struct",
+          "guide": "Bind the flags of the command straight into the fields of the options struct.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 8,
+              "text": "type greetOptions struct {\n    name  string\n    shout bool\n}\n\nfunc greet(opts greetOptions) string {\n    text := \"Hello, \" + opts.name\n    if opts.shout {\n        text += \"!\"\n    }\n    return text\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "The command only reads its flags and calls `greet`.",
+              "notes": [
+                {
+                  "on": "&opts.name",
+                  "text": "The flag writes straight into the field."
+                }
+              ],
+              "text": "func newGreetCmd() *cobra.Command {\n    var opts greetOptions\n    cmd := &cobra.Command{\n        Use: \"greet\",\n        Run: func(*cobra.Command, []string) {\n            fmt.Println(greet(opts))\n        },\n    }\n    f := cmd.Flags()\n    f.StringVar(&opts.name, \"name\", \"world\", \"who\")\n    f.BoolVar(&opts.shout, \"shout\", false, \"loud\")\n    return cmd\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 36,
+              "guide": "Add the command to a root and run it.",
+              "text": "    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(newGreetCmd())\n    root.Execute()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go greet --name Ana --shout",
+            "text": "Hello, Ana!"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "bind-gaps",
+          "title": "Bind to the options",
+          "guide": "Fill the gaps: the method of a text flag, the struct variable and what the constructor hands back.",
+          "code": "func newGreetCmd() *cobra.Command {\n    var opts greetOptions\n    cmd := &cobra.Command{\n        Use: \"greet\",\n        Run: func(*cobra.Command, []string) {\n            fmt.Println(greet(opts))\n        },\n    }\n    f := cmd.Flags()\n    f.___(&opts.name, \"name\", \"\", \"who\")\n    f.BoolVar(&___.shout, \"shout\", false, \"loud\")\n    return ___\n}",
+          "gaps": [
+            {
+              "answers": [
+                "StringVar"
+              ]
+            },
+            {
+              "answers": [
+                "opts"
+              ]
+            },
+            {
+              "answers": [
+                "cmd"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "options-purpose",
+          "title": "What opts is for",
+          "guide": "What does the options struct do in this command?",
+          "code": "func newGreetCmd() *cobra.Command {\n    var opts greetOptions\n    cmd := &cobra.Command{Use: \"greet\"}\n    f := cmd.Flags()\n    f.StringVar(&opts.name, \"name\", \"\", \"who\")\n    f.BoolVar(&opts.shout, \"shout\", false, \"loud\")\n    return cmd\n}",
+          "options": [
+            "It collects the values of all the command's flags",
+            "It stores the name and help text of the command",
+            "It shares the flags with every subcommand",
+            "It checks that the user gave the flags"
+          ],
+          "answer": 0,
+          "explanation": "Each flag writes into one field, so the command's whole input travels in one value that plain functions can take."
+        },
+        {
+          "type": "typing",
+          "id": "pass-config",
+          "title": "Dependencies as parameters",
+          "guide": "Hand the greeting to the command as a parameter instead of reading a global.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    newRootCmd().Execute()\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A small struct for what the commands share.",
+              "text": "type config struct {\n    greeting string\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "The constructor takes the config it needs.",
+              "notes": [
+                {
+                  "on": "cfg config",
+                  "text": "The command gets what it needs as a parameter."
+                }
+              ],
+              "text": "func newGreetCmd(cfg config) *cobra.Command {\n    return &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(cfg.greeting)\n        },\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "The root builds the config once and passes it down.",
+              "text": "func newRootCmd() *cobra.Command {\n    cfg := config{greeting: \"Hi there\"}\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(newGreetCmd(cfg))\n    return root\n}\n"
+            }
+          ],
+          "output": {
+            "command": "go run main.go greet",
+            "text": "Hi there"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Main and the whole file",
+        "slides": [
+          {
+            "text": "`main` should do almost nothing: build the root and run it, as you have since the first modules. Everything else is in constructors, which in a real project would each get a file, so adding a command never touches `main`."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "thin-main",
+          "title": "Add a command, keep main",
+          "guide": "Add a second command: only constructors change, `main` stays as it is.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    err := newRootCmd().Execute()\n    if err != nil {\n        os.Exit(1)\n    }\n}"},
+            {"mode": "auto", "line": 9, "text": "func newVersionCmd() *cobra.Command {\n    return &cobra.Command{\n        Use: \"version\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"app v1.0.0\")\n        },\n    }\n}\n"},
+            {"mode": "ghost", "line": 18, "guide": "The new command gets its own constructor.", "text": "func newGreetCmd() *cobra.Command {\n    return &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"Hello\")\n        },\n    }\n}\n"},
+            {"mode": "ghost", "line": 27, "guide": "The root lists both commands.", "notes": [{"on": "newGreetCmd()", "text": "The only line that changes when a command is added"}], "text": "func newRootCmd() *cobra.Command {\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(newVersionCmd(), newGreetCmd())\n    return root\n}\n"}
+          ],
+          "output": {
+            "command": "go run main.go greet",
+            "text": "Hello"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "exit-gaps",
+          "title": "Wire the root",
+          "guide": "Fill the gaps: the field that names the root, the method that collects its commands and what the constructor hands back.",
+          "code": "func newRootCmd() *cobra.Command {\n    root := &cobra.Command{___: \"app\"}\n    root.___(newVersionCmd(),\n        newGreetCmd())\n    ___ root\n}",
+          "gaps": [
+            {"answers": ["Use"]},
+            {"answers": ["AddCommand"]},
+            {"answers": ["return"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "file-split",
+          "title": "Where the commands live",
+          "guide": "The CLI grows to ten commands. Where does each constructor go?",
+          "code": "func newRootCmd() *cobra.Command {\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(newServeCmd())\n    return root\n}",
+          "options": [
+            "All in main.go, in one long file",
+            "Each in its own package with its own main",
+            "Inside the body of newRootCmd",
+            "Each in a file of cmd, next to root.go"
+          ],
+          "answer": 3,
+          "explanation": "One file per command inside the `cmd` package, with `root.go` wiring them. `cmd` is a separate package from `main`, so what `main.go` calls (like `NewRootCmd`) needs a capital letter to be exported."
+        },
+        {
+          "type": "typing",
+          "id": "full-cli",
+          "title": "The whole layout",
+          "guide": "Put it all together: a version variable, the commands and one place that wires them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n    \"github.com/spf13/cobra\"\n)\n\nfunc main() {\n    err := newRootCmd().Execute()\n    if err != nil {\n        os.Exit(1)\n    }\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A package variable for the release number.",
+              "notes": [
+                {
+                  "on": "var version",
+                  "text": "A build flag can set the real release number."
+                }
+              ],
+              "text": "var version = \"dev\"\n"
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "func newVersionCmd() *cobra.Command {\n    return &cobra.Command{\n        Use: \"version\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"app\", version)\n        },\n    }\n}\n\nfunc newGreetCmd() *cobra.Command {\n    var name string\n    cmd := &cobra.Command{\n        Use: \"greet\",\n        Run: func(cmd *cobra.Command, args []string) {\n            fmt.Println(\"Hello,\", name)\n        },\n    }\n    cmd.Flags().StringVar(&name, \"name\", \"world\", \"who\")\n    return cmd\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 32,
+              "guide": "The one place that lists every command. The two constructors are already in the file.",
+              "text": "func newRootCmd() *cobra.Command {\n    root := &cobra.Command{Use: \"app\"}\n    root.AddCommand(\n        newGreetCmd(),\n        newVersionCmd(),\n    )\n    return root\n}\n"
+            }
+          ],
+          "output": {
+            "command": "go run main.go greet",
+            "text": "Hello, world"
+          }
+        }
+      ]
+    }
+  ]
+}
