@@ -40,7 +40,7 @@ The shape of `course.json`:
 - **The tier of a section is the difficulty of its concepts,** not the shape of the exercises (`docs/course-structure.md`, "Tiers"): `basic`, `medium` or `advanced`. Decide it **from your own knowledge of the language or the library**: how many other concepts a concept needs first, how abstract it is, how easy it is to get wrong. Do not match it to a list of examples
 - **A section is cohesive:** every module in it fits the section's name and tier. When you add or move a module, check it against its section. If it does not fit, rename the section so the name covers all its modules, move the module to the section where it belongs, or make a new section for it (a module that is a rare topic goes to its own section with the medium tier, not into a basic one). Check the sections after a split too: a section must never become a pile of unrelated modules
 - **The order is the order of study** inside a section and across sections, and it follows what depends on what
-- **One session per module to start:** `"sessions": 1`. The exercises skill raises it up to 3 when a module needs more, and asks this skill for more modules when a concept needs more than 3 sessions
+- **One session per module to start:** `"sessions": 1`. The exercises skill raises it up to 4 when a module needs more, and asks this skill for more modules when a concept needs 5 or more sessions
 - **A module made by splitting a concept** is named for its theme (`Slices in functions`, `Maps of maps`), never `Slices 2`. Each one is still one concept
 - A core course covers the language itself, nothing tied to an external library. An ecosystem course covers its own library
 
@@ -50,7 +50,7 @@ The shape of `course.json`:
 - Keep every existing id, and the `id` of the course
 
 ## Called by the exercises skill
-When `ingrain-exercises` needs more modules because a concept does not fit in 3 sessions, it calls this skill with a request: the modules to add, the module they go right after, and the tier. Add them right after that module, in its section when they fit it, or in a section of their own, with the right tier, when they do not (rare topics get a medium section of their own). Each starts with `"sessions": 1` and has no file. Do not touch the module they follow. This skill never calls `ingrain-exercises` back
+When `ingrain-exercises` needs more modules because a concept does not fit in 4 sessions, it calls this skill with a request: the modules to add, the module they go right after, and the tier. Add them right after that module, in its section when they fit it, or in a section of their own, with the right tier, when they do not (rare topics get a medium section of their own). Each starts with `"sessions": 1` and has no file. Do not touch the module they follow. This skill never calls `ingrain-exercises` back
 
 ## Modifying: be careful
 - **Never rename or reuse the id of a module that has a file.** The saved progress points at `<language>/<course>/<module>`
