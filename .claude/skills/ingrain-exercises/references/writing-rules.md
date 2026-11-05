@@ -50,6 +50,7 @@ A note is a hint under a piece of code, shown while the user types it.
 - The code is short, uses a feature of the module's concept and not general programming, and has no comments that give the answer away
 - The `explanation` says why the answer is right, in a sentence or two, and does not repeat the option
 - **Never run the code.** The `answer` of an `output` quiz, and the `output` of a typing exercise, are what you can predict by reading the program. Keep every program deterministic, so the output is certain: no randomness, no current time, no map iteration order, no goroutines racing for the output. If you cannot be sure of an output, change the program
+- **`output` only for plain printed text.** The output card shows plain printed lines only. When the program prints plain text, even in an ecosystem course (a cobra command that prints a line), write `output`. When its result is a rendered TUI screen, a running web server or an interactive session, omit `output` right away. This does not apply to `output` quizzes
 
 ## Fill in the blank
 - The shape and the limits are in `docs/content-structure.md` ("Module file: fill-blank")
