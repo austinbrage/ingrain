@@ -1,0 +1,784 @@
+{
+  "id": "regular-expressions",
+  "intro": {
+    "title": "Regular expressions",
+    "slides": [
+      {
+        "text": "A regular expression is a pattern that describes a family of texts: every ticket id, every date, every number in a log. The `regexp` package finds, extracts and rewrites them.\n\nThe pattern `\\d+` means one or more digits.",
+        "code": "re := regexp.MustCompile(`\\d+`)\nfmt.Println(re.FindString(\"room 204\"))"
+      },
+      {
+        "text": "Go's engine always runs in linear time, so no pattern can hang the program. The price is that it has no lookahead and no backreferences.\n\nCompile a pattern once and reuse it. Compiling inside a loop wastes time."
+      },
+      {
+        "text": "You will match texts, find and extract them, then capture groups and replace text."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Matching",
+        "slides": [
+          {
+            "text": "A pattern is made of pieces. Some match one character:\n\n- `.` any character\n- `\\d` a digit\n- `\\w` a letter, digit or `_`\n- `\\s` a space or a tab\n- `[A-Z]` one from a set"
+          },
+          {
+            "text": "Quantifiers say how many times, and anchors pin the position:\n\n- `+` one or more\n- `*` zero or more\n- `?` zero or one\n- `{3}` exactly three\n- `^` and `$` the start and the end of the text"
+          },
+          {
+            "text": "Without anchors a pattern matches anywhere in the text. Characters like `.`, `+`, `(` and `[` have a meaning, so a literal dot is written `\\.`.\n\nA backtick string is raw, so `\\d` needs no doubling.",
+            "code": "raw := `\\d+`\nplain := \"\\\\d+\""
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "match-a-word",
+          "title": "Match a word",
+          "guide": "Check whether a text contains a pattern.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Compile the pattern once. `MustCompile` panics if the pattern is invalid.",
+              "notes": [
+                {
+                  "on": "regexp.MustCompile",
+                  "text": "Builds a pattern you can match many times"
+                }
+              ],
+              "text": "    re := regexp.MustCompile(`err`)"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`MatchString` is true when the pattern appears anywhere in the text.",
+              "notes": [
+                {
+                  "on": "re.MatchString(\"error",
+                  "text": "True if the pattern is found anywhere in the text"
+                }
+              ],
+              "text": "    fmt.Println(re.MatchString(\"error: disk full\"))\n    fmt.Println(re.MatchString(\"all good\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "product-codes",
+          "title": "Product codes",
+          "guide": "Validate codes like `AB-123`. Backticks keep `\\d` as written.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A code is two capital letters, a dash and three digits.",
+              "notes": [
+                {
+                  "on": "[A-Z]",
+                  "text": "One capital letter, from A to Z"
+                },
+                {
+                  "on": "{2}",
+                  "text": "Repeat the previous item exactly twice"
+                },
+                {
+                  "on": "\\d",
+                  "text": "One digit, from 0 to 9"
+                }
+              ],
+              "text": "    re := regexp.MustCompile(`[A-Z]{2}-\\d{3}`)"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Try four inputs. The pattern is not pinned to the whole text.",
+              "text": "    codes := []string{\n        \"AB-123\",\n        \"ab-123\",\n        \"AB-12\",\n        \"see CD-456 ok\",\n    }\n    for _, code := range codes {\n        fmt.Println(code, re.MatchString(code))\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "AB-123 true\nab-123 false\nAB-12 false\nsee CD-456 ok true"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "whole-text",
+          "title": "Match the whole text",
+          "guide": "Pin a pattern to the start and the end, so the whole text must fit.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`^` and `$` pin the pattern to the edges of the text.",
+              "notes": [
+                {
+                  "on": "^",
+                  "text": "Start of the text"
+                },
+                {
+                  "on": "$",
+                  "text": "End of the text"
+                },
+                {
+                  "on": "+",
+                  "text": "One or more of the previous item"
+                }
+              ],
+              "text": "    re := regexp.MustCompile(`^\\d+$`)"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`%q` shows the empty text as two quotes.",
+              "text": "    inputs := []string{\"2024\", \"20x4\", \"\", \"7\"}\n    for _, input := range inputs {\n        fmt.Printf(\"%q %v\\n\", input, re.MatchString(input))\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "\"2024\" true\n\"20x4\" false\n\"\" false\n\"7\" true"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "match-fill",
+          "title": "Check a word",
+          "guide": "Compile the pattern and check a text against it.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n    re := regexp.___(`^[a-z]+$`)\n    fmt.Println(re.___(\"go\"))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "MustCompile"
+              ]
+            },
+            {
+              "answers": [
+                "MatchString"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "ignore-case",
+          "title": "Ignore case",
+          "guide": "Accept an answer in any letter case.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A flag at the start of the pattern changes how it matches.",
+              "notes": [
+                {
+                  "on": "(?i)",
+                  "text": "Flag: ignore the case of the letters"
+                }
+              ],
+              "text": "    re := regexp.MustCompile(`(?i)^yes$`)"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Pinned with `^` and `$`, only the whole word counts.",
+              "text": "    answers := []string{\"yes\", \"YES\", \"Yes!\", \"no\"}\n    for _, answer := range answers {\n        fmt.Println(answer, re.MatchString(answer))\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "yes true\nYES true\nYes! false\nno false"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Finding",
+        "slides": [
+          {
+            "text": "The find methods are built from the same words. This is pseudo code for how the names grow, not Go.",
+            "code": "Find        the first match\nFindAll     every match\n...String   works on a string\n...Index    positions, not text\n...Submatch also the groups"
+          },
+          {
+            "text": "No match is not an error: `FindString` returns an empty string, and the slice versions return `nil`.\n\n`FindAllString(text, n)` stops after `n` matches, and `-1` means all of them."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "find-first",
+          "title": "Find the first match",
+          "guide": "Pull the first number out of a text.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A number is one or more digits.",
+              "text": "    re := regexp.MustCompile(`\\d+`)\n    text := \"order 66 ships in 3 days\""
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`FindString` returns the matching text, not a bool.",
+              "notes": [
+                {
+                  "on": "re.FindString(text)",
+                  "text": "The first match, reading left to right"
+                },
+                {
+                  "on": "re.FindString(\"no",
+                  "text": "No match gives an empty string"
+                }
+              ],
+              "text": "    fmt.Println(re.FindString(text))\n    fmt.Printf(\"%q\\n\", re.FindString(\"no digits\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "66\n\"\""
+          }
+        },
+        {
+          "type": "typing",
+          "id": "find-all",
+          "title": "Find every match",
+          "guide": "Collect every hashtag of a text.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A hashtag is `#` followed by word characters.",
+              "notes": [
+                {
+                  "on": "\\w",
+                  "text": "A letter, a digit or an underscore"
+                }
+              ],
+              "text": "    re := regexp.MustCompile(`#\\w+`)\n    text := \"#go and #rust beat #cobol\""
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`FindAllString` takes a limit. `-1` means no limit.",
+              "notes": [
+                {
+                  "on": "-1",
+                  "text": "No limit: return every match"
+                },
+                {
+                  "on": "text, 2",
+                  "text": "Stop after two matches"
+                }
+              ],
+              "text": "    tags := re.FindAllString(text, -1)\n    fmt.Println(tags, len(tags))\n    fmt.Println(re.FindAllString(text, 2))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[#go #rust #cobol] 3\n[#go #rust]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "find-position",
+          "title": "Find the position",
+          "guide": "Locate a match and cut it out of the text.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The text holds a room number and a floor.",
+              "text": "    re := regexp.MustCompile(`\\d+`)\n    text := \"room 204, floor 2\""
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`FindStringIndex` returns where the match starts and ends.",
+              "notes": [
+                {
+                  "on": "re.FindStringIndex(text)",
+                  "text": "Start and end of the first match"
+                },
+                {
+                  "on": "loc[0]:loc[1]",
+                  "text": "The end is exclusive, so this cuts the match out"
+                }
+              ],
+              "text": "    loc := re.FindStringIndex(text)\n    fmt.Println(loc)\n    fmt.Println(text[loc[0]:loc[1]])"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "With no match the result is `nil`.",
+              "text": "    fmt.Println(re.FindStringIndex(\"none\") == nil)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[5 8]\n204\ntrue"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "count-words",
+          "title": "Count the words",
+          "guide": "Collect every word as a string, with no limit on how many.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n    re := regexp.___(`[a-z]+`)\n    words := re.___(\"go, rust\", ___)\n    fmt.Println(len(words))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "MustCompile"
+              ]
+            },
+            {
+              "answers": [
+                "FindAllString"
+              ]
+            },
+            {
+              "answers": [
+                "-1"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "limit-output",
+          "title": "Limits",
+          "guide": "Read the code, then pick the output.",
+          "code": "re := regexp.MustCompile(`[a-z]+`)\ntext := \"ab cd ef\"\nfmt.Println(\n    re.FindAllString(text, 2),\n    re.FindAllString(text, 0),\n)",
+          "options": [
+            "[ab cd] [ab cd ef]",
+            "[ab cd] [ab]",
+            "[ab cd] []",
+            "[ab] []"
+          ],
+          "answer": 2,
+          "explanation": "A limit of 2 stops after two matches. A limit of 0 asks for none, so the result is an empty slice."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Groups and replacing",
+        "slides": [
+          {
+            "text": "Parentheses capture part of a match as a group. A submatch result lists the whole match first, then each group in order of its opening parenthesis. This is pseudo code.",
+            "code": "pattern: (year)-(month)\ntext:    \"2026-11\"\nresult:  [\"2026-11\", \"2026\", \"11\"]"
+          },
+          {
+            "text": "A group can have a name, `(?P<name>...)`, so you do not count positions.\n\nGroups also feed the replacement: in the new text, `$1` stands for the first group of each match."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "email-parts",
+          "title": "Capture groups",
+          "guide": "Pull the user and the site out of an address.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Parentheses turn parts of the pattern into groups.",
+              "notes": [
+                {
+                  "on": "(\\w+)@",
+                  "text": "Parentheses capture this part as a group"
+                },
+                {
+                  "on": "\\.",
+                  "text": "A literal dot, not any character"
+                }
+              ],
+              "text": "    re := regexp.MustCompile(`(\\w+)@(\\w+)\\.com`)\n    parts := re.FindStringSubmatch(\"mail ana@site.com now\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The result holds the whole match, then each group.",
+              "notes": [
+                {
+                  "on": "parts[0]",
+                  "text": "Index 0 is the whole match"
+                }
+              ],
+              "text": "    fmt.Println(len(parts))\n    fmt.Println(parts[0])\n    fmt.Println(parts[1], parts[2])"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "With no match the result is `nil`.",
+              "notes": [
+                {
+                  "on": "== nil",
+                  "text": "Check before indexing, or the program panics"
+                }
+              ],
+              "text": "    if re.FindStringSubmatch(\"no mail\") == nil {\n        fmt.Println(\"no match\")\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\nana@site.com\nana site\nno match"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "named-groups",
+          "title": "Named groups",
+          "guide": "Read a date by the name of its parts.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Give each group a name instead of counting.",
+              "notes": [
+                {
+                  "on": "(?P<year>",
+                  "text": "Names the group, so you need no position"
+                }
+              ],
+              "text": "    re := regexp.MustCompile(\n        `(?P<year>\\d{4})-(?P<month>\\d{2})`,\n    )\n    parts := re.FindStringSubmatch(\"due 2026-11-04\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "`SubexpIndex` turns a name into its position.",
+              "notes": [
+                {
+                  "on": "re.SubexpIndex(\"month\")",
+                  "text": "The position of a named group"
+                }
+              ],
+              "text": "    month := re.SubexpIndex(\"month\")\n    fmt.Println(parts[month])\n    fmt.Println(parts[re.SubexpIndex(\"year\")])"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "11\n2026"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "reorder-dates",
+          "title": "Reorder dates",
+          "guide": "Rewrite every date from year-month-day to day/month/year.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Three groups, one for each part of the date.",
+              "text": "    re := regexp.MustCompile(\n        `(\\d{4})-(\\d{2})-(\\d{2})`,\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "In the replacement, `$1` stands for the first group.",
+              "notes": [
+                {
+                  "on": "$3/$2/$1",
+                  "text": "Each $n inserts group n of the match"
+                }
+              ],
+              "text": "    text := \"2026-11-04 to 2026-12-01\"\n    fmt.Println(re.ReplaceAllString(text, \"$3/$2/$1\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "04/11/2026 to 01/12/2026"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "double-numbers",
+          "title": "Replace with a function",
+          "guide": "Double every number in a text.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n    \"strconv\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The text holds two numbers.",
+              "text": "    re := regexp.MustCompile(`\\d+`)\n    text := \"3 apples and 12 pears\""
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "A function decides the replacement of each match.",
+              "notes": [
+                {
+                  "on": "ReplaceAllStringFunc",
+                  "text": "Calls the function for every match"
+                }
+              ],
+              "text": "    doubled := re.ReplaceAllStringFunc(\n        text,\n        func(match string) string {\n            n, _ := strconv.Atoi(match)\n            return strconv.Itoa(n * 2)\n        },\n    )\n    fmt.Println(doubled)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "6 apples and 24 pears"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "dollar-names",
+          "title": "Group names",
+          "guide": "Read the code, then pick the output.",
+          "code": "re := regexp.MustCompile(`(\\d+)kg`)\na := re.ReplaceAllString(\"5kg\", \"$1g\")\nb := re.ReplaceAllString(\"5kg\", \"${1}g\")\nfmt.Printf(\"%q %q\\n\", a, b)",
+          "options": [
+            "\"5g\" \"5g\"",
+            "\"\" \"5g\"",
+            "\"5g\" \"\"",
+            "\"5kg\" \"5g\""
+          ],
+          "answer": 1,
+          "explanation": "`$1g` is read as a group named `1g`, which does not exist, so it adds nothing. Braces end the name: `${1}g` is group 1 and then `g`."
+        },
+        {
+          "type": "fill-blank",
+          "id": "pick-a-group",
+          "title": "Pick a group",
+          "guide": "Get the groups of the pair, print the value and swap the two sides.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n    re := regexp.MustCompile(`(\\w+)=(\\w+)`)\n    parts := re.___(\"mode=fast\")\n    fmt.Println(parts[___])\n    out := re.ReplaceAllString(\"a=b\", \"$___=$1\")\n    fmt.Println(out)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "FindStringSubmatch"
+              ]
+            },
+            {
+              "answers": [
+                "2"
+              ]
+            },
+            {
+              "answers": [
+                "2"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-4",
+      "intro": {
+        "title": "Patterns in real code",
+        "slides": [
+          {
+            "text": "`MustCompile` panics on a broken pattern, which is fine for a pattern you wrote in your code. A pattern that comes from outside needs `Compile`, which returns an error to check."
+          },
+          {
+            "text": "To match text from a user literally, wrap it with `QuoteMeta`: it escapes every character that has a meaning in a pattern."
+          },
+          {
+            "text": "`+` and `*` are greedy: they take as much text as they can. Adding `?` makes them lazy, taking as little as possible.\n\nThe difference shows when the text around the match can repeat."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "check-patterns",
+          "title": "Check a pattern",
+          "guide": "Find out which patterns are valid without crashing.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Two of these patterns are broken.",
+              "text": "    patterns := []string{`^\\d+$`, `*abc`, `a**`}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`Compile` returns an error instead of panicking. Use it for patterns you did not write.",
+              "notes": [
+                {
+                  "on": "regexp.Compile",
+                  "text": "Like MustCompile, but returns an error"
+                },
+                {
+                  "on": "err == nil",
+                  "text": "True when the pattern is valid"
+                }
+              ],
+              "text": "    for _, pattern := range patterns {\n        _, err := regexp.Compile(pattern)\n        fmt.Println(pattern, err == nil)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "^\\d+$ true\n*abc false\na** false"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "literal-name",
+          "title": "Why QuoteMeta?",
+          "guide": "Pick what the call to `QuoteMeta` is for.",
+          "code": "name := \"a.b\"\nre := regexp.MustCompile(\n    \"^\" + regexp.QuoteMeta(name) + \"$\",\n)",
+          "options": [
+            "Checks the pattern for syntax errors",
+            "Makes the match ignore letter case",
+            "Matches the name literally, dot included",
+            "Turns the name into capture groups"
+          ],
+          "answer": 2,
+          "explanation": "`QuoteMeta` escapes characters like `.` so they match themselves. Without it, `a.b` would also match `axb`."
+        },
+        {
+          "type": "typing",
+          "id": "greedy-and-lazy",
+          "title": "Greedy and lazy",
+          "guide": "Match an HTML tag in two ways and compare.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Two patterns for the same tag. The second has an extra character.",
+              "notes": [
+                {
+                  "on": ".+>",
+                  "text": "Dot is any character, and plus takes as much as it can"
+                },
+                {
+                  "on": ".+?",
+                  "text": "The question mark takes as little as it can"
+                }
+              ],
+              "text": "    text := \"<b>bold</b> and <i>italic</i>\"\n    greedy := regexp.MustCompile(`<.+>`)\n    lazy := regexp.MustCompile(`<.+?>`)"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Print the first match of each.",
+              "text": "    fmt.Println(greedy.FindString(text))\n    fmt.Println(lazy.FindString(text))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "<b>bold</b> and <i>italic</i>\n<b>"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "split-by-pattern",
+          "title": "Split by a pattern",
+          "guide": "Split a list written with mixed separators.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"regexp\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Commas or semicolons, with spaces around them.",
+              "notes": [
+                {
+                  "on": "[,;]",
+                  "text": "One of the characters inside the brackets"
+                },
+                {
+                  "on": "`\\s*",
+                  "text": "Zero or more spaces, so the gaps vanish"
+                }
+              ],
+              "text": "    re := regexp.MustCompile(`\\s*[,;]\\s*`)"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`Split` cuts the text at every match. `-1` means no limit.",
+              "text": "    parts := re.Split(\"a, b;c ,d\", -1)\n    fmt.Printf(\"%q\\n\", parts)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[\"a\" \"b\" \"c\" \"d\"]"
+          }
+        }
+      ]
+    }
+  ]
+}

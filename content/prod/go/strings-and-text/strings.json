@@ -1,0 +1,250 @@
+{
+  "id": "strings",
+  "intro": {
+    "title": "Strings",
+    "slides": [
+      {
+        "text": "A string is a read-only sequence of **bytes**. Most of what you do with it comes from that: its length counts bytes, an index gives a byte, and a cut gives a piece of bytes.\n\nIn this module you will write strings, measure and cut them, build new ones and compare them. Letters beyond ASCII come in `runes-and-utf8`, and the helpers in `strings-package`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Two ways to write text",
+        "slides": [
+          {
+            "text": "A normal string between quotes understands escapes: a backslash plus a letter makes a special character. A raw string between backticks understands nothing and keeps the text as it is.\n\nThe snippet is pseudo code, not Go.",
+            "code": "quotes   -> escapes work\nbackticks -> text kept as typed"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "escape-sequences",
+          "title": "Escape characters",
+          "guide": "Special characters inside a string start with a backslash.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A backslash and a letter make one special character. Type a new line and a tab.", "notes": [{"on": "\\n", "text": "Ends the line, like pressing Enter."}, {"on": "\\t", "text": "A tab: jumps to the next column."}], "text": "    fmt.Println(\"one\\ntwo\")\n    fmt.Println(\"Name:\\tAna\")"},
+            {"mode": "ghost", "line": 8, "guide": "A quote inside a string needs a backslash, or it would end the string.", "notes": [{"on": "\\\"hi", "text": "Prints a quote without ending the string."}], "text": "    fmt.Println(\"She said \\\"hi\\\"\")"},
+            {"mode": "ghost", "line": 9, "guide": "To print a backslash itself, write two.", "notes": [{"on": "\\\\", "text": "Two backslashes print as one."}], "text": "    fmt.Println(\"C:\\\\temp\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "one\ntwo\nName:\tAna\nShe said \"hi\"\nC:\\temp"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "raw-strings",
+          "title": "Raw strings",
+          "guide": "Backticks make a string where nothing is escaped.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Between backticks a backslash is just a backslash, so a path is written as it is.", "notes": [{"on": "`C:", "text": "Raw string: no escapes, what you type is what you get."}], "text": "    path := `C:\\temp\\new`\n    fmt.Println(path)"},
+            {"mode": "ghost", "line": 8, "guide": "A raw string can also span several lines. It keeps the line break and the spaces.", "text": "    menu := `tea\n    coffee`\n    fmt.Println(menu)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "C:\\temp\\new\ntea\n    coffee"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "raw-or-escaped",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := \"x\\ty\"\n    b := `x\\ty`\n    fmt.Println(len(a), len(b))\n}",
+          "options": ["3 3", "4 3", "3 4", "4 4"],
+          "answer": 2,
+          "explanation": "In `a`, `\\t` is one tab byte, so it holds 3 bytes. In the raw string `b` the backslash and the `t` stay as typed, so it holds 4."
+        },
+        {
+          "type": "typing",
+          "id": "empty-string",
+          "title": "The empty string",
+          "guide": "A string with nothing in it is a normal value.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A string declared without a value starts as the empty string, not `nil`.", "notes": [{"on": "== \"\"", "text": "Two quotes with nothing between: the empty string."}], "text": "    var name string\n    fmt.Println(name == \"\", len(name))"},
+            {"mode": "ghost", "line": 8, "guide": "Once it has text, it is no longer empty.", "text": "    name = \"Ana\"\n    fmt.Println(name == \"\", len(name))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true 0\nfalse 3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "check-empty",
+          "title": "Check for empty",
+          "guide": "Print each message when the name is empty: first by its length, then by comparing it.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    name := \"\"\n    if ___(name) == 0 {\n        fmt.Println(\"no name\")\n    }\n    if name ___ \"\" {\n        fmt.Println(\"still empty\")\n    }\n}",
+          "gaps": [{"answers": ["len"]}, {"answers": ["=="]}]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "A string is bytes",
+        "slides": [
+          {
+            "text": "Think of a string as a row of numbered boxes, each holding one byte. The first box is 0. Asking for a box gives a number, and asking for a range of boxes gives a new string.\n\nThe snippet is pseudo code, not Go.",
+            "code": "\"Go\" = boxes 71, 111\nbox 0 -> 71\nboxes 0 to 1 -> \"G\""
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "bytes-not-letters",
+          "title": "Bytes, not letters",
+          "guide": "`len` counts bytes, not letters. Counting letters comes in `runes-and-utf8`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A plain word has one byte per letter. An accented letter takes two.", "notes": [{"on": "café", "text": "The é is stored in 2 bytes, so the length grows."}], "text": "    fmt.Println(len(\"cafe\"))\n    fmt.Println(len(\"café\"))"},
+            {"mode": "ghost", "line": 8, "guide": "The same happens with a variable.", "text": "    name := \"niño\"\n    fmt.Println(name, len(name))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4\n5\nniño 5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "index-a-string",
+          "title": "Index a string",
+          "guide": "Read one position of a string.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Indexing a string gives one byte, which is a number, not a letter.", "notes": [{"on": "[0]", "text": "The byte at position 0: a number, not text."}], "text": "    lang := \"Go\"\n    fmt.Println(lang[0])"},
+            {"mode": "ghost", "line": 8, "guide": "Turn the byte back into text with `string`.", "text": "    fmt.Println(string(lang[0]))"},
+            {"mode": "ghost", "line": 9, "guide": "A byte can be compared with a character literal.", "text": "    fmt.Println(lang[0] == 'G')"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "71\nG\ntrue"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "index-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := \"Hi\"\n    fmt.Println(s[0], string(s[1]))\n}",
+          "options": ["72 i", "H i", "72 105", "H 105"],
+          "answer": 0,
+          "explanation": "`s[0]` is a byte, so it prints the number 72. `s[1]` is converted with `string`, so it prints the letter i."
+        },
+        {
+          "type": "typing",
+          "id": "cut-a-string",
+          "title": "Cut a string",
+          "guide": "Take a piece out of a string with positions.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A string is cut like a slice. The result is a new string.", "notes": [{"on": "date[:4]", "text": "Bytes 0 to 3: the piece is a string."}], "text": "    date := \"2026-11-04\"\n    year := date[:4]"},
+            {"mode": "ghost", "line": 8, "guide": "The positions count bytes from the start.", "text": "    month := date[5:7]\n    day := date[8:]\n    fmt.Println(year, month, day)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2026 11 04"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "split-the-file",
+          "title": "Split a file name",
+          "guide": "Cut `report` and `pdf` out of the file name, leaving the dot out.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    file := \"report.pdf\"\n    name := file[:___]\n    ext := file[___:]\n    fmt.Println(name, ext)\n}",
+          "gaps": [{"answers": ["6"]}, {"answers": ["7"]}]
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Strings never change",
+        "slides": [
+          {
+            "text": "The boxes of a string cannot be rewritten. To get a different text, you build a new string from pieces of the old one and new text. Comparing strings looks at the boxes from the left, one by one."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "build-a-new-string",
+          "title": "Build a new string",
+          "guide": "A string cannot change in place, so build another one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`word[0] = 'b'` does not compile: a string is read only.", "text": "    word := \"cat\""},
+            {"mode": "ghost", "line": 7, "guide": "Join new text with a piece of the old string. The old one stays as it was.", "text": "    fixed := \"b\" + word[1:]\n    fmt.Println(fixed, word)"},
+            {"mode": "ghost", "line": 9, "guide": "Keep the start of the word and change the end.", "text": "    short := word[:2] + \"p\"\n    fmt.Println(short)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "bat cat\ncap"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "last-byte",
+          "title": "The last byte",
+          "guide": "Read the end of a string.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Go has no `file[-1]`, so count from the length.", "notes": [{"on": "len(file)-1", "text": "Counting starts at 0, so the last index is one less."}], "text": "    file := \"notes.txt\"\n    last := file[len(file)-1]"},
+            {"mode": "ghost", "line": 8, "guide": "Show the byte and the letter.", "text": "    fmt.Println(last, string(last))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "116 t"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "first-and-last",
+          "title": "First and last",
+          "guide": "Read the first and the last byte of the word.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    word := \"gopher\"\n    last := word[___(word)-1]\n    first := word[___]\n    fmt.Println(first, last)\n}",
+          "gaps": [{"answers": ["len"]}, {"answers": ["0"]}]
+        },
+        {
+          "type": "typing",
+          "id": "compare-strings",
+          "title": "Compare strings",
+          "guide": "Strings compare byte by byte.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`==` needs every byte to match, so the case counts.", "text": "    lang := \"Go\"\n    fmt.Println(lang == \"Go\", lang == \"go\")"},
+            {"mode": "ghost", "line": 8, "guide": "`<` compares from the left. Uppercase letters come before lowercase ones.", "notes": [{"on": "up < low", "text": "Z is byte 90 and a is 97, so Z comes first."}], "text": "    low := \"apple\"\n    up := \"Zebra\"\n    fmt.Println(low < \"banana\")\n    fmt.Println(up < low)"},
+            {"mode": "ghost", "line": 12, "guide": "A string that is the start of another sorts first.", "text": "    fmt.Println(lang < \"Gopher\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true false\ntrue\ntrue\ntrue"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "compare-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := \"Go\"\n    b := \"go\"\n    c := \"Gopher\"\n    fmt.Println(a == b, a < b, c > a)\n}",
+          "options": ["false false true", "true true true", "false true false", "false true true"],
+          "answer": 3,
+          "explanation": "`a == b` is false because of the case. `a < b` is true because G (71) comes before g (103). `c > a` is true because `Gopher` extends `Go`."
+        }
+      ]
+    }
+  ]
+}

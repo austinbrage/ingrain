@@ -1,0 +1,378 @@
+{
+  "id": "string-builder",
+  "intro": {
+    "title": "String builder",
+    "slides": [
+      {
+        "text": "A Go string never changes, so joining many pieces with `+` makes a new copy each time. `strings.Builder` collects the pieces in one buffer and hands over the string at the end.\n\nIn this module you will write into a builder, add bytes and characters, and use it inside loops and functions."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Writing into a builder",
+        "slides": [
+          {
+            "text": "A builder is like an empty box you add text to. You write pieces in order, then read the whole text once.\n\nThe snippet is pseudo code, not Go.",
+            "code": "box = empty builder\nadd \"a\" to box\nadd \"b\" to box\ntext = read box\n      -> \"ab\""
+          },
+          {
+            "text": "Writing to a builder does not copy the text collected so far. That is why it beats `+=` when a loop adds many pieces."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "write-pieces",
+          "title": "Write into a builder",
+          "guide": "Collect text in a builder, then take the result.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A `strings.Builder` starts empty. Declare it with `var`, no setup needed.",
+              "notes": [
+                {
+                  "on": "strings.Builder",
+                  "text": "A buffer you add text to. Its empty value is ready to use."
+                }
+              ],
+              "text": "    var sb strings.Builder"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`WriteString` adds text to the end.",
+              "notes": [
+                {
+                  "on": "sb.WriteString(\"go\")",
+                  "text": "Appends to the end, without copying what is there."
+                }
+              ],
+              "text": "    sb.WriteString(\"go\")\n    sb.WriteString(\"lang\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`String` returns everything written so far. `Len` counts its bytes.",
+              "notes": [
+                {
+                  "on": "sb.String()",
+                  "text": "Turns the collected text into a string."
+                },
+                {
+                  "on": "sb.Len()",
+                  "text": "The size in bytes, like len on a string."
+                }
+              ],
+              "text": "    fmt.Println(sb.String())\n    fmt.Println(sb.Len())"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "golang\n6"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "build-in-loop",
+          "title": "Build in a loop",
+          "guide": "Write one line per step, then print the whole text.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Declare a builder and the steps to write.",
+              "text": "    var sb strings.Builder\n    steps := []string{\"ready\", \"set\", \"go\"}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Write each step and a line break. The builder keeps adding to the same buffer.",
+              "text": "    for _, step := range steps {\n        sb.WriteString(step)\n        sb.WriteString(\"...\\n\")\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "`Print` adds no line break of its own: the text already has them.",
+              "text": "    fmt.Print(sb.String())"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "ready...\nset...\ngo..."
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-the-builder",
+          "title": "Fill the builder",
+          "guide": "Declare a builder, write two pieces and print the text.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    var sb strings.___\n    sb.___(\"hello\")\n    sb.WriteString(\" world\")\n    fmt.Println(sb.___())\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Builder"
+              ]
+            },
+            {
+              "answers": [
+                "WriteString"
+              ]
+            },
+            {
+              "answers": [
+                "String"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "why-not-plus",
+          "title": "What is wrong with +=?",
+          "guide": "Read the code, then pick the reason a builder is better.",
+          "code": "var s string\nfor _, w := range words {\n    s += w\n}",
+          "options": [
+            "It does not compile inside a loop",
+            "A string cannot be changed with +=",
+            "Each += copies the whole text again",
+            "+= only joins two strings at a time"
+          ],
+          "answer": 2,
+          "explanation": "A string never changes, so every += builds a new one and copies all the old text. On a long loop that adds up. A builder appends to one buffer instead."
+        },
+        {
+          "type": "typing",
+          "id": "write-bytes-and-runes",
+          "title": "Bytes and runes",
+          "guide": "Add a single byte and a single character.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Start with two letters in the builder.",
+              "text": "    var sb strings.Builder\n    sb.WriteString(\"ab\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`WriteByte` adds one byte, `WriteRune` one character.",
+              "notes": [
+                {
+                  "on": "WriteByte",
+                  "text": "Takes a byte. A quoted ASCII character fits."
+                },
+                {
+                  "on": "WriteRune",
+                  "text": "Adds the character in its UTF-8 form."
+                }
+              ],
+              "text": "    sb.WriteByte('-')\n    sb.WriteRune('é')"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "`Len` counts bytes, and é takes two of them.",
+              "text": "    fmt.Println(sb.String())\n    fmt.Println(sb.Len())"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "ab-é\n5"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Builders in real code",
+        "slides": [
+          {
+            "text": "In real programs a builder usually lives inside a loop or a function: write the pieces, then return one string. It can also be emptied and reused, or told how much room to expect."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "between-items",
+          "title": "Separators between items",
+          "guide": "Write a comma before every name except the first.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Declare a builder and the names.",
+              "text": "    var sb strings.Builder\n    names := []string{\"ana\", \"ben\", \"cy\"}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The index tells which name is first. Only later ones get a separator.",
+              "notes": [
+                {
+                  "on": "i > 0",
+                  "text": "Skips the separator before the first name."
+                }
+              ],
+              "text": "    for i, name := range names {\n        if i > 0 {\n            sb.WriteString(\", \")\n        }\n        sb.WriteString(name)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Print the joined names.",
+              "text": "    fmt.Println(sb.String())"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "ana, ben, cy"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "dash-between",
+          "title": "A dash and a letter",
+          "guide": "Add the dash as a byte and the accented letter as a character.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    var sb strings.Builder\n    sb.WriteString(\"ab\")\n    sb.___('-')\n    sb.___('é')\n    fmt.Println(sb.String())\n}",
+          "gaps": [
+            {
+              "answers": [
+                "WriteByte",
+                "WriteRune"
+              ]
+            },
+            {
+              "answers": [
+                "WriteRune"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "builder-in-function",
+          "title": "Builder inside a function",
+          "guide": "Hide the builder in a function that returns the text.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "The package and imports are already in the file. The builder lives inside, and the caller only gets the finished string.",
+              "notes": [
+                {
+                  "on": "return sb.String()",
+                  "text": "The caller gets a plain string, not the builder."
+                }
+              ],
+              "text": "func bullets(items []string) string {\n    var sb strings.Builder\n    for _, item := range items {\n        sb.WriteString(\"- \")\n        sb.WriteString(item)\n        sb.WriteString(\"\\n\")\n    }\n    return sb.String()\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "Call it with a list.",
+              "text": "func main() {\n    list := bullets([]string{\"milk\", \"eggs\"})\n    fmt.Print(list)\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "- milk\n- eggs"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "snapshot-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    var sb strings.Builder\n    sb.WriteString(\"go\")\n    text := sb.String()\n    sb.WriteString(\"lang\")\n    fmt.Println(text, sb.String())\n}",
+          "options": [
+            "golang golang",
+            "go golang",
+            "go lang",
+            "go go"
+          ],
+          "answer": 1,
+          "explanation": "String returns the text as it is at that moment. Writing more later does not change a string that was already taken."
+        },
+        {
+          "type": "typing",
+          "id": "reuse-and-grow",
+          "title": "Reserve room and reuse",
+          "guide": "Reserve space ahead, then empty the builder and start again.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`Grow` reserves room when you know the size. The text stays empty.",
+              "notes": [
+                {
+                  "on": "sb.Grow(32)",
+                  "text": "Only prepares space for 32 more bytes. Nothing is written."
+                }
+              ],
+              "text": "    var sb strings.Builder\n    sb.Grow(32)\n    fmt.Println(sb.Len())"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Write a draft and check its size.",
+              "text": "    sb.WriteString(\"draft\")\n    fmt.Println(sb.Len())"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`Reset` empties the builder so it can be used again.",
+              "notes": [
+                {
+                  "on": "sb.Reset()",
+                  "text": "Throws away the text written so far."
+                }
+              ],
+              "text": "    sb.Reset()\n    fmt.Println(sb.Len())\n    sb.WriteString(\"final\")\n    fmt.Println(sb.String())"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0\n5\n0\nfinal"
+          }
+        }
+      ]
+    }
+  ]
+}

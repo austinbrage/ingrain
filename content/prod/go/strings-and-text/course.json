@@ -5,42 +5,42 @@
       "name": "Strings",
       "tier": "basic",
       "modules": [
-        { "id": "strings", "name": "Strings", "sessions": 1 },
-        { "id": "runes-and-utf8", "name": "Runes and UTF-8", "sessions": 1 },
-        { "id": "strings-package", "name": "The strings package", "sessions": 1 },
-        { "id": "string-builder", "name": "String builder", "sessions": 1 }
+        { "id": "strings", "name": "Strings", "sessions": 3 },
+        { "id": "runes-and-utf8", "name": "Runes and UTF-8", "sessions": 3 },
+        { "id": "strings-package", "name": "The strings package", "sessions": 3 },
+        { "id": "string-builder", "name": "String builder", "sessions": 2 }
       ]
     },
     {
       "name": "Formatting",
       "tier": "basic",
       "modules": [
-        { "id": "formatting-verbs", "name": "Formatting verbs", "sessions": 1 },
-        { "id": "strconv", "name": "Conversions", "sessions": 1 }
+        { "id": "formatting-verbs", "name": "Formatting verbs", "sessions": 3 },
+        { "id": "strconv", "name": "Conversions", "sessions": 3 }
       ]
     },
     {
       "name": "Bytes and characters",
       "tier": "medium",
       "modules": [
-        { "id": "bytes-and-conversions", "name": "Bytes and conversions", "sessions": 1 },
-        { "id": "unicode-package", "name": "The unicode package", "sessions": 1 }
+        { "id": "bytes-and-conversions", "name": "Bytes and conversions", "sessions": 3 },
+        { "id": "unicode-package", "name": "The unicode package", "sessions": 3 }
       ]
     },
     {
       "name": "Parsing text",
       "tier": "medium",
       "modules": [
-        { "id": "scanning-input", "name": "Scanning input", "sessions": 1 },
-        { "id": "regular-expressions", "name": "Regular expressions", "sessions": 1 }
+        { "id": "scanning-input", "name": "Scanning input", "sessions": 3 },
+        { "id": "regular-expressions", "name": "Regular expressions", "sessions": 4 }
       ]
     },
     {
       "name": "Templates",
       "tier": "medium",
       "modules": [
-        { "id": "templates", "name": "Templates", "sessions": 1 },
-        { "id": "template-logic-and-functions", "name": "Template logic and functions", "sessions": 1 }
+        { "id": "templates", "name": "Templates", "sessions": 3 },
+        { "id": "template-logic-and-functions", "name": "Template logic and functions", "sessions": 4 }
       ]
     }
   ]

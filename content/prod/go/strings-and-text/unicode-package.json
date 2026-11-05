@@ -1,0 +1,608 @@
+{
+  "id": "unicode-package",
+  "intro": {
+    "title": "The unicode package",
+    "slides": [
+      {
+        "text": "A rune is a number, so you can ask what kind of character it is: a letter, a digit, a space, punctuation, a capital.\n\nThe `unicode` package answers those questions for every alphabet. Session 1 sorts characters, session 2 handles punctuation, symbols and numbers, and session 3 checks whole texts and scripts. Changing the case of a whole string is in `strings-package`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Ask about a rune",
+        "slides": [
+          {
+            "text": "Each function takes one rune and answers true or false. They know every alphabet, not only English. Pseudo code, not Go:",
+            "code": "isLetter('ñ') -> true\nisDigit('ñ')  -> false\nisSpace(' ')  -> true\ntoUpper('é')  -> 'É'"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "classify-runes",
+          "title": "Ask what a character is",
+          "guide": "The `unicode` package answers questions about a rune.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`IsLetter` is true for a letter of any alphabet, not only English ones.",
+              "notes": [
+                {
+                  "on": "unicode.IsLetter(letter)",
+                  "text": "Takes a rune and answers true or false."
+                }
+              ],
+              "text": "    letter := 'ñ'\n    fmt.Println(unicode.IsLetter(letter))\n    fmt.Println(unicode.IsLetter('世'))"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`IsDigit` is true for characters that are digits.",
+              "text": "    fmt.Println(unicode.IsDigit('7'))\n    fmt.Println(unicode.IsDigit('x'))"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`IsSpace` is true for a space, a tab or a line break.",
+              "text": "    fmt.Println(unicode.IsSpace('\\t'))\n    fmt.Println(unicode.IsSpace('_'))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\ntrue\ntrue\nfalse\ntrue\nfalse"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "count-kinds",
+          "title": "Count each kind",
+          "guide": "Count each kind of character in a text.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "One counter for each kind of character.",
+              "text": "    text := \"Go 1.22 rocks\"\n    letters := 0\n    digits := 0\n    spaces := 0"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Test every character, and add to the matching counter.",
+              "text": "    for _, r := range text {\n        if unicode.IsLetter(r) {\n            letters++\n        } else if unicode.IsDigit(r) {\n            digits++\n        } else if unicode.IsSpace(r) {\n            spaces++\n        }\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "The dot is none of the three, so nobody counts it.",
+              "text": "    fmt.Println(letters, digits, spaces)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "7 3 2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "case-of-a-rune",
+          "title": "Case of a rune",
+          "guide": "Check the case of a rune, and convert it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`IsUpper` and `IsLower` check the case of a letter.",
+              "text": "    fmt.Println(unicode.IsUpper('G'), unicode.IsLower('G'))"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A digit has no case, so both answers are false.",
+              "text": "    fmt.Println(unicode.IsUpper('7'), unicode.IsLower('7'))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`ToUpper` and `ToLower` return the converted rune. `string` turns it into text.",
+              "notes": [
+                {
+                  "on": "unicode.ToUpper(first)",
+                  "text": "Gives back a rune, so wrap it in string to print the letter."
+                }
+              ],
+              "text": "    first := 'é'\n    fmt.Println(string(unicode.ToUpper(first)))\n    fmt.Println(string(unicode.ToLower('Ñ')))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true false\nfalse false\nÉ\nñ"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "classify-output",
+          "title": "What does it print?",
+          "guide": "Pick the output.",
+          "kind": "output",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n    r := 'Ñ'\n    fmt.Println(unicode.IsLetter(r),\n        unicode.IsUpper(r),\n        unicode.IsLower(r))\n}",
+          "options": [
+            "true false false",
+            "false true false",
+            "true true false",
+            "true true true"
+          ],
+          "answer": 2,
+          "explanation": "`Ñ` is a letter and a capital, so it is not lower case."
+        },
+        {
+          "type": "fill-blank",
+          "id": "flip-case",
+          "title": "Flip the case",
+          "guide": "Convert the letter to a capital, then check that the result is one.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n    first := 'é'\n    capital := unicode.___(first)\n    ok := unicode.___(capital)\n    fmt.Println(ok, string(capital))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "ToUpper"
+              ]
+            },
+            {
+              "answers": [
+                "IsUpper"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Marks and numbers",
+        "slides": [
+          {
+            "text": "Punctuation and symbols are two different groups, and a number is a wider idea than a digit. Pseudo code:",
+            "code": "punctuation: ! , . ? - _\nsymbol:      $ + = < >\ndigit:       0 1 2 ... 9\nnumber:      digits, and also ½ ²"
+          },
+          {
+            "text": "These functions are ideal rules for `strings.Map` and `strings.FieldsFunc`: they decide what to keep or where to split."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "punct-and-symbols",
+          "title": "Punctuation and symbols",
+          "guide": "Unicode splits marks into punctuation and symbols.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`IsPunct` is true for marks like the exclamation point and the comma.",
+              "text": "    fmt.Println(unicode.IsPunct('!'), unicode.IsPunct(','))"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`IsSymbol` covers signs like the dollar and the plus.",
+              "text": "    fmt.Println(unicode.IsSymbol('$'), unicode.IsSymbol('+'))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The groups do not overlap: a dollar is a symbol, not punctuation.",
+              "notes": [
+                {
+                  "on": "unicode.IsPunct('$')",
+                  "text": "Unicode files the dollar sign as a symbol."
+                }
+              ],
+              "text": "    fmt.Println(unicode.IsPunct('$'), unicode.IsSymbol('!'))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true true\ntrue true\nfalse false"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "punct-output",
+          "title": "What does it print?",
+          "guide": "Pick the output.",
+          "kind": "output",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n    fmt.Println(unicode.IsPunct('-'),\n        unicode.IsPunct('+'),\n        unicode.IsSymbol('='))\n}",
+          "options": [
+            "true true true",
+            "true false true",
+            "false false true",
+            "true false false"
+          ],
+          "answer": 1,
+          "explanation": "A hyphen is punctuation, but `+` and `=` are symbols."
+        },
+        {
+          "type": "typing",
+          "id": "digit-or-number",
+          "title": "Digits and numbers",
+          "guide": "Some numeric characters are not digits.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Digits of other alphabets are digits too. This one is the Arabic three.",
+              "text": "    fmt.Println(unicode.IsDigit('\\u0663'))"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A fraction is a number but not a digit. `IsNumber` accepts both.",
+              "notes": [
+                {
+                  "on": "unicode.IsNumber(",
+                  "text": "Wider than a digit: fractions and superscripts count."
+                }
+              ],
+              "text": "    fmt.Println(unicode.IsDigit('\\u00bd'))\n    fmt.Println(unicode.IsNumber('\\u00bd'))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse\ntrue"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "strip-punctuation",
+          "title": "Strip the punctuation",
+          "guide": "Remove the punctuation from a text.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Return `-1` to drop a rune, and the rune itself to keep it.",
+              "text": "    dropPunct := func(r rune) rune {\n        if unicode.IsPunct(r) {\n            return -1\n        }\n        return r\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "`Map` applies the function to every rune of the text.",
+              "text": "    fmt.Println(strings.Map(dropPunct, \"Wait, what? Yes!\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Hyphens, parentheses and dots all count as punctuation.",
+              "text": "    fmt.Println(strings.Map(dropPunct, \"Go-lang (v1.22)\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Wait what Yes\nGolang v122"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "split-words",
+          "title": "Split into words",
+          "guide": "Split a text into its words, whatever separates them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Anything that is not a letter works as a separator.",
+              "text": "    notLetter := func(r rune) bool {\n        return !unicode.IsLetter(r)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Several separators in a row count as one.",
+              "text": "    text := \"go, rust; and zig!\"\n    words := strings.FieldsFunc(text, notLetter)\n    fmt.Println(words, len(words))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[go rust and zig] 4"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "mark-check",
+          "title": "Marks of any kind",
+          "guide": "Make `isMark` true for punctuation, or for a symbol.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n    isMark := func(r rune) bool {\n        return unicode.___(r) ||\n            unicode.___(r)\n    }\n    fmt.Println(isMark('!'), isMark('+'))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "IsPunct",
+                "IsSymbol"
+              ]
+            },
+            {
+              "answers": [
+                "IsSymbol",
+                "IsPunct"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Whole texts",
+        "slides": [
+          {
+            "text": "To check a whole text, test every rune and stop at the first failure. Pseudo code:",
+            "code": "for each rune in text:\n    if it is not a letter:\n        the text is not a word\nthe text is a word"
+          },
+          {
+            "text": "A `unicode` function can also be handed straight to a `strings` helper, as the rule it applies.\n\nWatch what you pass in: a rune, not a byte."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "all-letters",
+          "title": "Is it only letters?",
+          "guide": "Write a function that says whether a text has only letters.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Stop at the first character that is not a letter.",
+              "text": "func isWord(text string) bool {\n    for _, r := range text {\n        if !unicode.IsLetter(r) {\n            return false\n        }\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "If nothing failed, the text is a word, unless it is empty.",
+              "text": "    return text != \"\""
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Accents count as letters, digits do not.",
+              "text": "func main() {\n    fmt.Println(isWord(\"niño\"))\n    fmt.Println(isWord(\"go2\"))\n    fmt.Println(isWord(\"\"))\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse\nfalse"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "capitalize",
+          "title": "Capitalize a word",
+          "guide": "Write a function that capitalizes the first letter of a word.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Work on runes, so a first letter with an accent is safe.",
+              "text": "func capitalize(word string) string {\n    letters := []rune(word)\n    return string(letters)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "An empty word has no first letter to convert.",
+              "text": "    if word == \"\" {\n        return word\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Convert only the first rune and keep the rest.",
+              "text": "    letters[0] = unicode.ToUpper(letters[0])"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "The accent is kept when the letter changes case.",
+              "text": "func main() {\n    fmt.Println(capitalize(\"élan\"))\n    fmt.Println(capitalize(\"go\"))\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Élan\nGo"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "lower-first",
+          "title": "Lower the first letter",
+          "guide": "Make the first letter of the word lower case.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n    word := \"Gopher\"\n    letters := []___(word)\n    letters[0] = unicode.___(letters[0])\n    fmt.Println(string(letters))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "rune"
+              ]
+            },
+            {
+              "answers": [
+                "ToLower"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "in-script",
+          "title": "Check the script",
+          "guide": "Find out which writing system a character belongs to.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`unicode.Is` checks a rune against a script, like the Han characters of Chinese.",
+              "notes": [
+                {
+                  "on": "unicode.Han, '世'",
+                  "text": "Pass the script first, then the rune to test."
+                }
+              ],
+              "text": "    fmt.Println(unicode.Is(unicode.Han, '世'))\n    fmt.Println(unicode.Is(unicode.Han, 'g'))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Other scripts have their own tables, like Latin and Cyrillic.",
+              "text": "    fmt.Println(unicode.Is(unicode.Latin, 'ñ'))\n    fmt.Println(unicode.Is(unicode.Cyrillic, 'ñ'))"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Count the characters of one script in a mixed text.",
+              "text": "    count := 0\n    for _, r := range \"Go 世界 2026\" {\n        if unicode.Is(unicode.Han, r) {\n            count++\n        }\n    }\n    fmt.Println(count)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse\ntrue\nfalse\n2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "pass-the-function",
+          "title": "Pass the function",
+          "guide": "Hand the unicode functions to the strings helpers.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`IndexFunc` finds the first rune a function accepts. Give it a `unicode` function as it is.",
+              "notes": [
+                {
+                  "on": "unicode.IsDigit)",
+                  "text": "No parentheses: the function itself is handed over."
+                }
+              ],
+              "text": "    text := \"room 42, floor 7\"\n    first := strings.IndexFunc(\n        text, unicode.IsDigit)\n    fmt.Println(first)"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`ContainsFunc` asks whether any rune fits.",
+              "text": "    found := strings.ContainsFunc(\n        text, unicode.IsPunct)\n    fmt.Println(found)"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "`TrimFunc` cuts both ends while the function says true.",
+              "text": "    clean := strings.TrimFunc(\n        \"--hello!!\", unicode.IsPunct)\n    fmt.Println(clean)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "5\ntrue\nhello"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "bytes-are-not-runes",
+          "title": "Bytes are not runes",
+          "guide": "Count punctuation by bytes and by runes, and compare.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Walk the text by index. Each `text[i]` is a byte.",
+              "notes": [
+                {
+                  "on": "rune(text[i])",
+                  "text": "Turns a single byte into a rune, right or wrong."
+                }
+              ],
+              "text": "    text := \"está!\"\n    byByte := 0\n    for i := 0; i < len(text); i++ {\n        if unicode.IsPunct(rune(text[i])) {\n            byByte++\n        }\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "Now walk the runes with `range`.",
+              "text": "    byRune := 0\n    for _, r := range text {\n        if unicode.IsPunct(r) {\n            byRune++\n        }\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "The counts differ: one byte of `á` looks like `¡` when taken alone.",
+              "text": "    fmt.Println(byByte, byRune)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 1"
+          }
+        }
+      ]
+    }
+  ]
+}

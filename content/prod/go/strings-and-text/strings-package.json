@@ -1,0 +1,779 @@
+{
+  "id": "strings-package",
+  "intro": {
+    "title": "The strings package",
+    "slides": [
+      {
+        "text": "The `strings` package holds the everyday helpers for text: searching, splitting, trimming and replacing. Each one takes a string and returns a new value, because a Go string never changes.\n\nIn this module you will search, split and join, clean the edges and swap pieces. Building a long text piece by piece is `string-builder`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Searching text",
+        "slides": [
+          {
+            "text": "Most functions take the text first and the piece to look for second. Some answer yes or no, others give a position.\n\nThe snippet is pseudo code, not Go.",
+            "code": "has = contains(text, piece)\n      -> true or false\nwhere = index(text, piece)\n      -> position, or -1"
+          },
+          {
+            "text": "A position counts bytes, like `len` and slicing. A missing piece gives -1 and no error, so check it before you cut with it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "contains-and-affixes",
+          "title": "Search inside a string",
+          "guide": "Test whether a string holds a piece, starts with it or ends with it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`Contains` answers true or false: is the piece anywhere in the string?",
+              "notes": [
+                {
+                  "on": "strings.Contains(",
+                  "text": "The package name comes first, then the function."
+                }
+              ],
+              "text": "    email := \"ana@example.com\"\n    fmt.Println(strings.Contains(email, \"@\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`ContainsAny` is true if any one of the characters appears. `ContainsRune` looks for a single rune.",
+              "notes": [
+                {
+                  "on": "ContainsAny",
+                  "text": "Each character of the second string is tried alone."
+                },
+                {
+                  "on": "ContainsRune",
+                  "text": "Takes one rune, not a string."
+                }
+              ],
+              "text": "    fmt.Println(strings.ContainsAny(email, \"!#\"))\n    fmt.Println(strings.ContainsRune(email, '@'))"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "`HasPrefix` and `HasSuffix` only look at the start and the end.",
+              "notes": [
+                {
+                  "on": "HasSuffix",
+                  "text": "True only if the string ends exactly with it."
+                }
+              ],
+              "text": "    fmt.Println(strings.HasPrefix(email, \"ana\"))\n    fmt.Println(strings.HasSuffix(email, \".org\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse\ntrue\ntrue\nfalse"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "check-a-file",
+          "title": "Check a file name",
+          "guide": "Check that the name starts with main, ends with .go and has _test somewhere in it.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    name := \"main_test.go\"\n    fmt.Println(strings.___(name, \"main\"))\n    fmt.Println(strings.___(name, \".go\"))\n    fmt.Println(strings.___(name, \"_test\"))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "HasPrefix",
+                "Contains"
+              ]
+            },
+            {
+              "answers": [
+                "HasSuffix",
+                "Contains"
+              ]
+            },
+            {
+              "answers": [
+                "Contains"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "find-position",
+          "title": "Find the position",
+          "guide": "Get the position of a piece, and use it to cut out part of the string.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`Index` gives the byte where the first match starts.",
+              "notes": [
+                {
+                  "on": "strings.Index(",
+                  "text": "Position of the first match, counted in bytes."
+                }
+              ],
+              "text": "    path := \"docs/guide/intro.md\"\n    fmt.Println(strings.Index(path, \"/\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`LastIndex` starts the search from the end.",
+              "text": "    fmt.Println(strings.LastIndex(path, \"/\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "A piece that is not there gives -1, not an error.",
+              "text": "    fmt.Println(strings.Index(path, \"zip\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Use the position of the last dot to cut out the extension.",
+              "text": "    dot := strings.LastIndex(path, \".\")\n    fmt.Println(path[dot+1:])"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4\n10\n-1\nmd"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "count-and-equalfold",
+          "title": "Count and compare",
+          "guide": "Count how often a piece appears, and compare ignoring upper and lower case.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`Count` returns how many times the piece appears, without overlaps.",
+              "notes": [
+                {
+                  "on": "strings.Count(",
+                  "text": "Number of non-overlapping matches."
+                }
+              ],
+              "text": "    text := \"banana bandana\"\n    fmt.Println(strings.Count(text, \"an\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "An empty piece matches between every character: the character count plus one.",
+              "text": "    fmt.Println(strings.Count(text, \"\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`==` is case sensitive. `EqualFold` ignores the case of letters.",
+              "notes": [
+                {
+                  "on": "EqualFold",
+                  "text": "Compares letters as if both were the same case."
+                }
+              ],
+              "text": "    answer := \"YES\"\n    fmt.Println(answer == \"yes\")\n    fmt.Println(strings.EqualFold(answer, \"yes\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4\n15\nfalse\ntrue"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "search-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    s := \"banana\"\n    first := strings.Index(s, \"na\")\n    last := strings.LastIndex(s, \"na\")\n    n := strings.Count(s, \"a\")\n    fmt.Println(first, last, n)\n}",
+          "options": [
+            "1 3 3",
+            "2 4 2",
+            "2 4 3",
+            "2 5 3"
+          ],
+          "answer": 2,
+          "explanation": "`na` starts at bytes 2 and 4, so `Index` finds 2 and `LastIndex` finds 4. The letter `a` appears 3 times."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Splitting and joining",
+        "slides": [
+          {
+            "text": "`Split` turns one string into a slice of pieces, and `Join` does the reverse.\n\nThe snippet is pseudo code, not Go.",
+            "code": "\"a,b,c\" split by \",\"\n      -> [\"a\", \"b\", \"c\"]\n[\"a\", \"b\", \"c\"] joined with \"-\"\n      -> \"a-b-c\""
+          },
+          {
+            "text": "Splitting is exact: two separators in a row leave an empty string between them. When the gaps vary, like repeated spaces, use `Fields`, which ignores them."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "split-and-join",
+          "title": "Split and join",
+          "guide": "Cut a string into a slice at a separator, then glue the slice back together.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`Split` cuts the string at every separator and returns a slice.",
+              "notes": [
+                {
+                  "on": "strings.Split(",
+                  "text": "One string in the slice for each piece."
+                }
+              ],
+              "text": "    line := \"ana,eva,leo\"\n    names := strings.Split(line, \",\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The separator itself is not kept in the pieces.",
+              "text": "    fmt.Println(names, len(names))"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`Join` does the reverse. The separator goes between the items.",
+              "notes": [
+                {
+                  "on": "strings.Join(",
+                  "text": "Takes the slice first and the glue second."
+                }
+              ],
+              "text": "    fmt.Println(strings.Join(names, \" & \"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Change an item of the slice, then join it again.",
+              "text": "    names[1] = \"bea\"\n    fmt.Println(strings.Join(names, \"-\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[ana eva leo] 3\nana & eva & leo\nana-bea-leo"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "fields-vs-split",
+          "title": "Split on any spaces",
+          "guide": "Split a text into words, even when the spaces are uneven.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A text with extra spaces at the start, the end and between words.",
+              "text": "    text := \"  go   is  fun \""
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Splitting on one space leaves an empty string for each extra space.",
+              "text": "    parts := strings.Split(text, \" \")\n    fmt.Println(len(parts))"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`Fields` splits around any run of white space and drops the empty pieces.",
+              "notes": [
+                {
+                  "on": "strings.Fields(",
+                  "text": "Ignores repeated spaces, and the edges too."
+                }
+              ],
+              "text": "    words := strings.Fields(text)\n    fmt.Println(words, len(words))"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Tabs and newlines count as white space as well.",
+              "text": "    fmt.Println(strings.Fields(\"a\\tb\\nc\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "9\n[go is fun] 3\n[a b c]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fields-and-join",
+          "title": "Words and dashes",
+          "guide": "Turn the sentence into its words, then glue the words with dashes.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    sentence := \"go is fun\"\n    words := strings.___(sentence)\n    dashed := strings.___(words, \"-\")\n    fmt.Println(len(words), dashed)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Fields"
+              ]
+            },
+            {
+              "answers": [
+                "Join"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "split-edge-cases",
+          "title": "Split at the edges",
+          "guide": "See what Split returns in unusual cases, and how to stop after a few pieces.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Splitting an empty string gives one empty string, not an empty slice.",
+              "text": "    fmt.Println(len(strings.Split(\"\", \",\")))"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "An empty separator cuts between every character.",
+              "text": "    fmt.Println(strings.Split(\"go\", \"\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`SplitN` makes at most n pieces. The last one keeps the rest of the string.",
+              "notes": [
+                {
+                  "on": "strings.SplitN(",
+                  "text": "The third argument is the maximum number of pieces."
+                }
+              ],
+              "text": "    pair := strings.SplitN(\"a=b=c\", \"=\", 2)\n    fmt.Println(pair, len(pair))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1\n[g o]\n[a b=c] 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "split-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    s := strings.Split(\"a,,b\", \",\")\n    fmt.Println(len(s), s[1] == \"\")\n}",
+          "options": [
+            "2 false",
+            "3 true",
+            "3 false",
+            "2 true"
+          ],
+          "answer": 1,
+          "explanation": "Two separators in a row leave an empty string between them, so there are 3 pieces and the middle one is empty."
+        },
+        {
+          "type": "typing",
+          "id": "cut-a-pair",
+          "title": "Cut at the first separator",
+          "guide": "Split a setting into its key and value, and check that the separator was there.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`Cut` splits at the first separator and says if it found one.",
+              "notes": [
+                {
+                  "on": "strings.Cut(",
+                  "text": "Gives the text before, the text after and a bool."
+                }
+              ],
+              "text": "    setting := \"port=8080\"\n    key, value, found := strings.Cut(setting, \"=\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The separator is in neither half.",
+              "text": "    fmt.Println(key, value, found)"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Without the separator, found is false.",
+              "text": "    _, _, found = strings.Cut(\"port\", \"=\")\n    fmt.Println(found)"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`CutPrefix` removes a prefix and says if it was there. `CutSuffix` does the same at the end.",
+              "notes": [
+                {
+                  "on": "strings.CutPrefix(",
+                  "text": "Returns the rest of the string and a bool."
+                }
+              ],
+              "text": "    rest, ok := strings.CutPrefix(\"v1.4\", \"v\")\n    fmt.Println(rest, ok)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "port 8080 true\nfalse\n1.4 true"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Cleaning and changing",
+        "slides": [
+          {
+            "text": "A Go string never changes. Every function here returns a new string, so keep the result in a variable. Calling one and ignoring the result does nothing.\n\nThe snippet is pseudo code, not Go.",
+            "code": "name = \"ana\"\nbig = upper(name)  -> \"ANA\"\nname is still \"ana\""
+          },
+          {
+            "text": "`Trim` removes characters from a set, while `TrimPrefix` and `TrimSuffix` remove an exact piece of text. `Map` and `FieldsFunc` take a function that decides about each rune."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "trim-text",
+          "title": "Trim white space and characters",
+          "guide": "Remove the extra characters from the ends of a string.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`TrimSpace` removes white space from both ends: spaces, tabs and newlines.",
+              "notes": [
+                {
+                  "on": "strings.TrimSpace(",
+                  "text": "Returns a new string without the outer white space."
+                }
+              ],
+              "text": "    input := \"  Ana \\t\\n\"\n    clean := strings.TrimSpace(input)"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The original string is longer than the clean one.",
+              "text": "    fmt.Println(len(input), len(clean), clean)"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`Trim` removes any of the given characters from both ends.",
+              "notes": [
+                {
+                  "on": "strings.Trim(",
+                  "text": "The second argument is a set of characters."
+                }
+              ],
+              "text": "    stars := \"**note**\"\n    fmt.Println(strings.Trim(stars, \"*\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`TrimLeft` and `TrimRight` work on one end only.",
+              "text": "    fmt.Println(strings.TrimLeft(stars, \"*\"))\n    fmt.Println(strings.TrimRight(stars, \"*\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "8 3 Ana\nnote\nnote**\n**note"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "trim-prefix-suffix",
+          "title": "Remove a known prefix or suffix",
+          "guide": "Remove an exact piece from the start or the end of a string.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`TrimPrefix` removes the exact text from the start, once.",
+              "notes": [
+                {
+                  "on": "strings.TrimPrefix(",
+                  "text": "Removes that exact text if the string starts with it."
+                }
+              ],
+              "text": "    version := \"v1.4.2\"\n    fmt.Println(strings.TrimPrefix(version, \"v\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`TrimSuffix` does the same at the end.",
+              "text": "    file := \"report.pdf\"\n    fmt.Println(strings.TrimSuffix(file, \".pdf\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "If the string does not end with it, nothing changes.",
+              "text": "    fmt.Println(strings.TrimSuffix(file, \".go\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`Trim` takes a set of characters, not a word. `TrimPrefix` takes the exact text.",
+              "text": "    fmt.Println(strings.Trim(\"moon\", \"mo\"))\n    fmt.Println(strings.TrimPrefix(\"moon\", \"mo\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1.4.2\nreport\nreport.pdf\nn\non"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "trim-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    a := strings.Trim(\"abcba\", \"ab\")\n    b := strings.TrimPrefix(\"abcba\", \"ab\")\n    fmt.Println(a, b)\n}",
+          "options": [
+            "c cba",
+            "cba c",
+            "c c",
+            "cba cba"
+          ],
+          "answer": 0,
+          "explanation": "`Trim` removes every `a` and `b` from both ends, leaving `c`. `TrimPrefix` removes the exact text `ab` once, leaving `cba`."
+        },
+        {
+          "type": "typing",
+          "id": "replace-text",
+          "title": "Replace text",
+          "guide": "Swap a piece of a string for another.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`ReplaceAll` swaps every match for the new text.",
+              "notes": [
+                {
+                  "on": "strings.ReplaceAll(",
+                  "text": "Arguments: the text, the old piece and the new one."
+                }
+              ],
+              "text": "    text := \"one fish, two fish\"\n    changed := strings.ReplaceAll(text, \"fish\", \"cat\")\n    fmt.Println(changed)"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`Replace` also takes how many matches to change.",
+              "notes": [
+                {
+                  "on": "\"cat\", 1",
+                  "text": "Only the first match is replaced. Use -1 for all."
+                }
+              ],
+              "text": "    fmt.Println(strings.Replace(text, \"fish\", \"cat\", 1))"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "A string never changes: the original is still there.",
+              "text": "    fmt.Println(text)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "one cat, two cat\none cat, two fish\none fish, two fish"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "case-and-repeat",
+          "title": "Case and repetition",
+          "guide": "Change the case of a text and repeat a piece.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`ToUpper` returns the text in capitals.",
+              "notes": [
+                {
+                  "on": "strings.ToUpper(",
+                  "text": "Returns a new string in upper case."
+                }
+              ],
+              "text": "    code := \"Go-2026\"\n    fmt.Println(strings.ToUpper(code))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`ToLower` does the opposite.",
+              "text": "    fmt.Println(strings.ToLower(code))"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`Repeat` joins a piece to itself the given number of times.",
+              "notes": [
+                {
+                  "on": "strings.Repeat(",
+                  "text": "Makes a longer string from copies of the first."
+                }
+              ],
+              "text": "    line := strings.Repeat(\"-\", 10)\n    fmt.Println(line)"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Case changes work on any letter, not only English ones.",
+              "text": "    fmt.Println(strings.ToUpper(\"niño\"))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "GO-2026\ngo-2026\n----------\nNIÑO"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "make-a-slug",
+          "title": "Make a slug",
+          "guide": "Remove the outer white space, swap the dash for an underscore, then print it in lower case.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n    raw := \"  Go-Lang  \"\n    clean := strings.___(raw)\n    slug := strings.___(clean, \"-\", \"_\")\n    fmt.Println(strings.___(slug))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "TrimSpace"
+              ]
+            },
+            {
+              "answers": [
+                "ReplaceAll"
+              ]
+            },
+            {
+              "answers": [
+                "ToLower"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "functions-as-rules",
+          "title": "A function as the rule",
+          "guide": "Pass a function that decides what to do with each character.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The function gets a rune and returns the rune to use. Returning -1 drops it.",
+              "notes": [
+                {
+                  "on": "return -1",
+                  "text": "A negative result removes the character."
+                }
+              ],
+              "text": "    onlyDigits := func(r rune) rune {\n        if r >= '0' && r <= '9' {\n            return r\n        }\n        return -1\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "`Map` applies the function to every rune of the string.",
+              "notes": [
+                {
+                  "on": "strings.Map(",
+                  "text": "Builds a new string, one rune at a time."
+                }
+              ],
+              "text": "    fmt.Println(strings.Map(onlyDigits, \"tel: 555-0199\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "`FieldsFunc` splits at every rune the function says true for.",
+              "notes": [
+                {
+                  "on": "strings.FieldsFunc(",
+                  "text": "Like Split, but the separator is any rune you choose."
+                }
+              ],
+              "text": "    parts := strings.FieldsFunc(\"a;b,c\", func(r rune) bool {\n        return r == ';' || r == ','\n    })\n    fmt.Println(parts)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "5550199\n[a b c]"
+          }
+        }
+      ]
+    }
+  ]
+}

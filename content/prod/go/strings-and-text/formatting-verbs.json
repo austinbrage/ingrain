@@ -1,0 +1,666 @@
+{
+  "id": "formatting-verbs",
+  "intro": {
+    "title": "Formatting verbs",
+    "slides": [
+      {
+        "text": "You already use `%s`, `%d` and `%v`. A verb can do much more: quote a text, show a type, print a number in another base, or fill a column.\n\nIn this module you choose the right verb, shape numbers and columns, and print whole slices and maps."
+      },
+      {
+        "text": "Between the `%` and the verb you can add flags, a width and a precision, all optional.\n\nThe first line is pseudo code, the second is a real verb.",
+        "code": "%  flags  width  .precision  verb\n%08.3f"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Choosing the verb",
+        "slides": [
+          {
+            "text": "The verb decides how a value looks, not only its type. The same number can show as a number, as a character or in binary.\n\nThe snippet is pseudo code, not Go.",
+            "code": "value 65\n  as a number     -> 65\n  as a character  -> A\n  as binary       -> 1000001"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "quote-a-string",
+          "title": "Quote a string",
+          "guide": "Print the same text plainly and in quotes.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print a word two ways: as it is, and in quotes.",
+              "notes": [
+                {
+                  "on": "%q",
+                  "text": "Prints the text inside double quotes."
+                }
+              ],
+              "text": "    word := \"go\"\n    fmt.Printf(\"%s %q\\n\", word, word)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "With `%s` an empty string shows nothing. Quotes show where the text starts and ends.",
+              "text": "    empty := \"\"\n    fmt.Printf(\"[%s] [%q]\\n\", empty, empty)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "go \"go\"\n[] [\"\"]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "bools-and-types",
+          "title": "Bools and types",
+          "guide": "Print a bool, and the type of a few values.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print a bool, then its type.",
+              "notes": [
+                {
+                  "on": "%t",
+                  "text": "Prints a bool as true or false."
+                },
+                {
+                  "on": "%T",
+                  "text": "Prints the type of the value."
+                }
+              ],
+              "text": "    ok := true\n    fmt.Printf(\"%t %T\\n\", ok, ok)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "The type follows the value: a whole number is an `int`, a decimal is a `float64`.",
+              "text": "    count := 42\n    price := 9.5\n    fmt.Printf(\"%T %T\\n\", count, price)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true bool\nint float64"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "pick-the-verb",
+          "title": "Pick the verb",
+          "guide": "Print the text in quotes, then the bool, then the type of the text.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    word := \"go\"\n    ok := true\n    fmt.Printf(\"%___\\n\", word)\n    fmt.Printf(\"%___\\n\", ok)\n    fmt.Printf(\"%___\\n\", word)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "q"
+              ]
+            },
+            {
+              "answers": [
+                "t",
+                "v"
+              ]
+            },
+            {
+              "answers": [
+                "T"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "characters-and-codes",
+          "title": "Characters and codes",
+          "guide": "Print a character, its code and its Unicode form.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A rune is a number. Print it as a character, as a number and as a Unicode code.",
+              "notes": [
+                {
+                  "on": "%c",
+                  "text": "Prints the character the number stands for."
+                },
+                {
+                  "on": "%U",
+                  "text": "Prints the code point as U+ and hex digits."
+                }
+              ],
+              "text": "    letter := 'G'\n    fmt.Printf(\"%c %d %U\\n\", letter, letter, letter)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A plain `int` works with the character verb too.",
+              "text": "    code := 72\n    fmt.Printf(\"%c\\n\", code)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "G 71 U+0047\nH"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "char-output",
+          "title": "Letter plus one",
+          "guide": "Read the code, then pick the output.",
+          "code": "letter := 'a'\nfmt.Printf(\"%c %d\\n\", letter+1, letter+1)",
+          "options": [
+            "a 97",
+            "b 98",
+            "98 b",
+            "b 97"
+          ],
+          "answer": 1,
+          "explanation": "`letter+1` is the code 98. With `%c` it shows as the character b, and with `%d` as the number 98."
+        },
+        {
+          "type": "typing",
+          "id": "number-bases",
+          "title": "Numbers in other bases",
+          "guide": "Print one number in binary, octal and hexadecimal.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "One number, printed in three bases. Hexadecimal comes in lower and upper case.",
+              "notes": [
+                {
+                  "on": "%b",
+                  "text": "Binary: only 0 and 1."
+                },
+                {
+                  "on": "%o",
+                  "text": "Octal, base 8."
+                },
+                {
+                  "on": "%x",
+                  "text": "Hexadecimal, in lower case."
+                },
+                {
+                  "on": "%X",
+                  "text": "Hexadecimal, in upper case."
+                }
+              ],
+              "text": "    n := 255\n    fmt.Printf(\"%b %o\\n\", n, n)\n    fmt.Printf(\"%x %X\\n\", n, n)"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The `#` flag adds the prefix. On text, `%x` prints the hex of every byte.",
+              "notes": [
+                {
+                  "on": "%#x",
+                  "text": "The # flag adds the 0x prefix."
+                },
+                {
+                  "on": "\"go\"",
+                  "text": "On text, prints the hex of every byte."
+                }
+              ],
+              "text": "    fmt.Printf(\"%#x\\n\", n)\n    fmt.Printf(\"%x\\n\", \"go\")"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "11111111 377\nff FF\n0xff\n676f"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Width and precision",
+        "slides": [
+          {
+            "text": "A number after the `%` sets the **width**: the least columns a value takes. A number after a dot sets the **precision**: for a float, the decimals. Flags change the padding and the sign.\n\nThe snippet is pseudo code, not Go.",
+            "code": "width 6, align left:\n|abc   |\nwidth 6, align right:\n|   abc|"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "decimals",
+          "title": "Decimals",
+          "guide": "Print a price with the default decimals and with a set number.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A float prints with six decimals by default.",
+              "notes": [
+                {
+                  "on": "%f",
+                  "text": "Prints a float, with six decimals."
+                }
+              ],
+              "text": "    price := 9.5\n    fmt.Printf(\"%f\\n\", price)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A dot and a number before the verb set the decimals. The value is rounded only in the text.",
+              "notes": [
+                {
+                  "on": "%.2f",
+                  "text": "A dot and a number set the decimals."
+                }
+              ],
+              "text": "    fmt.Printf(\"%.2f\\n\", price)\n    total := 19.999\n    fmt.Printf(\"%.1f\\n\", total)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "9.500000\n9.50\n20.0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "set-the-decimals",
+          "title": "Set the decimals",
+          "guide": "Print price with two decimals, then total with one decimal.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    price := 4.5\n    total := 19.999\n    fmt.Printf(\"%.___f\\n\", price)\n    fmt.Printf(\"%.1___\\n\", total)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "2"
+              ]
+            },
+            {
+              "answers": [
+                "f"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "pad-numbers",
+          "title": "Pad and sign numbers",
+          "guide": "Give numbers a width, and a sign.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A number before the verb is the width: the least columns the value takes. It pads on the left.",
+              "notes": [
+                {
+                  "on": "%5d",
+                  "text": "Pads with spaces on the left up to 5 columns."
+                }
+              ],
+              "text": "    id := 42\n    fmt.Printf(\"[%5d]\\n\", id)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A `-` pads on the right. A `0` pads with zeros.",
+              "notes": [
+                {
+                  "on": "%-5d",
+                  "text": "The - flag puts the number at the left."
+                },
+                {
+                  "on": "%05d",
+                  "text": "The 0 flag fills with zeros, not spaces."
+                }
+              ],
+              "text": "    fmt.Printf(\"[%-5d]\\n\", id)\n    fmt.Printf(\"[%05d]\\n\", id)"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The `+` flag always shows the sign.",
+              "notes": [
+                {
+                  "on": "%+d %",
+                  "text": "The + flag shows the sign on positives too."
+                }
+              ],
+              "text": "    fmt.Printf(\"%+d %+d\\n\", 5, -3)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[   42]\n[42   ]\n[00042]\n+5 -3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "price-table",
+          "title": "Price table",
+          "guide": "Print a table with aligned columns.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Two slices of the same length: the items and their prices.",
+              "text": "    names := []string{\"tea\", \"coffee\", \"cake\"}\n    prices := []float64{2.5, 3.25, 4}"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Pad the name to 8 columns on the right, and the price to 6 columns with 2 decimals.",
+              "notes": [
+                {
+                  "on": "%-8s",
+                  "text": "Text pads too: with - it fills on the right."
+                },
+                {
+                  "on": "%6.2f",
+                  "text": "Width 6, 2 decimals. The width comes first."
+                }
+              ],
+              "text": "    for i, name := range names {\n        fmt.Printf(\"%-8s %6.2f\\n\", name, prices[i])\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "tea        2.50\ncoffee     3.25\ncake       4.00"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "padding-output",
+          "title": "Where is the 7?",
+          "guide": "Read the code, then pick the output.",
+          "code": "n := 7\nfmt.Printf(\"[%-4d][%4d]\\n\", n, n)",
+          "options": [
+            "[   7][7   ]",
+            "[7   ][7   ]",
+            "[7   ][   7]",
+            "[   7][   7]"
+          ],
+          "answer": 2,
+          "explanation": "The - flag pads on the right, so the 7 sits at the left of its 4 columns. Without the flag, it sits at the right."
+        },
+        {
+          "type": "fill-blank",
+          "id": "flags-and-width",
+          "title": "Flags and width",
+          "guide": "Left-align the text in 6 columns, then fill the number with zeros up to 6 columns.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    word := \"go\"\n    n := 42\n    fmt.Printf(\"[%___6s]\\n\", word)\n    fmt.Printf(\"[%___6d]\\n\", n)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "-"
+              ]
+            },
+            {
+              "answers": [
+                "0"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Whole values and mistakes",
+        "slides": [
+          {
+            "text": "A verb can be applied to a whole slice or map: it is used on every element. And `Printf` never refuses a bad call. A wrong verb or a wrong count shows up as a marker inside the text.\n\nThe snippet is pseudo code, not Go.",
+            "code": "one verb, every element:\n[a b c]  ->  [\"a\" \"b\" \"c\"]\n\nbad call, no error:\ntext with a marker inside"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "slices-and-maps",
+          "title": "Slices and maps",
+          "guide": "One verb prints every element of a slice or a map.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A slice of numbers and a slice of names.",
+              "text": "    scores := []int{90, 85}\n    names := []string{\"ana\", \"ben\"}"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "The verb is applied to every element. `%q` quotes each name.",
+              "notes": [
+                {
+                  "on": "%v %d",
+                  "text": "The verb applies to every element of the slice."
+                }
+              ],
+              "text": "    fmt.Printf(\"%v %d\\n\", scores, scores)\n    fmt.Printf(\"%q\\n\", names)"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A map prints as `map[key:value]`.",
+              "notes": [
+                {
+                  "on": "%v",
+                  "text": "Maps print sorted by key, so the text is stable."
+                }
+              ],
+              "text": "    stock := map[string]int{\"tea\": 3, \"cake\": 1}\n    fmt.Printf(\"%v\\n\", stock)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[90 85] [90 85]\n[\"ana\" \"ben\"]\nmap[cake:1 tea:3]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "go-syntax",
+          "title": "Print as Go code",
+          "guide": "Print values the way you would write them in code.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "copy",
+              "line": 6,
+              "guide": "Declare them again.",
+              "text": "    scores := []int{90, 85}\n    names := []string{\"ana\", \"ben\"}\n    stock := map[string]int{\"tea\": 3, \"cake\": 1}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`%#v` prints a value as Go code: with its type, its quotes and its braces.",
+              "notes": [
+                {
+                  "on": "\"%#v\\n\", scores",
+                  "text": "The # flag asks for Go code, with type and braces."
+                }
+              ],
+              "text": "    fmt.Printf(\"%#v\\n\", scores)\n    fmt.Printf(\"%#v\\n\", names)\n    fmt.Printf(\"%#v\\n\", stock)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[]int{90, 85}\n[]string{\"ana\", \"ben\"}\nmap[string]int{\"cake\":1, \"tea\":3}"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "code-or-quotes",
+          "title": "Go code or quotes",
+          "guide": "Print scores as Go code, then names as a plain list with quotes.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    scores := []int{90, 85}\n    names := []string{\"ana\", \"ben\"}\n    fmt.Printf(\"%___\\n\", scores)\n    fmt.Printf(\"%___\\n\", names)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "#v"
+              ]
+            },
+            {
+              "answers": [
+                "q"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "percent-and-position",
+          "title": "Percent and position",
+          "guide": "Print a percent sign, and use an argument by its position.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "To print a `%` itself, write it twice.",
+              "notes": [
+                {
+                  "on": "%%",
+                  "text": "Two percent signs print a single one."
+                }
+              ],
+              "text": "    done := 80\n    fmt.Printf(\"%d%%\\n\", done)"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A `[1]` after the percent picks the first argument, so one value can be used twice.",
+              "notes": [
+                {
+                  "on": "%[1]s",
+                  "text": "The [1] picks the first argument by position."
+                }
+              ],
+              "text": "    name := \"Ana\"\n    fmt.Printf(\"%[1]s is %[1]q\\n\", name)"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The position also lets you reorder the arguments.",
+              "notes": [
+                {
+                  "on": "%[2]s",
+                  "text": "Takes the second argument first."
+                }
+              ],
+              "text": "    fmt.Printf(\"%[2]s %[1]s\\n\", \"world\", \"hello\")"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "80%\nAna is \"Ana\"\nhello world"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "format-mistakes",
+          "title": "Format mistakes",
+          "guide": "Printf does not fail on a bad call. See what it prints.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A number verb on a text. The problem is printed inside the text.",
+              "text": "    fmt.Printf(\"%d\\n\", \"go\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "A verb with no argument left.",
+              "text": "    fmt.Printf(\"%s %s\\n\", \"tea\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "An argument with no verb. The marker comes after the text, so `Println` adds the line break.",
+              "text": "    fmt.Printf(\"%d items\", 3, 4)\n    fmt.Println()"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "%!d(string=go)\ntea %!s(MISSING)\n3 items%!(EXTRA int=4)"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "print-spacing",
+          "title": "What does Print add?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fmt.Print(\"age:\", 30, 31, \"\\n\")",
+          "options": [
+            "age: 30 31",
+            "age:30 31",
+            "age:3031",
+            "age: 3031"
+          ],
+          "answer": 1,
+          "explanation": "Print puts a space between two operands only when neither is a text. 30 and 31 get one, but the texts around them do not."
+        }
+      ]
+    }
+  ]
+}

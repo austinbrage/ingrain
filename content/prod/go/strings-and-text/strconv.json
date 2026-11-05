@@ -1,0 +1,598 @@
+{
+  "id": "strconv",
+  "intro": {
+    "title": "Conversions",
+    "slides": [
+      {
+        "text": "In Go, the text `\"42\"` and the number `42` are different things, and Go never turns one into the other for you. The `strconv` package does it.\n\nIn this module you convert text to ints, floats and bools and back, in other bases, and deal with text that is not a number."
+      },
+      {
+        "text": "Reading text can fail: `\"abc\"` is not a number. So the functions that read text return two values: the result and an **error**. The error is `nil` when all went well.\n\nThe snippet is pseudo code, not Go.",
+        "code": "result, err = convert(text)\nif err is not nil {\n    handle the failure\n}"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Whole numbers",
+        "slides": [
+          {
+            "text": "`Atoi` reads text as an `int`, and `Itoa` writes an `int` as text. Atoi can fail, so it returns an error too. Itoa cannot fail, so it returns only the text.\n\nThe snippet is pseudo code, not Go.",
+            "code": "Atoi \"42\"   -> 42, no error\nAtoi \"abc\"  -> 0, an error\nItoa 42     -> \"42\""
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "atoi-basics",
+          "title": "Text to int",
+          "guide": "Read a text as an int, and use the number.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Atoi gives back the number and an error. Print both.",
+              "notes": [
+                {
+                  "on": "strconv.Atoi",
+                  "text": "Reads a text as an int."
+                },
+                {
+                  "on": "n, err :=",
+                  "text": "The number, and nil when it worked."
+                }
+              ],
+              "text": "    n, err := strconv.Atoi(\"42\")\n    fmt.Println(n, err)"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The result is a real int, so math works on it.",
+              "text": "    next := n + 1\n    fmt.Println(next)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "42 <nil>\n43"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "check-the-error",
+          "title": "Check the error",
+          "guide": "Bad text does not crash the program. It gives an error.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Convert a text that is not a number. Print the result and the error.",
+              "text": "    n, err := strconv.Atoi(\"abc\")\n    fmt.Println(n, err)"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Check the error before using the number. Stop when it failed.",
+              "notes": [
+                {
+                  "on": "err != nil",
+                  "text": "True when the conversion failed."
+                }
+              ],
+              "text": "    if err != nil {\n        fmt.Println(\"not a number\")\n        return\n    }\n    fmt.Println(n)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 strconv.Atoi: parsing \"abc\": invalid syntax\nnot a number"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "check-before-use",
+          "title": "Check before use",
+          "guide": "Read the text as an int, and stop when the conversion failed.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n    qty, err := strconv.___(\"12\")\n    if err ___ nil {\n        return\n    }\n    fmt.Println(qty * 2)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Atoi"
+              ]
+            },
+            {
+              "answers": [
+                "!="
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "whole-numbers-only",
+          "title": "A decimal text",
+          "guide": "Read the code, then pick the output.",
+          "code": "n, err := strconv.Atoi(\"3.5\")\nfmt.Println(n, err != nil)",
+          "options": [
+            "3 false",
+            "3 true",
+            "0 true",
+            "0 false"
+          ],
+          "answer": 2,
+          "explanation": "Atoi reads only whole numbers and never rounds. A decimal text is an error, and the number comes back as 0."
+        },
+        {
+          "type": "typing",
+          "id": "itoa-and-string",
+          "title": "Int to text",
+          "guide": "Turn an int into text, and see why string() is not the way.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Build a text that holds a number.",
+              "notes": [
+                {
+                  "on": "strconv.Itoa",
+                  "text": "Writes an int as text. It cannot fail."
+                }
+              ],
+              "text": "    count := 3\n    label := \"items: \" + strconv.Itoa(count)\n    fmt.Println(label)"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`string` on a number gives the character with that code. Itoa gives the digits.",
+              "text": "    fmt.Println(string(rune(65)))\n    fmt.Println(strconv.Itoa(65))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "items: 3\nA\n65"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "join-digits",
+          "title": "Plus on texts",
+          "guide": "Read the code, then pick the output.",
+          "code": "a := strconv.Itoa(7)\nb := strconv.Itoa(8)\nfmt.Println(a + b)",
+          "options": [
+            "15",
+            "78",
+            "7 8",
+            "87"
+          ],
+          "answer": 1,
+          "explanation": "Itoa gives texts, and `+` on texts joins them. The numbers are never added."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Floats, bools and bases",
+        "slides": [
+          {
+            "text": "The other types follow the same pattern: a `Parse` function reads text and returns an error too, and a `Format` function writes text. The extra arguments say the size in bits, and for ints, the base.\n\nThe snippet is pseudo code, not Go.",
+            "code": "ParseFloat text, size\nParseBool  text\nParseInt   text, base, size\nFormatInt  number, base"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "parse-float",
+          "title": "Text to float",
+          "guide": "Read a text as a float64.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "ParseFloat works like Atoi: the number and an error.",
+              "notes": [
+                {
+                  "on": "strconv.ParseFloat",
+                  "text": "Reads a text as a decimal number."
+                },
+                {
+                  "on": "64",
+                  "text": "The size in bits: 64 gives a float64."
+                }
+              ],
+              "text": "    price, err := strconv.ParseFloat(\"9.99\", 64)\n    fmt.Println(price, err)"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "It also reads the exponent form. A blank name drops the error, so do it only for text you know is good.",
+              "notes": [
+                {
+                  "on": "big, _",
+                  "text": "The blank name throws the error away."
+                }
+              ],
+              "text": "    big, _ := strconv.ParseFloat(\"1e3\", 64)\n    fmt.Println(big * 2)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "9.99 <nil>\n2000"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "format-float",
+          "title": "Float to text",
+          "guide": "Write a float as text with a set number of decimals.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "FormatFloat takes the value, a format letter, the decimals and the size.",
+              "notes": [
+                {
+                  "on": "'f'",
+                  "text": "The plain decimal format, like the %f verb."
+                },
+                {
+                  "on": "2, 64",
+                  "text": "Two decimals, for a float64."
+                }
+              ],
+              "text": "    price := 3.14159\n    text := strconv.FormatFloat(price, 'f', 2, 64)\n    fmt.Println(text)"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "With -1 decimals it keeps only the digits needed. With 0 it rounds to a whole number.",
+              "notes": [
+                {
+                  "on": "-1",
+                  "text": "As many decimals as the value needs."
+                }
+              ],
+              "text": "    fmt.Println(strconv.FormatFloat(2.5, 'f', -1, 64))\n    fmt.Println(strconv.FormatFloat(2.6, 'f', 0, 64))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3.14\n2.5\n3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "float-round-trip",
+          "title": "Read and write a float",
+          "guide": "Read the text as a float, then write it back with two decimals.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n    price, _ := strconv.___(\"4.5\", 64)\n    out := strconv.___(price, 'f', 2, 64)\n    fmt.Println(out)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "ParseFloat"
+              ]
+            },
+            {
+              "answers": [
+                "FormatFloat"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "parse-bool",
+          "title": "Text to bool",
+          "guide": "Read a bool from text, and write one back.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "ParseBool accepts true, false, 1, 0, t and f, in a few cases.",
+              "notes": [
+                {
+                  "on": "strconv.ParseBool(\"true\")",
+                  "text": "Reads a bool: 1, t, true and True all work."
+                }
+              ],
+              "text": "    ok, err := strconv.ParseBool(\"true\")\n    fmt.Println(ok, err)\n    yes, _ := strconv.ParseBool(\"1\")\n    no, _ := strconv.ParseBool(\"F\")\n    fmt.Println(yes, no)"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Other words are an error, and the value is false. FormatBool goes the other way.",
+              "notes": [
+                {
+                  "on": "strconv.FormatBool",
+                  "text": "Writes a bool as true or false."
+                }
+              ],
+              "text": "    maybe, err := strconv.ParseBool(\"yes\")\n    fmt.Println(maybe, err)\n    fmt.Println(strconv.FormatBool(true))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true <nil>\ntrue false\nfalse strconv.ParseBool: parsing \"yes\": invalid syntax\ntrue"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "bases",
+          "title": "Numbers in a base",
+          "guide": "Read and write ints in other bases.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "ParseInt takes the text, the base and the size. Here the text is in base 16.",
+              "notes": [
+                {
+                  "on": "strconv.ParseInt",
+                  "text": "Like Atoi, with a base and a size."
+                },
+                {
+                  "on": "16, 64",
+                  "text": "Base 16, and an int64 as the result."
+                }
+              ],
+              "text": "    n, err := strconv.ParseInt(\"ff\", 16, 64)\n    fmt.Println(n, err)"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Base 2 reads binary. Base 0 follows the prefix, so 0x means hex.",
+              "notes": [
+                {
+                  "on": "\"0x1f\", 0",
+                  "text": "Base 0 picks the base from the prefix."
+                }
+              ],
+              "text": "    bin, _ := strconv.ParseInt(\"1011\", 2, 64)\n    prefixed, _ := strconv.ParseInt(\"0x1f\", 0, 64)\n    fmt.Println(bin, prefixed)"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "FormatInt writes an int64 in any base.",
+              "notes": [
+                {
+                  "on": "strconv.FormatInt(bin, 2)",
+                  "text": "Writes the number in base 2."
+                }
+              ],
+              "text": "    fmt.Println(strconv.FormatInt(bin, 2))\n    fmt.Println(strconv.FormatInt(prefixed, 16))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "255 <nil>\n11 31\n1011\n1f"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "int-range",
+          "title": "Too big for 8 bits",
+          "guide": "Read the code, then pick the output.",
+          "code": "n, err := strconv.ParseInt(\"300\", 10, 8)\nfmt.Println(n, err != nil)",
+          "options": [
+            "300 false",
+            "0 true",
+            "300 true",
+            "127 true"
+          ],
+          "answer": 3,
+          "explanation": "An 8 bit int holds up to 127. A bigger value is an error, and the number returned is the largest one that fits."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Quotes and real input",
+        "slides": [
+          {
+            "text": "`Quote` wraps a text in double quotes and escapes what needs it, and `Unquote` undoes it.\n\nReal input is mixed: some pieces convert and some do not. After each conversion you decide what to do with a failure: skip the piece, use a default, or stop.\n\nThe snippet is pseudo code, not Go.",
+            "code": "for each piece of text {\n    convert it\n    if it failed {\n        skip it, or use a default\n    }\n    use the number\n}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "quote-text",
+          "title": "Quote and unquote",
+          "guide": "Wrap a text in quotes, and take the quotes off.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Quote also escapes special characters, such as a tab.",
+              "notes": [
+                {
+                  "on": "\"hi\"",
+                  "text": "Adds the double quotes, like the %q verb."
+                }
+              ],
+              "text": "    fmt.Println(strconv.Quote(\"hi\"))\n    fmt.Println(strconv.Quote(\"a\\tb\"))"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Unquote needs a text that has quotes around it. Without them it is an error.",
+              "notes": [
+                {
+                  "on": "text, err :=",
+                  "text": "The text without quotes, and an error."
+                }
+              ],
+              "text": "    text, err := strconv.Unquote(\"\\\"go\\\"\")\n    fmt.Println(text, err)\n    _, err = strconv.Unquote(\"go\")\n    fmt.Println(err)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "\"hi\"\n\"a\\tb\"\ngo <nil>\ninvalid syntax"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "quote-and-back",
+          "title": "Quote and back",
+          "guide": "Wrap the text in quotes, then take the quotes off again.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n    text := strconv.___(\"hi\")\n    fmt.Println(text)\n    back, err := strconv.___(text)\n    fmt.Println(back, err)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Quote"
+              ]
+            },
+            {
+              "answers": [
+                "Unquote"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "sum-the-fields",
+          "title": "Sum a line of numbers",
+          "guide": "Add up the numbers of a line and skip the words that are not numbers.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A line of numbers with one bad word, and a total to fill.",
+              "text": "    line := \"4 8 oops 15 16\"\n    total := 0"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Convert each word. When it fails, move on to the next one.",
+              "text": "    for _, word := range strings.Fields(line) {\n        n, err := strconv.Atoi(word)\n        if err != nil {\n            continue\n        }\n        total += n\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Only the good words were added.",
+              "text": "    fmt.Println(total)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "43"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "default-on-error",
+          "title": "A default on error",
+          "guide": "Write a function that falls back to a default port.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Return the default when the text is not a number.",
+              "text": "func port(text string) int {\n    n, err := strconv.Atoi(text)\n    if err != nil {\n        return 8080\n    }\n    return n\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "A good text, a bad one and an empty one.",
+              "text": "func main() {\n    fmt.Println(port(\"3000\"))\n    fmt.Println(port(\"abc\"))\n    fmt.Println(port(\"\"))\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3000\n8080\n8080"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "is-number",
+          "title": "What is this function for?",
+          "guide": "Read the code, then pick what it is for.",
+          "code": "func check(s string) bool {\n    _, err := strconv.Atoi(s)\n    return err == nil\n}",
+          "options": [
+            "Converts a text into an int",
+            "Checks that an int is not zero",
+            "Checks that a text is a whole number",
+            "Prints the error of a conversion"
+          ],
+          "answer": 2,
+          "explanation": "The number is thrown away and only the error is used. The function answers whether the text converts."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "trim-first",
+          "title": "Spaces around a number",
+          "guide": "Read the code, then pick the output.",
+          "code": "text := \" 42 \"\nn, _ := strconv.Atoi(strings.TrimSpace(text))\nfmt.Println(n + 1)",
+          "options": [
+            "43",
+            "1",
+            "42",
+            "0"
+          ],
+          "answer": 0,
+          "explanation": "Atoi fails on spaces, and the number would be 0. TrimSpace removes them first, so the result is 42 plus 1."
+        }
+      ]
+    }
+  ]
+}

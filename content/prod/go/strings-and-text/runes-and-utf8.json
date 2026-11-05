@@ -1,0 +1,299 @@
+{
+  "id": "runes-and-utf8",
+  "intro": {
+    "title": "Runes and UTF-8",
+    "slides": [
+      {
+        "text": "A string is bytes, but people think in characters. Go's answer is the **rune**: one character, kept as its Unicode number.\n\nIn this module you will do math with runes, count and walk text by characters, cut it without breaking a character, and reverse it. Changing case and searching come in `strings-package` and `unicode-package`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Characters are numbers",
+        "slides": [
+          {
+            "text": "Every character has a number in Unicode: `a` is 97 and `é` is 233. A rune is that number. Because runes are numbers, you can compare them and do math with them.\n\nThe snippet is pseudo code, not Go.",
+            "code": "'a' -> 97\n'b' -> 98\n'b' - 'a' -> 1"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "rune-numbers",
+          "title": "Any character is a rune",
+          "guide": "A rune holds the number of a character, in any alphabet.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "An accented letter is still one rune, with its own number.", "text": "    accent := 'é'\n    fmt.Println(accent, string(accent))"},
+            {"mode": "ghost", "line": 8, "guide": "Characters from other alphabets work the same way, with bigger numbers.", "text": "    wide := '世'\n    fmt.Println(wide, string(wide))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "233 é\n19990 世"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "unicode-escapes",
+          "title": "Write a character by its number",
+          "guide": "Write a character with its Unicode number instead of typing it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Inside a string, a backslash, a `u` and four hex digits make a character.", "notes": [{"on": "\\u00e9", "text": "Hex 00e9 is 233, the number of the letter é."}], "text": "    fmt.Println(\"caf\\u00e9\")"},
+            {"mode": "ghost", "line": 7, "guide": "The same escape works in a rune literal.", "text": "    fmt.Println(string('\\u4e16'))"},
+            {"mode": "ghost", "line": 8, "guide": "Both ways of writing the rune are the same number.", "text": "    fmt.Println('\\u00e9' == 'é')"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "café\n世\ntrue"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "rune-math",
+          "title": "Math with runes",
+          "guide": "Runes are numbers, so you can add and subtract them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Subtracting `'a'` gives the position of a letter in the alphabet, starting at 0.", "notes": [{"on": "letter - 'a'", "text": "Distance from a: 0 for a, 2 for c."}], "text": "    letter := 'c'\n    fmt.Println(letter - 'a')"},
+            {"mode": "ghost", "line": 8, "guide": "Add to a rune to get a later character. `string` turns it back into text.", "text": "    fmt.Println(string(letter + 1))"},
+            {"mode": "ghost", "line": 9, "guide": "To wrap around the alphabet, take the position, add one and keep the remainder of 26.", "notes": [{"on": "%26", "text": "Goes back to 0 after the last letter."}], "text": "    last := 'z'\n    wrapped := 'a' + (last-'a'+1)%26\n    fmt.Println(string(wrapped))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2\nd\na"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "rune-math-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    letter := 'e'\n    fmt.Println(letter-'a', string(letter-1))\n}",
+          "options": ["5 d", "4 f", "4 d", "101 d"],
+          "answer": 2,
+          "explanation": "`'e' - 'a'` is the number 4, and it is not converted, so it prints as 4. One less than `'e'` is `'d'`, which `string` turns into text."
+        },
+        {
+          "type": "typing",
+          "id": "rune-ranges",
+          "title": "Is it a capital letter?",
+          "guide": "Count the capital letters of a text by comparing runes.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A counter for the capitals found.", "text": "    upper := 0"},
+            {"mode": "ghost", "line": 7, "guide": "Capitals are in order in Unicode, so a rune is a capital when it sits between `'A'` and `'Z'`.", "notes": [{"on": "r >= 'A'", "text": "Compares the character's number with A's."}], "text": "    for _, r := range \"Go and Rust\" {\n        if r >= 'A' && r <= 'Z' {\n            upper++\n        }\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Show the count.", "text": "    fmt.Println(upper)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "digit-range",
+          "title": "Count the digits",
+          "guide": "Count the digit characters of the text: those from the first digit to the last one.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    digits := 0\n    for _, r := range \"Go 1.22\" {\n        if r >= ___ && r <= ___ {\n            digits++\n        }\n    }\n    fmt.Println(digits)\n}",
+          "gaps": [{"answers": ["'0'"]}, {"answers": ["'9'"]}]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Bytes and characters",
+        "slides": [
+          {
+            "text": "UTF-8 stores a character in 1 to 4 bytes. Plain English letters take one byte, `é` takes two and `世` takes three.\n\nThe snippet is pseudo code, not Go.",
+            "code": "a  -> 1 byte\né  -> 2 bytes\n世 -> 3 bytes"
+          },
+          {
+            "text": "`len` and indexes count bytes. To count characters, use the `unicode/utf8` package. To walk them, use `range`: it decodes one character at a time and tells you the byte where it starts."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "count-runes",
+          "title": "Count characters",
+          "guide": "`len` counts bytes. Count the characters instead.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode/utf8\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "The imports, with `unicode/utf8`, are already in the file. The `ï` takes two bytes.", "text": "    word := \"naïve\"\n    fmt.Println(len(word))"},
+            {"mode": "ghost", "line": 11, "guide": "`utf8` can count the characters of a string.", "notes": [{"on": "RuneCountInString", "text": "Counts characters, not bytes."}], "text": "    fmt.Println(utf8.RuneCountInString(word))"},
+            {"mode": "ghost", "line": 12, "guide": "Characters that take three bytes make the gap bigger.", "text": "    greeting := \"世界\"\n    fmt.Println(len(greeting))\n    fmt.Println(utf8.RuneCountInString(greeting))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "6\n5\n6\n2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "count-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"unicode/utf8\"\n)\n\nfunc main() {\n    s := \"héllo, 世界\"\n    fmt.Println(len(s), utf8.RuneCountInString(s))\n}",
+          "options": ["9 14", "14 9", "9 9", "14 14"],
+          "answer": 1,
+          "explanation": "The text has 9 characters. In bytes, `é` takes 2 and each of the two others takes 3, so the 6 single-byte characters make 14 in all."
+        },
+        {
+          "type": "fill-blank",
+          "id": "count-letters",
+          "title": "Bytes and characters",
+          "guide": "Print the size of the name in bytes, then in characters.",
+          "code": "package main\n\nimport (\n    \"fmt\"\n    \"unicode/utf8\"\n)\n\nfunc main() {\n    name := \"José\"\n    size := ___(name)\n    count := utf8.___(name)\n    fmt.Println(size, count)\n}",
+          "gaps": [{"answers": ["len"]}, {"answers": ["RuneCountInString"]}]
+        },
+        {
+          "type": "typing",
+          "id": "range-positions",
+          "title": "Walk a string",
+          "guide": "`range` visits the characters of a string, not its bytes.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A string with an accented letter in the middle.", "text": "    text := \"añb\""},
+            {"mode": "ghost", "line": 7, "guide": "The position is the byte where each character starts, so it jumps over the two bytes of `ñ`.", "notes": [{"on": "i, r", "text": "The byte position, then the character."}], "text": "    for i, r := range text {\n        fmt.Println(i, string(r))\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 a\n1 ñ\n3 b"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "position-output",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := \"añ!\"\n    for i, r := range s {\n        if r == '!' {\n            fmt.Println(i)\n        }\n    }\n}",
+          "options": ["2", "1", "4", "3"],
+          "answer": 3,
+          "explanation": "`a` takes byte 0 and `ñ` takes bytes 1 and 2, so `!` starts at byte 3. `range` gives byte positions, not character counts."
+        },
+        {
+          "type": "typing",
+          "id": "count-a-rune",
+          "title": "Count one character",
+          "guide": "Count how many times a character appears in a text.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The text and a counter.", "text": "    text := \"año, niño, mañana\"\n    count := 0"},
+            {"mode": "ghost", "line": 8, "guide": "Compare each rune with a rune literal. A loop over bytes would never find `ñ`, because it takes two.", "text": "    for _, r := range text {\n        if r == 'ñ' {\n            count++\n        }\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "Show the count.", "text": "    fmt.Println(count)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Working with characters",
+        "slides": [
+          {
+            "text": "A rune slice has one slot per character, so you can index it, cut it and change it without breaking anything. Cutting a string by bytes can land in the middle of a character and leave broken text.\n\nThe snippet is pseudo code, not Go.",
+            "code": "runes: [A] [ñ] [o]\n  cut after 2 -> Añ\nbytes: [A] [ñ1][ñ2] [o]\n  cut after 2 -> A + half of ñ"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "runes-slice",
+          "title": "A slice of runes",
+          "guide": "Turn a string into a slice with one slot per character.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Converting a string to `[]rune` makes a slice of its characters.", "notes": [{"on": "[]rune(word)", "text": "A copy with one slot per character."}], "text": "    word := \"niño\"\n    letters := []rune(word)"},
+            {"mode": "ghost", "line": 8, "guide": "Now `len` and the index count characters, not bytes.", "text": "    fmt.Println(len(letters))\n    fmt.Println(string(letters[2]))"},
+            {"mode": "ghost", "line": 10, "guide": "Unlike a string, a rune slice can change in place. Convert it back to read it as text.", "text": "    letters[0] = 'N'\n    fmt.Println(string(letters))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4\nñ\nNiño"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "second-letter",
+          "title": "Pick a character",
+          "guide": "Split the city into characters, then print how many there are and the second one.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    city := \"Málaga\"\n    letters := []___(city)\n    second := letters[___]\n    fmt.Println(len(letters), string(second))\n}",
+          "gaps": [{"answers": ["rune"]}, {"answers": ["1"]}]
+        },
+        {
+          "type": "typing",
+          "id": "cut-mid-character",
+          "title": "Cut in the middle of a character",
+          "guide": "Check whether a cut leaves valid text.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"unicode/utf8\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "`ñ` takes two bytes, so cutting at byte 2 keeps it whole.", "notes": [{"on": "ValidString", "text": "True when every byte belongs to a whole character."}], "text": "    word := \"ñu\"\n    fmt.Println(utf8.ValidString(word[:2]))"},
+            {"mode": "ghost", "line": 11, "guide": "Cutting at byte 1 splits `ñ` in half, and the text is broken.", "text": "    fmt.Println(utf8.ValidString(word[:1]))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "truncate-text",
+          "title": "Cut by characters",
+          "guide": "Shorten a text by characters, never by bytes.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "To cut by characters, convert the text to runes first.", "text": "    title := \"Año nuevo\"\n    letters := []rune(title)"},
+            {"mode": "ghost", "line": 8, "guide": "Keep the first 3 characters and add dots. It is safe even with `ñ`.", "text": "    fmt.Println(string(letters[:3]) + \"...\")"},
+            {"mode": "ghost", "line": 9, "guide": "The last 5 characters count back from the length.", "text": "    fmt.Println(string(letters[len(letters)-5:]))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Año...\nnuevo"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "bytes-or-runes",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := \"añ\"\n    r := []rune(s)\n    fmt.Println(len(s), len(r), s[1])\n}",
+          "options": ["3 2 195", "3 2 241", "2 2 241", "3 3 195"],
+          "answer": 0,
+          "explanation": "The string has 3 bytes and 2 runes. `s[1]` is a byte, the first of the two bytes of `ñ` (195), not the rune number of `ñ` (241)."
+        },
+        {
+          "type": "typing",
+          "id": "reverse-text",
+          "title": "Reverse a text",
+          "guide": "Write a function that reverses a text, accents included.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The function turns the text into runes and back. The reversing goes in between.", "text": "func reverse(text string) string {\n    letters := []rune(text)\n    return string(letters)\n}\n"},
+            {"mode": "ghost", "line": 7, "guide": "Swap the first and last characters, then the next pair, up to the middle.", "notes": [{"on": "len(letters)/2", "text": "Only half the pairs: swapping all would undo it."}], "text": "    last := len(letters) - 1\n    for i := 0; i < len(letters)/2; i++ {\n        j := last - i\n        letters[i], letters[j] = letters[j], letters[i]\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "Reversing bytes would break `ñ`. Reversing runes does not.", "text": "func main() {\n    fmt.Println(reverse(\"Año\"))\n    fmt.Println(reverse(\"gopher\"))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "oñA\nrehpog"
+          }
+        }
+      ]
+    }
+  ]
+}

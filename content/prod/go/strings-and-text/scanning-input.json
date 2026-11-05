@@ -1,0 +1,678 @@
+{
+  "id": "scanning-input",
+  "intro": {
+    "title": "Scanning input",
+    "slides": [
+      {
+        "text": "Programs read text from somewhere: the keyboard, a file, a network. `bufio.Scanner` cuts that text into pieces (lines, words, characters) and hands them over one by one.\n\nA real program reads the keyboard like this:",
+        "code": "scanner := bufio.NewScanner(os.Stdin)\nfor scanner.Scan() {\n    fmt.Println(scanner.Text())\n}"
+      },
+      {
+        "text": "Here the source is always a string, so every output is the same each time. Swapping it for the keyboard changes nothing else.\n\nYou will read lines, split input, handle errors and limits, and read values with `fmt.Sscan`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Reading lines",
+        "slides": [
+          {
+            "text": "A scanner wraps a source and moves through it one piece at a time. By default a piece is a line.\n\nThe snippet is pseudo code, not Go.",
+            "code": "scanner = wrap(source)\nwhile scanner has a next line:\n    line = current line\n    use line"
+          },
+          {
+            "text": "`Scan` moves forward and says whether there was something to read. `Text` gives the current piece, without its newline. That is why the usual loop is `for scanner.Scan()`."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "read-lines",
+          "title": "Read lines",
+          "guide": "Read a text one line at a time with a scanner.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The text to read. In a real program it would come from the keyboard or a file.",
+              "text": "    input := \"alpha\\nbeta\\ngamma\""
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "A scanner reads from a source. `strings.NewReader` turns a string into one.",
+              "notes": [
+                {
+                  "on": "bufio.NewScanner",
+                  "text": "Cuts a source into pieces, one line at a time"
+                },
+                {
+                  "on": "strings.NewReader",
+                  "text": "Makes the string readable like a file"
+                }
+              ],
+              "text": "    scanner := bufio.NewScanner(\n        strings.NewReader(input),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`Scan` moves to the next line and says if there is one. `Text` returns it.",
+              "notes": [
+                {
+                  "on": "scanner.Scan()",
+                  "text": "Reads the next line. False when the input ends"
+                },
+                {
+                  "on": "scanner.Text()",
+                  "text": "The line just read, without its newline"
+                }
+              ],
+              "text": "    for scanner.Scan() {\n        fmt.Println(\"line:\", scanner.Text())\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "line: alpha\nline: beta\nline: gamma"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "number-lines",
+          "title": "Number the lines",
+          "guide": "Print each line with its number, and see what counts as a line.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A blank line sits between two words, and the text ends with a newline.",
+              "text": "    input := \"red\\n\\nblue\\n\"\n    scanner := bufio.NewScanner(\n        strings.NewReader(input),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "`%q` quotes each line so the empty one is visible. The last newline adds no line.",
+              "notes": [
+                {
+                  "on": "%q",
+                  "text": "Quotes the text, so an empty line shows as two quotes"
+                }
+              ],
+              "text": "    n := 0\n    for scanner.Scan() {\n        n++\n        fmt.Printf(\"%d: %q\\n\", n, scanner.Text())\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1: \"red\"\n2: \"\"\n3: \"blue\""
+          }
+        },
+        {
+          "type": "typing",
+          "id": "skip-noise",
+          "title": "Skip blank and comment lines",
+          "guide": "Print only the lines that carry data.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Some lines are comments, some are blank, and one has extra spaces.",
+              "text": "    input := \"# servers\\nweb1\\n\\n  web2  \\n# off\\nweb3\\n\"\n    scanner := bufio.NewScanner(\n        strings.NewReader(input),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Trim each line, skip blank ones and comments with `continue`, and print the rest.",
+              "notes": [
+                {
+                  "on": "continue",
+                  "text": "Jumps to the next line without printing this one"
+                }
+              ],
+              "text": "    for scanner.Scan() {\n        line := strings.TrimSpace(scanner.Text())\n        if line == \"\" || strings.HasPrefix(line, \"#\") {\n            continue\n        }\n        fmt.Println(line)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "web1\nweb2\nweb3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "print-lines",
+          "title": "Print every line",
+          "guide": "Create a scanner over the reader and print each line.",
+          "code": "package main\n\nimport \"bufio\"\nimport \"fmt\"\nimport \"strings\"\n\nfunc main() {\n    r := strings.NewReader(\"a\\nb\")\n    sc := bufio.___(r)\n    for sc.___() {\n        fmt.Println(sc.___())\n    }\n}",
+          "gaps": [
+            {
+              "answers": [
+                "NewScanner"
+              ]
+            },
+            {
+              "answers": [
+                "Scan"
+              ]
+            },
+            {
+              "answers": [
+                "Text"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "lines-output",
+          "title": "How many lines?",
+          "guide": "Read the code, then pick the output.",
+          "code": "r := strings.NewReader(\"one\\ntwo\\n\\n\")\nscanner := bufio.NewScanner(r)\nn := 0\nfor scanner.Scan() {\n    n++\n}\nfmt.Println(n)",
+          "options": [
+            "2",
+            "3",
+            "4",
+            "1"
+          ],
+          "answer": 1,
+          "explanation": "The text holds `one`, `two` and an empty line: the final newline ends the empty line and adds nothing after it."
+        },
+        {
+          "type": "typing",
+          "id": "sum-lines",
+          "title": "Sum the numbers",
+          "guide": "Add up the numbers, one per line, ignoring lines that are not numbers.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"strconv\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "One line is not a number.",
+              "text": "    input := \"12\\nabc\\n30\\n8\\n\"\n    scanner := bufio.NewScanner(\n        strings.NewReader(input),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "Convert each line to a number, and skip the ones that fail.",
+              "text": "    total := 0\n    for scanner.Scan() {\n        n, err := strconv.Atoi(scanner.Text())\n        if err != nil {\n            continue\n        }\n        total += n\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 23,
+              "guide": "Print the sum of the valid lines.",
+              "text": "    fmt.Println(\"total:\", total)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "total: 50"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Splitting the input",
+        "slides": [
+          {
+            "text": "How the input is cut is a choice. The default rule cuts lines, and `bufio` has two more: `ScanWords` and `ScanRunes`.\n\nYou pick one with `Split` before the first `Scan`.",
+            "code": "scanner.Split(bufio.ScanWords)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "split-words",
+          "title": "Read word by word",
+          "guide": "Change the scanner so each piece is a word, not a line.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The words run across two lines and one gap has two spaces.",
+              "text": "    input := \"go is  fun\\nand fast\"\n    scanner := bufio.NewScanner(\n        strings.NewReader(input),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Choose how to cut the input. It goes before the first `Scan`.",
+              "notes": [
+                {
+                  "on": "scanner.Split",
+                  "text": "Sets the rule that cuts the input into pieces"
+                },
+                {
+                  "on": "bufio.ScanWords",
+                  "text": "Cuts on spaces and newlines, skipping empty gaps"
+                }
+              ],
+              "text": "    scanner.Split(bufio.ScanWords)"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "The loop is the same: only the pieces changed.",
+              "text": "    count := 0\n    for scanner.Scan() {\n        count++\n        fmt.Println(count, scanner.Text())\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1 go\n2 is\n3 fun\n4 and\n5 fast"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "scan-runes",
+          "title": "Read character by character",
+          "guide": "Cut the input into single characters and measure each one.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`ScanRunes` makes every character a piece.",
+              "notes": [
+                {
+                  "on": "bufio.ScanRunes",
+                  "text": "One piece per character, not per byte"
+                }
+              ],
+              "text": "    scanner := bufio.NewScanner(\n        strings.NewReader(\"né!\"),\n    )\n    scanner.Split(bufio.ScanRunes)"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Print each character and its size in bytes.",
+              "text": "    for scanner.Scan() {\n        text := scanner.Text()\n        fmt.Println(text, len(text))\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "n 1\né 2\n! 1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "pick-the-split",
+          "title": "Print the words",
+          "guide": "Print the text word by word, not line by line.",
+          "code": "package main\n\nimport \"bufio\"\nimport \"fmt\"\nimport \"strings\"\n\nfunc main() {\n    r := strings.NewReader(\"a b\\nc\")\n    sc := bufio.NewScanner(r)\n    sc.___(bufio.___)\n    for sc.Scan() {\n        fmt.Println(sc.Text())\n    }\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Split"
+              ]
+            },
+            {
+              "answers": [
+                "ScanWords"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "line-endings",
+          "title": "How long is the line?",
+          "guide": "Read the code, then pick the output.",
+          "code": "r := strings.NewReader(\"hi\\r\\nbye\")\nscanner := bufio.NewScanner(r)\nscanner.Scan()\nfmt.Println(len(scanner.Text()))",
+          "options": [
+            "2",
+            "3",
+            "4",
+            "1"
+          ],
+          "answer": 0,
+          "explanation": "Line scanning drops the newline and also a carriage return before it, so a Windows line ending leaves just `hi`."
+        },
+        {
+          "type": "typing",
+          "id": "parse-pairs",
+          "title": "Parse key=value lines",
+          "guide": "Split each line into a key and a value, and report the lines that do not fit.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A small config text, with one broken line.",
+              "text": "    input := \"host=db\\nport=5432\\nbad line\\n\"\n    scanner := bufio.NewScanner(\n        strings.NewReader(input),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Cut each line at the equals sign. A line without one is reported and skipped.",
+              "text": "    for scanner.Scan() {\n        line := scanner.Text()\n        key, value, found := strings.Cut(line, \"=\")\n        if !found {\n            fmt.Println(\"skip:\", line)\n            continue\n        }\n        fmt.Printf(\"%s -> %s\\n\", key, value)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "host -> db\nport -> 5432\nskip: bad line"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "header-row",
+          "title": "Read a header, then the rows",
+          "guide": "Read the first line on its own, then loop over the rest.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"strconv\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The first line names the columns.",
+              "text": "    input := \"name,qty\\napple,3\\npear,5\\n\"\n    scanner := bufio.NewScanner(\n        strings.NewReader(input),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "One call to `Scan` outside a loop reads exactly one line.",
+              "notes": [
+                {
+                  "on": "scanner.Scan()",
+                  "text": "Reads one line now. The loop below continues after it"
+                }
+              ],
+              "text": "    scanner.Scan()\n    fmt.Println(\"columns:\", scanner.Text())"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "The loop starts at the second line, because the first was read.",
+              "text": "    total := 0\n    for scanner.Scan() {\n        fields := strings.Split(scanner.Text(), \",\")\n        qty, _ := strconv.Atoi(fields[1])\n        total += qty\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 23,
+              "guide": "Print the sum of the quantities.",
+              "text": "    fmt.Println(\"total:\", total)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "columns: name,qty\ntotal: 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Errors and formatted input",
+        "slides": [
+          {
+            "text": "A scanner has a limit: a line longer than its buffer stops the loop. The loop ends the same way as at the end of the input, so only `Err` tells you something went wrong."
+          },
+          {
+            "text": "When the text has a known shape, `fmt.Sscan` and `fmt.Sscanf` read values straight into variables. They need the address of each variable, written with `&`: take it as a recipe for now, the pointers course explains it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "long-line",
+          "title": "A line that is too long",
+          "guide": "Set a size limit, read until a line breaks it, and check the error.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The second line is longer than the limit we set next.",
+              "text": "    input := \"ok\\nthis line is far too long\\nnext\"\n    scanner := bufio.NewScanner(\n        strings.NewReader(input),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Shrink the limit to 8 bytes, to see what happens past it.",
+              "notes": [
+                {
+                  "on": "scanner.Buffer",
+                  "text": "Sets the starting space and the biggest line allowed"
+                }
+              ],
+              "text": "    scanner.Buffer(make([]byte, 0, 8), 8)"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "The loop stops at the long line, as if the input had ended.",
+              "text": "    for scanner.Scan() {\n        fmt.Println(scanner.Text())\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "After the loop, ask why it stopped.",
+              "notes": [
+                {
+                  "on": "scanner.Err()",
+                  "text": "The failure that ended the loop, or nil at the normal end"
+                }
+              ],
+              "text": "    if err := scanner.Err(); err != nil {\n        fmt.Println(\"error:\", err)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "ok\nerror: bufio.Scanner: token too long"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "why-check-err",
+          "title": "Why call Err?",
+          "guide": "Read the code, then pick what the last check is for.",
+          "code": "for scanner.Scan() {\n    fmt.Println(scanner.Text())\n}\nif err := scanner.Err(); err != nil {\n    fmt.Println(\"failed:\", err)\n}",
+          "options": [
+            "Counts how many lines were read",
+            "Rewinds the scanner to read again",
+            "Tells a read failure from the normal end",
+            "Skips the lines that could not be parsed"
+          ],
+          "answer": 2,
+          "explanation": "`Scan` returns false both at the end of the input and on a failure. `Err` tells them apart: it is nil at the end."
+        },
+        {
+          "type": "typing",
+          "id": "sscan-values",
+          "title": "Read values from a string",
+          "guide": "Pull a word and a number out of a line of text.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Two variables to fill.",
+              "text": "    var name string\n    var age int"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`Sscan` splits the text on spaces and fills each variable in order.",
+              "notes": [
+                {
+                  "on": "fmt.Sscan",
+                  "text": "Reads values out of a string, separated by spaces"
+                },
+                {
+                  "on": "&name",
+                  "text": "Lets Sscan fill name. Pointers come later"
+                }
+              ],
+              "text": "    n, err := fmt.Sscan(\"ana 31\", &name, &age)"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "`n` counts the values filled, and `err` is nil when all went well.",
+              "text": "    fmt.Println(name, age, n, err)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "ana 31 2 <nil>"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "sscanf-format",
+          "title": "Read with a format",
+          "guide": "Read two numbers from a pattern, then see how a bad input fails.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Two numbers to fill.",
+              "text": "    var low, high int"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A format describes the shape of the text, with the verbs you know from printing.",
+              "notes": [
+                {
+                  "on": "fmt.Sscanf",
+                  "text": "Reads values from text that matches a format"
+                },
+                {
+                  "on": "%d-%d",
+                  "text": "Two numbers with a dash between them"
+                }
+              ],
+              "text": "    n, err := fmt.Sscanf(\"10-20\", \"%d-%d\", &low, &high)\n    fmt.Println(low, high, n, err)"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The second number is not a digit, so only one value is read.",
+              "text": "    n, err = fmt.Sscanf(\"10-x\", \"%d-%d\", &low, &high)\n    fmt.Println(n, err)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10 20 2 <nil>\n1 expected integer"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "scan-a-range",
+          "title": "Read a range",
+          "guide": "Read the two ends of a range with a format, then print them and how many values were read.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var lo, hi int\n    n, err := fmt.___(\"3-9\", \"%d-%d\", &lo, &hi)\n    if err != nil {\n        return\n    }\n    fmt.Println(lo, hi, ___)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Sscanf"
+              ]
+            },
+            {
+              "answers": [
+                "n"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "read-string-eof",
+          "title": "Read with a reader",
+          "guide": "Read lines with a reader, and keep the last line that has no newline.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"io\"\n    \"strings\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "A reader gives more control than a scanner. The text has no final newline.",
+              "notes": [
+                {
+                  "on": "bufio.NewReader",
+                  "text": "Reads a source piece by piece, with no size limit"
+                }
+              ],
+              "text": "    reader := bufio.NewReader(\n        strings.NewReader(\"first\\nlast\"),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Print what came back, then stop at the end. The last piece arrives together with the end-of-input error.",
+              "notes": [
+                {
+                  "on": "reader.ReadString",
+                  "text": "Reads up to the delimiter, which stays in the result"
+                },
+                {
+                  "on": "io.EOF",
+                  "text": "The error that means the input has ended"
+                }
+              ],
+              "text": "    for {\n        line, err := reader.ReadString('\\n')\n        fmt.Printf(\"%q\\n\", line)\n        if err == io.EOF {\n            break\n        }\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "\"first\\n\"\n\"last\""
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,794 @@
+{
+  "id": "template-logic-and-functions",
+  "intro": {
+    "title": "Template logic and functions",
+    "slides": [
+      {
+        "text": "The last module filled holes with values. Now the template decides: it shows parts only when a condition holds, repeats parts for every item, and calls functions.\n\nYou will use `if`, `range` and `with`, then variables, pipelines, the built-in functions and your own."
+      },
+      {
+        "text": "The data is still maps and slices. Everything runs on `text/template`: text with actions between `{{` and `}}`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Conditions",
+        "slides": [
+          {
+            "text": "`{{if}}` shows a part only when its condition is true, and `{{else}}` covers the rest. Every block closes with `{{end}}`.\n\nThe snippet is pseudo code.",
+            "code": "{{if condition}}\n    shown when true\n{{else}}\n    shown when false\n{{end}}"
+          },
+          {
+            "text": "A value is false when it is empty: `false`, `0`, an empty string, an empty slice or map, or `nil`. Any other value is true."
+          },
+          {
+            "text": "Comparisons are functions, and the function name comes first: `eq`, `ne`, `lt`, `le`, `gt` and `ge`. Both values must be the same kind, numbers with numbers or text with text.",
+            "code": "{{if gt .score 50}}pass{{end}}"
+          },
+          {
+            "text": "`and`, `or` and `not` are functions too, so the name comes first. Put a call inside parentheses to use its result as an argument.",
+            "code": "{{if and .active (not .banned)}}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "if-else",
+          "title": "If and else",
+          "guide": "Show one text or the other, depending on a boolean.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Pick a word with a condition. Each `if` is closed by `end`.",
+              "notes": [
+                {
+                  "on": "{{if .}}",
+                  "text": "Shows the next part only when the value is true"
+                },
+                {
+                  "on": "{{else}}",
+                  "text": "Shows this part instead when it is false"
+                }
+              ],
+              "text": "    tmpl := template.Must(\n        template.New(\"shop\").Parse(\n            \"Store is {{if .}}open\" +\n                \"{{else}}closed{{end}}.\\n\",\n        ),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "Run it with true, then with false.",
+              "text": "    tmpl.Execute(os.Stdout, true)\n    tmpl.Execute(os.Stdout, false)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Store is open.\nStore is closed."
+          }
+        },
+        {
+          "type": "typing",
+          "id": "compare-values",
+          "title": "Compare values",
+          "guide": "Pick a label for a number with comparisons.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Chain tests with `else if`. The first true one wins.",
+              "notes": [
+                {
+                  "on": "gt . 100",
+                  "text": "A function: gt a b is true when a > b"
+                },
+                {
+                  "on": "else if",
+                  "text": "A second test, tried only if the first failed"
+                }
+              ],
+              "text": "    text := \"{{if gt . 100}}high\" +\n        \"{{else if gt . 50}}mid\" +\n        \"{{else}}low{{end}}\\n\""
+            },
+            {
+              "mode": "auto",
+              "line": 12,
+              "text": "    tmpl := template.Must(\n        template.New(\"level\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "Try a number for each branch.",
+              "text": "    for _, score := range []int{120, 70, 10} {\n        tmpl.Execute(os.Stdout, score)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "high\nmid\nlow"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "empty-is-false",
+          "title": "Empty is false",
+          "guide": "What does it print?",
+          "kind": "output",
+          "code": "tmpl := template.Must(\n    template.New(\"x\").Parse(\n        \"{{if .}}yes{{else}}no{{end}}\",\n    ),\n)\ntmpl.Execute(os.Stdout, []string{})",
+          "options": [
+            "yes",
+            "<no value>",
+            "no",
+            "an error"
+          ],
+          "answer": 2,
+          "explanation": "An empty slice counts as false in an `if`, like `0`, an empty string and `false` itself."
+        },
+        {
+          "type": "fill-blank",
+          "id": "age-check",
+          "title": "Old enough",
+          "guide": "Print ok from 18 up and no below that.",
+          "code": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n    text := \"{{___ ge . 18}}ok{{___}}no{{end}}\\n\"\n    tmpl := template.Must(\n        template.New(\"age\").Parse(text),\n    )\n    tmpl.Execute(os.Stdout, 18)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "if"
+              ]
+            },
+            {
+              "answers": [
+                "else"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "or-discount",
+          "title": "Either condition",
+          "guide": "Give a discount to the youngest and the oldest.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Combine two tests into one condition.",
+              "notes": [
+                {
+                  "on": "or (lt",
+                  "text": "True when at least one of the tests is true"
+                },
+                {
+                  "on": "(lt . 5)",
+                  "text": "Parentheses make a test an argument of or"
+                }
+              ],
+              "text": "    text := \"{{if or (lt . 5) (gt . 65)}}\" +\n        \"discount{{else}}full price{{end}}\\n\""
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    tmpl := template.Must(\n        template.New(\"ticket\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Try a child, an adult and a senior.",
+              "text": "    for _, age := range []int{3, 30, 70} {\n        tmpl.Execute(os.Stdout, age)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "discount\nfull price\ndiscount"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "and-not",
+          "title": "And, not",
+          "guide": "What does it print?",
+          "kind": "output",
+          "code": "tmpl := template.Must(\n    template.New(\"x\").Parse(\n        \"{{if and (not .paid) .ready}}\" +\n            \"ship{{else}}wait{{end}}\",\n    ),\n)\norder := map[string]bool{\n    \"paid\":  true,\n    \"ready\": true,\n}\ntmpl.Execute(os.Stdout, order)",
+          "options": [
+            "ship",
+            "wait",
+            "true",
+            "<no value>"
+          ],
+          "answer": 1,
+          "explanation": "`paid` is true, so `not .paid` is false, and `and` needs both tests to be true."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Loops and with",
+        "slides": [
+          {
+            "text": "`{{range}}` repeats its part for each item of a slice, and inside it the dot is the current item. Its `{{else}}` runs when there are no items.\n\nThe snippet is pseudo code.",
+            "code": "{{range list}}\n    {{.}}\n{{else}}\n    nothing here\n{{end}}"
+          },
+          {
+            "text": "`{{with value}}` is an `if` that also moves the dot. If the value is not empty, the dot becomes that value inside the block. Its `{{else}}` runs otherwise."
+          },
+          {
+            "text": "Inside a loop, `{{break}}` leaves it and `{{continue}}` goes to the next item."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "range-list",
+          "title": "Loop over a list",
+          "guide": "Print every item of a list.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Repeat a part of the template once for each item.",
+              "notes": [
+                {
+                  "on": "{{range .}}",
+                  "text": "Repeats the part up to end for each item"
+                },
+                {
+                  "on": "{{.}}",
+                  "text": "Inside the loop, the dot is the current item"
+                }
+              ],
+              "text": "    text := \"Shopping:\\n\" +\n        \"{{range .}}- {{.}}\\n{{end}}\""
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    tmpl := template.Must(\n        template.New(\"list\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "The data is a slice of strings.",
+              "text": "    items := []string{\"milk\", \"eggs\", \"bread\"}\n    tmpl.Execute(os.Stdout, items)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Shopping:\n- milk\n- eggs\n- bread"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "empty-list",
+          "title": "When the list is empty",
+          "guide": "Show a message when there is nothing to loop over.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A `range` can have an `else` part too.",
+              "notes": [
+                {
+                  "on": "{{else}}",
+                  "text": "Runs when the list has no items"
+                }
+              ],
+              "text": "    text := \"{{range .}}[{{.}}]\" +\n        \"{{else}}empty{{end}}\\n\""
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    tmpl := template.Must(\n        template.New(\"tags\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Run it on a full list and an empty one.",
+              "text": "    lists := [][]string{{\"go\", \"rust\"}, {}}\n    for _, tags := range lists {\n        tmpl.Execute(os.Stdout, tags)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[go][rust]\nempty"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "skip-and-stop",
+          "title": "Skip and stop",
+          "guide": "Skip some items of a loop, and stop at another.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Control the loop from inside with `continue` and `break`.",
+              "notes": [
+                {
+                  "on": "eq . \"skip\"",
+                  "text": "True when both values are equal"
+                },
+                {
+                  "on": "{{continue}}",
+                  "text": "Jumps to the next item"
+                },
+                {
+                  "on": "{{break}}",
+                  "text": "Leaves the loop"
+                }
+              ],
+              "text": "    text := `{{range .}}` +\n        `{{if eq . \"skip\"}}{{continue}}{{end}}` +\n        `{{if eq . \"stop\"}}{{break}}{{end}}` +\n        `[{{.}}]{{end}}` + \"\\n\""
+            },
+            {
+              "mode": "auto",
+              "line": 13,
+              "text": "    tmpl := template.Must(\n        template.New(\"steps\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "Only `a` and `b` get through.",
+              "text": "    steps := []string{\"a\", \"skip\", \"b\", \"stop\", \"c\"}\n    tmpl.Execute(os.Stdout, steps)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[a][b]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "with-nickname",
+          "title": "Use a value if it is there",
+          "guide": "Print a nickname only when the user has one.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`with` runs its part only if the value is not empty.",
+              "notes": [
+                {
+                  "on": "{{with .nick}}",
+                  "text": "Skipped if empty; inside, the dot is the nick"
+                }
+              ],
+              "text": "    text := \"{{with .nick}}aka {{.}}\" +\n        \"{{else}}no nickname{{end}}\\n\""
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    tmpl := template.Must(\n        template.New(\"user\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Two users, one without a nickname.",
+              "text": "    users := []map[string]string{\n        {\"nick\": \"Ace\"},\n        {\"nick\": \"\"},\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "Run the template for each of them.",
+              "text": "    for _, user := range users {\n        tmpl.Execute(os.Stdout, user)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "aka Ace\nno nickname"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Variables and built-ins",
+        "slides": [
+          {
+            "text": "A variable keeps a value: `{{$name := value}}`. Inside `range` and `with` the dot changes, but a variable keeps what it held.\n\nThe snippet is pseudo code.",
+            "code": "{{$size := len .items}}\n{{range .items}}\n    {{$size}} items, now at {{.}}\n{{end}}"
+          },
+          {
+            "text": "`range` can name what it loops with: `{{range $i, $v := .}}` gives the position and the item of a slice, or the key and the value of a map. Map keys come in sorted order."
+          },
+          {
+            "text": "A few functions are built in: `len` counts, `index` takes an item by position or key, and `printf` formats like `fmt.Sprintf`. Call them with the arguments after the name.",
+            "code": "{{len .items}}\n{{index .items 0}}"
+          },
+          {
+            "text": "A pipeline sends a value through functions with `|`. The value on the left becomes the **last** argument of the function on the right, so the two lines below are the same.",
+            "code": "{{.name | printf \"%q\"}}\n{{printf \"%q\" .name}}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "builtin-functions",
+          "title": "Built-in functions",
+          "guide": "Pick an item and count the items with built-in functions.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Functions are called by name, with arguments after.",
+              "notes": [
+                {
+                  "on": "index .days 2",
+                  "text": "Takes the item at that position, from 0"
+                },
+                {
+                  "on": "printf",
+                  "text": "Formats text like Sprintf does"
+                }
+              ],
+              "text": "    text := `{{index .days 2}}, ` +\n        `{{printf \"%d days\" (len .days)}}` +\n        \"\\n\""
+            },
+            {
+              "mode": "auto",
+              "line": 12,
+              "text": "    tmpl := template.Must(\n        template.New(\"week\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "The map holds a list under `days`.",
+              "text": "    week := map[string][]string{\n        \"days\": {\"mon\", \"tue\", \"wed\"},\n    }\n    tmpl.Execute(os.Stdout, week)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "wed, 3 days"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "variables-and-index",
+          "title": "Variables and position",
+          "guide": "Number the items and show how many there are.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Keep the size in a variable, and loop with a position.",
+              "notes": [
+                {
+                  "on": "$total :=",
+                  "text": "Names a value so it can be used later"
+                },
+                {
+                  "on": "$i, $v",
+                  "text": "The position and the item of each turn"
+                }
+              ],
+              "text": "    text := \"{{$total := len .}}\" +\n        \"{{range $i, $v := .}}\" +\n        \"{{$i}}/{{$total}} {{$v}}\\n\" +\n        \"{{end}}\""
+            },
+            {
+              "mode": "auto",
+              "line": 13,
+              "text": "    tmpl := template.Must(\n        template.New(\"list\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "Positions start at 0.",
+              "text": "    colors := []string{\"red\", \"green\", \"blue\"}\n    tmpl.Execute(os.Stdout, colors)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0/3 red\n1/3 green\n2/3 blue"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "count-items",
+          "title": "Count the items",
+          "guide": "Keep the number of items in a variable, print it, then run the template.",
+          "code": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n    t := \"{{$n := ___ .}}{{$n}} items\\n\"\n    tmpl := template.Must(\n        template.New(\"count\").Parse(t),\n    )\n    tmpl.___(os.Stdout, []string{\"a\", \"b\"})\n}",
+          "gaps": [
+            {
+              "answers": [
+                "len"
+              ]
+            },
+            {
+              "answers": [
+                "Execute"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "range-map",
+          "title": "Loop over a map",
+          "guide": "Print every key with the items under it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Over a map, the loop gives the key, then its value.",
+              "notes": [
+                {
+                  "on": "$user, $items",
+                  "text": "A map gives its key first, then the value"
+                }
+              ],
+              "text": "    text := \"{{range $user, $items := .}}\" +\n        \"{{$user}}: \" +\n        \"{{range $items}}[{{.}}]{{end}}\\n\" +\n        \"{{end}}\""
+            },
+            {
+              "mode": "auto",
+              "line": 13,
+              "text": "    tmpl := template.Must(\n        template.New(\"carts\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "A template visits map keys in sorted order.",
+              "text": "    carts := map[string][]string{\n        \"Ben\": {\"tea\"},\n        \"Ana\": {\"milk\", \"eggs\"},\n    }\n    tmpl.Execute(os.Stdout, carts)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Ana: [milk][eggs]\nBen: [tea]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "pipe-printf",
+          "title": "Pipe into a function",
+          "guide": "Format a price with a pipeline.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Send a value into a function with a pipe.",
+              "notes": [
+                {
+                  "on": "|",
+                  "text": "Passes the left value as the last argument"
+                }
+              ],
+              "text": "    text := `{{.price | printf \"%.1f\"}}` +\n        \" USD\\n\""
+            },
+            {
+              "mode": "auto",
+              "line": 11,
+              "text": "    tmpl := template.Must(\n        template.New(\"price\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "The price is rounded to one decimal.",
+              "text": "    data := map[string]float64{\"price\": 4.567}\n    tmpl.Execute(os.Stdout, data)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4.6 USD"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-4",
+      "intro": {
+        "title": "Your own functions",
+        "slides": [
+          {
+            "text": "You can add your own functions. Give each a name in a `FuncMap`, and attach the map with `Funcs` **before** `Parse`, because parsing checks that every function exists.\n\nA function returns one value, or a value and an error. The snippet is pseudo code.",
+            "code": "name in template -> Go function\n\"upper\" -> strings.ToUpper\ntemplate.Funcs(map) then Parse(text)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "custom-functions",
+          "title": "Your own functions",
+          "guide": "Register functions and call them in a template.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"strings\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A function map pairs a name with a Go function.",
+              "notes": [
+                {
+                  "on": "template.FuncMap",
+                  "text": "Maps names used in templates to Go functions"
+                }
+              ],
+              "text": "    funcs := template.FuncMap{\n        \"upper\": strings.ToUpper,\n        \"double\": func(n int) int {\n            return n * 2\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "Attach the functions before parsing, then use them by name.",
+              "notes": [
+                {
+                  "on": "Funcs",
+                  "text": "Makes the functions known to the template"
+                }
+              ],
+              "text": "    text := `{{upper \"ana\"}} {{double 21}}`\n    tmpl := template.Must(\n        template.New(\"t\").Funcs(funcs).\n            Parse(text + \"\\n\"),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "This template needs no data.",
+              "text": "    tmpl.Execute(os.Stdout, nil)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "ANA 42"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "pipe-last-argument",
+          "title": "The piped value",
+          "guide": "What does it print?",
+          "kind": "output",
+          "code": "funcs := template.FuncMap{\n    \"repeat\": strings.Repeat,\n}\ntmpl := template.Must(\n    template.New(\"x\").Funcs(funcs).\n        Parse(`{{2 | repeat \"go\"}}`),\n)\ntmpl.Execute(os.Stdout, nil)",
+          "options": [
+            "22",
+            "go2",
+            "an error",
+            "gogo"
+          ],
+          "answer": 3,
+          "explanation": "The piped `2` becomes the last argument, so it runs `strings.Repeat(\"go\", 2)`."
+        },
+        {
+          "type": "typing",
+          "id": "funcs-before-parse",
+          "title": "Functions before parse",
+          "guide": "See that a function must be registered before Parse.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n    \"strings\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The template calls `upper`, which is not registered yet.",
+              "text": "    text := \"{{upper .}}\\n\"\n    _, err := template.New(\"t\").Parse(text)\n    if err != nil {\n        fmt.Println(\"not defined yet\")\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "Register it first, and the same text parses.",
+              "text": "    funcs := template.FuncMap{\n        \"upper\": strings.ToUpper,\n    }\n    tmpl := template.Must(\n        template.New(\"t\").Funcs(funcs).\n            Parse(text),\n    )\n    tmpl.Execute(os.Stdout, \"ana\")"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "not defined yet\nANA"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "function-error",
+          "title": "A function that fails",
+          "guide": "Return an error from a template function.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"errors\"\n    \"fmt\"\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "A template function may return an error as a second value.",
+              "notes": [
+                {
+                  "on": "(int, error)",
+                  "text": "A non-nil error stops Execute and is returned"
+                }
+              ],
+              "text": "    funcs := template.FuncMap{\n        \"half\": func(n int) (int, error) {\n            if n%2 != 0 {\n                return 0, errors.New(\"odd\")\n            }\n            return n / 2, nil\n        },\n    }"
+            },
+            {
+              "mode": "auto",
+              "line": 19,
+              "text": "    text := \"{{half .}}\"\n    tmpl := template.Must(\n        template.New(\"t\").Funcs(funcs).\n            Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 24,
+              "guide": "An odd number makes `half` fail, and so does `Execute`.",
+              "text": "    err := tmpl.Execute(os.Stdout, 7)\n    if err != nil {\n        fmt.Println(\"execution failed\")\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "execution failed"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "funcmap-fill",
+          "title": "Register a function",
+          "guide": "Register `up`, and attach it before parsing.",
+          "code": "package main\n\nimport (\n    \"os\"\n    \"strings\"\n    \"text/template\"\n)\n\nfunc main() {\n    fns := template.___{\"up\": strings.ToUpper}\n    t := template.New(\"t\").___(fns)\n    template.Must(t.Parse(\"{{up .}}\\n\"))\n    t.Execute(os.Stdout, \"hey\")\n}",
+          "gaps": [
+            {
+              "answers": [
+                "FuncMap"
+              ]
+            },
+            {
+              "answers": [
+                "Funcs"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

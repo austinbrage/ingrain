@@ -1,0 +1,667 @@
+{
+  "id": "templates",
+  "intro": {
+    "title": "Templates",
+    "slides": [
+      {
+        "text": "A template is text with holes. The `text/template` package fills the holes with data and writes the result: emails, reports, config files, generated code.\n\nThe snippet is pseudo code: a template, its data and what comes out.",
+        "code": "template: Hello, {{.name}}!\ndata:     name = Ana\nresult:   Hello, Ana!"
+      },
+      {
+        "text": "A hole is an **action**, written between `{{` and `}}`. Everything outside the actions is copied to the output as it is.\n\nInside an action, the dot `.` stands for the data you give the template."
+      },
+      {
+        "text": "`text/template` writes plain text and does no escaping. For HTML pages the standard library has `html/template`, with the same syntax and safe output.\n\nYou will build and run templates, read values from maps, handle errors and shape the output. Conditions, loops and functions come in the next module."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Parse and execute",
+        "slides": [
+          {
+            "text": "Using a template takes two steps. **Parse** turns the text into a template and checks its syntax. **Execute** fills the holes with data and writes the result to a writer.",
+            "code": "t, err := template.New(\"n\").Parse(s)\nerr = t.Execute(w, data)"
+          },
+          {
+            "text": "The writer is anything that can receive text: the terminal, a file, a network connection. The data is any value, and inside the template the dot is that value.\n\nA map gives the template named values: `.name` reads the key `name`."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "hello-template",
+          "title": "Hello, template",
+          "guide": "Build a template with one hole and print it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Create a template and parse its text. The hole is filled later.",
+              "notes": [
+                {
+                  "on": "template.New",
+                  "text": "Creates an empty template with a name"
+                },
+                {
+                  "on": "{{.}}",
+                  "text": "A hole: the dot is the data given later"
+                }
+              ],
+              "text": "    tmpl, err := template.New(\"hello\").\n        Parse(\"Hello, {{.}}!\\n\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Parsing can fail, so check the error first.",
+              "text": "    if err != nil {\n        fmt.Println(err)\n        return\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "Fill the hole with a value and write the result to the screen.",
+              "notes": [
+                {
+                  "on": "Execute",
+                  "text": "Fills the holes and writes the text to a writer"
+                },
+                {
+                  "on": "os.Stdout",
+                  "text": "The terminal, as a place to write to"
+                }
+              ],
+              "text": "    tmpl.Execute(os.Stdout, \"Gopher\")"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hello, Gopher!"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "reuse-one-template",
+          "title": "One template, many values",
+          "guide": "Run the same template with different values.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`Must` wraps `Parse` and panics on a syntax error, so there is no error to check.",
+              "notes": [
+                {
+                  "on": "template.Must",
+                  "text": "Parse and panic on error, in one step"
+                }
+              ],
+              "text": "    text := \"Total: {{.}}\\n\"\n    tmpl := template.Must(\n        template.New(\"t\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "The template is parsed once and can run again. The dot prints like `Println`.",
+              "text": "    tmpl.Execute(os.Stdout, 42)\n    tmpl.Execute(os.Stdout, 3.5)\n    tmpl.Execute(os.Stdout, true)\n    tmpl.Execute(os.Stdout, []int{1, 2})"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Total: 42\nTotal: 3.5\nTotal: true\nTotal: [1 2]"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "count-the-holes",
+          "title": "Count the holes",
+          "guide": "What does it print?",
+          "kind": "output",
+          "code": "tmpl := template.Must(\n    template.New(\"x\").Parse(\"{{.}}-{{.}}\"),\n)\ntmpl.Execute(os.Stdout, \"ab\")",
+          "options": [
+            "ab",
+            "ab-ab",
+            "{{.}}-{{.}}",
+            "ab-{{.}}"
+          ],
+          "answer": 1,
+          "explanation": "Every `{{.}}` becomes the data, and the dash outside the holes is copied as it is."
+        },
+        {
+          "type": "typing",
+          "id": "map-fields",
+          "title": "Values from a map",
+          "guide": "Give the template a map, and read its entries by key.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A hole like `.name` reads the entry with that key.",
+              "notes": [
+                {
+                  "on": "{{.name}}",
+                  "text": "Reads the entry called name from the map"
+                }
+              ],
+              "text": "    text := \"{{.name}} ordered {{.item}}.\\n\"\n    tmpl := template.Must(\n        template.New(\"order\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "The data is a map of strings.",
+              "text": "    order := map[string]string{\n        \"name\": \"Ana\",\n        \"item\": \"a lamp\",\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Pass the map as the data.",
+              "text": "    tmpl.Execute(os.Stdout, order)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Ana ordered a lamp."
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-template",
+          "title": "Fill the template",
+          "guide": "Build the template from the text, then fill it with the data.",
+          "code": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n    tmpl := template.___(\n        template.New(\"hi\").___(\"Hi {{.user}}!\"),\n    )\n    data := map[string]string{\"user\": \"Ana\"}\n    tmpl.___(os.Stdout, data)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Must"
+              ]
+            },
+            {
+              "answers": [
+                "Parse"
+              ]
+            },
+            {
+              "answers": [
+                "Execute"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "render-to-string",
+          "title": "Render to a string",
+          "guide": "Collect the result in a string instead of printing it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 10,
+              "text": "    text := \"welcome, {{.}}\"\n    tmpl := template.Must(\n        template.New(\"w\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "The template is already in the file. Any writer works, so a `strings.Builder` can collect the result.",
+              "notes": [
+                {
+                  "on": "&sb",
+                  "text": "A pointer, so Execute can write into the Builder"
+                }
+              ],
+              "text": "    var sb strings.Builder\n    tmpl.Execute(&sb, \"Ana\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "The result is a normal string now.",
+              "text": "    msg := sb.String()\n    fmt.Println(strings.ToUpper(msg))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "WELCOME, ANA"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Looking up data",
+        "slides": [
+          {
+            "text": "With a map as data, `.key` reads one entry. When an entry is itself a map, the keys chain with more dots.\n\nThe snippet is pseudo code.",
+            "code": "data:     a -> b -> c -> 7\ntemplate: {{.a.b.c}}\nresult:   7"
+          },
+          {
+            "text": "A key that is not in the map is not an error by default: the hole prints a placeholder text.\n\nThe `Option` method changes this. `missingkey=zero` prints the zero value of the map's element type, and `missingkey=error` makes `Execute` fail."
+          },
+          {
+            "text": "Two things can fail. **Parse** fails on broken syntax, such as a hole that never closes. **Execute** fails on data problems, such as a strict missing key.\n\nBoth return an `error`, and `Must` turns a parse error into a panic."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "nested-map",
+          "title": "Nested lookups",
+          "guide": "Read a value inside a map that is inside a map.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Chain the keys with dots to go one level deeper.",
+              "notes": [
+                {
+                  "on": "{{.user.name}}",
+                  "text": "Looks up user, then name inside it"
+                }
+              ],
+              "text": "    text := \"{{.user.name}}, {{.user.city}}\\n\"\n    tmpl := template.Must(\n        template.New(\"profile\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "The map holds another map under `user`.",
+              "text": "    profile := map[string]map[string]string{\n        \"user\": {\n            \"name\": \"Ana\",\n            \"city\": \"Lima\",\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Pass the outer map.",
+              "text": "    tmpl.Execute(os.Stdout, profile)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Ana, Lima"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "missing-key",
+          "title": "A key that is missing",
+          "guide": "Ask for a key the map does not have, and see what prints.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The template asks for an `email`.",
+              "text": "    text := \"Email: {{.email}}\\n\"\n    tmpl := template.Must(\n        template.New(\"contact\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "The map has no `email` entry. Execute does not fail.",
+              "text": "    contact := map[string]string{\n        \"name\": \"Ana\",\n    }\n    tmpl.Execute(os.Stdout, contact)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Email: <no value>"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "which-key",
+          "title": "Which key?",
+          "guide": "What does it print?",
+          "kind": "output",
+          "code": "user := map[string]string{\"name\": \"Ana\"}\ntmpl := template.Must(\n    template.New(\"hi\").Parse(\"Hi {{.Name}}\"),\n)\ntmpl.Execute(os.Stdout, user)",
+          "options": [
+            "Hi Ana",
+            "Hi <no value>",
+            "Hi ",
+            "Hi {{.Name}}"
+          ],
+          "answer": 1,
+          "explanation": "Map keys match exactly, so `Name` is not `name`. A key that is not found prints `<no value>`."
+        },
+        {
+          "type": "typing",
+          "id": "strict-keys",
+          "title": "Fail on a missing key",
+          "guide": "Make a missing key an error you can check.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 10,
+              "text": "    text := \"{{.email}}\\n\"\n    tmpl := template.Must(\n        template.New(\"t\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "The template is already in the file. Ask it to treat a missing key as an error.",
+              "notes": [
+                {
+                  "on": "missingkey=error",
+                  "text": "A key that does not exist now makes Execute fail"
+                }
+              ],
+              "text": "    tmpl.Option(\"missingkey=error\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "Now `Execute` returns an error. Check it.",
+              "text": "    contact := map[string]string{\"name\": \"Ana\"}\n    err := tmpl.Execute(os.Stdout, contact)\n    if err != nil {\n        fmt.Println(\"missing key\")\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "missing key"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "strict-fill",
+          "title": "Strict template",
+          "guide": "Make a missing key an error, parse the text and run it on an empty map.",
+          "code": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n    tmpl := template.New(\"t\")\n    tmpl.___(\"missingkey=error\")\n    template.Must(tmpl.___(\"{{.id}}\"))\n    tmpl.___(os.Stdout, map[string]int{})\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Option"
+              ]
+            },
+            {
+              "answers": [
+                "Parse"
+              ]
+            },
+            {
+              "answers": [
+                "Execute"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "parse-error",
+          "title": "Broken syntax",
+          "guide": "See that a bad template fails at parse time.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"fmt\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "This text opens a hole and never closes it.",
+              "notes": [
+                {
+                  "on": "_",
+                  "text": "Drops the template, only the error matters"
+                }
+              ],
+              "text": "    _, err := template.New(\"bad\").\n        Parse(\"Hi {{.name\")"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "A syntax error shows up at parse time, before any data is involved.",
+              "text": "    if err != nil {\n        fmt.Println(\"parse failed\")\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "parse failed"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Shaping the output",
+        "slides": [
+          {
+            "text": "Text around a hole is copied exactly, spaces and newlines included. A dash inside the braces trims it: `{{-` removes the whitespace before the hole and `-}}` removes the whitespace after it.\n\nThe snippet is pseudo code.",
+            "code": "template: id:   {{- .}}\ndata:     7\nresult:   id:7"
+          },
+          {
+            "text": "A comment is `{{/* text */}}`. It prints nothing. It explains the template to whoever edits it next.\n\nTrim markers work with comments too, with spaces around the comment: `{{- /* note */ -}}`."
+          },
+          {
+            "text": "`{{define \"name\"}}...{{end}}` stores a block of text under a name. `{{template \"name\" data}}` runs it, with that data as its dot.\n\nA template can hold many named blocks, and `ExecuteTemplate` runs one of them by name.",
+            "code": "{{define \"row\"}}({{.}}){{end}}\n{{template \"row\" 5}}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "comments",
+          "title": "Comments",
+          "guide": "Leave a note in a template that never prints.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "A comment sits in the text of the template and adds nothing to the output.",
+              "notes": [
+                {
+                  "on": "{{/*",
+                  "text": "A comment: it is dropped and prints nothing"
+                }
+              ],
+              "text": "    text := \"{{/* greeting */}}Hi, {{.}}!\\n\"\n    tmpl := template.Must(\n        template.New(\"c\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "The comment is gone from the result.",
+              "text": "    tmpl.Execute(os.Stdout, \"Ana\")"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hi, Ana!"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "trim-markers",
+          "title": "Trim the spaces",
+          "guide": "Compare a hole with and without trim markers.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Two texts with the same hole. The second one trims the spaces around it.",
+              "notes": [
+                {
+                  "on": "{{-",
+                  "text": "Removes the spaces just before the hole"
+                },
+                {
+                  "on": "-}}",
+                  "text": "Removes the spaces just after the hole"
+                }
+              ],
+              "text": "    plain := \"[ {{.}} ]\\n\"\n    trim := \"[ {{- . -}} ]\\n\""
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Run both texts with the same value.",
+              "text": "    for _, text := range []string{plain, trim} {\n        tmpl := template.Must(\n            template.New(\"t\").Parse(text),\n        )\n        tmpl.Execute(os.Stdout, \"Ana\")\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[ Ana ]\n[Ana]"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "which-spaces",
+          "title": "Which spaces go?",
+          "guide": "What does it print?",
+          "kind": "output",
+          "code": "tmpl := template.Must(\n    template.New(\"x\").Parse(\"a {{- .}} b\"),\n)\ntmpl.Execute(os.Stdout, 1)",
+          "options": [
+            "a 1 b",
+            "a1 b",
+            "a 1b",
+            "a1b"
+          ],
+          "answer": 1,
+          "explanation": "`{{-` removes the space before the hole. Nothing trims the space after it."
+        },
+        {
+          "type": "typing",
+          "id": "define-and-reuse",
+          "title": "Define and reuse",
+          "guide": "Define a block once and use it twice.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Define a small block, then call it with two different values.",
+              "notes": [
+                {
+                  "on": "{{define \"tag\"}}",
+                  "text": "Names a block of text so it can be reused"
+                },
+                {
+                  "on": "{{template \"tag\" .a}}",
+                  "text": "Runs the block, with .a as its dot"
+                }
+              ],
+              "text": "    text := `{{define \"tag\"}}[{{.}}]{{end}}` +\n        `{{template \"tag\" .a}}` +\n        `{{template \"tag\" .b}}` + \"\\n\""
+            },
+            {
+              "mode": "auto",
+              "line": 12,
+              "text": "    tmpl := template.Must(\n        template.New(\"page\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "The whole template gets the map. Each call picks its own entry.",
+              "text": "    tags := map[string]string{\n        \"a\": \"go\",\n        \"b\": \"rust\",\n    }\n    tmpl.Execute(os.Stdout, tags)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[go][rust]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "run-a-definition",
+          "title": "Run a definition",
+          "guide": "Run one named block directly.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Only a definition. It prints nothing by itself.",
+              "text": "    text := `{{define \"hi\"}}Hi, {{.}}!{{end}}`"
+            },
+            {
+              "mode": "auto",
+              "line": 10,
+              "text": "    tmpl := template.Must(\n        template.New(\"all\").Parse(text),\n    )"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "The template is already in the file. `ExecuteTemplate` runs one named block.",
+              "notes": [
+                {
+                  "on": "ExecuteTemplate",
+                  "text": "Runs the block with this name, not the whole template"
+                }
+              ],
+              "text": "    tmpl.ExecuteTemplate(os.Stdout, \"hi\", \"Ana\")"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Hi, Ana!"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "run-named",
+          "title": "Run a named block",
+          "guide": "Load the definition, then run the block called `tag`.",
+          "code": "package main\n\nimport (\n    \"os\"\n    \"text/template\"\n)\n\nfunc main() {\n    text := `{{define \"tag\"}}<{{.}}>{{end}}`\n    tmpl := template.New(\"t\")\n    template.Must(tmpl.___(text))\n    tmpl.___(os.Stdout, \"tag\", \"go\")\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Parse"
+              ]
+            },
+            {
+              "answers": [
+                "ExecuteTemplate"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,301 @@
+{
+  "id": "bytes-and-conversions",
+  "intro": {
+    "title": "Bytes and conversions",
+    "slides": [
+      {
+        "text": "A string cannot be changed, but a slice of bytes can. Go moves between the two with a conversion, and the `bytes` package gives the same tools as `strings` for byte slices.\n\nYou will edit text as bytes, search and split it with `bytes`, collect it in a `bytes.Buffer`, and meet the conversions that trip people up. Per-character checks come in `unicode-package`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Strings as bytes",
+        "slides": [
+          {
+            "text": "Converting a string to `[]byte` gives you a slice you can edit. The conversion copies, so the original string never changes.\n\nThe snippet is pseudo code, not Go.",
+            "code": "raw = bytes of \"cat\"\nraw[0] = 'b'\nstring from raw -> \"bat\"\noriginal still -> \"cat\""
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "bytes-from-string",
+          "title": "A string as bytes",
+          "guide": "Turn a string into a slice of its bytes and back.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Convert a string to a slice of its bytes. Printing it shows numbers.", "notes": [{"on": "[]byte(word)", "text": "Copies the string's bytes into a new slice"}], "text": "    word := \"go\"\n    raw := []byte(word)\n    fmt.Println(raw)"},
+            {"mode": "ghost", "line": 9, "guide": "Convert the bytes back to a string.", "notes": [{"on": "string(raw)", "text": "Builds a new string from the bytes"}], "text": "    fmt.Println(string(raw), len(raw))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[103 111]\ngo 2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "edit-in-place",
+          "title": "Edit a byte in place",
+          "guide": "A string cannot change, but a byte slice can.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Copy the string into bytes and change the first one.", "notes": [{"on": "raw[0] = 'b'", "text": "Slices allow assigning to an index, strings do not"}], "text": "    word := \"cat\"\n    raw := []byte(word)\n    raw[0] = 'b'"},
+            {"mode": "ghost", "line": 9, "guide": "The slice changed, but the conversion was a copy, so the original string stays.", "text": "    fmt.Println(string(raw), word)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "bat cat"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "edit-a-word",
+          "title": "Change the first letter",
+          "guide": "Turn the word into editable bytes, change its first letter, then print the result as text.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    word := \"hello\"\n    raw := ___(word)\n    raw[0] = 'j'\n    fmt.Println(___(raw))\n}",
+          "gaps": [{ "answers": ["[]byte"] }, { "answers": ["string"] }]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "print-bytes",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    raw := []byte(\"Hi\")\n    fmt.Println(raw, string(raw[1]))\n}",
+          "options": ["[Hi] i", "Hi i", "[72 105] i", "[72 105] 105"],
+          "answer": 2,
+          "explanation": "Printing a byte slice shows the number of each byte. `raw[1]` is the byte 105, and `string` turns it into the character `i`."
+        },
+        {
+          "type": "typing",
+          "id": "upper-by-byte",
+          "title": "Upper case by byte",
+          "guide": "Shift each lowercase letter to its capital by working on the bytes.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Start from the bytes of the text.", "text": "    tag := []byte(\"go-lang\")"},
+            {"mode": "ghost", "line": 7, "guide": "A lowercase letter is 32 above its capital. Move each one down by that gap and leave the rest.", "notes": [{"on": "'a' - 'A'", "text": "The gap between a letter and its capital: 32"}], "text": "    for i := range tag {\n        if tag[i] >= 'a' && tag[i] <= 'z' {\n            tag[i] -= 'a' - 'A'\n        }\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Print the edited bytes as text.", "text": "    fmt.Println(string(tag))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "GO-LANG"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "append-bytes",
+          "title": "Append to a byte slice",
+          "guide": "Grow a byte slice with append, from a string and from single bytes.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Start with an empty byte slice.", "text": "    var data []byte"},
+            {"mode": "ghost", "line": 7, "guide": "A string can be appended to a byte slice if it is followed by three dots.", "notes": [{"on": "\"id=\"...", "text": "Spreads the string into its bytes"}], "text": "    data = append(data, \"id=\"...)"},
+            {"mode": "ghost", "line": 8, "guide": "Single bytes can be appended too.", "text": "    data = append(data, '4', '2')"},
+            {"mode": "ghost", "line": 9, "guide": "Print the result as text, with its size in bytes.", "text": "    fmt.Println(string(data), len(data))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "id=42 5"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "The bytes package",
+        "slides": [
+          {
+            "text": "The `bytes` package has the same functions as `strings`, but they take and return byte slices. Slices cannot be compared with `==`, so `bytes.Equal` does that job.\n\nMost functions return a new slice, so the original stays as it was."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "compare-bytes",
+          "title": "Compare byte slices",
+          "guide": "Compare the content of two byte slices.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "Two slices with the same content.", "text": "    a := []byte(\"go\")\n    b := []byte(\"go\")"},
+            {"mode": "ghost", "line": 11, "guide": "Slices cannot use `==`. Ask the bytes package whether they are equal.", "notes": [{"on": "bytes.Equal", "text": "True when both hold the same bytes"}], "text": "    fmt.Println(bytes.Equal(a, b))"},
+            {"mode": "ghost", "line": 12, "guide": "Compare also tells which one comes first.", "notes": [{"on": "bytes.Compare", "text": "Gives -1, 0 or 1: less, equal or greater"}], "text": "    fmt.Println(bytes.Compare(a, []byte(\"rust\")))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\n-1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "search-bytes",
+          "title": "Search in bytes",
+          "guide": "Search a byte slice the way you search a string.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "A log line as bytes.", "text": "    data := []byte(\"error: disk full\")"},
+            {"mode": "ghost", "line": 10, "guide": "The same names as in strings, but the pieces to find are byte slices.", "notes": [{"on": "[]byte(\"error\")", "text": "The piece to find is a byte slice, not a string"}], "text": "    fmt.Println(bytes.HasPrefix(data, []byte(\"error\")))\n    fmt.Println(bytes.Contains(data, []byte(\"disk\")))"},
+            {"mode": "ghost", "line": 12, "guide": "Find where the colon is.", "text": "    fmt.Println(bytes.Index(data, []byte(\":\")))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\ntrue\n5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "split-join-bytes",
+          "title": "Split and join bytes",
+          "guide": "Split a byte slice at a separator, then join the parts again.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "Split at every comma.", "notes": [{"on": "bytes.Split(", "text": "Gives a slice of byte slices"}], "text": "    data := []byte(\"red,green,blue\")\n    parts := bytes.Split(data, []byte(\",\"))"},
+            {"mode": "ghost", "line": 11, "guide": "Count the parts, then join them with a dash.", "text": "    fmt.Println(len(parts))\n    joined := bytes.Join(parts, []byte(\"-\"))\n    fmt.Println(string(joined))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\nred-green-blue"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "date-parts",
+          "title": "Reformat a date",
+          "guide": "Cut the date at its dashes, then put the parts back together with slashes.",
+          "code": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n    data := []byte(\"2026-11-04\")\n    parts := bytes.___(data, []byte(\"-\"))\n    fmt.Println(len(parts))\n    slashed := bytes.___(parts, []byte(\"/\"))\n    fmt.Println(string(slashed))\n}",
+          "gaps": [{ "answers": ["Split"] }, { "answers": ["Join"] }]
+        },
+        {
+          "type": "typing",
+          "id": "trim-and-upper",
+          "title": "Trim and change case",
+          "guide": "Clean the white space around a line of bytes and change its case.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "Remove the spaces at both ends.", "text": "    line := []byte(\"  ok  \")\n    clean := bytes.TrimSpace(line)"},
+            {"mode": "ghost", "line": 11, "guide": "Compare the sizes, then print the cleaned line in capitals.", "text": "    fmt.Println(len(line), len(clean))\n    fmt.Println(string(bytes.ToUpper(clean)))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "6 2\nOK"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "upper-is-a-copy",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n    data := []byte(\"go\")\n    upper := bytes.ToUpper(data)\n    upper[0] = 'X'\n    fmt.Println(string(data), string(upper))\n}",
+          "options": ["XO XO", "go XO", "go GO", "Go XO"],
+          "answer": 1,
+          "explanation": "`ToUpper` returns a new slice, so `data` stays `go`. The new slice is `GO`, and its first byte is then replaced by `X`."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Buffers and conversions",
+        "slides": [
+          {
+            "text": "A `bytes.Buffer` is a builder you can also read from: you write bytes in, and you read them back out. Reading uses the data up, so the buffer holds only what is left."
+          },
+          {
+            "text": "Go converts between strings, bytes, runes and numbers, and some conversions do not mean what they seem. A number turned into text with `string` becomes a character, not its digits."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "write-to-buffer",
+          "title": "Write into a buffer",
+          "guide": "Collect text and bytes in a bytes.Buffer.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "A buffer works like a builder, and its zero value is ready to use.", "notes": [{"on": "bytes.Buffer", "text": "Ready to use with no setup"}], "text": "    var buf bytes.Buffer\n    buf.WriteString(\"id=\")"},
+            {"mode": "ghost", "line": 11, "guide": "Add a single byte, then a whole byte slice.", "notes": [{"on": "buf.Write(", "text": "Adds every byte of a slice"}], "text": "    buf.WriteByte('7')\n    buf.Write([]byte(\"!\"))"},
+            {"mode": "ghost", "line": 13, "guide": "Print what the buffer holds and its size.", "text": "    fmt.Println(buf.String(), buf.Len())"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "id=7! 5"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-the-buffer",
+          "title": "Fill a buffer",
+          "guide": "Declare a buffer, write a string and a byte into it, then print its text.",
+          "code": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n    var buf ___.Buffer\n    buf.___(\"v\")\n    buf.WriteByte('2')\n    fmt.Println(buf.___())\n}",
+          "gaps": [{ "answers": ["bytes"] }, { "answers": ["WriteString"] }, { "answers": ["String"] }]
+        },
+        {
+          "type": "typing",
+          "id": "read-from-buffer",
+          "title": "Read from a buffer",
+          "guide": "Read the first line out of a buffer and see what is left.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "Start a buffer with some text, then read up to the first newline.", "notes": [{"on": "NewBufferString", "text": "A buffer that starts with this text"}, {"on": "ReadString", "text": "Takes text up to and including the newline"}], "text": "    buf := bytes.NewBufferString(\"first\\nsecond\\n\")\n    line, _ := buf.ReadString('\\n')"},
+            {"mode": "ghost", "line": 11, "guide": "The line keeps its newline. Quote it to see it.", "text": "    fmt.Printf(\"%q\\n\", line)"},
+            {"mode": "ghost", "line": 12, "guide": "Reading used up the first line, so only the rest remains.", "text": "    fmt.Printf(\"%q\\n\", buf.String())"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "\"first\\n\"\n\"second\\n\""
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "unread-size",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport (\n    \"bytes\"\n    \"fmt\"\n)\n\nfunc main() {\n    buf := bytes.NewBufferString(\"ab\\ncd\")\n    buf.ReadString('\\n')\n    fmt.Println(buf.Len())\n}",
+          "options": ["2", "5", "3", "0"],
+          "answer": 0,
+          "explanation": "`ReadString` took `ab` and the newline, 3 bytes of the 5. `Len` counts only the bytes not read yet, so 2 remain."
+        },
+        {
+          "type": "typing",
+          "id": "bytes-or-runes-sizes",
+          "title": "Bytes or runes",
+          "guide": "Convert the same text to bytes and to runes and compare them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The same text as bytes and as runes.", "text": "    word := \"héllo\"\n    raw := []byte(word)\n    letters := []rune(word)"},
+            {"mode": "ghost", "line": 9, "guide": "The accent takes two bytes but is one rune.", "text": "    fmt.Println(len(raw), len(letters))\n    fmt.Println(raw)"},
+            {"mode": "ghost", "line": 11, "guide": "Show the bytes of the string in hexadecimal.", "notes": [{"on": "%x", "text": "Prints each byte as two hex digits"}], "text": "    fmt.Printf(\"%x\\n\", word)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "6 5\n[104 195 169 108 108 111]\n68c3a96c6c6f"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "number-as-text",
+          "title": "A number as text",
+          "guide": "Turn a number into a character, and into its digits.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"strconv\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "To read a number as a character code, go through a rune.", "notes": [{"on": "rune(n)", "text": "Says the number is a character code, not digits"}], "text": "    n := 65\n    fmt.Println(string(rune(n)))"},
+            {"mode": "ghost", "line": 11, "guide": "To get its digits as text, use strconv.", "text": "    fmt.Println(strconv.Itoa(n))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "A\n65"
+          }
+        }
+      ]
+    }
+  ]
+}
