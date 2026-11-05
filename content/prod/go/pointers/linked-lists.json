@@ -1,0 +1,878 @@
+{
+  "id": "linked-lists",
+  "intro": {
+    "title": "Linked lists",
+    "slides": [
+      {
+        "text": "A linked list is a chain of nodes. Each node holds a value and a pointer to the next node, and the last one points to nil. You will build, walk, change and reverse them with the pointers you already know."
+      },
+      {
+        "text": "The nodes are not side by side like a slice. You reach one only by following pointers from the **head**, the first node. The sketch is not Go.",
+        "code": "head -> [1|*] -> [2|*] -> [3|nil]"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Nodes and walking",
+        "slides": [
+          {
+            "text": "A node needs a field that points to another node of the same type. That works with a pointer: a node cannot contain a whole node of its own type, but it can point to one."
+          },
+          {
+            "text": "To visit every node, keep a pointer to the current one and hop until it is nil. The snippet is pseudo code, not Go.",
+            "code": "current = head\nwhile current is not nil\n    use current\n    current = current.next"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "node-type",
+          "title": "A node that points on",
+          "guide": "Define a node and link two of them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A node holds a value and a pointer to the node after it.",
+              "notes": [
+                {
+                  "on": "*Node",
+                  "text": "A pointer: the type names itself without containing itself."
+                }
+              ],
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Link them: `first` points to `second`. The last node leaves `Next` empty.",
+              "text": "    second := &Node{Value: 20}\n    first := &Node{Value: 10, Next: second}"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Follow the pointer with `.Next`. An unset pointer is nil.",
+              "text": "    fmt.Println(first.Value, first.Next.Value)\n    fmt.Println(second.Next == nil)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10 20\ntrue"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "chain-by-hand",
+          "title": "A chain by hand",
+          "guide": "Link three nodes and follow the chain.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "copy",
+              "line": 5,
+              "guide": "The same node as before.",
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Build from the end, so each node can point at one that exists. The first node is the **head**.",
+              "notes": [
+                {
+                  "on": "Next: tail",
+                  "text": "Points middle at the node that already exists."
+                }
+              ],
+              "text": "    tail := &Node{Value: 3}\n    middle := &Node{Value: 2, Next: tail}\n    head := &Node{Value: 1, Next: middle}"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Two hops from the head reach the last node.",
+              "text": "    fmt.Println(head.Next.Next.Value)"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "The chain holds pointers, not copies: this changes the very node `middle` names.",
+              "text": "    head.Next.Value = 20\n    fmt.Println(middle.Value)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\n20"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "walk-the-list",
+          "title": "Walk the list",
+          "guide": "Visit every node of the list.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "A list can be written nested. Only `head` gets a name.",
+              "text": "    head := &Node{\n        Value: 1,\n        Next: &Node{\n            Value: 2,\n            Next:  &Node{Value: 3},\n        },\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "Start at the head and hop until there is no node left.",
+              "notes": [
+                {
+                  "on": "n = n.Next",
+                  "text": "Moves n to the following node. After the last it is nil."
+                }
+              ],
+              "text": "    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1\n2\n3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "walk-gaps",
+          "title": "Complete the walk",
+          "guide": "Fill the gaps so the loop visits every node.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Node struct{ Value int; Next *Node }\n\nfunc main() {\n    head := &Node{Value: 4, Next: &Node{Value: 5}}\n    for n := head; n ___ nil; n = n.___ {\n        fmt.Println(n.Value)\n    }\n}",
+          "gaps": [
+            {
+              "answers": [
+                "!="
+              ]
+            },
+            {
+              "answers": [
+                "Next"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "length-and-sum",
+          "title": "Length and sum",
+          "guide": "Count the nodes and add their values.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The same walk, counting instead of printing. An empty list counts 0 with no special case.",
+              "text": "func length(head *Node) int {\n    count := 0\n    for n := head; n != nil; n = n.Next {\n        count++\n    }\n    return count\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "The same walk once more, adding the values.",
+              "text": "func sum(head *Node) int {\n    total := 0\n    for n := head; n != nil; n = n.Next {\n        total += n.Value\n    }\n    return total\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 27,
+              "guide": "A new node hangs on the last one. `nil` is a valid, empty list.",
+              "text": "    head := &Node{Value: 4, Next: &Node{Value: 5}}\n    head.Next.Next = &Node{Value: 6}\n    fmt.Println(length(head), sum(head))\n    fmt.Println(length(nil))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3 15\n0"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "skip-the-last",
+          "title": "What does it print?",
+          "guide": "Read the loop, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Node struct{ Value int; Next *Node }\n\nfunc main() {\n    last := &Node{Value: 3}\n    mid := &Node{Value: 2, Next: last}\n    head := &Node{Value: 1, Next: mid}\n    for n := head; n.Next != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}",
+          "options": [
+            "1, 2 and 3",
+            "1 and 2",
+            "Only 1",
+            "Only 3"
+          ],
+          "answer": 1,
+          "explanation": "The loop stops when `n.Next` is nil, which is true while standing on the last node. That node is never printed."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Adding nodes",
+        "slides": [
+          {
+            "text": "Adding in front only needs the new node to point at the old head. Adding at the end means finding the last node first, unless the list also keeps a pointer to it."
+          },
+          {
+            "text": "Order matters when linking in the middle: the new node must take the old next node **before** the old one is pointed at it, or the rest of the list is lost. Pseudo code, not Go.",
+            "code": "new.next = node.next\nnode.next = new"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "prepend",
+          "title": "Add to the front",
+          "guide": "Put a new node before the head.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The new node points at the old head, and it is the new head. Return it.",
+              "notes": [
+                {
+                  "on": "Next: head",
+                  "text": "The old head becomes the node after the new one."
+                }
+              ],
+              "text": "func prepend(head *Node, value int) *Node {\n    return &Node{Value: value, Next: head}\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A helper to print the list, one value a line.",
+              "text": "func printList(head *Node) {\n    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "A nil pointer is an empty list. Each new node goes in front, so the order flips.",
+              "notes": [
+                {
+                  "on": "var head *Node",
+                  "text": "No nodes yet: the list is empty."
+                }
+              ],
+              "text": "    var head *Node\n    head = prepend(head, 1)\n    head = prepend(head, 2)\n    head = prepend(head, 3)\n    printList(head)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\n2\n1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "prepend-gaps",
+          "title": "Complete prepend",
+          "guide": "Fill the gaps: link the new node in front of the old head.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Node struct{ Value int; Next *Node }\n\nfunc prepend(head *Node, value int) *Node {\n    return &Node{Value: value, ___: head}\n}\n\nfunc main() {\n    head := prepend(nil, 7)\n    fmt.Println(head.Value, head.Next == ___)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Next"
+              ]
+            },
+            {
+              "answers": [
+                "nil"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "append-to-tail",
+          "title": "Add to the end",
+          "guide": "Walk to the last node and hang a new one there.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n\nfunc printList(head *Node) {\n    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "An empty list becomes the new node. Otherwise find the last node and link after it.",
+              "notes": [
+                {
+                  "on": "last.Next != nil",
+                  "text": "Stops standing on the last node, not past it."
+                }
+              ],
+              "text": "func appendNode(head *Node, value int) *Node {\n    node := &Node{Value: value}\n    if head == nil {\n        return node\n    }\n    last := head\n    for last.Next != nil {\n        last = last.Next\n    }\n    last.Next = node\n    return head\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 30,
+              "guide": "Appending keeps the order.",
+              "text": "    var head *Node\n    for i := 1; i <= 3; i++ {\n        head = appendNode(head, i)\n    }\n    printList(head)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1\n2\n3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "list-with-tail",
+          "title": "A list that knows its tail",
+          "guide": "Keep a pointer to the last node so appending is quick.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n\nfunc printList(head *Node) {\n    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "A list type that remembers both ends and its length.",
+              "text": "type List struct {\n    head *Node\n    tail *Node\n    size int\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 23,
+              "guide": "No walk needed: link after the tail, then the new node becomes the tail. The first node is both ends.",
+              "notes": [
+                {
+                  "on": "l.tail == nil",
+                  "text": "True only while the list is empty."
+                }
+              ],
+              "text": "func (l *List) Push(value int) {\n    node := &Node{Value: value}\n    if l.tail == nil {\n        l.head = node\n    } else {\n        l.tail.Next = node\n    }\n    l.tail = node\n    l.size++\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 34,
+              "guide": "The zero `List` is already an empty list.",
+              "text": "    var list List\n    list.Push(1)\n    list.Push(2)\n    list.Push(3)\n    printList(list.head)\n    fmt.Println(list.size)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1\n2\n3\n3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "insert-after",
+          "title": "Insert in the middle",
+          "guide": "Put a new node right after a given one.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n\nfunc printList(head *Node) {\n    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "The new node must take the old next node before `node` points at it, or the rest is lost.",
+              "notes": [
+                {
+                  "on": "Next: node.Next",
+                  "text": "Read first: keeps the rest of the list attached."
+                }
+              ],
+              "text": "func insertAfter(node *Node, value int) {\n    node.Next = &Node{Value: value, Next: node.Next}\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "Inserting after the last node works too: its old next is nil.",
+              "text": "    head := &Node{Value: 1, Next: &Node{Value: 3}}\n    insertAfter(head, 2)\n    insertAfter(head.Next.Next, 4)\n    printList(head)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1\n2\n3\n4"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "lost-nodes",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Node struct{ Value int; Next *Node }\n\nfunc main() {\n    head := &Node{Value: 1, Next: &Node{Value: 2}}\n    head.Next = &Node{Value: 9}\n    next := head.Next\n    fmt.Println(next.Value, next.Next == nil)\n}",
+          "options": [
+            "2 true",
+            "9 false",
+            "9 true",
+            "2 false"
+          ],
+          "answer": 2,
+          "explanation": "`head.Next` now points at the new node, whose own `Next` is nil. The node holding 2 is no longer reachable from the head."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Finding and removing",
+        "slides": [
+          {
+            "text": "A search returns a pointer to the node itself, so changing it changes the list. Nil means there was no match, and callers must check for it."
+          },
+          {
+            "text": "To remove a node, the node before it skips over it. Nothing points at the removed node afterward, and Go frees it on its own. The head has no node before it, so it is a special case. Pseudo code, not Go.",
+            "code": "before.next = before.next.next"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "find-node",
+          "title": "Find a node",
+          "guide": "Return the node that holds a value, or nil.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n\nfunc printList(head *Node) {\n    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Return the node itself, not a copy. Nil means not found.",
+              "notes": [
+                {
+                  "on": "n.Value == value",
+                  "text": "Matches by value, then hands back the node itself."
+                }
+              ],
+              "text": "func find(head *Node, value int) *Node {\n    for n := head; n != nil; n = n.Next {\n        if n.Value == value {\n            return n\n        }\n    }\n    return nil\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 26,
+              "guide": "Changing the found node changes the list. Check for nil before using the result.",
+              "text": "    head := &Node{Value: 1, Next: &Node{Value: 2}}\n    head.Next.Next = &Node{Value: 3}\n    found := find(head, 2)\n    if found != nil {\n        found.Value = 20\n    }\n    printList(head)\n    fmt.Println(find(head, 7) == nil)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1\n20\n3\ntrue"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "remove-head",
+          "title": "Remove the first node",
+          "guide": "Drop the head by moving to the next node.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n\nfunc printList(head *Node) {\n    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "The new head is the second node. An empty list stays empty.",
+              "notes": [
+                {
+                  "on": "head.Next",
+                  "text": "The old head is left out and nothing points at it."
+                }
+              ],
+              "text": "func removeHead(head *Node) *Node {\n    if head == nil {\n        return nil\n    }\n    return head.Next\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 24,
+              "guide": "Removing from an empty list is safe.",
+              "text": "    head := &Node{Value: 1, Next: &Node{Value: 2}}\n    head.Next.Next = &Node{Value: 3}\n    head = removeHead(head)\n    printList(head)\n    head = removeHead(head)\n    head = removeHead(head)\n    head = removeHead(head)\n    fmt.Println(head == nil)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2\n3\ntrue"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "remove-after",
+          "title": "Remove the next node",
+          "guide": "Link around the node after a given one.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n\nfunc printList(head *Node) {\n    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "To remove a node, the node before it skips it. Nothing to do after the last one.",
+              "notes": [
+                {
+                  "on": "prev.Next.Next",
+                  "text": "The node after the removed one takes its place."
+                }
+              ],
+              "text": "func removeAfter(prev *Node) {\n    if prev.Next != nil {\n        prev.Next = prev.Next.Next\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 23,
+              "guide": "The second call is on the last node, so it does nothing.",
+              "text": "    head := &Node{Value: 1, Next: &Node{Value: 2}}\n    head.Next.Next = &Node{Value: 3}\n    head.Next.Next.Next = &Node{Value: 4}\n    removeAfter(head)\n    removeAfter(head.Next.Next)\n    printList(head)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1\n3\n4"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "remove-after-gaps",
+          "title": "Complete removeAfter",
+          "guide": "Fill the gaps: skip the node after `prev`, then check the result.",
+          "code": "package main\n\nimport \"fmt\"\ntype Node struct{ Value int; Next *Node }\n\nfunc removeAfter(prev *Node) {\n    prev.Next = prev.___.Next\n}\n\nfunc main() {\n    head := &Node{Value: 1, Next: &Node{Value: 2}}\n    removeAfter(head)\n    fmt.Println(head.Next == ___)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Next"
+              ]
+            },
+            {
+              "answers": [
+                "nil"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "remove-value",
+          "title": "Remove by value",
+          "guide": "Remove the first node that holds a value.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n\nfunc printList(head *Node) {\n    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "The head has no node before it, so it is a case of its own. Otherwise look one node ahead.",
+              "notes": [
+                {
+                  "on": "n != nil && n.Next != nil",
+                  "text": "Stops before reading Next of a nil node."
+                },
+                {
+                  "on": "break",
+                  "text": "Only the first match is removed."
+                }
+              ],
+              "text": "func remove(head *Node, value int) *Node {\n    if head != nil && head.Value == value {\n        return head.Next\n    }\n    for n := head; n != nil && n.Next != nil; n = n.Next {\n        if n.Next.Value == value {\n            n.Next = n.Next.Next\n            break\n        }\n    }\n    return head\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 30,
+              "guide": "Only the first 2 goes. A missing value changes nothing.",
+              "text": "    head := &Node{Value: 1, Next: &Node{Value: 2}}\n    head.Next.Next = &Node{Value: 2}\n    head = remove(head, 2)\n    head = remove(head, 1)\n    head = remove(head, 9)\n    printList(head)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "moving-the-head",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Node struct{ Value int; Next *Node }\n\nfunc main() {\n    head := &Node{Value: 1, Next: &Node{Value: 2}}\n    second := head.Next\n    head = head.Next\n    head.Value = 9\n    fmt.Println(second.Value, head == second)\n}",
+          "options": [
+            "2 true",
+            "9 true",
+            "9 false",
+            "2 false"
+          ],
+          "answer": 1,
+          "explanation": "Moving `head` only changes what it points at. After it, `head` and `second` hold the same pointer, so the write is seen through both."
+        }
+      ]
+    },
+    {
+      "id": "session-4",
+      "intro": {
+        "title": "Reversing and other shapes",
+        "slides": [
+          {
+            "text": "Reversing walks the list once, pointing each node at the one before it. The next node must be saved before its link changes, or the walk loses its place. Pseudo code, not Go.",
+            "code": "previous = nil\nwhile node is not nil\n    saved = node.next\n    node.next = previous\n    previous = node\n    node = saved"
+          },
+          {
+            "text": "A node with a pointer back to its previous node is a doubly linked list. A stack can sit on a list by using the head as the top. Two pointers moving at different speeds find the middle in one pass."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "reverse",
+          "title": "Reverse a list",
+          "guide": "Turn every link around, walking once.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n\nfunc printList(head *Node) {\n    for n := head; n != nil; n = n.Next {\n        fmt.Println(n.Value)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Each node points back at the one before it. Keep the next node before changing the link.",
+              "notes": [
+                {
+                  "on": "next := head.Next",
+                  "text": "Saved first: the link is about to change."
+                },
+                {
+                  "on": "return prev",
+                  "text": "When head runs out, prev is the new head."
+                }
+              ],
+              "text": "func reverse(head *Node) *Node {\n    var prev *Node\n    for head != nil {\n        next := head.Next\n        head.Next = prev\n        prev = head\n        head = next\n    }\n    return prev\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 28,
+              "guide": "The old last node is now the head.",
+              "text": "    head := &Node{Value: 1, Next: &Node{Value: 2}}\n    head.Next.Next = &Node{Value: 3}\n    head = reverse(head)\n    printList(head)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\n2\n1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "doubly-linked",
+          "title": "Links in both directions",
+          "guide": "Give a node a pointer to the one before it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A doubly linked node also knows its previous node.",
+              "text": "type DNode struct {\n    Value int\n    Prev  *DNode\n    Next  *DNode\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Each link needs setting both ways. The first has no Prev, the last has no Next.",
+              "text": "    first := &DNode{Value: 1}\n    second := &DNode{Value: 2, Prev: first}\n    first.Next = second\n    third := &DNode{Value: 3, Prev: second}\n    second.Next = third"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "From the last node, walk backwards.",
+              "text": "    for n := third; n != nil; n = n.Prev {\n        fmt.Println(n.Value)\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\n2\n1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "walk-back-gaps",
+          "title": "Complete both links",
+          "guide": "Fill the gaps: link forward, then walk backwards.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype DNode struct{ Value int; Prev, Next *DNode }\n\nfunc main() {\n    a := &DNode{Value: 1}\n    b := &DNode{Value: 2, Prev: a}\n    a.___ = b\n    for n := b; n != nil; n = n.___ {\n        fmt.Println(n.Value)\n    }\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Next"
+              ]
+            },
+            {
+              "answers": [
+                "Prev"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "stack-of-nodes",
+          "title": "A stack on a list",
+          "guide": "Push and pop at the head of a list.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Pushing is adding to the front: the head is the top.",
+              "text": "type Stack struct {\n    top *Node\n}\n\nfunc (s *Stack) Push(value int) {\n    s.top = &Node{Value: value, Next: s.top}\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Popping is removing the head. An empty stack has nothing to give.",
+              "text": "func (s *Stack) Pop() (int, bool) {\n    if s.top == nil {\n        return 0, false\n    }\n    value := s.top.Value\n    s.top = s.top.Next\n    return value, true\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 28,
+              "guide": "Last in, first out. The third pop finds it empty.",
+              "text": "    var stack Stack\n    stack.Push(1)\n    stack.Push(2)\n    value, ok := stack.Pop()\n    fmt.Println(value, ok)\n    stack.Pop()\n    _, ok = stack.Pop()\n    fmt.Println(ok)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 true\nfalse"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "middle-node",
+          "title": "Find the middle",
+          "guide": "Find the middle node in a single pass.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Node struct {\n    Value int\n    Next  *Node\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Two pointers: `fast` moves two nodes for each one of `slow`. When `fast` ends, `slow` is halfway.",
+              "notes": [
+                {
+                  "on": "fast.Next.Next",
+                  "text": "Two hops at a time."
+                }
+              ],
+              "text": "func middle(head *Node) *Node {\n    slow, fast := head, head\n    for fast != nil && fast.Next != nil {\n        slow = slow.Next\n        fast = fast.Next.Next\n    }\n    return slow\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 20,
+              "guide": "Build 1 to 5 from the back, then ask for the middle.",
+              "text": "    var head *Node\n    for i := 5; i >= 1; i-- {\n        head = &Node{Value: i, Next: head}\n    }\n    fmt.Println(middle(head).Value)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3"
+          }
+        }
+      ]
+    }
+  ]
+}

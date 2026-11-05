@@ -1,0 +1,526 @@
+{
+  "id": "pointers-to-structs",
+  "intro": {
+    "title": "Pointers to structs",
+    "slides": [
+      {
+        "text": "Go programs share a record by pointing at it instead of copying it. A function, a list or a tree node can all reach the same struct.\n\nYou will create a pointer to a struct, reach its fields, share it, copy it, pass it to functions and compare it."
+      },
+      {
+        "text": "The examples use small structs: a group of named fields, declared with `type` and `struct`. Structs get their own course later, so here you only need their shape.",
+        "code": "type Player struct {\n    name  string\n    score int\n}"
+      },
+      {
+        "text": "A literal builds a struct. A **keyed** literal names each field, a **positional** one lists the values in field order. A dot reaches a field.\n\nThe next modules use all three.",
+        "code": "p := Player{name: \"Ana\", score: 5}\nq := Player{\"Bo\", 7}\nfmt.Println(p.name, q.score)"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Reaching the fields",
+        "slides": [
+          {
+            "text": "With a pointer to a struct, a dot reaches a field directly. Go follows the pointer for you.\n\nThe snippet is pseudo code, not Go.",
+            "code": "p = address of a Player\np.score = 5\n(*p).score = 5   same thing\n*p = the whole Player"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "print-pointer-struct",
+          "title": "Pointer to a struct",
+          "guide": "Define a struct, take the address of a new one and print it both ways.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A struct with two fields. It is only the data we point at.",
+              "notes": [
+                {
+                  "on": "score int",
+                  "text": "Each field has a name and a type"
+                }
+              ],
+              "text": "type Player struct {\n    name  string\n    score int\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 10,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Build a player and keep a pointer to it.",
+              "notes": [
+                {
+                  "on": "&Player{",
+                  "text": "Builds a Player and gives you its address"
+                }
+              ],
+              "text": "    p := &Player{name: \"Ana\", score: 10}"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Print the pointer, then the struct it points at.",
+              "notes": [
+                {
+                  "on": "*p",
+                  "text": "Follows the pointer to the whole struct"
+                }
+              ],
+              "text": "    fmt.Println(p)\n    fmt.Println(*p)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "&{Ana 10}\n{Ana 10}"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "field-through-pointer",
+          "title": "Fields through a pointer",
+          "guide": "Read and change fields using the pointer directly.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "The same struct again.",
+              "text": "type Player struct {\n    name  string\n    score int\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 10,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Point at a new player.",
+              "text": "    p := &Player{name: \"Bo\", score: 3}"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Set a field and read two, all through the pointer.",
+              "notes": [
+                {
+                  "on": "p.score = 8",
+                  "text": "No * needed: Go follows the pointer for the dot"
+                }
+              ],
+              "text": "    p.score = 8\n    fmt.Println(p.name, p.score)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Bo 8"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "explicit-dereference",
+          "title": "The long form",
+          "guide": "The dot on a pointer is a shortcut for following the pointer first.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\ntype Player struct {\n    name  string\n    score int\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Point at a new player.",
+              "text": "    p := &Player{name: \"Cy\", score: 1}"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Follow the pointer, then pick the field. Both forms reach the same field.",
+              "notes": [
+                {
+                  "on": "(*p).score",
+                  "text": "The parentheses make the * apply to p, not to the field"
+                }
+              ],
+              "text": "    (*p).score = 30\n    fmt.Println(p.score)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "30"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "set-the-score",
+          "title": "Set the score",
+          "guide": "Create a player through a pointer, set its score to 9 and print the whole struct.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Player struct {\n    name  string\n    score int\n}\n\nfunc main() {\n    p := &___{name: \"Ana\", score: 1}\n    p.___ = 9\n    fmt.Println(*___)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Player"
+              ]
+            },
+            {
+              "answers": [
+                "score"
+              ]
+            },
+            {
+              "answers": [
+                "p"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "print-after-change",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Player struct {\n    name  string\n    score int\n}\n\nfunc main() {\n    p := &Player{name: \"Ana\", score: 1}\n    p.score = p.score + 4\n    fmt.Println(p)\n}",
+          "options": [
+            "{Ana 5}",
+            "&{Ana 5}",
+            "An address such as 0xc000012000",
+            "&{Ana 1}"
+          ],
+          "answer": 1,
+          "explanation": "Printing a pointer to a struct shows `&` followed by its fields. The assignment through the pointer changed the score to 5 first."
+        },
+        {
+          "type": "typing",
+          "id": "field-address",
+          "title": "Address of a field",
+          "guide": "A pointer can also aim at one field of a struct.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\ntype Player struct {\n    name  string\n    score int\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Point at a new player.",
+              "text": "    p := &Player{name: \"Ana\", score: 10}"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Take the address of the score field and change it through that pointer.",
+              "notes": [
+                {
+                  "on": "&p.score",
+                  "text": "The address of the field, not of p"
+                }
+              ],
+              "text": "    s := &p.score\n    *s += 5\n    fmt.Println(p.score)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "15"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Sharing and copying",
+        "slides": [
+          {
+            "text": "Copying a pointer copies only the address, so both reach one struct. Following the pointer in an assignment copies the whole struct.\n\nThe snippet is pseudo code, not Go.",
+            "code": "b = a        one struct, two names\nc = copy of *a   two structs"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "share-a-struct",
+          "title": "Two names, one struct",
+          "guide": "Copy a pointer and see both names reach the same struct.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\ntype Player struct {\n    name  string\n    score int\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Make a pointer, then a second one from it.",
+              "notes": [
+                {
+                  "on": "b := a",
+                  "text": "Copies the address only: no new struct exists"
+                }
+              ],
+              "text": "    a := &Player{name: \"Ana\", score: 10}\n    b := a"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Change a field through the second pointer and read it through the first.",
+              "text": "    b.score = 50\n    fmt.Println(a.score)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "50"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "copy-the-struct",
+          "title": "Copy the struct",
+          "guide": "Follow the pointer to get an independent copy.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\ntype Player struct {\n    name  string\n    score int\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Dereferencing a pointer in an assignment copies the struct.",
+              "notes": [
+                {
+                  "on": "c := *a",
+                  "text": "c is a plain Player, separate from the original"
+                }
+              ],
+              "text": "    a := &Player{name: \"Ana\", score: 10}\n    c := *a"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Change the copy: the original stays as it was.",
+              "text": "    c.score = 99\n    fmt.Println(a.score, c.score)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10 99"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "alias-or-clone",
+          "title": "Alias and clone",
+          "guide": "Make alias share the player and clone be a separate copy, so the final score is 50.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Player struct{ score int }\n\nfunc main() {\n    p := &Player{score: 10}\n    alias := ___\n    clone := ___\n    alias.score = 50\n    clone.score = 70\n    fmt.Println(p.score)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "p"
+              ]
+            },
+            {
+              "answers": [
+                "*p"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "three-names",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Player struct{ score int }\n\nfunc main() {\n    a := &Player{score: 1}\n    b := a\n    c := *a\n    b.score = 7\n    c.score = 9\n    fmt.Println(a.score, b.score, c.score)\n}",
+          "options": [
+            "1 7 9",
+            "7 7 7",
+            "7 7 9",
+            "1 1 9"
+          ],
+          "answer": 2,
+          "explanation": "`b` points at the same struct as `a`, so the 7 shows in both. `c` is a copy, so the 9 stays in `c`."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Functions, constructors and comparing",
+        "slides": [
+          {
+            "text": "A struct pointer can be a parameter, so the function changes the caller's struct, and a function can return a pointer to a new struct. Comparing pointers compares addresses, comparing the structs behind them compares fields.\n\nThe snippet is pseudo code, not Go.",
+            "code": "takes a pointer -> changes the caller's\nreturns a pointer -> a new struct\na == b      same address?\n*a == *b    same fields?"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "update-in-function",
+          "title": "Change it in a function",
+          "guide": "A function that takes a pointer to a struct changes the caller's struct.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\ntype Player struct {\n    name  string\n    score int\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The parameter is a pointer, so the change reaches the caller.",
+              "notes": [
+                {
+                  "on": "p *Player",
+                  "text": "Receives the address of a player, not a copy"
+                }
+              ],
+              "text": "func addPoints(p *Player, n int) {\n    p.score += n\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Pass the pointer in and read the score afterwards.",
+              "text": "func main() {\n    p := &Player{name: \"Ana\", score: 10}\n    addPoints(p, 5)\n    fmt.Println(p.score)\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "15"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "new-player",
+          "title": "Return a pointer",
+          "guide": "A function can build a struct and hand back its address.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\ntype Player struct {\n    name  string\n    score int\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Build the player inside and return a pointer to it.",
+              "notes": [
+                {
+                  "on": "return &Player",
+                  "text": "Safe: Go keeps the struct alive after the function ends"
+                }
+              ],
+              "text": "func newPlayer(name string) *Player {\n    return &Player{name: name}\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Use the pointer you got back.",
+              "text": "func main() {\n    p := newPlayer(\"Bo\")\n    p.score = 4\n    fmt.Println(*p)\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "{Bo 4}"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "constructor-pointer",
+          "title": "Fix the return type",
+          "guide": "Make newPlayer give back a pointer to a new player.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Player struct{ score int }\n\nfunc newPlayer(score int) ___ {\n    return ___{score: score}\n}\n\nfunc main() {\n    p := newPlayer(3)\n    fmt.Println(p.score)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "*Player"
+              ]
+            },
+            {
+              "answers": [
+                "&Player"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "compare-pointers",
+          "title": "Compare pointers",
+          "guide": "Two pointers are equal only when they aim at the same struct.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\ntype Player struct {\n    name  string\n    score int\n}\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Two separate players with the same contents.",
+              "text": "    a := &Player{name: \"Ana\", score: 1}\n    b := &Player{name: \"Ana\", score: 1}"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Compare the pointers, then the structs they point at.",
+              "notes": [
+                {
+                  "on": "a == b",
+                  "text": "Compares addresses, not contents"
+                },
+                {
+                  "on": "*a == *b",
+                  "text": "Compares every field of both structs"
+                }
+              ],
+              "text": "    fmt.Println(a == b)\n    fmt.Println(*a == *b)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "false\ntrue"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "equal-or-not",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Player struct{ score int }\n\nfunc main() {\n    a := &Player{score: 1}\n    b := &Player{score: 1}\n    c := a\n    fmt.Println(a == b, a == c, *a == *b)\n}",
+          "options": [
+            "true true true",
+            "false false true",
+            "false true false",
+            "false true true"
+          ],
+          "answer": 3,
+          "explanation": "`a` and `b` are different structs, so their addresses differ. `c` is the same address as `a`. The structs `*a` and `*b` hold equal fields."
+        }
+      ]
+    }
+  ]
+}

@@ -5,26 +5,26 @@
       "name": "Basics",
       "tier": "basic",
       "modules": [
-        { "id": "pointer-basics", "name": "Pointer basics", "sessions": 1 },
-        { "id": "pointers-and-functions", "name": "Pointers and functions", "sessions": 1 },
-        { "id": "pointers-to-structs", "name": "Pointers to structs", "sessions": 1 }
+        { "id": "pointer-basics", "name": "Pointer basics", "sessions": 2 },
+        { "id": "pointers-and-functions", "name": "Pointers and functions", "sessions": 2 },
+        { "id": "pointers-to-structs", "name": "Pointers to structs", "sessions": 3 }
       ]
     },
     {
       "name": "Semantics",
       "tier": "medium",
       "modules": [
-        { "id": "value-vs-pointer", "name": "Value or pointer", "sessions": 1 },
-        { "id": "nil-pointers", "name": "Nil pointers", "sessions": 1 },
-        { "id": "slices-maps-and-pointers", "name": "Slices, maps and pointers", "sessions": 1 }
+        { "id": "value-vs-pointer", "name": "Value or pointer", "sessions": 3 },
+        { "id": "nil-pointers", "name": "Nil pointers", "sessions": 3 },
+        { "id": "slices-maps-and-pointers", "name": "Slices, maps and pointers", "sessions": 4 }
       ]
     },
     {
       "name": "Linked structures",
       "tier": "medium",
       "modules": [
-        { "id": "linked-lists", "name": "Linked lists", "sessions": 1 },
-        { "id": "binary-trees", "name": "Binary trees", "sessions": 1 }
+        { "id": "linked-lists", "name": "Linked lists", "sessions": 4 },
+        { "id": "binary-trees", "name": "Binary trees", "sessions": 3 }
       ]
     }
   ]

@@ -1,0 +1,559 @@
+{
+  "id": "nil-pointers",
+  "intro": {
+    "title": "Pointers that point at nothing",
+    "slides": [
+      {
+        "text": "A pointer does not always have a target. Its zero value is `nil`: it points at nothing, and reading through it stops the program.\n\nIn this module you check for nil, return it for missing results, use it for optional values and guard longer chains."
+      },
+      {
+        "text": "Pseudo code, not Go. A pointer is either empty or holds an address, and you ask which before you read through it.",
+        "code": "p is empty (nil)\np holds an address\n\nif p is empty {\n    do something else\n}\nread through p"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Nil and the crash",
+        "slides": [
+          {
+            "text": "A pointer you declare without a target is `nil`. You compare it with `== nil` or `!= nil`.\n\nPseudo code, not Go.",
+            "code": "declare p, no target\np == nil is true\n\np = address of n\np == nil is false"
+          },
+          {
+            "text": "Reading through a nil pointer is not an error you can ignore: the program panics and stops. So code that may get a nil pointer checks first."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "nil-zero-value",
+          "title": "The zero value",
+          "guide": "A pointer with no target is nil.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A pointer declared with no value starts as nil. Print the check and the pointer.",
+              "notes": [
+                {
+                  "on": "p == nil",
+                  "text": "True when the pointer points at nothing."
+                }
+              ],
+              "text": "    var p *int\n    fmt.Println(p == nil)\n    fmt.Println(p)"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Point it at a variable and it is no longer nil.",
+              "text": "    n := 5\n    p = &n\n    fmt.Println(p == nil, *p)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\n<nil>\nfalse 5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "guard-nil",
+          "title": "Guard before you read",
+          "guide": "Check for nil before reading through a pointer.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Return early when the pointer is nil, so the read at the end is safe.",
+              "text": "func show(p *int) {\n    if p == nil {\n        fmt.Println(\"no value\")\n        return\n    }\n    fmt.Println(*p)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Call it with a real pointer, then with nil.",
+              "text": "    n := 8\n    show(&n)\n    show(nil)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "8\nno value"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "guard-fill-in",
+          "title": "Guard the count",
+          "guide": "Stop early when no count was given.",
+          "code": "package main\nimport \"fmt\"\nfunc report(count *int) {\n    if count ___ nil {\n        fmt.Println(\"unknown\")\n        return\n    }\n    fmt.Println(*count)\n}\nfunc main() {\n    report(nil)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "=="
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "read-through-nil",
+          "title": "Reading nil",
+          "guide": "Read the code, then pick your answer.",
+          "code": "var p *int\nfmt.Println(\"before\")\nfmt.Println(*p)\nfmt.Println(\"after\")",
+          "options": [
+            "before, 0, after",
+            "before, then a panic",
+            "before, <nil>, after",
+            "It does not compile"
+          ],
+          "answer": 1,
+          "explanation": "The code compiles. Reading through a nil pointer panics at run time, so `before` prints and the program stops there."
+        },
+        {
+          "type": "typing",
+          "id": "nil-struct-pointer",
+          "title": "Nil struct pointer",
+          "guide": "A struct pointer is nil until it points at a value.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A struct with one field.",
+              "text": "type User struct {\n    Name string\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A struct pointer starts as nil too.",
+              "text": "    var u *User\n    fmt.Println(u == nil)"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Reading a field of a nil pointer crashes, so guard it.",
+              "notes": [
+                {
+                  "on": "u.Name",
+                  "text": "Crashes here when u is nil."
+                }
+              ],
+              "text": "    if u != nil {\n        fmt.Println(u.Name)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "Give it a User and the field is safe to read.",
+              "text": "    u = &User{Name: \"Ana\"}\n    fmt.Println(u.Name)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nAna"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Nil as no result",
+        "slides": [
+          {
+            "text": "A function that may find nothing returns a pointer: the value when found, and nil when not. The caller checks before using it.\n\nPseudo code, not Go.",
+            "code": "function pick(id)\n    if id matches\n        return address of user\n    return nil"
+          },
+          {
+            "text": "Pointers also sit inside structs. Every step along a path can be nil, so check each one before the next step."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "lookup-returns-nil",
+          "title": "Nothing found",
+          "guide": "A lookup returns a pointer, or nil when it finds nothing.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "The same User struct.",
+              "text": "type User struct {\n    Name string\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Return a pointer when the id matches, and nil when it does not.",
+              "notes": [
+                {
+                  "on": "return nil",
+                  "text": "Tells the caller nothing was found."
+                }
+              ],
+              "text": "func pick(id int) *User {\n    if id == 1 {\n        return &User{Name: \"Ana\"}\n    }\n    return nil\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Use the result only when it is not nil.",
+              "text": "    found := pick(1)\n    if found != nil {\n        fmt.Println(found.Name)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 21,
+              "guide": "An id with no user gives nil.",
+              "text": "    missing := pick(2)\n    fmt.Println(missing == nil)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Ana\ntrue"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "lookup-fill-in",
+          "title": "Fill the lookup",
+          "guide": "Return nothing when the id is wrong, and detect it in main.",
+          "code": "package main\nimport \"fmt\"\nfunc find(id int) *string {\n    name := \"Ana\"\n    if id == 1 {\n        return &name\n    }\n    return ___\n}\nfunc main() {\n    if find(2) ___ nil {\n        fmt.Println(\"missing\")\n    }\n}",
+          "gaps": [
+            {
+              "answers": [
+                "nil"
+              ]
+            },
+            {
+              "answers": [
+                "=="
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "optional-field",
+          "title": "Missing or zero",
+          "guide": "A pointer field can tell a missing value from a zero.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Age is a pointer: nil means no age was given.",
+              "notes": [
+                {
+                  "on": "*int",
+                  "text": "Nil here means the age is unknown."
+                }
+              ],
+              "text": "type Profile struct {\n    Name string\n    Age  *int\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Report the age only when it exists.",
+              "text": "func describe(p Profile) {\n    if p.Age == nil {\n        fmt.Println(p.Name, \"age unknown\")\n        return\n    }\n    fmt.Println(p.Name, *p.Age)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "One profile has an age of 0, the other has none.",
+              "text": "    zero := 0\n    ana := Profile{Name: \"Ana\", Age: &zero}\n    bo := Profile{Name: \"Bo\"}"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "The two cases print differently.",
+              "text": "    describe(ana)\n    describe(bo)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Ana 0\nBo age unknown"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "why-a-pointer-field",
+          "title": "Why a pointer field",
+          "guide": "Pick what the pointer is for.",
+          "code": "type Profile struct {\n    Name string\n    Age  *int\n}",
+          "options": [
+            "Lets Age be missing, which differs from 0",
+            "Makes reading Age faster",
+            "Lets functions change Age in a copy",
+            "Lets Age hold a bigger number"
+          ],
+          "answer": 0,
+          "explanation": "A plain int is 0 when unset, which looks like a real age. A nil pointer says that no age was given."
+        },
+        {
+          "type": "typing",
+          "id": "chain-guard",
+          "title": "Guard a chain",
+          "guide": "Check every pointer on the way before you read the last one.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Two structs, one holding a pointer to the other.",
+              "text": "type Address struct {\n    City string\n}\n\ntype User struct {\n    Name string\n    Home *Address\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Check u first, then u.Home, and only then read the city.",
+              "notes": [
+                {
+                  "on": "||",
+                  "text": "Stops at the first true, so u.Home is safe."
+                }
+              ],
+              "text": "func city(u *User) string {\n    if u == nil || u.Home == nil {\n        return \"unknown\"\n    }\n    return u.Home.City\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "Only the first user gets a home.",
+              "text": "    ana := &User{Name: \"Ana\"}\n    ana.Home = &Address{City: \"Lima\"}\n    bo := &User{Name: \"Bo\"}"
+            },
+            {
+              "mode": "ghost",
+              "line": 25,
+              "guide": "Each case is safe, even nil itself.",
+              "text": "    fmt.Println(city(ana))\n    fmt.Println(city(bo))\n    fmt.Println(city(nil))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "Lima\nunknown\nunknown"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "check-order",
+          "title": "Order of the checks",
+          "guide": "Read the code, then pick your answer.",
+          "code": "type User struct{ Name string }\n\nvar u *User\nif u != nil && u.Name == \"Ana\" {\n    fmt.Println(\"hi Ana\")\n} else {\n    fmt.Println(\"who?\")\n}",
+          "options": [
+            "hi Ana",
+            "A panic",
+            "It does not compile",
+            "who?"
+          ],
+          "answer": 3,
+          "explanation": "The `&&` stops at the first false part, so `u.Name` is never read. The else branch runs."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Methods, defaults and clearing",
+        "slides": [
+          {
+            "text": "A method with a pointer receiver can be called on a nil pointer. The method runs, and receives nil.\n\nA nil pointer can also stand for a missing setting, so the code falls back to a default. Setting a pointer to nil clears only that pointer, never the variable it pointed at."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "nil-receiver",
+          "title": "Method on nil",
+          "guide": "A pointer method can check its own receiver.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A counter with one field.",
+              "text": "type Counter struct {\n    n int\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The method returns 0 when its receiver is nil.",
+              "notes": [
+                {
+                  "on": "c == nil",
+                  "text": "A method can check the pointer it was called on."
+                }
+              ],
+              "text": "func (c *Counter) Value() int {\n    if c == nil {\n        return 0\n    }\n    return c.n\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Calling it on a nil pointer is fine.",
+              "text": "    var c *Counter\n    fmt.Println(c.Value())"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "With a real counter it reads the field.",
+              "text": "    c = &Counter{n: 3}\n    fmt.Println(c.Value())"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0\n3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "value-receiver-nil",
+          "title": "Value receiver on nil",
+          "guide": "Read the code, then pick your answer.",
+          "code": "type Counter struct{ n int }\n\nfunc (c Counter) Value() int {\n    return c.n\n}\n\nvar c *Counter\nfmt.Println(c.Value())",
+          "options": [
+            "0",
+            "<nil>",
+            "A panic: nil pointer dereference",
+            "It does not compile"
+          ],
+          "answer": 2,
+          "explanation": "A value receiver gets a copy, so Go reads `*c` to make it. Reading through a nil pointer panics."
+        },
+        {
+          "type": "typing",
+          "id": "default-for-nil",
+          "title": "Default for nil",
+          "guide": "Use a fallback when no value was given.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Return the fallback when the pointer is nil, and the pointed value otherwise.",
+              "text": "func valueOr(p *int, fallback int) int {\n    if p == nil {\n        return fallback\n    }\n    return *p\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "One call has a value, the other has nil.",
+              "text": "    port := 8080\n    fmt.Println(valueOr(&port, 80))\n    fmt.Println(valueOr(nil, 80))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "8080\n80"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "default-fill-in",
+          "title": "Fill the default",
+          "guide": "Return the fallback when no limit was given.",
+          "code": "package main\nimport \"fmt\"\nfunc limitOr(p *int, def int) int {\n    if p ___ nil {\n        return ___\n    }\n    return *p\n}\nfunc main() {\n    fmt.Println(limitOr(nil, 10))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "=="
+              ]
+            },
+            {
+              "answers": [
+                "def"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "set-to-nil",
+          "title": "Detach a pointer",
+          "guide": "Setting a pointer to nil clears only that pointer.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Two pointers to the same variable, then one is cleared.",
+              "notes": [
+                {
+                  "on": "p = nil",
+                  "text": "Clears p only. The target stays."
+                }
+              ],
+              "text": "    score := 10\n    p := &score\n    q := p\n    p = nil"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The variable and the other pointer are untouched.",
+              "text": "    fmt.Println(p == nil)\n    fmt.Println(q != nil, *q, score)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\ntrue 10 10"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "compare-pointers",
+          "title": "Comparing pointers",
+          "guide": "Read the code, then pick your answer.",
+          "code": "var a, b *int\nx := 1\nc := &x\nfmt.Println(a == b, a == nil, c == nil)",
+          "options": [
+            "false true false",
+            "true true false",
+            "true false true",
+            "true true true"
+          ],
+          "answer": 1,
+          "explanation": "Two nil pointers are equal, and a nil pointer equals nil. c holds the address of x, so it is not nil."
+        }
+      ]
+    }
+  ]
+}

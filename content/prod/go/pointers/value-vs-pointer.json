@@ -1,0 +1,445 @@
+{
+  "id": "value-vs-pointer",
+  "intro": {
+    "title": "Value or pointer",
+    "slides": [
+      {
+        "text": "You know how pointers work. Now you decide when to use one. Go copies values on every assignment and call, and a pointer is how you share instead.\n\nYou will see what gets copied, how to choose a receiver and a parameter, and what a copy still shares."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "What gets copied",
+        "slides": [
+          {
+            "text": "A struct is copied whole when you assign it, pass it or return it. A pointer is copied too, but both copies lead to the same struct.\n\nThe snippet is pseudo code, not Go.",
+            "code": "b = copy of a\nchange b -> a unchanged\n\np = address of a\nchange via p -> a changed"
+          },
+          {
+            "text": "A method is a function with a receiver, the value written before its name. Inside `Add`, `p` is the receiver, and `pos.Add(other)` calls it on `pos`.\n\nThe receiver is a value (`Point`) or a pointer (`*Wallet`). Methods get their own course later.",
+            "code": "func (p Point) Add(o Point) Point {\n    return Point{p.X + o.X, p.Y + o.Y}\n}\n\nfunc (w *Wallet) Add(n int) {\n    w.coins += n\n}\n\npos.Add(other)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "value-style-update",
+          "title": "Return the new value",
+          "guide": "A function that gets a struct by value changes only its copy. Return it to keep the change.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A struct and a function that takes it by value.",
+              "text": "type Account struct {\n    Name    string\n    Balance int\n}\n\nfunc deposit(acc Account, n int) {\n    acc.Balance += n\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "This one changes its copy and hands it back.",
+              "notes": [
+                {
+                  "on": "Account {",
+                  "text": "Gives the changed copy back to the caller"
+                }
+              ],
+              "text": "func withDeposit(acc Account, n int) Account {\n    acc.Balance += n\n    return acc\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 20,
+              "guide": "The first call changes a copy that is thrown away. The caller keeps its balance.",
+              "text": "    acc := Account{\"ana\", 100}\n    deposit(acc, 50)\n    fmt.Println(acc.Balance)"
+            },
+            {
+              "mode": "ghost",
+              "line": 23,
+              "guide": "Assign the returned copy back to the variable to keep the change.",
+              "text": "    acc = withDeposit(acc, 50)\n    fmt.Println(acc.Balance)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "100\n150"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "value-methods",
+          "title": "Methods that return values",
+          "guide": "Small types work well as values: a method returns a new one and never changes the receiver.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A small struct with a method that builds a new Point from two.",
+              "text": "type Point struct {\n    X, Y int\n}\n\nfunc (p Point) Add(o Point) Point {\n    return Point{p.X + o.X, p.Y + o.Y}\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Assign the result back to move the point.",
+              "text": "    pos := Point{1, 2}\n    pos = pos.Add(Point{3, 4})\n    fmt.Println(pos)"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Without the assignment, `pos` is untouched.",
+              "text": "    fmt.Println(pos.Add(Point{1, 1}), pos)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "{4 6}\n{5 7} {4 6}"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "add-point",
+          "title": "Add two points",
+          "guide": "Return a new point from `Add`, then call it on `start`.",
+          "code": "package main\n\nimport \"fmt\"\ntype Point struct{ X, Y int }\n\nfunc (p Point) Add(o Point) ___ {\n    return Point{p.X + o.X, p.Y + o.Y}\n}\n\nfunc main() {\n    start := Point{1, 1}\n    fmt.Println(start, start.___(Point{2, 2}))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "Point"
+              ]
+            },
+            {
+              "answers": [
+                "Add"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "grow-chain",
+          "title": "Copies in a chain",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\ntype Box struct{ N int }\n\nfunc grow(b Box) Box {\n    b.N++\n    return b\n}\n\nfunc main() {\n    a := Box{1}\n    fmt.Println(a.N, grow(a).N, grow(grow(a)).N)\n}",
+          "options": [
+            "1 2 3",
+            "2 3 4",
+            "1 2 2",
+            "2 2 3"
+          ],
+          "answer": 0,
+          "explanation": "`grow` works on a copy, so `a` stays 1. `grow(a)` is 2, and the outer `grow` receives that returned copy and makes it 3."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Choosing value or pointer",
+        "slides": [
+          {
+            "text": "Pick a pointer when the code must change the caller's data, or when the struct is big. A value receiver cannot change the caller's data: it works on a copy."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "choose-receiver",
+          "title": "Pick the receiver",
+          "guide": "Changing needs a pointer receiver. Give every method of the type the same kind.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A struct and a method that only reads it. It takes a pointer too, so the type keeps one kind of receiver.",
+              "text": "type Wallet struct {\n    coins int\n}\n\nfunc (w *Wallet) Total() int {\n    return w.coins\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "A method that changes the struct needs a pointer receiver, or it changes a copy.",
+              "notes": [
+                {
+                  "on": "*Wallet",
+                  "text": "The method works on the caller's Wallet"
+                }
+              ],
+              "text": "func (w *Wallet) Add(n int) {\n    w.coins += n\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "Call both on a variable. Go passes `&w` for you when needed.",
+              "text": "    w := Wallet{}\n    w.Add(5)\n    w.Add(3)\n    fmt.Println(w.Total())"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "A pointer calls the methods the same way.",
+              "notes": [
+                {
+                  "on": "pw.Total()",
+                  "text": "The method receives the pointer itself"
+                }
+              ],
+              "text": "    pw := &w\n    fmt.Println(pw.Total())"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "8\n8"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "pick-receiver",
+          "title": "Mutate through a pointer",
+          "guide": "`Add` must change the caller's wallet. Fill the receiver type.",
+          "code": "package main\n\nimport \"fmt\"\ntype Wallet struct{ coins int }\n\nfunc (w ___) Add(n int) { w.coins += n }\n\nfunc main() {\n    w := Wallet{}\n    w.Add(5)\n    fmt.Println(w.coins)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "*Wallet"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "lost-update",
+          "title": "Why is it zero",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\ntype Meter struct{ Level int }\n\nfunc (m Meter) Set(n int) { m.Level = n }\n\nfunc main() {\n    m := Meter{}\n    m.Set(30)\n    fmt.Println(m.Level)\n}",
+          "options": [
+            "30",
+            "0",
+            "{30}",
+            "{0}"
+          ],
+          "answer": 1,
+          "explanation": "A value receiver gets a copy of `m`, so `Set` changes the copy and `m.Level` stays 0."
+        },
+        {
+          "type": "typing",
+          "id": "pick-the-parameter",
+          "title": "Pick the parameter",
+          "guide": "Reading a small struct takes a value. Changing the caller's struct takes a pointer.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A small struct, and a function that only reads it, so it takes a value.",
+              "text": "type Player struct {\n    Name  string\n    Score int\n}\n\nfunc show(p Player) {\n    fmt.Println(p.Name, p.Score)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "This one must change the caller's player, so it takes a pointer.",
+              "notes": [
+                {
+                  "on": "*Player",
+                  "text": "Points at the caller's Player, not a copy"
+                }
+              ],
+              "text": "func addScore(p *Player, n int) {\n    p.Score += n\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "Pass the address to the function that changes the struct.",
+              "text": "    player := Player{\"mia\", 10}\n    addScore(&player, 5)\n    show(player)"
+            },
+            {
+              "mode": "ghost",
+              "line": 22,
+              "guide": "The change is kept, and `show` still gets a copy to read.",
+              "text": "    addScore(&player, 7)\n    show(player)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "mia 15\nmia 22"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "big-struct",
+          "title": "Pass a big struct",
+          "guide": "Pick the best parameter type for `update`.",
+          "code": "package main\n\ntype Report struct {\n    Title string\n    Body  string\n    Pages int\n}\n\nfunc update(r ___) {\n    r.Pages++\n}",
+          "options": [
+            "*Report: avoids the copy, and the change is kept",
+            "Report: Go only copies the fields it changes",
+            "Report: the caller gets the change back anyway",
+            "*Report: it only matters for methods"
+          ],
+          "answer": 0,
+          "explanation": "A `Report` parameter is a full copy and the change would be lost. A pointer avoids the copy and updates the caller's struct."
+        },
+        {
+          "type": "quiz",
+          "id": "mixed-receivers",
+          "title": "One kind of receiver",
+          "guide": "Pick the usual advice for the methods of `Stack`.",
+          "code": "package main\n\ntype Stack struct{ items []int }\n\nfunc (s *Stack) Push(n int) {\n    s.items = append(s.items, n)\n}\n\nfunc (s Stack) Size() int {\n    return len(s.items)\n}",
+          "options": [
+            "Keep both: values for reads, pointers for writes",
+            "Use value receivers on both methods",
+            "Use pointer receivers on both methods",
+            "Mixing receivers does not compile"
+          ],
+          "answer": 2,
+          "explanation": "When one method needs a pointer receiver, give the type pointer receivers everywhere. Mixed kinds make it unclear whether a copy or the original is used."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "What a copy shares",
+        "slides": [
+          {
+            "text": "A copy of a struct copies each field. A field that is a pointer copies the address, so the two structs still share what it points to.\n\nSharing is fine when you want it. A type should also stay consistent: one kind of receiver for all its methods."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "shallow-copy",
+          "title": "A copy keeps the pointer",
+          "guide": "Copying a struct copies its pointer fields, not what they point to.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A team holds a pointer to its lead.",
+              "text": "type Person struct {\n    Name string\n}\n\ntype Team struct {\n    Name string\n    Lead *Person\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "`b` is a copy of `a`, so each has its own Name.",
+              "text": "    a := Team{\"core\", &Person{\"ana\"}}\n    b := a\n    b.Name = \"ops\"\n    fmt.Println(a.Name)"
+            },
+            {
+              "mode": "ghost",
+              "line": 19,
+              "guide": "The Lead field holds a pointer, and the copy holds the same address. Both teams share one Person.",
+              "notes": [
+                {
+                  "on": "a.Lead == b.Lead",
+                  "text": "Same address, so one shared Person"
+                }
+              ],
+              "text": "    b.Lead.Name = \"bo\"\n    fmt.Println(a.Lead.Name)\n    fmt.Println(a.Lead == b.Lead)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "core\nbo\ntrue"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "own-person",
+          "title": "Give the copy its own data",
+          "guide": "Copy what the pointer points to, then point the new team at the copy.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "The same types as before.",
+              "text": "type Person struct {\n    Name string\n}\n\ntype Team struct {\n    Name string\n    Lead *Person\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "Copy the team, then copy its lead.",
+              "text": "    a := Team{\"core\", &Person{\"ana\"}}\n    b := a\n    lead := *a.Lead"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "Point `b` at the copy. Now a change through `b` stays in `b`.",
+              "text": "    b.Lead = &lead\n    b.Lead.Name = \"bo\"\n    fmt.Println(a.Lead.Name, b.Lead.Name)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "ana bo"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "own-book",
+          "title": "Separate the book",
+          "guide": "`other` must get its own book, so renaming it leaves `shelf` alone.",
+          "code": "package main\n\nimport \"fmt\"\ntype Book struct{ Title string }\ntype Shelf struct{ Top *Book }\n\nfunc main() {\n    shelf := Shelf{&Book{\"Go\"}}\n    other := shelf\n    fresh := ___shelf.Top\n    other.Top = ___fresh\n    other.Top.Title = \"Rust\"\n    fmt.Println(shelf.Top.Title)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "*"
+              ]
+            },
+            {
+              "answers": [
+                "&"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "shared-lead",
+          "title": "What the copy shares",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\ntype Person struct{ Name string }\ntype Team struct{ Size int; Lead *Person }\n\nfunc main() {\n    a := Team{3, &Person{\"ana\"}}\n    b := a\n    b.Size = 5\n    b.Lead.Name = \"bo\"\n    fmt.Println(a.Size, a.Lead.Name)\n}",
+          "options": [
+            "5 ana",
+            "3 ana",
+            "5 bo",
+            "3 bo"
+          ],
+          "answer": 3,
+          "explanation": "`Size` is copied, so `a.Size` stays 3. `Lead` is a copied pointer to the same Person, so the new name shows in `a` too."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,317 @@
+{
+  "id": "binary-trees",
+  "intro": {
+    "title": "Binary trees",
+    "slides": [
+      {
+        "text": "A binary tree is a linked list where every node has two pointers: a left child and a right child. You will build trees by hand, walk them in different orders, grow and search a sorted tree, measure it, flip it and remove nodes from it.\n\nThe snippet is pseudo code, not Go.",
+        "code": "node:\n    value\n    left  -> a node, or nil\n    right -> a node, or nil"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Walking a tree",
+        "slides": [
+          {"text": "A tree is either empty (`nil`) or a node with a left tree and a right tree. So a function over a tree always has the same shape: stop at `nil`, then deal with the node and with each side.\n\nThe snippet is pseudo code.", "code": "visit(node):\n    if node is nil:\n        stop\n    visit(left of node)\n    visit(right of node)"},
+          {"text": "Where the work sits decides the order a tree is walked in: before the two calls, between them, or after them. Each order has its own use."}
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "node-struct",
+          "title": "A node with two children",
+          "guide": "Build a tiny tree by hand: a root with a left and a right child.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 5, "guide": "Like a list node, but with two pointers: one for each child. A `nil` pointer means no child there.", "notes": [{"on": "Left", "text": "Points at the left child, or is nil."}], "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "The root is a pointer to a node. Hang two new nodes from it.", "notes": [{"on": "root.Left =", "text": "Links a new node as the left child."}], "text": "    root := &Node{Value: 2}\n    root.Left = &Node{Value: 1}\n    root.Right = &Node{Value: 3}"},
+            {"mode": "ghost", "line": 15, "guide": "Follow the pointers down. The child of a child does not exist yet, so it is nil.", "text": "    fmt.Println(root.Value)\n    fmt.Println(root.Left.Value, root.Right.Value)\n    fmt.Println(root.Left.Left == nil)"}
+          ],
+          "output": {"command": "go run main.go", "text": "2\n1 3\ntrue"}
+        },
+        {
+          "type": "typing",
+          "id": "count-nodes",
+          "title": "Count the nodes",
+          "guide": "Count every node of a tree with a function that calls itself.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "copy", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "An empty tree has no nodes. Otherwise count this node, plus everything on each side.", "notes": [{"on": "n == nil", "text": "An empty tree: nothing left to count."}, {"on": "count(n.Left)", "text": "The left child is itself a smaller tree."}], "text": "func count(n *Node) int {\n    if n == nil {\n        return 0\n    }\n    return 1 + count(n.Left) + count(n.Right)\n}\n"},
+            {"mode": "ghost", "line": 19, "guide": "Nested literals build the whole tree: each child sits inside its parent.", "notes": [{"on": "Left: &Node{", "text": "A child can be written inside its parent."}], "text": "    root := &Node{\n        Value: 4,\n        Left: &Node{\n            Value: 2,\n            Left:  &Node{Value: 1},\n            Right: &Node{Value: 3},\n        },\n        Right: &Node{Value: 5},\n    }"},
+            {"mode": "ghost", "line": 28, "guide": "`nil` is an empty tree, so its count is 0.", "text": "    fmt.Println(count(root), count(nil))"}
+          ],
+          "output": {"command": "go run main.go", "text": "5 0"}
+        },
+        {
+          "type": "fill-blank",
+          "id": "sum-values",
+          "title": "Add up the values",
+          "guide": "Fill the gaps so the function adds up every value in the tree.",
+          "code": "func sum(n *Node) int {\n    if n ___ nil {\n        return ___\n    }\n    return n.Value + sum(n.___) + sum(n.Right)\n}",
+          "gaps": [
+            {"answers": ["=="]},
+            {"answers": ["0"]},
+            {"answers": ["Left"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "in-order",
+          "title": "Left, node, right",
+          "guide": "Print a tree by visiting the left side, then the node, then the right side.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "The print sits between the two calls: the left side is finished before this node, the right side comes after.", "notes": [{"on": "fmt.Println(n.Value)", "text": "Runs only after the whole left side is done."}], "text": "func inorder(n *Node) {\n    if n == nil {\n        return\n    }\n    inorder(n.Left)\n    fmt.Println(n.Value)\n    inorder(n.Right)\n}\n"},
+            {"mode": "auto", "line": 21, "text": "    root := &Node{\n        Value: 4,\n        Left: &Node{\n            Value: 2,\n            Left:  &Node{Value: 1},\n            Right: &Node{Value: 3},\n        },\n        Right: &Node{Value: 5},\n    }"},
+            {"mode": "ghost", "line": 30, "guide": "The tree is already built in the file. Walk it from the root.", "text": "    inorder(root)"}
+          ],
+          "output": {"command": "go run main.go", "text": "1\n2\n3\n4\n5"}
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "pre-order-print",
+          "title": "Print before the calls",
+          "guide": "Read the code, then pick the output. The tree has 4 at the root, 2 and 5 below it, and 1 and 3 below the 2.",
+          "code": "func preorder(n *Node) {\n    if n == nil {\n        return\n    }\n    fmt.Println(n.Value)\n    preorder(n.Left)\n    preorder(n.Right)\n}",
+          "options": [
+            "1, 2, 3, 4, 5",
+            "4, 2, 1, 3, 5",
+            "4, 2, 5, 1, 3",
+            "1, 3, 2, 5, 4"
+          ],
+          "answer": 1,
+          "explanation": "The node is printed before its sides, so a parent comes before its children: 4, then the whole left side (2, 1, 3), then 5."
+        },
+        {
+          "type": "typing",
+          "id": "post-order",
+          "title": "Children before parents",
+          "guide": "Print a tree so every node comes after both of its sides.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "Same walk as before, with the print moved after both calls.", "notes": [{"on": "postorder(n.Right)", "text": "Both sides are done before this node prints."}], "text": "func postorder(n *Node) {\n    if n == nil {\n        return\n    }\n    postorder(n.Left)\n    postorder(n.Right)\n    fmt.Println(n.Value)\n}\n"},
+            {"mode": "auto", "line": 21, "text": "    root := &Node{\n        Value: 4,\n        Left: &Node{\n            Value: 2,\n            Left:  &Node{Value: 1},\n            Right: &Node{Value: 3},\n        },\n        Right: &Node{Value: 5},\n    }"},
+            {"mode": "ghost", "line": 30, "guide": "The root is the last one to print.", "text": "    postorder(root)"}
+          ],
+          "output": {"command": "go run main.go", "text": "1\n3\n2\n5\n4"}
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Search trees",
+        "slides": [
+          {"text": "In a search tree, everything on the left of a node is smaller and everything on the right is larger, for every node. A search can drop a whole side at each step.\n\nThe snippet is pseudo code.", "code": "search(node, value):\n    if value < node's value:\n        look only on the left\n    otherwise:\n        look only on the right"},
+          {"text": "Inserting follows the path a search would take and puts the new node where the search ends: at an empty (`nil`) spot. The same values in another order build a different tree."}
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "insert-values",
+          "title": "Insert into a search tree",
+          "guide": "Put each new value where a search for it would end.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "Smaller values go left, the others go right. At an empty spot, the new node is created and returned.", "notes": [{"on": "&Node{Value: v}", "text": "An empty spot: the new value becomes a leaf."}, {"on": "n.Left = insert", "text": "Stores the returned node back as the left child."}], "text": "func insert(n *Node, v int) *Node {\n    if n == nil {\n        return &Node{Value: v}\n    }\n    if v < n.Value {\n        n.Left = insert(n.Left, v)\n    } else {\n        n.Right = insert(n.Right, v)\n    }\n    return n\n}\n"},
+            {"mode": "ghost", "line": 24, "guide": "Start from an empty tree and insert the values one by one.", "notes": [{"on": "var root *Node", "text": "A nil pointer is an empty tree."}], "text": "    var root *Node\n    for _, v := range []int{4, 2, 5, 1, 3} {\n        root = insert(root, v)\n    }"},
+            {"mode": "ghost", "line": 28, "guide": "See where each value landed.", "text": "    l := root.Left\n    fmt.Println(root.Value)\n    fmt.Println(l.Value, root.Right.Value)\n    fmt.Println(l.Left.Value, l.Right.Value)"}
+          ],
+          "output": {"command": "go run main.go", "text": "4\n2 5\n1 3"}
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "insert-shape",
+          "title": "Where did the values land?",
+          "guide": "`insert` is the function you typed. Each value prints on its own line; the options list them in order.",
+          "code": "var root *Node\nfor _, v := range []int{5, 3, 8, 4} {\n    root = insert(root, v)\n}\nfmt.Println(root.Left.Value)\nfmt.Println(root.Left.Right.Value)\nfmt.Println(root.Right.Value)",
+          "options": [
+            "5, 4, 8",
+            "3, 8, 4",
+            "4, 3, 8",
+            "3, 4, 8"
+          ],
+          "answer": 3,
+          "explanation": "5 is the root. 3 goes left of it and 8 goes right. 4 is smaller than 5, so it goes left, then larger than 3, so it goes right of 3."
+        },
+        {
+          "type": "fill-blank",
+          "id": "insert-gaps",
+          "title": "Complete the insert",
+          "guide": "Fill the gaps so smaller values go left and the function returns the node it received.",
+          "code": "func insert(n *Node, v int) *Node {\n    if n == nil {\n        return &Node{Value: v}\n    }\n    if v ___ n.Value {\n        n.Left = ___(n.Left, v)\n    } else {\n        n.Right = insert(n.Right, v)\n    }\n    return ___\n}",
+          "gaps": [
+            {"answers": ["<", "<="]},
+            {"answers": ["insert"]},
+            {"answers": ["n"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "contains-recursive",
+          "title": "Search for a value",
+          "guide": "Find out if a value is in the tree, going down only one side.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "auto", "line": 11, "text": "func insert(n *Node, v int) *Node {\n    if n == nil {\n        return &Node{Value: v}\n    }\n    if v < n.Value {\n        n.Left = insert(n.Left, v)\n    } else {\n        n.Right = insert(n.Right, v)\n    }\n    return n\n}\n"},
+            {"mode": "ghost", "line": 23, "guide": "A match ends the search. Otherwise only one side can hold the value. Reaching nil means it is not there.", "notes": [{"on": "contains(n.Left, v)", "text": "The right side is skipped: it holds only larger values."}], "text": "func contains(n *Node, v int) bool {\n    if n == nil {\n        return false\n    }\n    if v == n.Value {\n        return true\n    }\n    if v < n.Value {\n        return contains(n.Left, v)\n    }\n    return contains(n.Right, v)\n}\n"},
+            {"mode": "auto", "line": 37, "text": "    var root *Node\n    for _, v := range []int{4, 2, 5, 1, 3} {\n        root = insert(root, v)\n    }"},
+            {"mode": "ghost", "line": 41, "guide": "The tree is built in the file. Look for a value that is there and one that is not.", "text": "    fmt.Println(contains(root, 3))\n    fmt.Println(contains(root, 7))"}
+          ],
+          "output": {"command": "go run main.go", "text": "true\nfalse"}
+        },
+        {
+          "type": "typing",
+          "id": "contains-loop",
+          "title": "Search with a loop",
+          "guide": "The same search, walking down with a loop instead of calls.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "auto", "line": 11, "text": "func insert(n *Node, v int) *Node {\n    if n == nil {\n        return &Node{Value: v}\n    }\n    if v < n.Value {\n        n.Left = insert(n.Left, v)\n    } else {\n        n.Right = insert(n.Right, v)\n    }\n    return n\n}\n"},
+            {"mode": "ghost", "line": 23, "guide": "Move the pointer down one level each turn, until a match or a nil.", "notes": [{"on": "n = n.Left", "text": "Moves this copy of the pointer; the tree is untouched."}], "text": "func contains(n *Node, v int) bool {\n    for n != nil {\n        if v == n.Value {\n            return true\n        }\n        if v < n.Value {\n            n = n.Left\n        } else {\n            n = n.Right\n        }\n    }\n    return false\n}\n"},
+            {"mode": "auto", "line": 38, "text": "    var root *Node\n    for _, v := range []int{4, 2, 5, 1, 3} {\n        root = insert(root, v)\n    }"},
+            {"mode": "ghost", "line": 42, "guide": "Try a value that is there and one that is not.", "text": "    fmt.Println(contains(root, 1))\n    fmt.Println(contains(root, 6))"}
+          ],
+          "output": {"command": "go run main.go", "text": "true\nfalse"}
+        },
+        {
+          "type": "typing",
+          "id": "smallest-largest",
+          "title": "Smallest and largest",
+          "guide": "Find the extremes of a search tree without looking at every node.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "auto", "line": 11, "text": "func insert(n *Node, v int) *Node {\n    if n == nil {\n        return &Node{Value: v}\n    }\n    if v < n.Value {\n        n.Left = insert(n.Left, v)\n    } else {\n        n.Right = insert(n.Right, v)\n    }\n    return n\n}\n"},
+            {"mode": "ghost", "line": 23, "guide": "The smallest value is at the far left: keep going left while there is a left child.", "notes": [{"on": "n.Left != nil", "text": "Stops on the last node, so the tree can't be empty."}], "text": "func smallest(n *Node) int {\n    for n.Left != nil {\n        n = n.Left\n    }\n    return n.Value\n}\n"},
+            {"mode": "ghost", "line": 30, "guide": "The mirror image: the largest value is at the far right.", "text": "func largest(n *Node) int {\n    for n.Right != nil {\n        n = n.Right\n    }\n    return n.Value\n}\n"},
+            {"mode": "auto", "line": 38, "text": "    var root *Node\n    for _, v := range []int{5, 3, 8, 1, 4, 9} {\n        root = insert(root, v)\n    }"},
+            {"mode": "ghost", "line": 42, "guide": "The tree is built in the file.", "text": "    fmt.Println(smallest(root), largest(root))"}
+          ],
+          "output": {"command": "go run main.go", "text": "1 9"}
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Shape and change",
+        "slides": [
+          {"text": "The shape of a search tree depends on the order of insertion. Values that arrive sorted make a chain, and a search then visits every node, like in a list. The **height** shows how tall the tree got."},
+          {"text": "Changing a tree means changing pointers. A function that may replace the node it receives returns the new subtree, and the caller stores it back, as in `n.Left = f(n.Left)`. Flipping a tree this way breaks its ordering, so it stops being a search tree."},
+          {"text": "Removing a node has three cases, depending on its children.\n\nThe snippet is pseudo code.", "code": "remove(node):\n    no left child:\n        use the right child\n    no right child:\n        use the left child\n    both children:\n        copy in the next larger value\n        remove that value from the right"}
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "tree-height",
+          "title": "How tall is the tree",
+          "guide": "Measure a tree, and see what the order of insertion does to it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "auto", "line": 11, "text": "func insert(n *Node, v int) *Node {\n    if n == nil {\n        return &Node{Value: v}\n    }\n    if v < n.Value {\n        n.Left = insert(n.Left, v)\n    } else {\n        n.Right = insert(n.Right, v)\n    }\n    return n\n}\n"},
+            {"mode": "ghost", "line": 23, "guide": "An empty tree has height 0. Otherwise it is one more than its taller side.", "notes": [{"on": "l := height(n.Left)", "text": "Measure each side first, then compare."}], "text": "func height(n *Node) int {\n    if n == nil {\n        return 0\n    }\n    l := height(n.Left)\n    r := height(n.Right)\n    if l > r {\n        return l + 1\n    }\n    return r + 1\n}\n"},
+            {"mode": "ghost", "line": 36, "guide": "Seven values, starting from the middle one.", "text": "    var balanced, chain *Node\n    for _, v := range []int{4, 2, 6, 1, 3, 5, 7} {\n        balanced = insert(balanced, v)\n    }"},
+            {"mode": "ghost", "line": 40, "guide": "The same seven values, but in order.", "text": "    for v := 1; v <= 7; v++ {\n        chain = insert(chain, v)\n    }"},
+            {"mode": "ghost", "line": 43, "guide": "Same values, different shapes.", "text": "    fmt.Println(height(balanced), height(chain))"}
+          ],
+          "output": {"command": "go run main.go", "text": "3 7"}
+        },
+        {
+          "type": "fill-blank",
+          "id": "height-gaps",
+          "title": "Complete the height",
+          "guide": "Fill the gaps so the function returns one more than its taller side.",
+          "code": "func height(n *Node) int {\n    if n == nil {\n        return 0\n    }\n    l := height(n.Left)\n    r := ___(n.Right)\n    if l ___ r {\n        return l + 1\n    }\n    return ___ + 1\n}",
+          "gaps": [
+            {"answers": ["height"]},
+            {"answers": [">", ">="]},
+            {"answers": ["r"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "sorted-walk",
+          "title": "Values in order",
+          "guide": "`inorder` prints each value on its own line, and the options list them in order.",
+          "code": "var root *Node\nfor _, v := range []int{6, 2, 9, 1, 4} {\n    root = insert(root, v)\n}\ninorder(root)",
+          "options": [
+            "6, 2, 9, 1, 4",
+            "1, 4, 2, 9, 6",
+            "1, 2, 4, 6, 9",
+            "6, 2, 1, 4, 9"
+          ],
+          "answer": 2,
+          "explanation": "In a search tree everything on the left is smaller and everything on the right is larger. Walking left, node, right visits the values from smallest to largest."
+        },
+        {
+          "type": "typing",
+          "id": "mirror-tree",
+          "title": "Flip a tree",
+          "guide": "Swap the children of every node, so the tree becomes its mirror.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "auto", "line": 11, "text": "func insert(n *Node, v int) *Node {\n    if n == nil {\n        return &Node{Value: v}\n    }\n    if v < n.Value {\n        n.Left = insert(n.Left, v)\n    } else {\n        n.Right = insert(n.Right, v)\n    }\n    return n\n}\n"},
+            {"mode": "ghost", "line": 23, "guide": "Swap the two pointers of a node, then do the same in both children. The tree changes in place.", "notes": [{"on": "n.Left, n.Right = n.Right, n.Left", "text": "Swaps the pointers; each child brings its subtree."}], "text": "func mirror(n *Node) {\n    if n == nil {\n        return\n    }\n    n.Left, n.Right = n.Right, n.Left\n    mirror(n.Left)\n    mirror(n.Right)\n}\n"},
+            {"mode": "auto", "line": 33, "text": "    var root *Node\n    for _, v := range []int{4, 2, 5, 1, 3} {\n        root = insert(root, v)\n    }"},
+            {"mode": "ghost", "line": 37, "guide": "Check the children before the flip.", "text": "    fmt.Println(root.Left.Value, root.Right.Value)"},
+            {"mode": "ghost", "line": 38, "guide": "Flip it and look again. The 2 is now on the right.", "text": "    mirror(root)\n    fmt.Println(root.Left.Value, root.Right.Value)\n    fmt.Println(root.Right.Left.Value)"}
+          ],
+          "output": {"command": "go run main.go", "text": "2 5\n5 2\n3"}
+        },
+        {
+          "type": "typing",
+          "id": "remove-simple",
+          "title": "Remove a node",
+          "guide": "Remove a leaf, or a node with one child. Two children come next.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "auto", "line": 11, "text": "func insert(n *Node, v int) *Node {\n    if n == nil {\n        return &Node{Value: v}\n    }\n    if v < n.Value {\n        n.Left = insert(n.Left, v)\n    } else {\n        n.Right = insert(n.Right, v)\n    }\n    return n\n}\n"},
+            {"mode": "ghost", "line": 23, "guide": "`remove` returns the new root of the tree it was given.", "text": "func remove(n *Node, v int) *Node {\n}\n"},
+            {"mode": "ghost", "line": 24, "guide": "Walk down like insert. Each step stores the result back and returns the node.", "text": "    if n == nil {\n        return nil\n    }\n    if v < n.Value {\n        n.Left = remove(n.Left, v)\n        return n\n    }\n    if v > n.Value {\n        n.Right = remove(n.Right, v)\n        return n\n    }"},
+            {"mode": "ghost", "line": 35, "guide": "Found it. With one child or none, hand back the child: the parent links to it and the node is gone.", "notes": [{"on": "return n.Right", "text": "The parent will point at this child instead."}], "text": "    if n.Left == nil {\n        return n.Right\n    }\n    if n.Right == nil {\n        return n.Left\n    }\n    return n"},
+            {"mode": "auto", "line": 45, "text": "    var root *Node\n    for _, v := range []int{5, 3, 8, 2, 9} {\n        root = insert(root, v)\n    }"},
+            {"mode": "ghost", "line": 49, "guide": "Remove a leaf, then a node with one child.", "notes": [{"on": "root = remove(root, 2)", "text": "Store the result: the root itself could be removed."}], "text": "    root = remove(root, 2)\n    root = remove(root, 8)"},
+            {"mode": "ghost", "line": 51, "guide": "The 2 is gone, and the 8 was replaced by its child.", "text": "    fmt.Println(root.Left.Left == nil)\n    fmt.Println(root.Right.Value)"}
+          ],
+          "output": {"command": "go run main.go", "text": "true\n9"}
+        },
+        {
+          "type": "typing",
+          "id": "remove-two-children",
+          "title": "Remove with two children",
+          "guide": "Handle the last case: a node that has both children.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "auto", "line": 5, "text": "type Node struct {\n    Value int\n    Left  *Node\n    Right *Node\n}\n"},
+            {"mode": "auto", "line": 11, "text": "func insert(n *Node, v int) *Node {\n    if n == nil {\n        return &Node{Value: v}\n    }\n    if v < n.Value {\n        n.Left = insert(n.Left, v)\n    } else {\n        n.Right = insert(n.Right, v)\n    }\n    return n\n}\n"},
+            {"mode": "auto", "line": 23, "text": "func remove(n *Node, v int) *Node {\n    if n == nil {\n        return nil\n    }\n    if v < n.Value {\n        n.Left = remove(n.Left, v)\n        return n\n    }\n    if v > n.Value {\n        n.Right = remove(n.Right, v)\n        return n\n    }\n    if n.Left == nil {\n        return n.Right\n    }\n    if n.Right == nil {\n        return n.Left\n    }\n    return n\n}\n"},
+            {"mode": "ghost", "line": 20, "guide": "The earlier cases are in the file. With two children, take the smallest value of the right side, put it in this node, then remove it from there.", "notes": [{"on": "next := n.Right", "text": "The next larger value in the tree."}, {"on": "n.Value = next.Value", "text": "The node stays; only its value is replaced."}], "text": "    next := n.Right\n    for next.Left != nil {\n        next = next.Left\n    }\n    n.Value = next.Value\n    n.Right = remove(n.Right, next.Value)"},
+            {"mode": "auto", "line": 51, "text": "    var root *Node\n    for _, v := range []int{5, 3, 8, 2, 4, 7, 9} {\n        root = insert(root, v)\n    }"},
+            {"mode": "ghost", "line": 55, "guide": "Remove the root, which has two children.", "text": "    root = remove(root, 5)"},
+            {"mode": "ghost", "line": 56, "guide": "The 7 moved up, and its old place is empty.", "text": "    fmt.Println(root.Value, root.Left.Value)\n    fmt.Println(root.Right.Value)\n    fmt.Println(root.Right.Left == nil)"}
+          ],
+          "output": {"command": "go run main.go", "text": "7 3\n8\ntrue"}
+        }
+      ]
+    }
+  ]
+}

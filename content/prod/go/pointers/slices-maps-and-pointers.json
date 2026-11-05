@@ -1,0 +1,864 @@
+{
+  "id": "slices-maps-and-pointers",
+  "intro": {
+    "title": "Slices, maps and pointers",
+    "slides": [
+      {
+        "text": "Slices and maps already hide pointers inside them. This module shows where that sharing helps and where it surprises you.\n\nYou will pass slices to functions, keep structs and pointers in slices and maps, and copy data so two values stop sharing."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Slices through pointers",
+        "slides": [
+          {
+            "text": "A slice is a small header: a pointer to an array, a length and a capacity. Passing a slice copies the header, not the elements.\n\nThe snippet is pseudo code, not Go.",
+            "code": "slice header\n    points to: array\n    length: 3\n    capacity: 3\nfunction gets a copy of the header"
+          },
+          {
+            "text": "Both headers point at the same elements, so a write by index is seen by the caller. But the length lives in the header, so a longer or shorter slice stays in the function unless you take a pointer to the slice.\n\nWith a `*[]T` the function can append, shrink or cut an element out, and the caller sees it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "shared-elements",
+          "title": "Elements are shared",
+          "guide": "Change a slice's elements inside a function.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "The function gets a copy of the slice header, which points at the same elements. Writing by index changes the caller's data.",
+              "notes": [
+                {
+                  "on": "prices[i] /= 2",
+                  "text": "Changes the caller's element, not a copy."
+                }
+              ],
+              "text": "func halve(prices []int) {\n    for i := range prices {\n        prices[i] /= 2\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The caller sees the halved prices.",
+              "text": "func main() {\n    prices := []int{10, 20, 30}\n    halve(prices)\n    fmt.Println(prices)\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[5 10 15]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "append-is-lost",
+          "title": "Append is lost",
+          "guide": "Append inside a function and see the caller's length.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`append` can return a longer slice. The function only changes its own copy of the header.",
+              "notes": [
+                {
+                  "on": "tags = append(tags, \"new\")",
+                  "text": "Updates only this function's slice."
+                }
+              ],
+              "text": "func addTag(tags []string) {\n    tags = append(tags, \"new\")\n    fmt.Println(len(tags))\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "The caller's slice still has its old length.",
+              "text": "func main() {\n    tags := []string{\"go\", \"cli\"}\n    addTag(tags)\n    fmt.Println(len(tags))\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\n2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "pointer-to-slice",
+          "title": "Pointer to a slice",
+          "guide": "Let a function replace the caller's slice.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A pointer to the slice variable lets the function store the grown slice in the caller.",
+              "notes": [
+                {
+                  "on": "*[]string",
+                  "text": "A pointer to a slice variable."
+                },
+                {
+                  "on": "*tags = append",
+                  "text": "Stores the grown slice in the caller's variable."
+                }
+              ],
+              "text": "func addTag(tags *[]string, tag string) {\n    *tags = append(*tags, tag)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Pass the address of the slice variable.",
+              "text": "func main() {\n    tags := []string{\"go\"}\n    addTag(&tags, \"cli\")\n    addTag(&tags, \"tui\")\n    fmt.Println(tags, len(tags))\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[go cli tui] 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "index-through-pointer",
+          "title": "Index through the pointer",
+          "guide": "Reach the elements from a pointer to a slice.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "You cannot index a pointer. Dereference it first, in parentheses, then index.",
+              "notes": [
+                {
+                  "on": "(*tags)[0]",
+                  "text": "Dereference first, then index the slice."
+                }
+              ],
+              "text": "func setFirst(tags *[]string, tag string) {\n    (*tags)[0] = tag\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Elements alone need no pointer: a plain slice would work here.",
+              "text": "func main() {\n    tags := []string{\"go\", \"cli\"}\n    setFirst(&tags, \"rust\")\n    fmt.Println(tags)\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[rust cli]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "push-and-pop",
+          "title": "Push and pop",
+          "guide": "Grow and shrink a slice through a pointer.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Push appends through the pointer.",
+              "text": "func push(s *[]int, n int) {\n    *s = append(*s, n)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Pop reads the last element, then cuts the slice one shorter and stores it back.",
+              "notes": [
+                {
+                  "on": "(*s)[:len(*s)-1]",
+                  "text": "The slice without its last element."
+                }
+              ],
+              "text": "func pop(s *[]int) int {\n    last := (*s)[len(*s)-1]\n    *s = (*s)[:len(*s)-1]\n    return last\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Both calls change the caller's slice.",
+              "text": "func main() {\n    nums := []int{1, 2}\n    push(&nums, 3)\n    push(&nums, 4)\n    top := pop(&nums)\n    fmt.Println(top, nums)\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "4 [1 2 3]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "remove-at",
+          "title": "Remove at an index",
+          "guide": "Cut one element out of the caller's slice.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Join the part before `i` with the part after it, and store the result in the caller.",
+              "notes": [
+                {
+                  "on": "(*s)[i+1:]...",
+                  "text": "Spreads the rest as separate values."
+                }
+              ],
+              "text": "func removeAt(s *[]int, i int) {\n    *s = append((*s)[:i], (*s)[i+1:]...)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "The slice is one element shorter.",
+              "text": "func main() {\n    nums := []int{10, 20, 30, 40}\n    removeAt(&nums, 1)\n    fmt.Println(nums, len(nums))\n}"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[10 30 40] 3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "drop-at",
+          "title": "Drop an element",
+          "guide": "Finish the function and its call.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc dropAt(s ___[]int, i int) {\n    *s = ___((*s)[:i], (*s)[i+1:]...)\n}\n\nfunc main() {\n    nums := []int{1, 2, 3}\n    dropAt(___nums, 0)\n    fmt.Println(nums)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "*"
+              ]
+            },
+            {
+              "answers": [
+                "append"
+              ]
+            },
+            {
+              "answers": [
+                "&"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Slices of structs",
+        "slides": [
+          {
+            "text": "A slice of structs holds the structs themselves, one after another. A slice of pointers holds addresses that lead to structs stored elsewhere.\n\nThe snippet is pseudo code, not Go.",
+            "code": "[]Task    -> the tasks are inside\n[]*Task   -> addresses of tasks\nrange gives a copy of each element"
+          },
+          {
+            "text": "A copy of a struct edits nothing, but a copy of a pointer still reaches the same struct. A pointer into a slice is only good while the slice keeps its array: when `append` moves it, the pointer stays behind."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "range-copy",
+          "title": "Range gives a copy",
+          "guide": "Set a field inside a range loop.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A task with a name and a done flag.",
+              "text": "type Task struct {\n    name string\n    done bool\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 9,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`t` is a copy of each struct, so setting `done` on it is lost.",
+              "notes": [
+                {
+                  "on": "for _, t := range tasks",
+                  "text": "t is a copy of the element."
+                }
+              ],
+              "text": "    tasks := []Task{{name: \"write\"}, {name: \"test\"}}\n    for _, t := range tasks {\n        t.done = true\n    }\n    fmt.Println(tasks)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[{write false} {test false}]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "edit-by-index",
+          "title": "Edit by index",
+          "guide": "Change the elements in place.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Task struct {\n    name string\n    done bool\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 9,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Index into the slice to reach the real element.",
+              "notes": [
+                {
+                  "on": "tasks[i].done",
+                  "text": "The field of the element itself."
+                }
+              ],
+              "text": "    tasks := []Task{{name: \"write\"}, {name: \"test\"}}\n    for i := range tasks {\n        tasks[i].done = true\n    }\n    fmt.Println(tasks)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[{write true} {test true}]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "find-task",
+          "title": "Find a task",
+          "guide": "Return a pointer to the task that matches.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Task struct {\n    name string\n    done bool\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Return `&tasks[i]`, a pointer into the slice, or `nil` when no task matches.",
+              "notes": [
+                {
+                  "on": "&tasks[i]",
+                  "text": "Address of the element, not a copy."
+                },
+                {
+                  "on": "return nil",
+                  "text": "Nothing found, so no pointer."
+                }
+              ],
+              "text": "func find(tasks []Task, name string) *Task {\n    for i := range tasks {\n        if tasks[i].name == name {\n            return &tasks[i]\n        }\n    }\n    return nil\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 17,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 18,
+              "guide": "Check for `nil` before changing the task. A change through the pointer shows in the slice.",
+              "notes": [
+                {
+                  "on": "t != nil",
+                  "text": "Only touch the task when it was found."
+                }
+              ],
+              "text": "    tasks := []Task{{name: \"write\"}, {name: \"test\"}}\n    t := find(tasks, \"test\")\n    if t != nil {\n        t.done = true\n    }\n    fmt.Println(tasks)\n    fmt.Println(find(tasks, \"ship\") == nil)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[{write false} {test true}]\ntrue"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "mark-all-done",
+          "title": "Mark every task",
+          "guide": "Mark all the tasks done through their index.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Task struct{ done bool }\n\nfunc main() {\n    tasks := []Task{{}}\n    for i := ___ tasks {\n        tasks[i].___ = true\n    }\n    fmt.Println(tasks)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "range"
+              ]
+            },
+            {
+              "answers": [
+                "done"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "slice-of-pointers",
+          "title": "Slice of pointers",
+          "guide": "Store pointers in the slice.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Task struct {\n    name string\n    done bool\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 9,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Each element is a pointer, so the loop's copy still points at the same task.",
+              "notes": [
+                {
+                  "on": "[]*Task{{name",
+                  "text": "Each {...} means &Task{...} here."
+                },
+                {
+                  "on": "*tasks[0]",
+                  "text": "Dereference the element to print the struct."
+                }
+              ],
+              "text": "    tasks := []*Task{{name: \"write\"}, {name: \"test\"}}\n    for _, t := range tasks {\n        t.done = true\n    }\n    fmt.Println(*tasks[0], *tasks[1])"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "{write true} {test true}"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "stale-pointer",
+          "title": "A pointer that goes stale",
+          "guide": "Append after taking a pointer to an element.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "The slice is full, so `append` copies it to a new array. `first` still points at the old one.",
+              "notes": [
+                {
+                  "on": "first := &scores[0]",
+                  "text": "Points at the element in the current array."
+                }
+              ],
+              "text": "    scores := []int{1, 2, 3}\n    first := &scores[0]\n    scores = append(scores, 4)\n    *first = 99\n    fmt.Println(scores[0], *first)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1 99"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Maps of structs",
+        "slides": [
+          {
+            "text": "A map value is not an address you can take, so the struct you read is a copy. Go will not even let you write `inv[key].stock--` when the values are structs.\n\nThe snippet is pseudo code, not Go.",
+            "code": "item = copy of map[key]\nchange item\nmap[key] = item"
+          },
+          {
+            "text": "A map of pointers avoids the copy: the pointer is the value, and you change the struct it points at. A key that is missing gives a nil pointer, so check before you use it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "struct-from-map",
+          "title": "A struct from a map",
+          "guide": "Change a struct stored by value in a map.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "An item with a stock and a price.",
+              "text": "type Item struct {\n    stock int\n    price int\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 9,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A map gives back a copy of the struct. Change the copy, then store it back under the key.",
+              "notes": [
+                {
+                  "on": "item := inv[\"pen\"]",
+                  "text": "A copy of the stored struct."
+                },
+                {
+                  "on": "inv[\"pen\"] = item",
+                  "text": "Writes the changed copy back."
+                }
+              ],
+              "text": "    inv := map[string]Item{\"pen\": {stock: 10, price: 2}}\n    item := inv[\"pen\"]\n    item.stock--\n    fmt.Println(inv[\"pen\"].stock)\n    inv[\"pen\"] = item\n    fmt.Println(inv[\"pen\"].stock)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10\n9"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "map-of-pointers",
+          "title": "Map of pointers",
+          "guide": "Store pointers so entries change in place.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Item struct {\n    stock int\n    price int\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 9,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "The value is a pointer to the struct, so a field can be changed right through the map.",
+              "notes": [
+                {
+                  "on": "inv[\"pen\"].stock--",
+                  "text": "Changes the stored struct directly."
+                }
+              ],
+              "text": "    inv := map[string]*Item{\"pen\": {stock: 10, price: 2}}\n    inv[\"pen\"].stock--\n    fmt.Println(inv[\"pen\"].stock)\n    inv[\"ink\"] = &Item{stock: 4, price: 5}\n    fmt.Println(len(inv))"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "9\n2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "missing-entry",
+          "title": "Missing entry",
+          "guide": "Look up a key that may not be there.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "auto",
+              "line": 5,
+              "text": "type Item struct {\n    stock int\n    price int\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 9,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "A missing key gives a nil pointer. Using it would panic, so check `ok` first.",
+              "notes": [
+                {
+                  "on": "item == nil",
+                  "text": "A missing key gives a nil pointer."
+                }
+              ],
+              "text": "    inv := map[string]*Item{\"pen\": {stock: 10}}\n    item, ok := inv[\"ink\"]\n    fmt.Println(item == nil, ok)\n    if ok {\n        item.stock--\n    } else {\n        fmt.Println(\"no ink\")\n    }"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true false\nno ink"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "use-if-found",
+          "title": "Use it if found",
+          "guide": "Lower the stock only when the pen exists.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Item struct{ stock int }\n\nfunc main() {\n    inv := map[string]*Item{\"pen\": {stock: 10}}\n    ___, ok := inv[\"pen\"]\n    if ___ {\n        item.stock--\n    }\n    fmt.Println(inv[\"pen\"].stock)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "item"
+              ]
+            },
+            {
+              "answers": [
+                "ok"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "shared-entry",
+          "title": "Two keys, one item",
+          "guide": "Pick what main prints.",
+          "kind": "output",
+          "code": "func main() {\n    pen := &Item{stock: 10}\n    inv := map[string]*Item{\n        \"pen\":  pen,\n        \"biro\": pen,\n    }\n    inv[\"pen\"].stock = 3\n    fmt.Println(inv[\"biro\"].stock)\n}",
+          "options": [
+            "10",
+            "0",
+            "3"
+          ],
+          "answer": 2,
+          "explanation": "Both keys hold the same pointer, so there is only one `Item`. A change through one key shows through the other."
+        },
+        {
+          "type": "quiz",
+          "id": "deposit-purpose",
+          "title": "Why a pointer here",
+          "guide": "Pick what the code is for.",
+          "kind": "purpose",
+          "code": "type Account struct {\n    balance int\n}\n\nvar accounts map[string]*Account\n\nfunc deposit(id string, n int) {\n    accounts[id].balance += n\n}",
+          "options": [
+            "Adds money to a copy of the account",
+            "Adds money to a stored account in place",
+            "Creates the account if the id is missing",
+            "Replaces the account with a new one"
+          ],
+          "answer": 1,
+          "explanation": "The map holds pointers, so `accounts[id].balance` is the stored account itself. With plain structs this line would not compile."
+        }
+      ]
+    },
+    {
+      "id": "session-4",
+      "intro": {
+        "title": "Copies that share",
+        "slides": [
+          {
+            "text": "Copying a value copies what is inside it: a slice header, a map reference or a pointer. The data behind them is still the same, so both copies change it together.\n\nThe snippet is pseudo code, not Go.",
+            "code": "b = copy of a\nb.list -> same array as a.list\nb.ptr  -> same struct as a.ptr"
+          },
+          {
+            "text": "To get a truly separate value, build new storage and copy into it: a new slice for the elements, and a new struct for every pointer."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "quiz",
+          "id": "team-copy",
+          "title": "Copy a struct",
+          "guide": "Pick what main prints.",
+          "kind": "output",
+          "code": "type Team struct {\n    members []string\n}\n\nfunc main() {\n    a := Team{[]string{\"Ana\", \"Eva\"}}\n    b := a\n    b.members[0] = \"Zed\"\n    fmt.Println(a.members[0])\n}",
+          "options": [
+            "Ana",
+            "Zed",
+            "Eva"
+          ],
+          "answer": 1,
+          "explanation": "`b := a` copies the struct, but the `members` field is a slice header that points at the same array, so both teams share the elements."
+        },
+        {
+          "type": "typing",
+          "id": "deep-copy",
+          "title": "Copy the data too",
+          "guide": "Give the new struct its own elements.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A team with a slice of names.",
+              "text": "type Team struct {\n    members []string\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 8,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Make a new slice of the same length and copy the names into it.",
+              "notes": [
+                {
+                  "on": "make([]string, len(a.members))",
+                  "text": "A new array, as long as the original."
+                },
+                {
+                  "on": "copy(b.members, a.members)",
+                  "text": "Fills the new array from the old one."
+                }
+              ],
+              "text": "    a := Team{members: []string{\"Ana\", \"Eva\"}}\n    b := Team{members: make([]string, len(a.members))}\n    copy(b.members, a.members)\n    b.members[0] = \"Zed\"\n    fmt.Println(a.members, b.members)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[Ana Eva] [Zed Eva]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "own-elements",
+          "title": "Its own elements",
+          "guide": "Build b with its own names, then fill them.",
+          "code": "package main\n\nimport \"fmt\"\n\ntype Team struct{ members []string }\n\nfunc main() {\n    a := Team{members: []string{\"Ana\"}}\n    b := Team{members: ___([]string, 1)}\n    ___(b.members, a.members)\n    fmt.Println(b.members)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "make"
+              ]
+            },
+            {
+              "answers": [
+                "copy"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "copied-pointers",
+          "title": "Copy a slice of pointers",
+          "guide": "Pick what main prints.",
+          "kind": "output",
+          "code": "type Task struct {\n    name string\n}\n\nfunc main() {\n    a := []*Task{{name: \"write\"}}\n    b := make([]*Task, 1)\n    copy(b, a)\n    b[0].name = \"test\"\n    fmt.Println(a[0].name)\n}",
+          "options": [
+            "write",
+            "test",
+            "A runtime panic"
+          ],
+          "answer": 1,
+          "explanation": "`copy` copies the pointers, not the tasks. Both slices hold the same pointer, so the change shows in `a`."
+        },
+        {
+          "type": "typing",
+          "id": "copy-each-item",
+          "title": "Copy each item",
+          "guide": "Copy the items of a map, not only the pointers.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "An item with a stock.",
+              "text": "type Item struct {\n    stock int\n}\n"
+            },
+            {
+              "mode": "auto",
+              "line": 8,
+              "text": "func main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Copying the map would copy the pointers. Build a new map and give it a copy of every item.",
+              "notes": [
+                {
+                  "on": "c := *v",
+                  "text": "A copy of the struct that v points to."
+                },
+                {
+                  "on": "b[k] = &c",
+                  "text": "Stores a pointer to the new copy."
+                }
+              ],
+              "text": "    a := map[string]*Item{\"pen\": {stock: 10}, \"ink\": {stock: 4}}\n    b := make(map[string]*Item, len(a))\n    for k, v := range a {\n        c := *v\n        b[k] = &c\n    }\n    b[\"pen\"].stock = 7\n    fmt.Println(a[\"pen\"].stock, b[\"pen\"].stock, b[\"ink\"].stock)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10 7 4"
+          }
+        }
+      ]
+    }
+  ]
+}

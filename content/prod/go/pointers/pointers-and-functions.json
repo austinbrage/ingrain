@@ -1,0 +1,466 @@
+{
+  "id": "pointers-and-functions",
+  "intro": {
+    "title": "Pointers and functions",
+    "slides": [
+      {
+        "text": "Go gives every function its own copy of each argument. In this module you see how a pointer parameter lets a function change the caller's variable, how a function can return a pointer, and which parts are still copies."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Copies and addresses",
+        "slides": [
+          {
+            "text": "A parameter is a new variable that holds a copy of the argument. Changing it never touches the caller's variable.\n\nThe snippet is pseudo code, not Go.",
+            "code": "caller: score = 50\ncall addBonus(copy of score)\ninside: copy = 60\ncaller: score is still 50"
+          },
+          {
+            "text": "To change the caller's variable, pass its address. The parameter type becomes `*int`, the call passes `&score`, and the body writes through `*score`.\n\nThe address is copied too, but both copies lead to the same variable."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "copy-is-lost",
+          "title": "A copy changes nothing",
+          "guide": "Change a parameter inside a function and see what the caller keeps.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "The parameter is a new variable holding a copy of the argument.",
+              "notes": [
+                {
+                  "on": "score int",
+                  "text": "A plain int: the function gets its own copy."
+                }
+              ],
+              "text": "func addBonus(score int) {\n    score = score + 10\n    fmt.Println(\"inside:\", score)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Call it with `score`, then print the original.",
+              "text": "func main() {\n    score := 50\n    addBonus(score)\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "The caller's variable never moved.",
+              "text": "    fmt.Println(\"outside:\", score)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "inside: 60\noutside: 50"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "bonus-through-pointer",
+          "title": "Change the caller's variable",
+          "guide": "Take a pointer, so the function writes to the caller's own variable.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "The parameter is the address of an int. Write through it.",
+              "notes": [
+                {
+                  "on": "score *int",
+                  "text": "The function receives the variable's address."
+                }
+              ],
+              "text": "func addBonus(score *int) {\n    *score = *score + 10\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Pass the address of `score`.",
+              "notes": [
+                {
+                  "on": "&score",
+                  "text": "Hands over the variable itself, not a copy."
+                }
+              ],
+              "text": "func main() {\n    score := 50\n    addBonus(&score)\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "The change is visible after the call.",
+              "text": "    fmt.Println(score)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "60"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "reset-counter",
+          "title": "Reset through a pointer",
+          "guide": "Make `reset` set the caller's `visits` back to 0.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc reset(count ___) {\n    *count = 0\n}\n\nfunc main() {\n    visits := 12\n    reset(___)\n    fmt.Println(visits)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "*int"
+              ]
+            },
+            {
+              "answers": [
+                "&visits"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "swap-two",
+          "title": "Swap two variables",
+          "guide": "Swap two ints of the caller with a function.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Two pointer parameters. Assign both sides at once.",
+              "notes": [
+                {
+                  "on": "a, b *int",
+                  "text": "Both names are pointers to int."
+                },
+                {
+                  "on": "*a, *b = *b, *a",
+                  "text": "The right side is read first, so no temp is needed."
+                }
+              ],
+              "text": "func swap(a, b *int) {\n    *a, *b = *b, *a\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Pass the address of each variable.",
+              "text": "func main() {\n    first := 3\n    second := 9\n    swap(&first, &second)\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Both variables changed places.",
+              "text": "    fmt.Println(first, second)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "9 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "which-changes",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc bump(a int, b *int) {\n    a++\n    *b++\n}\n\nfunc main() {\n    x, y := 5, 5\n    bump(x, &y)\n    fmt.Println(x, y)\n}",
+          "options": [
+            "6 6",
+            "6 5",
+            "5 5",
+            "5 6"
+          ],
+          "answer": 3,
+          "explanation": "`a` is a copy, so `a++` is lost. `b` holds the address of `y`, so `*b++` changes `y`."
+        },
+        {
+          "type": "typing",
+          "id": "out-parameters",
+          "title": "Results through pointers",
+          "guide": "Fill two of the caller's variables from one function.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Two plain inputs, and two pointers that receive the results.",
+              "notes": [
+                {
+                  "on": "boxes, left *int",
+                  "text": "These are outputs: the caller reads them after."
+                }
+              ],
+              "text": "func divide(total, size int, boxes, left *int) {\n    *boxes = total / size\n    *left = total % size\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Declare the two outputs, then pass their addresses.",
+              "notes": [
+                {
+                  "on": "var boxes, left int",
+                  "text": "Both start at 0 until divide fills them."
+                }
+              ],
+              "text": "func main() {\n    var boxes, left int\n    divide(17, 5, &boxes, &left)\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "17 items in boxes of 5.",
+              "text": "    fmt.Println(boxes, left)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3 2"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Returning and reassigning",
+        "slides": [
+          {
+            "text": "A function can return the address of its own local variable. Go keeps that variable alive while a pointer to it exists, and every call makes a new one."
+          },
+          {
+            "text": "A pointer parameter is a copy of the pointer. Writing through it changes the caller's variable. Assigning a new address to it only moves the copy.",
+            "code": "*p = 1     // changes the variable\np = other  // only the copy moves"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "return-local-pointer",
+          "title": "Return a pointer to a local",
+          "guide": "Return the address of a variable created inside a function.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "The local variable outlives the call because the pointer still uses it.",
+              "notes": [
+                {
+                  "on": ") *int",
+                  "text": "Returns an address instead of a value."
+                }
+              ],
+              "text": "func newLimit(base int) *int {\n    limit := base * 2\n    return &limit\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Each call creates its own `limit`.",
+              "text": "func main() {\n    first := newLimit(5)\n    second := newLimit(5)\n    *first = 99\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Only the first one changed.",
+              "text": "    fmt.Println(*first, *second)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "99 10"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "new-counter",
+          "title": "A counter that lives on",
+          "guide": "Return a pointer to the local count, then add one through it.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc newCounter(start int) ___ {\n    count := start\n    return ___\n}\n\nfunc main() {\n    c := newCounter(7)\n    *c = ___ + 1\n    fmt.Println(*c)\n}",
+          "gaps": [
+            {
+              "answers": [
+                "*int"
+              ]
+            },
+            {
+              "answers": [
+                "&count"
+              ]
+            },
+            {
+              "answers": [
+                "*c"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "reassign-the-copy",
+          "title": "Move the pointer, not the variable",
+          "guide": "See why pointing a pointer parameter elsewhere stays inside the function.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`p` is itself a copy of the caller's pointer. Pointing it elsewhere is local.",
+              "notes": [
+                {
+                  "on": "p = other",
+                  "text": "Only the copy of the pointer moves."
+                }
+              ],
+              "text": "func aim(p, other *int) {\n    p = other\n    fmt.Println(\"inside:\", *p)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`target` points at `a` and is passed along.",
+              "text": "func main() {\n    a := 1\n    b := 2\n    target := &a\n    aim(target, &b)\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 15,
+              "guide": "The caller's pointer still points at `a`.",
+              "text": "    fmt.Println(\"outside:\", *target)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "inside: 2\noutside: 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "pointer-to-a-copy",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc update(p *int, v int) {\n    p = &v\n    *p = 100\n}\n\nfunc main() {\n    n := 5\n    update(&n, 7)\n    fmt.Println(n)\n}",
+          "options": [
+            "100",
+            "7",
+            "5",
+            "12"
+          ],
+          "answer": 2,
+          "explanation": "`p = &v` points the copy of the pointer at the local `v`, so `*p = 100` writes to `v`. `n` is untouched."
+        },
+        {
+          "type": "typing",
+          "id": "larger-of-two",
+          "title": "Return the larger one",
+          "guide": "Return the pointer to the larger of two ints, then write through it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Compare the values behind the pointers, and return one of the pointers.",
+              "notes": [
+                {
+                  "on": "*int {",
+                  "text": "Returns one of the two addresses, not a number."
+                }
+              ],
+              "text": "func larger(a, b *int) *int {\n    if *a > *b {\n        return a\n    }\n    return b\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "`top` holds the address of the larger variable.",
+              "text": "func main() {\n    first := 12\n    second := 30\n    top := larger(&first, &second)\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "Writing through the result changes the original variable.",
+              "text": "    *top = *top + 1\n    fmt.Println(first, second, *top)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "12 31 31"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "pass-it-along",
+          "title": "Pass a pointer along",
+          "guide": "Let one function hand its pointer to another.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "package main\n\nimport \"fmt\"\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Double the int that `n` points at.",
+              "text": "func double(n *int) {\n    *n = *n * 2\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "`n` already holds an address, so pass it on as it is, with no `&`.",
+              "text": "func quadruple(n *int) {\n    double(n)\n    double(n)\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Only `main` takes the address of the variable.",
+              "text": "func main() {\n    size := 3\n    quadruple(&size)\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Two doublings of 3.",
+              "text": "    fmt.Println(size)"
+            }
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "12"
+          }
+        }
+      ]
+    }
+  ]
+}

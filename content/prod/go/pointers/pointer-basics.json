@@ -1,0 +1,201 @@
+{
+  "id": "pointer-basics",
+  "intro": {
+    "title": "Pointer basics",
+    "slides": [
+      {
+        "text": "A variable lives at an address in memory. A pointer is a value that holds that address, so you can reach the variable without copying it.\n\nYou will take addresses, read and write through them, create variables with `new`, compare pointers and point at slice elements. Pointers in functions and structs come in the next modules."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Address and value",
+        "slides": [
+          {
+            "text": "Two operators do all the work: `&` gives the address of a variable, and `*` follows an address back to the variable.\n\nThe snippet is pseudo code, not Go.",
+            "code": "score = 10\np = address of score\nvalue at p -> 10\nset value at p to 25\nscore -> 25"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "address-of",
+          "title": "Take an address",
+          "guide": "Store the address of a variable in a pointer and read the value back.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Make a variable, then a pointer holding its address.", "notes": [{"on": "&score", "text": "The address of score, not its value"}], "text": "    score := 42\n    p := &score"},
+            {"mode": "ghost", "line": 8, "guide": "Follow the pointer to get the value. The type of the pointer is a star plus the type it points to.", "notes": [{"on": "*p", "text": "Follows the pointer to the value it points at"}, {"on": "%T", "text": "Prints the type of the value"}], "text": "    fmt.Println(*p)\n    fmt.Printf(\"%T\\n\", p)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "42\n*int"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "write-through",
+          "title": "Write through a pointer",
+          "guide": "Assign to the pointed-at value and watch the variable change.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Set the variable through its pointer.", "notes": [{"on": "*p = 25", "text": "Stores 25 in the variable p points at"}], "text": "    score := 10\n    p := &score\n    *p = 25"},
+            {"mode": "ghost", "line": 9, "guide": "The variable and the pointer see the same value.", "text": "    fmt.Println(score)\n    fmt.Println(*p)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "25\n25"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "address-and-star",
+          "title": "Point and assign",
+          "guide": "Point at the variable, then set its value through the pointer.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    lives := 3\n    p := ___lives\n    ___p = 5\n    fmt.Println(lives)\n}",
+          "gaps": [{ "answers": ["&"] }, { "answers": ["*"] }]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "copy-or-share",
+          "title": "Copy or share?",
+          "guide": "Read the code and pick what it prints.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    a := 1\n    b := a\n    p := &a\n    b = 2\n    *p = 9\n    fmt.Println(a, b)\n}",
+          "options": ["1 2", "9 2", "9 9", "2 9"],
+          "answer": 1,
+          "explanation": "`b := a` copies the value, so `b` is independent. `p` points at `a` itself, so `*p = 9` changes `a`."
+        },
+        {
+          "type": "typing",
+          "id": "new-pointer",
+          "title": "A variable from new",
+          "guide": "Create a variable with `new` and use it only through its pointer.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`new` makes a variable of the type, set to its zero value, and returns a pointer to it.", "notes": [{"on": "new(int)", "text": "Allocates an int and returns its address"}], "text": "    p := new(int)\n    fmt.Println(*p)"},
+            {"mode": "ghost", "line": 8, "guide": "There is no named variable here, only the pointer.", "text": "    *p = 7\n    fmt.Println(*p)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0\n7"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "other-types",
+          "title": "Pointers to other types",
+          "guide": "Any type can have a pointer, and the type is a star plus the type.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A pointer to a string. Build on the value it points at.", "notes": [{"on": "*p + \"pher\"", "text": "Reads the string, so the result is a new string"}], "text": "    name := \"go\"\n    p := &name\n    *p = *p + \"pher\"\n    fmt.Println(name)"},
+            {"mode": "ghost", "line": 10, "guide": "A pointer to a bool works the same way.", "text": "    done := false\n    flag := &done\n    *flag = true\n    fmt.Println(done)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "gopher\ntrue"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Sharing and comparing",
+        "slides": [
+          {
+            "text": "Copying a pointer copies the address, not the variable: both pointers reach the same place. Comparing two pointers asks whether they hold the same address, not whether the values look alike.\n\nThe snippet is pseudo code, not Go.",
+            "code": "a = 8, b = 8\np = address of a\nq = p\nr = address of b\np same address as q -> yes\np same address as r -> no\nvalue at p equals value at r -> yes"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "compare-pointers",
+          "title": "Compare pointers",
+          "guide": "Two pointers are equal when they hold the same address.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two variables with the same value, and three pointers. `q` is a copy of `p`.", "text": "    first := 8\n    second := 8\n    p := &first\n    q := p\n    r := &second"},
+            {"mode": "ghost", "line": 11, "guide": "Compare the addresses, then the values behind them.", "notes": [{"on": "p == r", "text": "Equal only if both point at the same variable"}, {"on": "*p == *r", "text": "Compares the values, not the addresses"}], "text": "    fmt.Println(p == q)\n    fmt.Println(p == r)\n    fmt.Println(*p == *r)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "true\nfalse\ntrue"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "update-through-pointer",
+          "title": "Update through a pointer",
+          "guide": "The assignment operators work on the pointed-at value too.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Start with a counter and a pointer to it.", "text": "    count := 4\n    p := &count"},
+            {"mode": "ghost", "line": 8, "guide": "Increment, add and multiply through the pointer.", "notes": [{"on": "*p++", "text": "Adds one to the value, not to the address"}], "text": "    *p++\n    *p += 10\n    *p *= 2"},
+            {"mode": "ghost", "line": 11, "guide": "Print the variable itself.", "text": "    fmt.Println(count)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "30"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "adjust-stock",
+          "title": "Adjust through a pointer",
+          "guide": "Subtract 5 from the variable through the pointer, then add one.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    stock := 20\n    p := &stock\n    *p ___ 5\n    *p ___\n    fmt.Println(stock)\n}",
+          "gaps": [{ "answers": ["-="] }, { "answers": ["++"] }]
+        },
+        {
+          "type": "typing",
+          "id": "pointer-to-element",
+          "title": "Point at a slice element",
+          "guide": "An element of a slice is a variable too, so it has an address.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Point at the second element and assign through it.", "notes": [{"on": "&nums[1]", "text": "The address of that slot in the slice"}], "text": "    nums := []int{4, 8, 15}\n    p := &nums[1]\n    *p = 80"},
+            {"mode": "ghost", "line": 9, "guide": "The slice itself changed.", "text": "    fmt.Println(nums)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[4 80 15]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "swap-values",
+          "title": "Swap through pointers",
+          "guide": "Swap two variables using only their pointers.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two variables and a pointer to each.", "text": "    left := 1\n    right := 2\n    pl := &left\n    pr := &right"},
+            {"mode": "ghost", "line": 10, "guide": "Assign both values at once, so neither is lost.", "notes": [{"on": "*pl, *pr = *pr, *pl", "text": "The right side is read before either side is written"}], "text": "    *pl, *pr = *pr, *pl"},
+            {"mode": "ghost", "line": 11, "guide": "The variables swapped places.", "text": "    fmt.Println(left, right)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2 1"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "repoint",
+          "title": "Where does q point?",
+          "guide": "Read the code and pick what it prints.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    x := 5\n    y := 5\n    p := &x\n    q := &y\n    q = p\n    *q = 6\n    fmt.Println(x, y, p == q)\n}",
+          "options": ["6 6 true", "5 5 false", "6 5 true", "6 5 false"],
+          "answer": 2,
+          "explanation": "`q = p` makes `q` hold the address of `x`. Writing through `q` changes `x`, `y` is untouched, and both pointers now hold the same address."
+        }
+      ]
+    }
+  ]
+}
