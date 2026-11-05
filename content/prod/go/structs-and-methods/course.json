@@ -7,6 +7,7 @@
       "modules": [
         { "id": "structs", "name": "Structs", "sessions": 1 },
         { "id": "nested-and-anonymous-structs", "name": "Nested and anonymous structs", "sessions": 1 },
+        { "id": "comparing-and-copying-structs", "name": "Comparing and copying structs", "sessions": 1 },
         { "id": "constructors", "name": "Constructors", "sessions": 1 }
       ]
     },
@@ -22,9 +23,17 @@
       "name": "Composition",
       "tier": "medium",
       "modules": [
-        { "id": "embedding", "name": "Embedding", "sessions": 1 },
+        { "id": "embedding", "name": "Embedding", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Struct techniques",
+      "tier": "medium",
+      "modules": [
+        { "id": "method-values", "name": "Method values", "sessions": 1 },
         { "id": "struct-tags", "name": "Struct tags", "sessions": 1 },
-        { "id": "method-values", "name": "Method values", "sessions": 1 }
+        { "id": "empty-structs", "name": "Empty structs", "sessions": 1 },
+        { "id": "functional-options", "name": "Functional options", "sessions": 1 }
       ]
     }
   ]

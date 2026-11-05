@@ -7,6 +7,7 @@
       "modules": [
         { "id": "generic-functions", "name": "Generic functions", "sessions": 1 },
         { "id": "constraints", "name": "Constraints", "sessions": 1 },
+        { "id": "ordered-and-underlying-types", "name": "Ordered and underlying types", "sessions": 1 },
         { "id": "type-inference", "name": "Type inference", "sessions": 1 }
       ]
     },
@@ -15,7 +16,8 @@
       "tier": "advanced",
       "modules": [
         { "id": "generic-types", "name": "Generic types", "sessions": 1 },
-        { "id": "generics-in-practice", "name": "Generics in practice", "sessions": 1 }
+        { "id": "generic-methods", "name": "Methods on generic types", "sessions": 1 },
+        { "id": "generic-data-structures", "name": "Generic data structures", "sessions": 1 }
       ]
     }
   ]

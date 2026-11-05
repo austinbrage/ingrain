@@ -7,7 +7,16 @@
       "modules": [
         { "id": "run-and-build", "name": "Run and build", "sessions": 1 },
         { "id": "format-and-vet", "name": "Format and vet", "sessions": 1 },
-        { "id": "documentation", "name": "Documentation", "sessions": 1 }
+        { "id": "documentation", "name": "Documentation", "sessions": 1 },
+        { "id": "go-env", "name": "Go env", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Installing tools",
+      "tier": "basic",
+      "modules": [
+        { "id": "go-install", "name": "Go install", "sessions": 1 },
+        { "id": "linting", "name": "Linting", "sessions": 1 }
       ]
     },
     {
@@ -15,7 +24,17 @@
       "tier": "medium",
       "modules": [
         { "id": "cross-compilation", "name": "Cross compilation", "sessions": 1 },
-        { "id": "build-tags-and-generate", "name": "Build tags and generate", "sessions": 1 }
+        { "id": "build-tags-and-generate", "name": "Build tags and generate", "sessions": 1 },
+        { "id": "build-flags", "name": "Build flags", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Running tests and debugging",
+      "tier": "medium",
+      "modules": [
+        { "id": "go-test-flags", "name": "Go test flags", "sessions": 1 },
+        { "id": "race-detector", "name": "Race detector", "sessions": 1 },
+        { "id": "debugging-with-delve", "name": "Debugging with Delve", "sessions": 1 }
       ]
     },
     {

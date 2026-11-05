@@ -18,6 +18,14 @@
         { "id": "nil-pointers", "name": "Nil pointers", "sessions": 1 },
         { "id": "slices-maps-and-pointers", "name": "Slices, maps and pointers", "sessions": 1 }
       ]
+    },
+    {
+      "name": "Linked structures",
+      "tier": "medium",
+      "modules": [
+        { "id": "linked-lists", "name": "Linked lists", "sessions": 1 },
+        { "id": "binary-trees", "name": "Binary trees", "sessions": 1 }
+      ]
     }
   ]
 }

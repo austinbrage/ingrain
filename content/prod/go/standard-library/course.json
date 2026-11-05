@@ -2,35 +2,162 @@
   "id": "standard-library",
   "module_sections": [
     {
-      "name": "Input and output",
-      "tier": "medium",
+      "name": "Command line and files",
+      "tier": "basic",
       "modules": [
-        { "id": "readers-and-writers", "name": "Readers and writers", "sessions": 1 },
-        { "id": "files-and-directories", "name": "Files and directories", "sessions": 1 },
-        { "id": "command-line", "name": "Command line", "sessions": 1 }
+        {
+          "id": "command-line",
+          "name": "Command line",
+          "sessions": 1
+        },
+        {
+          "id": "files-and-directories",
+          "name": "Files and directories",
+          "sessions": 1
+        },
+        {
+          "id": "file-paths",
+          "name": "File paths",
+          "sessions": 1
+        }
       ]
     },
     {
-      "name": "Data formats",
-      "tier": "medium",
+      "name": "Math and sorting",
+      "tier": "basic",
       "modules": [
-        { "id": "json", "name": "JSON", "sessions": 1 },
-        { "id": "time-and-dates", "name": "Time and dates", "sessions": 1 }
+        {
+          "id": "math-and-random",
+          "name": "Math and random numbers",
+          "sessions": 1
+        },
+        {
+          "id": "sorting",
+          "name": "Sorting",
+          "sessions": 1
+        }
       ]
     },
     {
-      "name": "Networking",
+      "name": "Streams",
       "tier": "medium",
       "modules": [
-        { "id": "http-clients", "name": "HTTP clients", "sessions": 1 },
-        { "id": "http-servers", "name": "HTTP servers", "sessions": 1 }
+        {
+          "id": "readers-and-writers",
+          "name": "Readers and writers",
+          "sessions": 1
+        },
+        {
+          "id": "buffered-io",
+          "name": "Buffered I/O",
+          "sessions": 1
+        }
       ]
     },
     {
-      "name": "Everyday tools",
+      "name": "Encoding and hashing",
       "tier": "medium",
       "modules": [
-        { "id": "logging", "name": "Logging", "sessions": 1 }
+        {
+          "id": "json",
+          "name": "JSON",
+          "sessions": 1
+        },
+        {
+          "id": "csv",
+          "name": "CSV",
+          "sessions": 1
+        },
+        {
+          "id": "base64-and-hex",
+          "name": "Base64 and hex",
+          "sessions": 1
+        },
+        {
+          "id": "hashing",
+          "name": "Hashing",
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "name": "Time",
+      "tier": "medium",
+      "modules": [
+        {
+          "id": "time-and-durations",
+          "name": "Time and durations",
+          "sessions": 1
+        },
+        {
+          "id": "time-formatting-and-zones",
+          "name": "Time formatting and zones",
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "name": "Logging",
+      "tier": "medium",
+      "modules": [
+        {
+          "id": "logging",
+          "name": "The log package",
+          "sessions": 1
+        },
+        {
+          "id": "structured-logging",
+          "name": "Structured logging with slog",
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "name": "Programs and assets",
+      "tier": "medium",
+      "modules": [
+        {
+          "id": "embedded-files",
+          "name": "Embedded files",
+          "sessions": 1
+        },
+        {
+          "id": "running-commands",
+          "name": "Running commands",
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "name": "Web clients",
+      "tier": "medium",
+      "modules": [
+        {
+          "id": "urls",
+          "name": "URLs",
+          "sessions": 1
+        },
+        {
+          "id": "http-clients",
+          "name": "HTTP clients",
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "name": "Web servers",
+      "tier": "advanced",
+      "modules": [
+        {
+          "id": "http-servers",
+          "name": "HTTP servers",
+          "sessions": 1
+        },
+        {
+          "id": "http-middleware",
+          "name": "HTTP middleware",
+          "sessions": 1
+        }
       ]
     }
   ]

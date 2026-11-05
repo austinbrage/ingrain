@@ -14,16 +14,26 @@
       "tier": "medium",
       "modules": [
         { "id": "wrapping-errors", "name": "Wrapping errors", "sessions": 1 },
+        { "id": "sentinel-errors", "name": "Sentinel errors", "sessions": 1 },
         { "id": "errors-is-and-as", "name": "Errors Is and As", "sessions": 1 },
-        { "id": "custom-errors", "name": "Custom errors", "sessions": 1 },
-        { "id": "sentinel-errors", "name": "Sentinel errors", "sessions": 1 }
+        { "id": "custom-errors", "name": "Custom errors", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Handling patterns",
+      "tier": "medium",
+      "modules": [
+        { "id": "handle-or-return", "name": "Handle or return", "sessions": 1 },
+        { "id": "errors-with-defer", "name": "Errors with defer", "sessions": 1 },
+        { "id": "joining-errors", "name": "Joining errors", "sessions": 1 }
       ]
     },
     {
       "name": "Panics",
       "tier": "medium",
       "modules": [
-        { "id": "panic-and-recover", "name": "Panic and recover", "sessions": 1 }
+        { "id": "panic-and-recover", "name": "Panic and recover", "sessions": 1 },
+        { "id": "when-to-panic", "name": "When to panic", "sessions": 1 }
       ]
     }
   ]

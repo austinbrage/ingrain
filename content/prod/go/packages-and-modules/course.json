@@ -11,12 +11,29 @@
       ]
     },
     {
-      "name": "Modules",
+      "name": "Modules and dependencies",
       "tier": "medium",
       "modules": [
         { "id": "go-modules", "name": "Go modules", "sessions": 1 },
         { "id": "dependencies", "name": "Dependencies", "sessions": 1 },
-        { "id": "project-layout", "name": "Project layout", "sessions": 1 }
+        { "id": "semantic-versioning", "name": "Semantic versioning", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Organizing a project",
+      "tier": "medium",
+      "modules": [
+        { "id": "project-layout", "name": "Project layout", "sessions": 1 },
+        { "id": "internal-packages", "name": "Internal packages", "sessions": 1 },
+        { "id": "import-cycles", "name": "Import cycles", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Multi-module development",
+      "tier": "advanced",
+      "modules": [
+        { "id": "workspaces-and-replace", "name": "Workspaces and replace", "sessions": 1 },
+        { "id": "vendoring", "name": "Vendoring", "sessions": 1 }
       ]
     }
   ]
