@@ -33,13 +33,6 @@
       "name": "Ecosystem",
       "course_groups": [
         {
-          "name": "TUI",
-          "courses": [
-            { "id": "ratatui", "name": "ratatui" },
-            { "id": "crossterm", "name": "crossterm" }
-          ]
-        },
-        {
           "name": "CLI",
           "courses": [
             { "id": "clap", "name": "clap" },
@@ -47,9 +40,16 @@
           ]
         },
         {
+          "name": "TUI",
+          "courses": [
+            { "id": "ratatui", "name": "ratatui" },
+            { "id": "crossterm", "name": "crossterm" }
+          ]
+        },
+        {
           "name": "Web",
           "courses": [
-            { "id": "actix", "name": "actix" },
+            { "id": "axum", "name": "axum" },
             { "id": "sqlx", "name": "sqlx" }
           ]
         }

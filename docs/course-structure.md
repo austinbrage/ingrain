@@ -7,7 +7,7 @@ Reference: `legacy/docs/course-structure.md` (frozen). Read it for tiers, sessio
 Language (Rust, Go)
  └─ Layer (Core | Ecosystem)
      └─ Course group (related courses: Fundamentals, Ownership. Ecosystem: CLI, Web, TUI)
-         └─ Course (Rust Core: syntax, borrow checker, concurrency. Rust Ecosystem: ratatui, clap, actix)
+         └─ Course (Rust Core: syntax, borrow checker, concurrency. Rust Ecosystem: clap, ratatui, axum)
              └─ Module section (related modules, stacked from basic to advanced)
                  └─ Module (one concept: conditionals, loops, enums)
                      └─ Session (a set of exercises, as in legacy)
