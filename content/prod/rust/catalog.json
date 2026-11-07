@@ -9,21 +9,71 @@
           "name": "Fundamentals",
           "courses": [
             { "id": "syntax", "name": "Syntax" },
-            { "id": "structs-and-enums", "name": "Structs and enums" }
+            { "id": "functions", "name": "Functions" }
           ]
         },
         {
           "name": "Ownership",
           "courses": [
-            { "id": "borrow-checker", "name": "Borrow checker" },
-            { "id": "error-handling", "name": "Error handling" }
+            { "id": "ownership", "name": "Ownership" },
+            { "id": "borrowing", "name": "Borrowing" }
           ]
         },
         {
-          "name": "Concurrency",
+          "name": "Data",
           "courses": [
+            { "id": "strings-and-text", "name": "Strings and text" },
+            { "id": "collections", "name": "Collections" },
+            { "id": "structs-and-methods", "name": "Structs and methods" },
+            { "id": "enums", "name": "Enums" },
+            { "id": "pattern-matching", "name": "Pattern matching" }
+          ]
+        },
+        {
+          "name": "Abstraction",
+          "courses": [
+            { "id": "traits", "name": "Traits" },
+            { "id": "generics", "name": "Generics" },
+            { "id": "standard-traits", "name": "Standard traits" },
+            { "id": "trait-objects", "name": "Trait objects" }
+          ]
+        },
+        {
+          "name": "Reliable code",
+          "courses": [
+            { "id": "error-handling", "name": "Error handling" },
+            { "id": "testing", "name": "Testing" }
+          ]
+        },
+        {
+          "name": "Functional style",
+          "courses": [
+            { "id": "closures", "name": "Closures" },
+            { "id": "iterators", "name": "Iterators" }
+          ]
+        },
+        {
+          "name": "Memory",
+          "courses": [
+            { "id": "lifetimes", "name": "Lifetimes" },
+            { "id": "smart-pointers", "name": "Smart pointers" },
+            { "id": "unsafe-rust", "name": "Unsafe Rust" }
+          ]
+        },
+        {
+          "name": "Larger programs",
+          "courses": [
+            { "id": "modules-and-crates", "name": "Modules and crates" },
+            { "id": "macros", "name": "Macros" },
             { "id": "concurrency", "name": "Concurrency" },
             { "id": "async", "name": "Async" }
+          ]
+        },
+        {
+          "name": "Everyday tools",
+          "courses": [
+            { "id": "standard-library", "name": "Standard library" },
+            { "id": "tooling", "name": "Tooling" }
           ]
         }
       ]
