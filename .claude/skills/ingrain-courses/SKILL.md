@@ -5,7 +5,7 @@ description: Create or modify the courses of one layer (Core or Ecosystem) of a 
 
 # ingrain-courses
 
-Writes the courses of one layer of a language, in `content/prod/<language>/catalog.json`, and calls `ingrain-modules` to draw the modules of every course it creates. It is the first of three skills: this one, `ingrain-modules` (the modules of one course) and `ingrain-exercises` (the exercises of each module).
+Writes the courses of one layer of a language, in `content/prod/<language>/catalog.json`. It is the first of three skills: this one, `ingrain-modules` (the modules of a course, or of a whole layer) and `ingrain-exercises` (the exercises of each module). It never draws modules: the user calls `ingrain-modules` after approving the courses.
 
 Arguments: `$ARGUMENTS` is `<language> <layer> [request]`. The layer is `core` or `ecosystem`. Without a request, write the whole list of courses of that layer. With a request, change the list as it says.
 
@@ -51,16 +51,10 @@ A course id is a slug (lowercase letters, digits and hyphens), and it is also th
 - Reordering is allowed, but say so: it changes the order in which users are taken through the courses
 - If the request would remove, rename or reorder courses that exist, say exactly what will change and ask before writing
 
-## The modules of each new course
-The catalog only stores an id and a name, so what a course covers would be lost after this run. Keep it by drawing the modules now:
-1. For each course you **created** (one with no folder yet), decide its **scope**: one line of what it covers, and what it leaves to its neighbors
-2. Then call the `ingrain-modules` skill for it, as `<language> <layer> <course>`, and pass as its request the scope of the course and the scopes of the courses around it, so that no topic is covered twice and none falls between two courses
-3. Do it one course at a time, in the order of study. Do not call it for a course that already has a folder, and do not touch the modules of an existing course
-
 ## Finish
 Run `cargo test --test content` and fix everything it reports. Among other checks, it fails when a course id is not a slug, when an id repeats, and when a course folder is not listed in the catalog, and when a group has no courses or repeats the name of another group of its layer.
 
 Then report:
 - what you added, changed or left as it was
 - what the request asked and you did not do, and why
-- for each new course, its scope and the modules `ingrain-modules` drew for it
+- the next step: `ingrain-modules <language> <layer>` for the courses that have no `course.json` yet
