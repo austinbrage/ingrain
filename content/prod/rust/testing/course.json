@@ -1,0 +1,31 @@
+{
+  "id": "testing",
+  "module_sections": [
+    {
+      "name": "First tests",
+      "tier": "basic",
+      "modules": [
+        { "id": "test-functions", "name": "Test functions", "sessions": 1 },
+        { "id": "assertions", "name": "Assertions", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Testing failures",
+      "tier": "medium",
+      "modules": [
+        { "id": "should-panic", "name": "Expected panics", "sessions": 1 },
+        { "id": "tests-returning-result", "name": "Tests returning Result", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Organizing tests",
+      "tier": "medium",
+      "modules": [
+        { "id": "unit-test-modules", "name": "The tests module", "sessions": 1 },
+        { "id": "integration-tests", "name": "Integration tests", "sessions": 1 },
+        { "id": "doc-tests", "name": "Doc tests", "sessions": 1 },
+        { "id": "ignored-tests", "name": "The ignore attribute", "sessions": 1 }
+      ]
+    }
+  ]
+}

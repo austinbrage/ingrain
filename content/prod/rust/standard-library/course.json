@@ -1,0 +1,57 @@
+{
+  "id": "standard-library",
+  "module_sections": [
+    {
+      "name": "Program environment",
+      "tier": "basic",
+      "modules": [
+        { "id": "command-line-args", "name": "Command line arguments", "sessions": 1 },
+        { "id": "environment-variables", "name": "Environment variables", "sessions": 1 },
+        { "id": "exit-codes", "name": "Exit codes", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Standard input and output",
+      "tier": "medium",
+      "modules": [
+        { "id": "stdin-and-stdout", "name": "Stdin and stdout", "sessions": 1 },
+        { "id": "read-and-write", "name": "Read and Write traits", "sessions": 1 },
+        { "id": "buffered-io", "name": "Buffered I/O", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Files and paths",
+      "tier": "medium",
+      "modules": [
+        { "id": "paths", "name": "Paths", "sessions": 1 },
+        { "id": "reading-and-writing-files", "name": "Reading and writing files", "sessions": 1 },
+        { "id": "directories", "name": "Directories", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Time",
+      "tier": "medium",
+      "modules": [
+        { "id": "durations", "name": "Durations", "sessions": 1 },
+        { "id": "instants-and-system-time", "name": "Instants and system time", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Small utilities",
+      "tier": "medium",
+      "modules": [
+        { "id": "mem-utilities", "name": "The mem module", "sessions": 1 },
+        { "id": "num-and-cmp-helpers", "name": "Number and comparison helpers", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Processes and networking",
+      "tier": "advanced",
+      "modules": [
+        { "id": "running-commands", "name": "Running commands", "sessions": 1 },
+        { "id": "tcp-streams", "name": "TCP streams", "sessions": 1 },
+        { "id": "tcp-listeners", "name": "TCP listeners", "sessions": 1 }
+      ]
+    }
+  ]
+}

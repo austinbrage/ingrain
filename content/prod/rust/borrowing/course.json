@@ -1,0 +1,32 @@
+{
+  "id": "borrowing",
+  "module_sections": [
+    {
+      "name": "References",
+      "tier": "basic",
+      "modules": [
+        { "id": "shared-references", "name": "Shared references", "sessions": 1 },
+        { "id": "mutable-references", "name": "Mutable references", "sessions": 1 },
+        { "id": "borrowing-in-functions", "name": "Borrowing in functions", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Borrow rules",
+      "tier": "medium",
+      "modules": [
+        { "id": "borrow-rules", "name": "The borrow rules", "sessions": 1 },
+        { "id": "non-lexical-lifetimes", "name": "Where a borrow ends", "sessions": 1 },
+        { "id": "reborrowing", "name": "Reborrowing", "sessions": 1 },
+        { "id": "dangling-references", "name": "Dangling references", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Slices",
+      "tier": "medium",
+      "modules": [
+        { "id": "slices", "name": "Slices as views", "sessions": 1 },
+        { "id": "mutable-slices", "name": "Mutable slices", "sessions": 1 }
+      ]
+    }
+  ]
+}

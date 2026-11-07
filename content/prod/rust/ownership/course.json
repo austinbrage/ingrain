@@ -1,0 +1,32 @@
+{
+  "id": "ownership",
+  "module_sections": [
+    {
+      "name": "Memory and ownership",
+      "tier": "basic",
+      "modules": [
+        { "id": "stack-and-heap", "name": "Stack and heap", "sessions": 1 },
+        { "id": "ownership-rules", "name": "Ownership rules", "sessions": 1 },
+        { "id": "moves", "name": "Moves", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Copying values",
+      "tier": "basic",
+      "modules": [
+        { "id": "copy-types", "name": "Copy types", "sessions": 1 },
+        { "id": "clone", "name": "Clone", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Ownership in motion",
+      "tier": "medium",
+      "modules": [
+        { "id": "ownership-in-calls", "name": "Ownership in calls", "sessions": 1 },
+        { "id": "returning-ownership", "name": "Returning ownership", "sessions": 1 },
+        { "id": "drop-and-scope", "name": "Drop and scope", "sessions": 1 },
+        { "id": "partial-moves", "name": "Partial moves", "sessions": 1 }
+      ]
+    }
+  ]
+}

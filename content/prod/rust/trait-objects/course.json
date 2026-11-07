@@ -1,0 +1,24 @@
+{
+  "id": "trait-objects",
+  "module_sections": [
+    {
+      "name": "Dynamic dispatch",
+      "tier": "medium",
+      "modules": [
+        { "id": "dyn-trait", "name": "Dyn Trait", "sessions": 1 },
+        { "id": "boxed-trait-objects", "name": "Boxed trait objects", "sessions": 1 },
+        { "id": "trait-objects-in-collections", "name": "Trait objects in collections", "sessions": 1 },
+        { "id": "static-vs-dynamic-dispatch", "name": "Static vs dynamic dispatch", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Limits of trait objects",
+      "tier": "advanced",
+      "modules": [
+        { "id": "sized-and-unsized", "name": "Sized and unsized types", "sessions": 1 },
+        { "id": "object-safety", "name": "Object safety", "sessions": 1 },
+        { "id": "dyn-any", "name": "Dyn Any", "sessions": 1 }
+      ]
+    }
+  ]
+}

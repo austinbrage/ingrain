@@ -1,0 +1,33 @@
+{
+  "id": "modules-and-crates",
+  "module_sections": [
+    {
+      "name": "Modules",
+      "tier": "basic",
+      "modules": [
+        { "id": "inline-modules", "name": "Inline modules", "sessions": 1 },
+        { "id": "paths", "name": "Paths", "sessions": 1 },
+        { "id": "privacy", "name": "Privacy with pub", "sessions": 1 },
+        { "id": "use-declarations", "name": "Use declarations", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Files and layout",
+      "tier": "medium",
+      "modules": [
+        { "id": "modules-in-files", "name": "Modules in files", "sessions": 1 },
+        { "id": "nested-modules", "name": "Nested modules", "sessions": 1 },
+        { "id": "restricted-visibility", "name": "Restricted visibility", "sessions": 1 },
+        { "id": "re-exports", "name": "Re-exports and the public API", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Crates",
+      "tier": "medium",
+      "modules": [
+        { "id": "binary-and-library-crates", "name": "Binary and library crates", "sessions": 1 },
+        { "id": "dependencies", "name": "Using external crates", "sessions": 1 }
+      ]
+    }
+  ]
+}

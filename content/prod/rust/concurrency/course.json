@@ -1,0 +1,42 @@
+{
+  "id": "concurrency",
+  "module_sections": [
+    {
+      "name": "Threads",
+      "tier": "medium",
+      "modules": [
+        { "id": "spawn-and-join", "name": "Spawn and join", "sessions": 1 },
+        { "id": "move-into-threads", "name": "Move into threads", "sessions": 1 },
+        { "id": "scoped-threads", "name": "Scoped threads", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Message passing",
+      "tier": "medium",
+      "modules": [
+        { "id": "channels", "name": "Channels", "sessions": 1 },
+        { "id": "multiple-producers", "name": "Multiple producers", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Shared state",
+      "tier": "medium",
+      "modules": [
+        { "id": "send-and-sync", "name": "Send and Sync", "sessions": 1 },
+        { "id": "arc", "name": "Arc", "sessions": 1 },
+        { "id": "mutex", "name": "Mutex", "sessions": 1 },
+        { "id": "arc-mutex", "name": "Arc and Mutex together", "sessions": 1 },
+        { "id": "rwlock", "name": "RwLock", "sessions": 1 },
+        { "id": "mutex-poisoning", "name": "Mutex poisoning", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Atomics and signaling",
+      "tier": "advanced",
+      "modules": [
+        { "id": "atomics", "name": "Atomics", "sessions": 1 },
+        { "id": "condvar", "name": "Condvar", "sessions": 1 }
+      ]
+    }
+  ]
+}

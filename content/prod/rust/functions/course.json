@@ -1,0 +1,31 @@
+{
+  "id": "functions",
+  "module_sections": [
+    {
+      "name": "Foundations",
+      "tier": "basic",
+      "modules": [
+        { "id": "defining-functions", "name": "Defining functions", "sessions": 1 },
+        { "id": "parameters", "name": "Parameters", "sessions": 1 },
+        { "id": "return-values", "name": "Return values", "sessions": 1 },
+        { "id": "early-return", "name": "Early return", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Functions as items and values",
+      "tier": "medium",
+      "modules": [
+        { "id": "nested-functions", "name": "Nested functions", "sessions": 1 },
+        { "id": "function-pointers", "name": "Function pointers", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Special functions",
+      "tier": "medium",
+      "modules": [
+        { "id": "const-fn", "name": "Const functions", "sessions": 1 },
+        { "id": "diverging-functions", "name": "Diverging functions", "sessions": 1 }
+      ]
+    }
+  ]
+}

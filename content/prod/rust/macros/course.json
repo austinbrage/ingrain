@@ -1,0 +1,32 @@
+{
+  "id": "macros",
+  "module_sections": [
+    {
+      "name": "Macros in practice",
+      "tier": "medium",
+      "modules": [
+        { "id": "macros-vs-functions", "name": "Macros vs functions", "sessions": 1 },
+        { "id": "std-macros-expanded", "name": "Standard macros expanded", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Declarative macros",
+      "tier": "medium",
+      "modules": [
+        { "id": "macro-rules-basics", "name": "macro_rules! basics", "sessions": 1 },
+        { "id": "fragment-specifiers", "name": "Fragment specifiers", "sessions": 1 },
+        { "id": "repetitions", "name": "Repetitions", "sessions": 1 },
+        { "id": "macro-items", "name": "Macros that generate items", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Advanced macros",
+      "tier": "advanced",
+      "modules": [
+        { "id": "hygiene", "name": "Hygiene", "sessions": 1 },
+        { "id": "recursive-macros", "name": "Recursive macros", "sessions": 1 },
+        { "id": "macro-scope-and-export", "name": "Macro scope and export", "sessions": 1 }
+      ]
+    }
+  ]
+}

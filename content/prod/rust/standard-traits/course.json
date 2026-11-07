@@ -1,0 +1,41 @@
+{
+  "id": "standard-traits",
+  "module_sections": [
+    {
+      "name": "Printing, copying and defaults",
+      "tier": "basic",
+      "modules": [
+        { "id": "debug", "name": "Debug", "sessions": 1 },
+        { "id": "display", "name": "Display", "sessions": 1 },
+        { "id": "clone-and-copy-traits", "name": "Clone and Copy traits", "sessions": 1 },
+        { "id": "default", "name": "Default", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Comparing and hashing",
+      "tier": "medium",
+      "modules": [
+        { "id": "partial-eq-and-eq", "name": "PartialEq and Eq", "sessions": 1 },
+        { "id": "partial-ord-and-ord", "name": "PartialOrd and Ord", "sessions": 1 },
+        { "id": "hash", "name": "Hash", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Conversions",
+      "tier": "medium",
+      "modules": [
+        { "id": "from-and-into", "name": "From and Into", "sessions": 1 },
+        { "id": "try-from", "name": "TryFrom", "sessions": 1 },
+        { "id": "as-ref", "name": "AsRef", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Behaving like built-ins",
+      "tier": "advanced",
+      "modules": [
+        { "id": "operator-overloading", "name": "Operator overloading", "sessions": 1 },
+        { "id": "deref", "name": "Deref", "sessions": 1 }
+      ]
+    }
+  ]
+}

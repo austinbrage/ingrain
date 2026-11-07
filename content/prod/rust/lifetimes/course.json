@@ -1,0 +1,31 @@
+{
+  "id": "lifetimes",
+  "module_sections": [
+    {
+      "name": "Annotations",
+      "tier": "medium",
+      "modules": [
+        { "id": "why-lifetimes", "name": "Why lifetimes exist", "sessions": 1 },
+        { "id": "lifetime-annotations", "name": "Lifetime annotations", "sessions": 1 },
+        { "id": "elision-rules", "name": "Elision rules", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Lifetimes in types",
+      "tier": "medium",
+      "modules": [
+        { "id": "lifetimes-in-structs", "name": "Lifetimes in structs", "sessions": 1 },
+        { "id": "lifetimes-in-impls", "name": "Lifetimes in impls", "sessions": 1 },
+        { "id": "static-lifetime", "name": "The static lifetime", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Lifetime bounds",
+      "tier": "advanced",
+      "modules": [
+        { "id": "lifetime-bounds", "name": "Lifetime bounds", "sessions": 1 },
+        { "id": "higher-ranked-bounds", "name": "Higher-ranked bounds", "sessions": 1 }
+      ]
+    }
+  ]
+}

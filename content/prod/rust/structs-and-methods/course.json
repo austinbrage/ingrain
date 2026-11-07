@@ -1,0 +1,32 @@
+{
+  "id": "structs-and-methods",
+  "module_sections": [
+    {
+      "name": "Defining structs",
+      "tier": "basic",
+      "modules": [
+        { "id": "named-structs", "name": "Named structs", "sessions": 1 },
+        { "id": "tuple-and-unit-structs", "name": "Tuple and unit structs", "sessions": 1 },
+        { "id": "update-syntax", "name": "Struct update syntax", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Methods",
+      "tier": "basic",
+      "modules": [
+        { "id": "methods", "name": "Methods and self", "sessions": 1 },
+        { "id": "associated-functions", "name": "Associated functions", "sessions": 1 },
+        { "id": "associated-consts", "name": "Associated consts", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Structs in practice",
+      "tier": "medium",
+      "modules": [
+        { "id": "derive-basics", "name": "Basic derives", "sessions": 1 },
+        { "id": "multiple-impl-blocks", "name": "Multiple impl blocks", "sessions": 1 },
+        { "id": "builder-pattern", "name": "Builder pattern", "sessions": 1 }
+      ]
+    }
+  ]
+}

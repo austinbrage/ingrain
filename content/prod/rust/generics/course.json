@@ -1,0 +1,32 @@
+{
+  "id": "generics",
+  "module_sections": [
+    {
+      "name": "Generic types",
+      "tier": "medium",
+      "modules": [
+        { "id": "generic-functions", "name": "Generic functions and trait bounds", "sessions": 1 },
+        { "id": "turbofish-and-inference", "name": "Turbofish and type inference", "sessions": 1 },
+        { "id": "generic-structs-and-enums", "name": "Generic structs and enums", "sessions": 1 },
+        { "id": "generic-impls", "name": "Generic impl blocks", "sessions": 1 },
+        { "id": "where-clauses", "name": "Where clauses", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "How generics compile",
+      "tier": "medium",
+      "modules": [
+        { "id": "monomorphization", "name": "Monomorphization", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Advanced generics",
+      "tier": "advanced",
+      "modules": [
+        { "id": "const-generics", "name": "Const generics", "sessions": 1 },
+        { "id": "associated-types", "name": "Associated types", "sessions": 1 },
+        { "id": "blanket-impls", "name": "Blanket impls", "sessions": 1 }
+      ]
+    }
+  ]
+}

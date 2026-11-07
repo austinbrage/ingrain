@@ -1,0 +1,33 @@
+{
+  "id": "async",
+  "module_sections": [
+    {
+      "name": "Async basics",
+      "tier": "medium",
+      "modules": [
+        { "id": "async-functions", "name": "Async functions", "sessions": 1 },
+        { "id": "await", "name": "Await", "sessions": 1 },
+        { "id": "async-blocks", "name": "Async blocks", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Futures",
+      "tier": "advanced",
+      "modules": [
+        { "id": "future-trait", "name": "The Future trait", "sessions": 1 },
+        { "id": "hand-written-futures", "name": "Hand-written futures", "sessions": 1 },
+        { "id": "pin", "name": "Pin", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Executors",
+      "tier": "advanced",
+      "modules": [
+        { "id": "wakers", "name": "Wakers and Context", "sessions": 1 },
+        { "id": "block-on", "name": "A minimal executor", "sessions": 1 },
+        { "id": "task-queue", "name": "Spawning tasks", "sessions": 1 },
+        { "id": "join", "name": "Joining futures", "sessions": 1 }
+      ]
+    }
+  ]
+}

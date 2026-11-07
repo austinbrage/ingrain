@@ -1,0 +1,33 @@
+{
+  "id": "tooling",
+  "module_sections": [
+    {
+      "name": "Cargo basics",
+      "tier": "basic",
+      "modules": [
+        { "id": "cargo-commands", "name": "Cargo commands", "sessions": 1 },
+        { "id": "cargo-toml", "name": "Cargo.toml", "sessions": 1 },
+        { "id": "build-profiles", "name": "Build profiles", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Code quality tools",
+      "tier": "basic",
+      "modules": [
+        { "id": "rustfmt", "name": "rustfmt", "sessions": 1 },
+        { "id": "clippy", "name": "Clippy", "sessions": 1 },
+        { "id": "rustdoc", "name": "rustdoc", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Configuring projects",
+      "tier": "medium",
+      "modules": [
+        { "id": "cargo-features", "name": "Cargo features", "sessions": 1 },
+        { "id": "editions", "name": "Editions", "sessions": 1 },
+        { "id": "test-flags", "name": "Test flags", "sessions": 1 },
+        { "id": "workspaces", "name": "Workspaces", "sessions": 1 }
+      ]
+    }
+  ]
+}

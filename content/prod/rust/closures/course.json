@@ -1,0 +1,36 @@
+{
+  "id": "closures",
+  "module_sections": [
+    {
+      "name": "Closure basics",
+      "tier": "basic",
+      "modules": [
+        { "id": "closure-syntax", "name": "Closure syntax", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Capturing",
+      "tier": "medium",
+      "modules": [
+        { "id": "capture-by-reference", "name": "Capture by reference", "sessions": 1 },
+        { "id": "move-closures", "name": "Move closures", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Fn traits",
+      "tier": "medium",
+      "modules": [
+        { "id": "fn-fnmut-fnonce", "name": "Fn, FnMut and FnOnce", "sessions": 1 },
+        { "id": "closures-as-arguments", "name": "Closures as arguments", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Returning and storing closures",
+      "tier": "advanced",
+      "modules": [
+        { "id": "returning-closures", "name": "Returning closures", "sessions": 1 },
+        { "id": "boxed-closures", "name": "Boxed closures", "sessions": 1 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "strings-and-text",
+  "module_sections": [
+    {
+      "name": "String types",
+      "tier": "basic",
+      "modules": [
+        { "id": "string-and-str", "name": "String and &str", "sessions": 1 },
+        { "id": "building-strings", "name": "Building strings", "sessions": 1 },
+        { "id": "format-macro", "name": "format!", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Unicode and slicing",
+      "tier": "medium",
+      "modules": [
+        { "id": "utf-8-and-bytes", "name": "UTF-8 and bytes", "sessions": 1 },
+        { "id": "char", "name": "char", "sessions": 1 },
+        { "id": "slicing-strings", "name": "Slicing strings", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "String methods and parsing",
+      "tier": "medium",
+      "modules": [
+        { "id": "searching-and-splitting", "name": "Searching and splitting", "sessions": 1 },
+        { "id": "trimming-and-replacing", "name": "Trimming and replacing", "sessions": 1 },
+        { "id": "parsing-numbers", "name": "Parsing numbers", "sessions": 1 }
+      ]
+    }
+  ]
+}

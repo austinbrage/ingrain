@@ -1,0 +1,38 @@
+{
+  "id": "collections",
+  "module_sections": [
+    {
+      "name": "Vectors",
+      "tier": "basic",
+      "modules": [
+        { "id": "vec-basics", "name": "Vec basics", "sessions": 1 },
+        { "id": "vec-access", "name": "Vec access and removal", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Key-value and unique collections",
+      "tier": "medium",
+      "modules": [
+        { "id": "hashmap", "name": "HashMap", "sessions": 1 },
+        { "id": "entry-api", "name": "The entry API", "sessions": 1 },
+        { "id": "hashset", "name": "HashSet", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Sorting and searching",
+      "tier": "medium",
+      "modules": [
+        { "id": "sorting-and-searching", "name": "Sorting, deduping and searching", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Ordered and queue collections",
+      "tier": "advanced",
+      "modules": [
+        { "id": "btreemap", "name": "BTreeMap", "sessions": 1 },
+        { "id": "vecdeque", "name": "VecDeque", "sessions": 1 },
+        { "id": "binaryheap", "name": "BinaryHeap", "sessions": 1 }
+      ]
+    }
+  ]
+}

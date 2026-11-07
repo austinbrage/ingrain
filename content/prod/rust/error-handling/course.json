@@ -1,0 +1,33 @@
+{
+  "id": "error-handling",
+  "module_sections": [
+    {
+      "name": "Failing and propagating",
+      "tier": "basic",
+      "modules": [
+        { "id": "panics", "name": "Panics", "sessions": 1 },
+        { "id": "unwrap-and-expect", "name": "Unwrap and expect", "sessions": 1 },
+        { "id": "handling-results", "name": "Recover or propagate", "sessions": 1 },
+        { "id": "question-mark", "name": "The question mark operator", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Combinators",
+      "tier": "medium",
+      "modules": [
+        { "id": "option-combinators", "name": "Option combinators", "sessions": 1 },
+        { "id": "result-combinators", "name": "Result combinators", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Own error types",
+      "tier": "medium",
+      "modules": [
+        { "id": "custom-errors", "name": "Custom errors", "sessions": 1 },
+        { "id": "error-conversion", "name": "Error conversion with From", "sessions": 1 },
+        { "id": "boxed-errors", "name": "Boxed errors", "sessions": 1 },
+        { "id": "main-returning-result", "name": "Main returning Result", "sessions": 1 }
+      ]
+    }
+  ]
+}

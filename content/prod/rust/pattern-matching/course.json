@@ -1,0 +1,41 @@
+{
+  "id": "pattern-matching",
+  "module_sections": [
+    {
+      "name": "Matching beyond literals",
+      "tier": "basic",
+      "modules": [
+        { "id": "match-expression", "name": "Matching enums and exhaustiveness", "sessions": 1 },
+        { "id": "literal-and-range-patterns", "name": "Ranges and or-patterns", "sessions": 1 },
+        { "id": "if-let", "name": "If let", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Destructuring",
+      "tier": "medium",
+      "modules": [
+        { "id": "destructuring", "name": "Destructuring", "sessions": 1 },
+        { "id": "guards", "name": "Match guards", "sessions": 1 },
+        { "id": "binding-patterns", "name": "Binding with @", "sessions": 1 },
+        { "id": "references-in-patterns", "name": "References in patterns", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Control flow patterns",
+      "tier": "medium",
+      "modules": [
+        { "id": "let-else", "name": "Let else", "sessions": 1 },
+        { "id": "while-let", "name": "While let", "sessions": 1 },
+        { "id": "refutability", "name": "Refutability", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Advanced patterns",
+      "tier": "advanced",
+      "modules": [
+        { "id": "slice-patterns", "name": "Slice patterns", "sessions": 1 },
+        { "id": "nested-and-or-patterns", "name": "Nested patterns", "sessions": 1 }
+      ]
+    }
+  ]
+}

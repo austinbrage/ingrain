@@ -1,0 +1,124 @@
+{
+  "id": "iterators",
+  "module_sections": [
+    {
+      "name": "Using iterators",
+      "tier": "basic",
+      "modules": [
+        {
+          "id": "iterator-basics",
+          "name": "The Iterator trait and next",
+          "sessions": 1
+        },
+        {
+          "id": "laziness",
+          "name": "Lazy evaluation",
+          "sessions": 1
+        },
+        {
+          "id": "iter-modes",
+          "name": "iter, iter_mut and into_iter",
+          "sessions": 1
+        },
+        {
+          "id": "for-loops-and-iterators",
+          "name": "For loops over iterators",
+          "sessions": 1
+        },
+        {
+          "id": "consumers",
+          "name": "Consumers, sum and min/max",
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "name": "Adapters",
+      "tier": "medium",
+      "modules": [
+        {
+          "id": "map-and-filter",
+          "name": "Map and filter",
+          "sessions": 1
+        },
+        {
+          "id": "enumerate-zip-skip-take",
+          "name": "Enumerate, zip, skip and take",
+          "sessions": 1
+        },
+        {
+          "id": "flat-map-and-flatten",
+          "name": "Flat map and flatten",
+          "sessions": 1
+        },
+        {
+          "id": "filter-map-and-find-map",
+          "name": "Filter map and find map",
+          "sessions": 1
+        },
+        {
+          "id": "windows-and-chunks",
+          "name": "Windows and chunks",
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "name": "Collecting and folding",
+      "tier": "medium",
+      "modules": [
+        {
+          "id": "collect",
+          "name": "Collect",
+          "sessions": 1
+        },
+        {
+          "id": "collect-results-and-options",
+          "name": "Collecting Results and Options",
+          "sessions": 1
+        },
+        {
+          "id": "fold-and-reduce",
+          "name": "Fold and reduce",
+          "sessions": 1
+        },
+        {
+          "id": "partition-and-unzip",
+          "name": "Partition and unzip",
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "name": "Writing your own",
+      "tier": "advanced",
+      "modules": [
+        {
+          "id": "custom-iterators",
+          "name": "Custom iterators",
+          "sessions": 1
+        },
+        {
+          "id": "peekable",
+          "name": "Peekable",
+          "sessions": 1
+        },
+        {
+          "id": "into-iterator",
+          "name": "IntoIterator for own types",
+          "sessions": 1
+        },
+        {
+          "id": "double-ended-and-exact-size",
+          "name": "DoubleEnded and ExactSize iterators",
+          "sessions": 1
+        },
+        {
+          "id": "returning-iterators",
+          "name": "Returning iterators",
+          "sessions": 1
+        }
+      ]
+    }
+  ]
+}

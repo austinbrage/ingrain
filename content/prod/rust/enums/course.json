@@ -1,0 +1,23 @@
+{
+  "id": "enums",
+  "module_sections": [
+    {
+      "name": "Defining enums",
+      "tier": "basic",
+      "modules": [
+        { "id": "unit-variants", "name": "Unit variants", "sessions": 1 },
+        { "id": "variants-with-data", "name": "Variants with data", "sessions": 1 },
+        { "id": "enum-methods", "name": "Enum methods", "sessions": 1 },
+        { "id": "option", "name": "Option", "sessions": 1 },
+        { "id": "result", "name": "Result", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "C-like enums",
+      "tier": "medium",
+      "modules": [
+        { "id": "discriminants", "name": "Discriminants", "sessions": 1 }
+      ]
+    }
+  ]
+}

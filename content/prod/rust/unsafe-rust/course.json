@@ -1,0 +1,38 @@
+{
+  "id": "unsafe-rust",
+  "module_sections": [
+    {
+      "name": "The unsafe boundary",
+      "tier": "medium",
+      "modules": [
+        { "id": "undefined-behavior", "name": "Undefined behavior", "sessions": 1 },
+        { "id": "unsafe-blocks", "name": "Unsafe blocks", "sessions": 1 },
+        { "id": "raw-pointers", "name": "Raw pointers", "sessions": 1 },
+        { "id": "unsafe-functions", "name": "Unsafe functions", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Unsafe data",
+      "tier": "medium",
+      "modules": [
+        { "id": "static-mut", "name": "Static mut", "sessions": 1 },
+        { "id": "unions", "name": "Unions", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Contracts and C",
+      "tier": "advanced",
+      "modules": [
+        { "id": "unsafe-traits", "name": "Unsafe traits", "sessions": 1 },
+        { "id": "extern-c", "name": "Extern C", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Safe abstractions",
+      "tier": "advanced",
+      "modules": [
+        { "id": "safe-abstractions", "name": "Safe abstractions", "sessions": 1 }
+      ]
+    }
+  ]
+}

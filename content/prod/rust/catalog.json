@@ -39,17 +39,17 @@
           ]
         },
         {
-          "name": "Reliable code",
-          "courses": [
-            { "id": "error-handling", "name": "Error handling" },
-            { "id": "testing", "name": "Testing" }
-          ]
-        },
-        {
           "name": "Functional style",
           "courses": [
             { "id": "closures", "name": "Closures" },
             { "id": "iterators", "name": "Iterators" }
+          ]
+        },
+        {
+          "name": "Reliable code",
+          "courses": [
+            { "id": "error-handling", "name": "Error handling" },
+            { "id": "testing", "name": "Testing" }
           ]
         },
         {

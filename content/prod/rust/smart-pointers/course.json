@@ -1,0 +1,33 @@
+{
+  "id": "smart-pointers",
+  "module_sections": [
+    {
+      "name": "Heap allocation",
+      "tier": "medium",
+      "modules": [
+        { "id": "box", "name": "Box", "sessions": 1 },
+        { "id": "recursive-types", "name": "Recursive types", "sessions": 1 },
+        { "id": "drop-trait", "name": "The Drop trait", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Shared ownership",
+      "tier": "medium",
+      "modules": [
+        { "id": "rc", "name": "Rc", "sessions": 1 },
+        { "id": "cell", "name": "Cell", "sessions": 1 },
+        { "id": "refcell", "name": "RefCell", "sessions": 1 },
+        { "id": "rc-refcell", "name": "Rc and RefCell together", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Cycles and clones",
+      "tier": "advanced",
+      "modules": [
+        { "id": "weak", "name": "Weak", "sessions": 1 },
+        { "id": "reference-cycles", "name": "Reference cycles", "sessions": 1 },
+        { "id": "cow", "name": "Cow", "sessions": 1 }
+      ]
+    }
+  ]
+}
