@@ -83,6 +83,30 @@
       "name": "Ecosystem",
       "course_groups": [
         {
+          "name": "Essentials",
+          "courses": [
+            { "id": "serde", "name": "serde" },
+            { "id": "thiserror", "name": "thiserror" },
+            { "id": "anyhow", "name": "anyhow" }
+          ]
+        },
+        {
+          "name": "Concurrency",
+          "courses": [
+            { "id": "tokio", "name": "tokio" },
+            { "id": "rayon", "name": "rayon" }
+          ]
+        },
+        {
+          "name": "Toolbox",
+          "courses": [
+            { "id": "regex", "name": "regex" },
+            { "id": "rand", "name": "rand" },
+            { "id": "tracing", "name": "tracing" },
+            { "id": "reqwest", "name": "reqwest" }
+          ]
+        },
+        {
           "name": "CLI",
           "courses": [
             { "id": "clap", "name": "clap" },
