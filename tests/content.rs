@@ -31,6 +31,10 @@ const GAP_MARKER: &str = "___";
 const MAX_CODE_LINES: usize = 14;
 const MAX_CODE_WIDTH: usize = 50;
 
+// The limit of a course name and of a module name: the explorer cuts a longer one with `…` on
+// narrow terminals, and 24 keeps the names whole on most of them
+const MAX_NAME_CHARS: usize = 24;
+
 // ------------------------------------------------------------
 // The checks: small functions, each returns what is wrong as sentences that say where
 // ------------------------------------------------------------
@@ -95,6 +99,23 @@ fn module_problems(place: &str, id: &str, sessions: usize, module: &Module) -> V
             "{place}: the file has {} sessions, course.json says {sessions}",
             module.sessions.len()
         ));
+    }
+
+    problems
+}
+
+// A course name or a module name is at most MAX_NAME_CHARS characters
+fn name_problems(place: &str, names: &[&str]) -> Vec<String> {
+    let mut problems = Vec::new();
+
+    for name in names {
+        let chars = name.chars().count();
+
+        if chars > MAX_NAME_CHARS {
+            problems.push(format!(
+                "{place}: the name `{name}` has {chars} characters, the limit is {MAX_NAME_CHARS}"
+            ));
+        }
     }
 
     problems
@@ -553,9 +574,16 @@ mod real_content {
                 .flat_map(|layer| layer.courses())
                 .map(|course| course.id.as_str())
                 .collect();
+            let course_names: Vec<&str> = catalog
+                .layers
+                .iter()
+                .flat_map(|layer| layer.courses())
+                .map(|course| course.name.as_str())
+                .collect();
 
             problems.extend(slug_problems(language, &layers));
             problems.extend(slug_problems(language, &courses));
+            problems.extend(name_problems(language, &course_names));
 
             for layer in &catalog.layers {
                 problems.extend(group_problems(&format!("{language}/{}", layer.id), layer));
@@ -580,8 +608,10 @@ mod real_content {
                     .flat_map(|section| &section.modules)
                     .collect();
                 let module_ids: Vec<&str> = modules.iter().map(|m| m.id.as_str()).collect();
+                let module_names: Vec<&str> = modules.iter().map(|m| m.name.as_str()).collect();
 
                 problems.extend(slug_problems(&place, &module_ids));
+                problems.extend(name_problems(&place, &module_names));
                 problems.extend(unlisted_problems(
                     &place,
                     "course.json",
@@ -711,6 +741,23 @@ mod checks_of_the_checks {
         assert!(problems[0].contains("the file has the id `while`, course.json has `loops`"));
         assert!(problems[1].contains("the file has 1 sessions, course.json says 2"));
         assert!(module_problems("rust/syntax/while", "while", 1, &module).is_empty());
+    }
+
+    #[test]
+    fn the_name_check_catches_a_name_that_is_too_long() {
+        let long = "a".repeat(25);
+        let fits = "a".repeat(24);
+
+        let problems = name_problems(
+            "rust/traits",
+            &["Traits", "Associated functions and consts in traits", &fits],
+        );
+
+        assert_eq!(problems.len(), 1);
+        assert!(problems[0].contains("`Associated functions and consts in traits`"));
+        assert!(problems[0].contains("has 41 characters, the limit is 24"));
+        assert_eq!(name_problems("rust/traits", &[&long]).len(), 1);
+        assert!(name_problems("rust/traits", &[&fits]).is_empty());
     }
 
     #[test]
