@@ -99,7 +99,12 @@ impl TestApp {
 
     // Draw the current screen into memory
     pub fn screen(&self) -> Screen {
-        let mut terminal = Terminal::new(TestBackend::new(WIDTH, HEIGHT)).unwrap();
+        self.screen_at(WIDTH)
+    }
+
+    // The same, on a terminal of another width
+    pub fn screen_at(&self, width: u16) -> Screen {
+        let mut terminal = Terminal::new(TestBackend::new(width, HEIGHT)).unwrap();
         terminal.draw(|frame| ui::draw(frame, &self.app)).unwrap();
 
         Screen::new(terminal.backend().buffer().clone())

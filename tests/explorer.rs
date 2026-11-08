@@ -304,6 +304,31 @@ mod modules {
         assert!(!screen.has_row(&["Planned", "✓"]));
         assert!(!screen.has_row(&["Many", "soon"]));
     }
+
+    #[test]
+    fn a_name_longer_than_its_cell_is_cut_before_the_count() {
+        let mut app = rust_explorer();
+        app.press(KeyCode::Right); // focus the courses column
+        app.press(KeyCode::Down); // Second
+        app.press(KeyCode::Right); // focus its modules column
+
+        let screen = app.screen();
+        assert!(screen.has_row(&["Name too long for a…", "0/1"]));
+        assert!(!screen.contains("Name too long for a cell"));
+        assert!(screen.has_row(&["Long", "0/1"]));
+    }
+
+    #[test]
+    fn a_wide_terminal_cuts_no_name() {
+        let mut app = rust_explorer();
+        app.press(KeyCode::Right); // focus the courses column
+        app.press(KeyCode::Down); // Second
+        app.press(KeyCode::Right); // focus its modules column
+
+        let screen = app.screen_at(160);
+        assert!(screen.has_row(&["Name too long for a cell", "0/1"]));
+        assert!(!screen.contains("…"));
+    }
 }
 
 mod sessions {

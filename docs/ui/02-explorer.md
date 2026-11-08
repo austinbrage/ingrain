@@ -279,6 +279,27 @@ A module not written yet. Loops is selected and is not written, so its count (`0
 - **Hint:** unchanged
 - **Color:** `soon` and `coming soon` in `overlay1`, dimmer than the rows. The text of an empty module row is also `overlay1`, and when the row is selected it takes the selected look like any other
 
+## Long names
+Status: Draft
+
+A name longer than its cell is cut with `…`, so it never runs into the right-hand text (`soon`, a count, `next`). Without the cut, `Nested and anonymous structs` at 100 columns reads `Nested and anonymous strusoon`. The sketch shows the modules column at its 32 cells (100 columns), with two long names:
+
+```
+  STRUCTS AND METHODS           
+                                
+   FOUNDATIONS            basic 
+     Declaring structs    ✓ 4/4 
+     Nested and anonymou…   0/2 
+     Comparing and copyi…  soon 
+     Methods                0/3 
+```
+
+- **Rule:** the name keeps all the cells between the indent and the right-hand text, less one blank cell that stays as a gap. What does not fit is replaced by `…`, which takes the last cell. A name that fits is not touched
+- **What counts as the right-hand text:** the widest thing the row can show there. On the next module row, that is the widest of `next█` and the count, so the name does not change length while `next` is typed
+- **Where:** every column row, the modules, the courses and the sessions. The course group and module section labels have no right-hand text or a short tier (`basic`), and are cut the same way
+- **Narrow columns:** the same rule at any width. The narrower the column, the shorter the name.
+- **Color:** `…` takes the color of its row
+
 ## Open
 - Fill or a bold `sky` bar for the focused row. The fill is built, the bar was not tried
 - The right-hand text and the module section and course group labels are not dimmer than the rows. If the list looks flat they can be dimmed with a row built by hand

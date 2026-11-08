@@ -7,7 +7,7 @@
       "modules": [
         { "id": "alone", "name": "Alone", "sessions": 1 },
         { "id": "long", "name": "Long", "sessions": 1 },
-        { "id": "wide", "name": "Wide", "sessions": 1 }
+        { "id": "wide", "name": "Name too long for a cell", "sessions": 1 }
       ]
     }
   ]

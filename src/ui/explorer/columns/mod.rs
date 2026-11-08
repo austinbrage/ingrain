@@ -26,6 +26,12 @@ const ROWS_PER_TICK: usize = 2;
 
 const NEXT_WORD: &str = "next";
 
+// Cells the highlight symbol takes at the left of a row
+const SYMBOL_CELLS: usize = 3;
+// Cells every row keeps at least for its right-hand text: the widest count (`✓ 4/4`) and the cell
+// after it, so a name is cut at the same place whatever its count shows
+const RIGHT_CELLS: usize = 6;
+
 // Ticks to type one char
 const TYPE_TICKS: u64 = 4;
 // Ticks to erase one char
@@ -152,7 +158,14 @@ fn render_single_column(frame: &mut Frame, area: Rect, column: &Column, divider:
     };
 
     let list = List::new(rows.iter().map(|item| {
-        let row = ListItem::new(item.text.as_str());
+        // The right-hand text and one blank cell are kept free, so a long name is cut with `…`
+        let right_cells = if item.next {
+            RIGHT_CELLS
+        } else {
+            (item.right.chars().count() + 1).max(RIGHT_CELLS)
+        };
+        let name_cells = (items.width as usize).saturating_sub(SYMBOL_CELLS + right_cells + 1);
+        let row = ListItem::new(cut(&item.text, name_cells));
 
         if item.next {
             row.style(Style::new().fg(palette.sky.into()))
@@ -201,6 +214,17 @@ fn render_single_column(frame: &mut Frame, area: Rect, column: &Column, divider:
         .collect();
 
     frame.render_widget(Paragraph::new(right).right_aligned(), items);
+}
+
+// The text, or its first chars and a `…` when it is longer than the cells
+fn cut(text: &str, cells: usize) -> String {
+    if text.chars().count() <= cells {
+        return text.to_string();
+    }
+
+    let kept: String = text.chars().take(cells.saturating_sub(1)).collect();
+
+    format!("{kept}…")
 }
 
 // The text with a color per char, a gradient that slides with the tick
