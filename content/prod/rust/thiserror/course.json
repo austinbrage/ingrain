@@ -27,7 +27,7 @@
         { "id": "result-aliases-and-layers", "name": "Aliases & layers", "sessions": 1 },
         { "id": "non-exhaustive-errors", "name": "Non-exhaustive errors", "sessions": 1 },
         { "id": "generic-errors", "name": "Generic errors", "sessions": 1 },
-        { "id": "backtraces", "name": "Backtraces", "sessions": 1 }
+        { "id": "backtrace-fields", "name": "Backtrace fields", "sessions": 1 }
       ]
     }
   ]

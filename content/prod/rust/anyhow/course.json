@@ -33,7 +33,7 @@
       "modules": [
         { "id": "downcasting", "name": "Downcasting", "sessions": 1 },
         { "id": "anyhow-and-thiserror", "name": "anyhow & thiserror", "sessions": 1 },
-        { "id": "backtraces", "name": "Backtraces", "sessions": 1 }
+        { "id": "anyhow-backtraces", "name": "Captured backtraces", "sessions": 1 }
       ]
     }
   ]
