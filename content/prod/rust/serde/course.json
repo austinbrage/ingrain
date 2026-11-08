@@ -1,0 +1,53 @@
+{
+  "id": "serde",
+  "module_sections": [
+    {
+      "name": "Foundations",
+      "tier": "basic",
+      "modules": [
+        { "id": "derive-and-json", "name": "Derive and JSON", "sessions": 1 },
+        { "id": "nested-data", "name": "Nested data", "sessions": 1 },
+        { "id": "parse-errors", "name": "Parse errors", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Field attributes",
+      "tier": "medium",
+      "modules": [
+        { "id": "renaming-fields", "name": "Renaming fields", "sessions": 1 },
+        { "id": "defaults-and-strictness", "name": "Defaults & strictness", "sessions": 1 },
+        { "id": "skipping-fields", "name": "Skipping fields", "sessions": 1 },
+        { "id": "flatten", "name": "Flatten", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Enum representations",
+      "tier": "medium",
+      "modules": [
+        { "id": "external-enums", "name": "Default enum layout", "sessions": 1 },
+        { "id": "tagged-enums", "name": "Tagged enums", "sessions": 1 },
+        { "id": "untagged-enums", "name": "Untagged enums", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Input & output",
+      "tier": "medium",
+      "modules": [
+        { "id": "value-and-json-macro", "name": "Value & json!", "sessions": 1 },
+        { "id": "readers-and-writers", "name": "Readers & writers", "sessions": 1 },
+        { "id": "other-formats", "name": "Other formats", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Custom serialization",
+      "tier": "advanced",
+      "modules": [
+        { "id": "field-helpers", "name": "Field helpers", "sessions": 1 },
+        { "id": "generic-types", "name": "Generic types", "sessions": 1 },
+        { "id": "borrowed-data", "name": "Borrowed data", "sessions": 1 },
+        { "id": "manual-serialize", "name": "Manual Serialize", "sessions": 1 },
+        { "id": "manual-deserialize", "name": "Manual Deserialize", "sessions": 1 }
+      ]
+    }
+  ]
+}

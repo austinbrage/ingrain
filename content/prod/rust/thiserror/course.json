@@ -1,0 +1,34 @@
+{
+  "id": "thiserror",
+  "module_sections": [
+    {
+      "name": "Foundations",
+      "tier": "basic",
+      "modules": [
+        { "id": "derive-error", "name": "Derive Error", "sessions": 1 },
+        { "id": "error-messages", "name": "Error messages", "sessions": 1 },
+        { "id": "error-enums", "name": "Error enums", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Wrapping errors",
+      "tier": "medium",
+      "modules": [
+        { "id": "from-attribute", "name": "The from attribute", "sessions": 1 },
+        { "id": "source-attribute", "name": "The source attribute", "sessions": 1 },
+        { "id": "error-chains", "name": "Error chains", "sessions": 1 },
+        { "id": "transparent-errors", "name": "Transparent errors", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Library design",
+      "tier": "advanced",
+      "modules": [
+        { "id": "result-aliases-and-layers", "name": "Aliases & layers", "sessions": 1 },
+        { "id": "non-exhaustive-errors", "name": "Non-exhaustive errors", "sessions": 1 },
+        { "id": "generic-errors", "name": "Generic errors", "sessions": 1 },
+        { "id": "backtraces", "name": "Backtraces", "sessions": 1 }
+      ]
+    }
+  ]
+}

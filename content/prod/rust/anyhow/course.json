@@ -1,0 +1,40 @@
+{
+  "id": "anyhow",
+  "module_sections": [
+    {
+      "name": "Foundations",
+      "tier": "basic",
+      "modules": [
+        { "id": "anyhow-result", "name": "The anyhow Result", "sessions": 1 },
+        { "id": "error-macros", "name": "Error macros", "sessions": 1 },
+        { "id": "main-with-anyhow", "name": "Main with anyhow", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Adding context",
+      "tier": "medium",
+      "modules": [
+        { "id": "adding-context", "name": "Adding context", "sessions": 1 },
+        { "id": "lazy-context", "name": "Lazy context", "sessions": 1 },
+        { "id": "context-on-option", "name": "Context on Option", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Reading errors",
+      "tier": "medium",
+      "modules": [
+        { "id": "display-formats", "name": "Display formats", "sessions": 1 },
+        { "id": "walking-the-chain", "name": "Walking the chain", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Application design",
+      "tier": "advanced",
+      "modules": [
+        { "id": "downcasting", "name": "Downcasting", "sessions": 1 },
+        { "id": "anyhow-and-thiserror", "name": "anyhow & thiserror", "sessions": 1 },
+        { "id": "backtraces", "name": "Backtraces", "sessions": 1 }
+      ]
+    }
+  ]
+}

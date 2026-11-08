@@ -1,0 +1,73 @@
+{
+  "id": "rayon",
+  "module_sections": [
+    {
+      "name": "Parallel iterators",
+      "tier": "basic",
+      "modules": [
+        { "id": "par-iter", "name": "par_iter", "sessions": 1 },
+        { "id": "into-par-iter", "name": "into_par_iter & ranges", "sessions": 1 },
+        { "id": "par-iter-mut", "name": "par_iter_mut", "sessions": 1 },
+        { "id": "map-and-filter", "name": "map, filter & for_each", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Consuming iterators",
+      "tier": "basic",
+      "modules": [
+        { "id": "collect", "name": "collect", "sessions": 1 },
+        { "id": "sum-count-min-max", "name": "sum, count, min & max", "sessions": 1 },
+        { "id": "any-all-find", "name": "any, all & find", "sessions": 1 },
+        { "id": "collect-result", "name": "Collect into Result", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Combining items",
+      "tier": "medium",
+      "modules": [
+        { "id": "reduce", "name": "reduce", "sessions": 1 },
+        { "id": "fold", "name": "fold", "sessions": 1 },
+        { "id": "ordering", "name": "Ordering & enumerate", "sessions": 1 },
+        { "id": "zip-chain-flat-map", "name": "zip, chain & flat_map", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Slices & sorting",
+      "tier": "medium",
+      "modules": [
+        { "id": "par-chunks", "name": "par_chunks", "sessions": 1 },
+        { "id": "par-sort", "name": "par_sort", "sessions": 1 },
+        { "id": "par-iter-maps", "name": "Parallel maps & sets", "sessions": 1 },
+        { "id": "par-bridge", "name": "par_bridge", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Fork-join",
+      "tier": "medium",
+      "modules": [
+        { "id": "join", "name": "rayon::join", "sessions": 1 },
+        { "id": "scope", "name": "scope", "sessions": 1 },
+        { "id": "spawn", "name": "spawn", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Shared state",
+      "tier": "advanced",
+      "modules": [
+        { "id": "atomics-and-mutex", "name": "Atomics & Mutex", "sessions": 1 },
+        { "id": "thread-local-init", "name": "map_init & for_each_init", "sessions": 1 },
+        { "id": "own-par-iterators", "name": "Your own parallel types", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Thread pools",
+      "tier": "advanced",
+      "modules": [
+        { "id": "thread-pool-builder", "name": "ThreadPoolBuilder", "sessions": 1 },
+        { "id": "pool-install", "name": "install & global pool", "sessions": 1 },
+        { "id": "tuning", "name": "Splitting & min_len", "sessions": 1 },
+        { "id": "panics", "name": "Panics in parallel code", "sessions": 1 }
+      ]
+    }
+  ]
+}

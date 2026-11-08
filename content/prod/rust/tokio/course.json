@@ -1,0 +1,78 @@
+{
+  "id": "tokio",
+  "module_sections": [
+    {
+      "name": "Runtime",
+      "tier": "basic",
+      "modules": [
+        { "id": "runtime-and-main", "name": "Runtime & main", "sessions": 1 },
+        { "id": "spawn", "name": "Spawning tasks", "sessions": 1 },
+        { "id": "join-handles", "name": "Join handles", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Time",
+      "tier": "medium",
+      "modules": [
+        { "id": "sleep-and-timeout", "name": "Sleep & timeout", "sessions": 1 },
+        { "id": "intervals", "name": "Intervals", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Channels",
+      "tier": "medium",
+      "modules": [
+        { "id": "mpsc", "name": "mpsc channels", "sessions": 1 },
+        { "id": "oneshot", "name": "oneshot channels", "sessions": 1 },
+        { "id": "broadcast", "name": "broadcast channels", "sessions": 1 },
+        { "id": "watch", "name": "watch channels", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Combining futures",
+      "tier": "medium",
+      "modules": [
+        { "id": "join-macros", "name": "join! & try_join!", "sessions": 1 },
+        { "id": "select", "name": "select!", "sessions": 1 },
+        { "id": "select-loops", "name": "select! in loops", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Shared state",
+      "tier": "medium",
+      "modules": [
+        { "id": "async-mutex", "name": "Async Mutex", "sessions": 1 },
+        { "id": "semaphore", "name": "Semaphore", "sessions": 1 },
+        { "id": "notify", "name": "Notify", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Async I/O",
+      "tier": "medium",
+      "modules": [
+        { "id": "async-read-write", "name": "AsyncRead & AsyncWrite", "sessions": 1 },
+        { "id": "buffered-lines", "name": "Buffered lines", "sessions": 1 },
+        { "id": "tcp-server", "name": "TCP server", "sessions": 1 },
+        { "id": "tcp-client", "name": "TCP client", "sessions": 1 },
+        { "id": "split-streams", "name": "Splitting streams", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Testing",
+      "tier": "medium",
+      "modules": [
+        { "id": "testing-async", "name": "Testing async code", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Robust tasks",
+      "tier": "advanced",
+      "modules": [
+        { "id": "join-set", "name": "JoinSet", "sessions": 1 },
+        { "id": "spawn-blocking", "name": "spawn_blocking", "sessions": 1 },
+        { "id": "cancellation-safety", "name": "Cancellation safety", "sessions": 1 },
+        { "id": "graceful-shutdown", "name": "Graceful shutdown", "sessions": 1 }
+      ]
+    }
+  ]
+}
