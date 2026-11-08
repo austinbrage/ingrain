@@ -38,5 +38,6 @@ pub fn courses_column(catalog: &Catalog, state: ExplorerState) -> Column {
         items,
         selected,
         focused: state.depth == Depth::Courses,
+        coming_soon: false,
     }
 }

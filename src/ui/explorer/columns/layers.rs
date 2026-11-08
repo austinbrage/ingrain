@@ -16,5 +16,6 @@ pub fn layers_column(catalog: &Catalog, state: ExplorerState) -> Column {
             .collect(),
         selected: Some(state.layer),
         focused: state.depth == Depth::Layers,
+        coming_soon: false,
     }
 }

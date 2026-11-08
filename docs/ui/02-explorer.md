@@ -209,6 +209,76 @@ The sessions depth, with the failed session selected. The `✗` takes the place 
 - **The hint:** `Enter retake` only on a failed row of the sessions column, where Enter is always a retake. On the modules column it stays `Enter start`, because Enter there may open the sessions column first
 - **Color:** the `✗` in the mocha `red`, the same as in the recap drafts (`docs/ui/complete/`). The count after it keeps the color of its row
 
+## Empty
+Status: Draft
+
+A course with no modules, or a module whose file is not written yet (it keeps its planned session count in `course.json`), is content not written yet. Enter does nothing on it. The explorer says so, in the same dim look as the rest, instead of leaving a row that looks like it can be opened or done.
+
+A course with no modules. Structs and enums is selected and has none, so the third column, which would list its modules, shows `coming soon` centered in the column, horizontally and vertically in the list area. The row keeps its `›`:
+
+```
+┏━━━━━━━                                                                                    ━━━━━━━┓
+┃ Ingrain                                                                              Rust › Core ┃
+┃                                                                                                  ┃
+   RUST                          │ CORE                          │ STRUCTS AND ENUMS                
+                                 │                               │                                  
+   ▸ Core                      › │   FUNDAMENTALS                │                                  
+     Ecosystem                 › │     Syntax                  › │                                  
+                                 │ ▌   Structs and enums       › │                                  
+                                 │                               │                                  
+                                 │   OWNERSHIP                   │                                  
+                                 │     Borrow checker          › │                                  
+                                 │     Error handling          › │                                  
+                                 │                               │            coming soon           
+                                 │   CONCURRENCY                 │                                  
+                                 │     Concurrency             › │                                  
+                                 │     Async                   › │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+┃                                                                                                  ┃
+┃                                                                                                  ┃
+┗━━━━━━━                      ↑↓ move   → open   ← back   Ctrl-Q quit                       ━━━━━━━┛
+```
+
+A module not written yet. Loops is selected and is not written, so its count (`0/4`) gives way to `soon` on its row:
+
+```
+┏━━━━━━━                                                                                    ━━━━━━━┓
+┃ Ingrain                                                                     Rust › Core › Syntax ┃
+┃                                                                                                  ┃
+   RUST                          │ CORE                          │ SYNTAX                           
+                                 │                               │                                  
+   ▸ Core                      › │   FUNDAMENTALS                │   FOUNDATIONS            basic   
+     Ecosystem                 › │ ▸   Syntax                  › │     Variables              4/4   
+                                 │     Structs and enums       › │     Conditionals           3/3   
+                                 │                               │ ▌   Loops                 soon   
+                                 │   OWNERSHIP                   │                                  
+                                 │     Borrow checker          › │   DATA TYPES             basic   
+                                 │     Error handling          › │     Structs                0/4   
+                                 │                               │     Enums                  0/3   
+                                 │   CONCURRENCY                 │                                  
+                                 │     Concurrency             › │                                  
+                                 │     Async                   › │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+                                 │                               │                                  
+┃                                                                                                  ┃
+┃                                                                                                  ┃
+┗━━━━━━━                    ↑↓ move   Enter start   ← back   Ctrl-Q quit                    ━━━━━━━┛
+```
+
+- **Course, no modules:** the course row is drawn as any other. The third column shows `coming soon` instead of the modules. It shows at the courses depth only, because Enter does not open the modules column of an empty course
+- **Module, not written:** the row shows `soon` where the count goes, instead of the count (`0/4`). It is never complete (no green `✓`) and never the next module (no `next`), and Continue already skips it
+- **Sessions column:** no empty state. A module that is written always has content to list
+- **Enter:** does nothing on an empty course or an empty module, the same as now
+- **Hint:** unchanged
+- **Color:** `soon` and `coming soon` in `overlay1`, dimmer than the rows. The text of an empty module row is also `overlay1`, and when the row is selected it takes the selected look like any other
+
 ## Open
 - Fill or a bold `sky` bar for the focused row. The fill is built, the bar was not tried
 - The right-hand text and the module section and course group labels are not dimmer than the rows. If the list looks flat they can be dimmed with a row built by hand

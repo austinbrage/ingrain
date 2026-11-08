@@ -89,6 +89,7 @@ mod courses {
         assert!(screen.has_row(&["RUST", "CORE", "BASICS"]));
         assert!(screen.has_row(&["FOUNDATIONS", "basic"]));
         assert!(!screen.contains("Alone"));
+        assert!(!screen.contains("coming soon"));
         assert!(screen.has_row(&["Ingrain", "Rust › Core"]));
         assert!(!screen.has_row(&["Ingrain", "Rust › Core ›"]));
         assert!(screen.has_row(&["↑↓ move", "→ open", "← back", "Ctrl-Q quit"]));
@@ -180,7 +181,7 @@ mod courses {
     }
 
     #[test]
-    fn a_course_without_modules_keeps_the_modules_column_empty_and_does_not_open() {
+    fn a_course_without_modules_says_coming_soon_in_the_modules_column_and_does_not_open() {
         let mut app = rust_explorer();
         app.press(KeyCode::Down); // Ecosystem
         app.press(KeyCode::Right); // focus the courses column
@@ -191,6 +192,7 @@ mod courses {
         assert!(screen.has_rows_in_order(&["LIBRARIES", "Bare"]));
         assert!(!screen.contains("UTILITIES"));
         assert!(!screen.contains("Helpers"));
+        assert!(screen.contains("coming soon"));
 
         app.press(KeyCode::Right); // there is nothing to open
         app.press(KeyCode::Enter);
@@ -199,6 +201,7 @@ mod courses {
         assert!(!screen.has_row(&["Ingrain", "Rust › Ecosystem ›"]));
         assert!(screen.has_row(&["↑↓ move", "→ open", "← back", "Ctrl-Q quit"]));
         assert_eq!(screen.background_of("Bare"), Some(highlighted()));
+        assert!(screen.contains("coming soon"));
     }
 }
 
@@ -289,6 +292,17 @@ mod modules {
         assert!(screen.contains("Ingrain"));
         assert!(screen.has_row(&["↑↓ move", "Enter start", "← back", "Ctrl-Q quit"]));
         assert_eq!(screen.background_of("Planned"), Some(highlighted()));
+    }
+
+    #[test]
+    fn an_unwritten_module_says_soon_instead_of_its_count() {
+        let screen = rust_modules().screen();
+
+        assert!(screen.has_row(&["Many", "0/2"]));
+        assert!(screen.has_row(&["Planned", "soon"]));
+        assert!(!screen.has_row(&["Planned", "0/1"]));
+        assert!(!screen.has_row(&["Planned", "✓"]));
+        assert!(!screen.has_row(&["Many", "soon"]));
     }
 }
 
@@ -452,7 +466,7 @@ mod marks {
     fn a_new_user_sees_zero_counts() {
         let screen = rust_explorer().screen();
 
-        assert!(screen.has_row(&["Planned", "0/1"]));
+        assert!(screen.has_row(&["Planned", "soon"]));
         assert!(screen.has_row(&["Many", "0/2"]));
     }
 
@@ -466,7 +480,7 @@ mod marks {
 
         let screen = app.screen();
         assert!(screen.has_row(&["One", "✓ 1/1"]));
-        assert!(screen.has_row(&["Planned", "0/1"]));
+        assert!(screen.has_row(&["Planned", "soon"]));
 
         let mut saw_next = false;
         let mut saw_count = false;

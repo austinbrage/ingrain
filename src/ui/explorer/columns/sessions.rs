@@ -40,6 +40,7 @@ pub fn sessions_column(
                 },
                 complete: done && !failed,
                 next,
+                ..Item::default()
             }
         })
         .collect();
@@ -49,5 +50,6 @@ pub fn sessions_column(
         items,
         selected: Some(state.session),
         focused: true,
+        coming_soon: false,
     }
 }

@@ -40,6 +40,7 @@ struct Item {
     right: String,
     complete: bool,
     next: bool,
+    unwritten: bool,
 }
 
 // A titled list: selected row and focus (focused shows a sky fill)
@@ -48,6 +49,7 @@ struct Column {
     items: Vec<Item>,
     selected: Option<usize>,
     focused: bool,
+    coming_soon: bool,
 }
 
 pub fn render_columns(
@@ -110,6 +112,23 @@ fn render_single_column(frame: &mut Frame, area: Rect, column: &Column, divider:
 
     frame.render_widget(Paragraph::new(title_line), title);
 
+    if column.coming_soon {
+        let [_, middle, _] = Layout::vertical([
+            Constraint::Fill(1),
+            Constraint::Length(1),
+            Constraint::Fill(1),
+        ])
+        .areas(items);
+
+        frame.render_widget(
+            Paragraph::new("coming soon")
+                .style(Style::new().fg(palette.overlay1.into()))
+                .centered(),
+            middle,
+        );
+        return;
+    }
+
     // 3. Render column list options
     let shown = column
         .items
@@ -137,6 +156,8 @@ fn render_single_column(frame: &mut Frame, area: Rect, column: &Column, divider:
 
         if item.next {
             row.style(Style::new().fg(palette.sky.into()))
+        } else if item.unwritten {
+            row.style(Style::new().fg(palette.overlay1.into()))
         } else {
             row
         }
@@ -171,6 +192,8 @@ fn render_single_column(frame: &mut Frame, area: Rect, column: &Column, divider:
 
             if item.complete {
                 line.style(Style::new().fg(palette.green.into()))
+            } else if item.unwritten {
+                line.style(Style::new().fg(palette.overlay1.into()))
             } else {
                 line
             }

@@ -37,7 +37,10 @@ pub fn modules_column(
                 let failed = marks.failed.get(module_index).copied().unwrap_or(false);
                 let complete = passed == module.sessions as usize;
                 let next = marks.next == Some(module_index);
-                let count = if complete {
+                let unwritten = !module.written;
+                let count = if unwritten {
+                    "soon".to_string()
+                } else if complete {
                     format!("✓ {passed}/{}", module.sessions)
                 } else if failed {
                     format!("✗ {passed}/{}", module.sessions)
@@ -54,6 +57,7 @@ pub fn modules_column(
                     },
                     complete,
                     next,
+                    unwritten,
                 });
                 module_index += 1;
             }
@@ -62,6 +66,7 @@ pub fn modules_column(
 
     Column {
         title: selected_course.name.to_uppercase(),
+        coming_soon: items.is_empty(),
         items,
         selected,
         focused,
