@@ -11,7 +11,7 @@
       ]
     },
     {
-      "name": "Standard input and output",
+      "name": "Standard input & output",
       "tier": "medium",
       "modules": [
         { "id": "stdin-and-stdout", "name": "Stdin and stdout", "sessions": 1 },

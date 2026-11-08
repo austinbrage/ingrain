@@ -2,7 +2,7 @@
   "id": "standard-traits",
   "module_sections": [
     {
-      "name": "Printing, copying and defaults",
+      "name": "Print, copy & defaults",
       "tier": "basic",
       "modules": [
         { "id": "debug", "name": "Debug", "sessions": 1 },

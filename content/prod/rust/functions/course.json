@@ -12,7 +12,7 @@
       ]
     },
     {
-      "name": "Functions as items and values",
+      "name": "Functions as values",
       "tier": "medium",
       "modules": [
         { "id": "nested-functions", "name": "Nested functions", "sessions": 1 },

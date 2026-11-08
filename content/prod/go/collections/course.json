@@ -52,7 +52,7 @@
       ]
     },
     {
-      "name": "The slices and maps packages",
+      "name": "Slices & maps packages",
       "tier": "medium",
       "modules": [
         { "id": "slices-and-maps-packages", "name": "The slices package", "sessions": 3 },

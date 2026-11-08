@@ -25,7 +25,7 @@
       ]
     },
     {
-      "name": "Returning and storing closures",
+      "name": "Returning & storing",
       "tier": "advanced",
       "modules": [
         { "id": "returning-closures", "name": "Returning closures", "sessions": 1 },

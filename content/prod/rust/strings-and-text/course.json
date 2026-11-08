@@ -20,7 +20,7 @@
       ]
     },
     {
-      "name": "String methods and parsing",
+      "name": "String methods & parsing",
       "tier": "medium",
       "modules": [
         { "id": "searching-and-splitting", "name": "Searching and splitting", "sessions": 1 },

@@ -29,7 +29,7 @@
       ]
     },
     {
-      "name": "Running tests and debugging",
+      "name": "Running tests & debug",
       "tier": "medium",
       "modules": [
         { "id": "go-test-flags", "name": "Go test flags", "sessions": 1 },
