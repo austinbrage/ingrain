@@ -31,8 +31,8 @@ const GAP_MARKER: &str = "___";
 const MAX_CODE_LINES: usize = 14;
 const MAX_CODE_WIDTH: usize = 50;
 
-// The limit of a course name and of a module name: the explorer cuts a longer one with `…` on
-// narrow terminals, and 24 keeps the names whole on most of them
+// The limit of a course, module, course group and module section name: the explorer cuts a longer
+// one with `…` on narrow terminals, and 24 keeps the names whole on most of them
 const MAX_NAME_CHARS: usize = 24;
 
 // ------------------------------------------------------------
@@ -104,7 +104,7 @@ fn module_problems(place: &str, id: &str, sessions: usize, module: &Module) -> V
     problems
 }
 
-// A course name or a module name is at most MAX_NAME_CHARS characters
+// A name shown in the explorer is at most MAX_NAME_CHARS characters
 fn name_problems(place: &str, names: &[&str]) -> Vec<String> {
     let mut problems = Vec::new();
 
@@ -580,10 +580,17 @@ mod real_content {
                 .flat_map(|layer| layer.courses())
                 .map(|course| course.name.as_str())
                 .collect();
+            let group_names: Vec<&str> = catalog
+                .layers
+                .iter()
+                .flat_map(|layer| &layer.course_groups)
+                .map(|group| group.name.as_str())
+                .collect();
 
             problems.extend(slug_problems(language, &layers));
             problems.extend(slug_problems(language, &courses));
             problems.extend(name_problems(language, &course_names));
+            problems.extend(name_problems(language, &group_names));
 
             for layer in &catalog.layers {
                 problems.extend(group_problems(&format!("{language}/{}", layer.id), layer));
@@ -609,9 +616,15 @@ mod real_content {
                     .collect();
                 let module_ids: Vec<&str> = modules.iter().map(|m| m.id.as_str()).collect();
                 let module_names: Vec<&str> = modules.iter().map(|m| m.name.as_str()).collect();
+                let section_names: Vec<&str> = course
+                    .module_sections
+                    .iter()
+                    .map(|section| section.name.as_str())
+                    .collect();
 
                 problems.extend(slug_problems(&place, &module_ids));
                 problems.extend(name_problems(&place, &module_names));
+                problems.extend(name_problems(&place, &section_names));
                 problems.extend(unlisted_problems(
                     &place,
                     "course.json",
