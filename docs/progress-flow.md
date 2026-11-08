@@ -14,10 +14,10 @@ One JSON file in the OS data directory (on macOS `~/Library/Application Support/
 
 ```json
 {
-  "last": { "language": "rust", "course": "ratatui" },
+  "last": { "language": "go", "course": "cobra" },
   "modules": [
     { "id": "rust/syntax/loops", "done": ["session-1", "session-2"], "in_progress": {}, "failed": {}, "practiced": 1760400000 },
-    { "id": "rust/ratatui/first-frame", "done": ["session-1"], "in_progress": { "session-2": "frame-area" }, "failed": { "session-1": ["draw-block"] }, "practiced": 1760403600 }
+    { "id": "go/cobra/root-command", "done": ["session-1"], "in_progress": { "session-2": "command-name" }, "failed": { "session-1": ["error-shown"] }, "practiced": 1760403600 }
   ]
 }
 ```
@@ -74,7 +74,7 @@ An exercise ends when the last character of a typing exercise is typed (`handle_
 A quiz or a fill-blank is finished whatever the answer, but the answer is remembered. `handle_quiz_action` passes `selected == answer` as `passed`, `handle_fill_blank_key` passes whether every gap is right, and typing passes `true`, because a typing exercise cannot fail. An exercise left with Esc writes nothing: it is not failed, only not visited.
 
 `record_completion` does three things:
-1. `Content::module_path` builds the module id (`rust/ratatui/first-frame`) from the explorer position
+1. `Content::module_path` builds the module id (`go/cobra/root-command`) from the explorer position
 2. `Progress::complete_exercise(module, session, exercise, passed, next_exercise)` records the result:
    - a **wrong** result adds the exercise id to the session's `failed` list (once), and a **right** one removes it, and the session's entry when its list is empty
    - the finished exercise was **not** the last of its session: `in_progress` saves the id of the next exercise
@@ -168,11 +168,11 @@ When no course has anything left to study, `next_course` finds nothing and the b
 Reviewing is practice like any other: finishing an exercise stamps that module's `practiced` with the current time, so the next review picks the next-oldest module and the user cycles through everything. It never duplicates a finished session and never reorders `modules`.
 
 ## Example
-The user finishes session 1 of `first-frame`, opens session 2, finishes its first exercise, and quits.
+The user finishes session 1 of `root-command`, opens session 2, finishes its first exercise, and quits.
 
-- the file now has `first-frame` with `done: ["session-1"]` and `in_progress: { "session-2": "frame-area" }`, and `last` is `ratatui`
-- next day the Home shows `Continue   Rust · ratatui`
-- Enter: `next_module` gives `first-frame` (not complete), `next_session` gives `session-2`, `next_exercise` gives `frame-area`. The user lands on that exercise
+- the file now has `root-command` with `done: ["session-1"]` and `in_progress: { "session-2": "command-name" }`, and `last` is `cobra`
+- next day the Home shows `Continue   Go · cobra`
+- Enter: `next_module` gives `root-command` (not complete), `next_session` gives `session-2`, `next_exercise` gives `command-name`. The user lands on that exercise
 
 ## Where each piece is
 

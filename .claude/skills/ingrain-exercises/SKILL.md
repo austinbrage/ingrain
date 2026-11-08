@@ -51,7 +51,7 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
 4. The module's entry in the `course.json` of its course (its tier and its session count), and the modules before it in the course: the user has done them
 5. The module file, if it exists
 6. If a `docs/courses/<language>-<layer>.md` file exists (for example `docs/courses/rust-core.md`): where the course stops and the rules of the module. A rule there wins over what the module name suggests
-7. For the format, an existing module: `content/prod/rust/ratatui/first-frame.json` (typing) and `content/prod/go/pointers/nil-pointers.json` (quizzes and intros)
+7. For the format, an existing module: `content/prod/go/syntax/conditionals.json` (typing) and `content/prod/go/pointers/nil-pointers.json` (quizzes and intros)
 
 ## What the exercises must be
 - **The user must master the concept.** A module has as many exercises as that takes, from a few to many. There is no fixed number: decide from the course and the module

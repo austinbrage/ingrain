@@ -189,10 +189,10 @@ Stored outside the repo, one small file per machine, in the OS data directory (f
 `INGRAIN_DATA_DIR` overrides the folder during development (`make dev:fresh` uses it). The file is created the first time something is saved.
 ```json
 {
-  "last": { "language": "rust", "course": "ratatui" },
+  "last": { "language": "go", "course": "cobra" },
   "modules": [
     { "id": "rust/syntax/loops", "done": ["session-1"], "in_progress": {}, "failed": {}, "practiced": 1760400000 },
-    { "id": "rust/ratatui/first-frame", "done": ["session-1"], "in_progress": { "session-2": "frame-area" }, "failed": { "session-1": ["draw-block"] }, "practiced": 1760403600 }
+    { "id": "go/cobra/root-command", "done": ["session-1"], "in_progress": { "session-2": "command-name" }, "failed": { "session-1": ["error-shown"] }, "practiced": 1760403600 }
   ]
 }
 ```
