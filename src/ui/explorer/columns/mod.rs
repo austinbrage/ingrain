@@ -213,7 +213,12 @@ fn render_single_column(frame: &mut Frame, area: Rect, column: &Column, divider:
         })
         .collect();
 
-    frame.render_widget(Paragraph::new(right).right_aligned(), items);
+    frame.render_widget(
+        Paragraph::new(right)
+            .right_aligned()
+            .scroll((state.offset() as u16, 0)),
+        items,
+    );
 }
 
 // The text, or its first chars and a `…` when it is longer than the cells
