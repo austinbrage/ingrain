@@ -49,7 +49,7 @@ content/
 - A course group is only a label in `catalog.json` (`{ "name", "courses" }`), like a module section in `course.json`: it has no `id`, and no folder or progress key uses it. The course order is the order of the catalog read through the groups, so a course keeps one flat index in its layer
 - The folder name is the course id and the file name is the module id
 - The module ids in `course.json` must match the file names
-- A course name and a module name have at most 24 characters, spaces included. The explorer shows them in a column cell and cuts a longer one with `…`. The content validation (`tests/content.rs`) checks it
+- A course name, a module name, a course group name and a module section name have at most 24 characters, spaces included. The explorer shows them in a column cell and cuts a longer one with `…`. The content validation (`tests/content.rs`) checks it
 - A course folder always has a `course.json`
 
 ## Sessions in the explorer

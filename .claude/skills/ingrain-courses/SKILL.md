@@ -34,7 +34,7 @@ A course id is a slug (lowercase letters, digits and hyphens), and it is also th
 - **There is no fixed number.** A layer has as many courses as it needs. If that is 100, write 100: the explorer column scrolls
 - **The order is the order of study.** The first course is the first one to learn, and the app proposes the next course in this order. Decide what a layer needs and in what order **from your own knowledge of the language or the library** (what everyday code uses, what depends on what, how hard each topic is), not from a list given to you
 - A course name is short and plain, and at most 24 characters (`Syntax`, `Pointers`, `Error handling`). Write `&` instead of `and` to stay under it (`Packages & modules`), and spell it `and` in the id
-- **Course groups gather related courses under one label** (`Fundamentals`, `Ownership`, `CLI`, `Web`). A group has at least one course, and no other group of the layer has its name. The groups are runs of the study order: the order of the catalog read through the groups is still the order of study, so a group never reorders courses
+- **Course groups gather related courses under one label** (`Fundamentals`, `Ownership`, `CLI`, `Web`). A group has at least one course, and no other group of the layer has its name. A group name is at most 24 characters too, with `&` for `and`. The groups are runs of the study order: the order of the catalog read through the groups is still the order of study, so a group never reorders courses
 - **A group is worth its label with two or more courses.** If a theme has one course, join it to its neighbors, or add the courses the layer is missing (for the ecosystem, the libraries that are used together). Do not write a group of one course
 
 ## Writing
@@ -52,7 +52,7 @@ A course id is a slug (lowercase letters, digits and hyphens), and it is also th
 - If the request would remove, rename or reorder courses that exist, say exactly what will change and ask before writing
 
 ## Finish
-Run `cargo test --test content` and fix everything it reports. Among other checks, it fails when a course id is not a slug, when an id repeats, and when a course folder is not listed in the catalog, and when a group has no courses or repeats the name of another group of its layer, and when a course name is longer than 24 characters.
+Run `cargo test --test content` and fix everything it reports. Among other checks, it fails when a course id is not a slug, when an id repeats, and when a course folder is not listed in the catalog, and when a group has no courses or repeats the name of another group of its layer, and when a course name or a group name is longer than 24 characters.
 
 Then report:
 - what you added, changed or left as it was

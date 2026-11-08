@@ -56,7 +56,7 @@ The shape of `course.json`:
 - **A module name is at most 24 characters,** spaces included, so it fits its cell in the explorer (`Slices in functions` has 19). Write `&` instead of `and` to stay under it (`Stacks, queues & copies`), which saves 2 characters, and spell it `and` in the id. If the concept still needs a longer name, shorten the name and let the module's content carry the detail
 - **Mastery is the measure:** completing all the modules of the course must let the user master the course. No fewer, and none that the course does not need. There is no fixed number
 - **Keep the list lean:** cover every topic needed for mastery, but give no module to a rare edge case. Merge small related topics into one module instead of one module each, and prefer a few well-sized modules over many thin ones
-- **Module sections** group related modules, stacked from the easiest concepts to the hardest. A section has a name that says what its modules share (`Foundations`, `Data types`)
+- **Module sections** group related modules, stacked from the easiest concepts to the hardest. A section has a name that says what its modules share (`Foundations`, `Data types`), at most 24 characters, with `&` for `and`. The tier takes cells on the same row, so a short name reads best
 - **The tier of a section is the difficulty of its concepts,** not the shape of the exercises (`docs/course-structure.md`, "Tiers"): `basic`, `medium` or `advanced`. Decide it **from your own knowledge of the language or the library**: how many other concepts a concept needs first, how abstract it is, how easy it is to get wrong. Do not match it to a list of examples
 - **A section is cohesive:** every module in it fits the section's name and tier. When you add or move a module, check it against its section. If it does not fit, rename the section so the name covers all its modules, move the module to the section where it belongs, or make a new section for it (a module that is a rare topic goes to its own section with the medium tier, not into a basic one). Check the sections after a split too: a section must never become a pile of unrelated modules
 - **The order is the order of study** inside a section and across sections, and it follows what depends on what
@@ -83,7 +83,7 @@ When `ingrain-exercises` needs more modules because a concept does not fit in 4 
 - If the request would remove, rename or reorder modules that exist, say exactly what will change and ask before writing
 
 ## Finish
-Run `cargo test --test content` and fix everything it reports. In the layer mode, this is the parent's run after the subagents return. Among other checks, it fails when an id is not a slug or repeats, when a module file is not listed in `course.json`, and when a written module has a different id or number of sessions than `course.json` says, and when a module name is longer than 24 characters.
+Run `cargo test --test content` and fix everything it reports. In the layer mode, this is the parent's run after the subagents return. Among other checks, it fails when an id is not a slug or repeats, when a module file is not listed in `course.json`, and when a written module has a different id or number of sessions than `course.json` says, and when a module name or a section name is longer than 24 characters.
 
 Then report:
 - what you added, changed or left as it was
