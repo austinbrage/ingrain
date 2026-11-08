@@ -1,0 +1,79 @@
+{
+  "id": "tracing",
+  "module_sections": [
+    {
+      "name": "Events",
+      "tier": "basic",
+      "modules": [
+        { "id": "log-vs-tracing", "name": "tracing vs log", "sessions": 1 },
+        { "id": "event-macros", "name": "Event macros", "sessions": 1 },
+        { "id": "levels", "name": "Levels", "sessions": 1 },
+        { "id": "fields", "name": "Structured fields", "sessions": 1 },
+        { "id": "field-sigils", "name": "% and ? sigils", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "First subscriber",
+      "tier": "basic",
+      "modules": [
+        { "id": "fmt-subscriber", "name": "fmt subscriber", "sessions": 1 },
+        { "id": "env-filter", "name": "EnvFilter & RUST_LOG", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Spans",
+      "tier": "medium",
+      "modules": [
+        { "id": "span-macros", "name": "span! & levels", "sessions": 1 },
+        { "id": "enter-and-in-scope", "name": "enter & in_scope", "sessions": 1 },
+        { "id": "instrument-attribute", "name": "#[instrument]", "sessions": 1 },
+        { "id": "instrument-options", "name": "instrument options", "sessions": 1 },
+        { "id": "nested-spans", "name": "Nested spans", "sessions": 1 },
+        { "id": "recording-fields", "name": "Recording fields", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Filtering",
+      "tier": "medium",
+      "modules": [
+        { "id": "filter-directives", "name": "Filter directives", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Output formats",
+      "tier": "medium",
+      "modules": [
+        { "id": "compact-and-pretty", "name": "Compact & pretty", "sessions": 1 },
+        { "id": "json-format", "name": "JSON format", "sessions": 1 },
+        { "id": "format-options", "name": "Format options", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Files & output",
+      "tier": "medium",
+      "modules": [
+        { "id": "writers", "name": "Writers", "sessions": 1 },
+        { "id": "rolling-files", "name": "Rolling files", "sessions": 1 },
+        { "id": "non-blocking", "name": "Non-blocking output", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Async",
+      "tier": "medium",
+      "modules": [
+        { "id": "instrument-futures", "name": "Instrument futures", "sessions": 1 },
+        { "id": "spans-in-tasks", "name": "Spans in spawned tasks", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Layers",
+      "tier": "advanced",
+      "modules": [
+        { "id": "registry-and-layers", "name": "Registry & layers", "sessions": 1 },
+        { "id": "per-layer-filters", "name": "Per-layer filters", "sessions": 1 },
+        { "id": "custom-layer", "name": "Custom Layer", "sessions": 1 },
+        { "id": "scoped-subscribers", "name": "Scoped subscribers", "sessions": 1 }
+      ]
+    }
+  ]
+}

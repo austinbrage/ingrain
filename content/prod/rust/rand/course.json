@@ -1,0 +1,58 @@
+{
+  "id": "rand",
+  "module_sections": [
+    {
+      "name": "First random values",
+      "tier": "basic",
+      "modules": [
+        { "id": "rng-and-random", "name": "rng() and random", "sessions": 1 },
+        { "id": "random-range", "name": "random_range", "sessions": 1 },
+        { "id": "bools-and-ratios", "name": "Bools & ratios", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Random from slices",
+      "tier": "basic",
+      "modules": [
+        { "id": "shuffle", "name": "Shuffle", "sessions": 1 },
+        { "id": "choose-one", "name": "Choose one", "sessions": 1 },
+        { "id": "choose-many", "name": "Choose many", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Distributions",
+      "tier": "medium",
+      "modules": [
+        { "id": "uniform", "name": "Uniform", "sessions": 1 },
+        { "id": "standard-distribution", "name": "Standard", "sessions": 1 },
+        { "id": "weighted-choice", "name": "Weighted choice", "sessions": 1 },
+        { "id": "normal-distribution", "name": "Normal with rand_distr", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Reproducible runs",
+      "tier": "medium",
+      "modules": [
+        { "id": "seeding", "name": "Seeding", "sessions": 1 },
+        { "id": "reproducible-tests", "name": "Reproducible tests", "sessions": 1 },
+        { "id": "choosing-an-rng", "name": "Choosing an RNG", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Bulk & bytes",
+      "tier": "medium",
+      "modules": [
+        { "id": "filling-buffers", "name": "Filling buffers", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Under the hood",
+      "tier": "advanced",
+      "modules": [
+        { "id": "rngcore-trait", "name": "The RngCore trait", "sessions": 1 },
+        { "id": "generic-over-rng", "name": "Generic over Rng", "sessions": 1 },
+        { "id": "security-limits", "name": "Security limits", "sessions": 1 }
+      ]
+    }
+  ]
+}

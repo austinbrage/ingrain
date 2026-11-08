@@ -1,0 +1,50 @@
+{
+  "id": "regex",
+  "module_sections": [
+    {
+      "name": "Foundations",
+      "tier": "basic",
+      "modules": [
+        { "id": "regex-and-is-match", "name": "Regex & is_match", "sessions": 1 },
+        { "id": "find-and-matches", "name": "Find & matches", "sessions": 1 },
+        { "id": "pattern-syntax", "name": "Pattern syntax", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Captures",
+      "tier": "medium",
+      "modules": [
+        { "id": "numbered-captures", "name": "Numbered captures", "sessions": 1 },
+        { "id": "named-captures", "name": "Named captures", "sessions": 1 },
+        { "id": "captures-iter", "name": "Many captures", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Transforming text",
+      "tier": "medium",
+      "modules": [
+        { "id": "replace-text", "name": "Replace text", "sessions": 1 },
+        { "id": "replace-with-closures", "name": "Replace with closures", "sessions": 1 },
+        { "id": "split-text", "name": "Split text", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Tuning patterns",
+      "tier": "medium",
+      "modules": [
+        { "id": "flags-and-groups", "name": "Flags & groups", "sessions": 1 },
+        { "id": "regex-builder", "name": "RegexBuilder", "sessions": 1 },
+        { "id": "compile-errors", "name": "Compile errors", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Performance",
+      "tier": "advanced",
+      "modules": [
+        { "id": "compile-once", "name": "Compile once", "sessions": 1 },
+        { "id": "regex-set", "name": "RegexSet", "sessions": 1 },
+        { "id": "cost-model", "name": "Cost model", "sessions": 1 }
+      ]
+    }
+  ]
+}

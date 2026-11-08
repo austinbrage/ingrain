@@ -1,0 +1,61 @@
+{
+  "id": "reqwest",
+  "module_sections": [
+    {
+      "name": "First requests",
+      "tier": "basic",
+      "modules": [
+        { "id": "client", "name": "Client & reuse", "sessions": 1 },
+        { "id": "get-requests", "name": "GET requests", "sessions": 1 },
+        { "id": "response-status", "name": "Status & headers", "sessions": 1 },
+        { "id": "response-body", "name": "Body: text & bytes", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "JSON",
+      "tier": "basic",
+      "modules": [
+        { "id": "json-response", "name": "JSON responses", "sessions": 1 },
+        { "id": "post-json", "name": "POST with JSON", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Building requests",
+      "tier": "medium",
+      "modules": [
+        { "id": "query-params", "name": "Query parameters", "sessions": 1 },
+        { "id": "request-headers", "name": "Request headers", "sessions": 1 },
+        { "id": "authentication", "name": "Basic & bearer auth", "sessions": 1 },
+        { "id": "forms", "name": "Form bodies", "sessions": 1 },
+        { "id": "multipart", "name": "Multipart uploads", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Client settings",
+      "tier": "medium",
+      "modules": [
+        { "id": "timeouts", "name": "Timeouts", "sessions": 1 },
+        { "id": "redirects", "name": "Redirects", "sessions": 1 },
+        { "id": "client-builder", "name": "ClientBuilder options", "sessions": 1 },
+        { "id": "blocking-client", "name": "Blocking client", "sessions": 1 },
+        { "id": "tls-and-proxy", "name": "TLS & proxy basics", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Errors",
+      "tier": "medium",
+      "modules": [
+        { "id": "reqwest-error", "name": "reqwest::Error", "sessions": 1 },
+        { "id": "error-for-status", "name": "error_for_status", "sessions": 1 },
+        { "id": "retry-patterns", "name": "Retry patterns", "sessions": 1 }
+      ]
+    },
+    {
+      "name": "Large bodies",
+      "tier": "advanced",
+      "modules": [
+        { "id": "streaming", "name": "Streaming bodies", "sessions": 1 }
+      ]
+    }
+  ]
+}
