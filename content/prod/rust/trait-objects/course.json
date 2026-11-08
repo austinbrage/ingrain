@@ -7,8 +7,8 @@
       "modules": [
         { "id": "dyn-trait", "name": "Dyn Trait", "sessions": 1 },
         { "id": "boxed-trait-objects", "name": "Boxed trait objects", "sessions": 1 },
-        { "id": "trait-objects-in-collections", "name": "Trait objects in collections", "sessions": 1 },
-        { "id": "static-vs-dynamic-dispatch", "name": "Static vs dynamic dispatch", "sessions": 1 }
+        { "id": "trait-object-collections", "name": "Trait object collections", "sessions": 1 },
+        { "id": "static-vs-dyn-dispatch", "name": "Static vs dyn dispatch", "sessions": 1 }
       ]
     },
     {

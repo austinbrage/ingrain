@@ -7,7 +7,7 @@
       "modules": [
         { "id": "generic-functions", "name": "Generic functions", "sessions": 1 },
         { "id": "constraints", "name": "Constraints", "sessions": 1 },
-        { "id": "ordered-and-underlying-types", "name": "Ordered and underlying types", "sessions": 1 },
+        { "id": "ordered-and-underlying", "name": "Ordered & underlying", "sessions": 1 },
         { "id": "type-inference", "name": "Type inference", "sessions": 1 }
       ]
     },

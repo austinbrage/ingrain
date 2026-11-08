@@ -90,8 +90,8 @@
           "sessions": 1
         },
         {
-          "id": "time-formatting-and-zones",
-          "name": "Time formatting and zones",
+          "id": "time-formats-and-zones",
+          "name": "Time formats & zones",
           "sessions": 1
         }
       ]
@@ -106,8 +106,8 @@
           "sessions": 1
         },
         {
-          "id": "structured-logging",
-          "name": "Structured logging with slog",
+          "id": "logging-with-slog",
+          "name": "Logging with slog",
           "sessions": 1
         }
       ]

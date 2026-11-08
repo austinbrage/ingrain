@@ -15,7 +15,7 @@
       "tier": "medium",
       "modules": [
         { "id": "persistent-flags", "name": "Persistent flags", "sessions": 2 },
-        { "id": "required-flags", "name": "Required flags and groups", "sessions": 3 },
+        { "id": "required-flags-and-groups", "name": "Required flags & groups", "sessions": 3 },
         { "id": "positional-arguments", "name": "Positional arguments", "sessions": 3 }
       ]
     },

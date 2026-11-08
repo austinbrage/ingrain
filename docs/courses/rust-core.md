@@ -48,7 +48,7 @@ Rules:
 
 **collections**
 - `vec-access`, `hashmap`: use `Option` only as a black box (`unwrap`, `unwrap_or`, `if let Some`), because enums comes later
-- `sorting-and-searching`: only `sort`, `sort_unstable`, `dedup`, `binary_search`, `contains`; no closure-keyed variants
+- `sort-dedup-and-search`: only `sort`, `sort_unstable`, `dedup`, `binary_search`, `contains`; no closure-keyed variants
 
 **strings-and-text**
 - `format-macro`: `format!` only, no `Display` impl
@@ -62,17 +62,17 @@ Rules:
 - `option`, `result`: the data shape only, no combinators and no `?`
 
 **pattern-matching**
-- `match-expression`: matching on enums and exhaustiveness, not the first contact with `match`
+- `enums-and-exhaustiveness`: matching on enums and exhaustiveness, not the first contact with `match`
 - `literal-and-range-patterns`: owns plain or-patterns (`1 | 2`) and ranges
 - `nested-and-or-patterns`: patterns inside patterns, including or-patterns inside them (`Some(1 | 2)`); it never re-teaches plain `x | y`
 
 **traits**
-- `trait-bounds`: only the `impl Trait` argument form; `<T: Trait>` and `where` are taught in generics
-- `associated-items-in-traits`: associated consts and functions only; associated types stay in generics
-- `impl-trait`: teach only what `trait-bounds` does not, so the two do not overlap
+- `impl-trait-arguments`: only the `impl Trait` argument form; `<T: Trait>` and `where` are taught in generics
+- `associated-items`: associated consts and functions only; associated types stay in generics
+- `impl-trait`: teach only what `impl-trait-arguments` does not, so the two do not overlap
 
 **generics**
-- `generic-functions`: teaches the `<T: Trait>` form. `where-clauses`: teaches `where`
+- `generic-function-bounds`: teaches the `<T: Trait>` form. `where-clauses`: teaches `where`
 - `turbofish-and-inference`: `collect::<Vec<_>>()` and `parse::<i32>()` are the examples
 
 **standard-traits**
@@ -85,12 +85,12 @@ Rules:
 
 **iterators**
 - `custom-iterators`, `returning-iterators`: owned data only; no `&'a [T]` struct and no `+ '_` (borrowed iterators belong to lifetimes)
-- `enumerate-zip-skip-take`: still covers `rev` and `chain` as ways of shaping which items you walk
+- `enumerate-and-friends`: still covers `rev` and `chain` as ways of shaping which items you walk
 
 **error-handling**
 - Closures are allowed in the combinator modules: functional style comes first
 - `handling-results`: the decision to recover or propagate, not the `match` on `Ok`/`Err`
-- `question-mark`: covers `?` on both `Result` and `Option`
+- `the-question-mark`: covers `?` on both `Result` and `Option`
 
 **testing**
 - `unit-test-modules`: the `#[cfg(test)] mod tests` + `use super::*` idiom as boilerplate; `mod`, `pub` and `use` are taught in modules-and-crates
@@ -101,7 +101,7 @@ Rules:
 - `std-macros-expanded`: how `println!`, `vec!` and `assert!` expand, not how to use them (their use was taught before); plus `todo!`, `unreachable!`, `matches!`, `dbg!`
 
 **modules-and-crates**
-- `re-exports`: `pub use` and shaping the crate's public surface
+- `re-exports-and-public-api`: `pub use` and shaping the crate's public surface
 - `dependencies`: using an external crate's paths with `use`; `Cargo.toml` syntax, versions and features belong to tooling
 
 **concurrency, smart-pointers**

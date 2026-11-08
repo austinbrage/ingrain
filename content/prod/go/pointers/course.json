@@ -16,7 +16,7 @@
       "modules": [
         { "id": "value-vs-pointer", "name": "Value or pointer", "sessions": 3 },
         { "id": "nil-pointers", "name": "Nil pointers", "sessions": 3 },
-        { "id": "slices-maps-and-pointers", "name": "Slices, maps and pointers", "sessions": 4 }
+        { "id": "slices-maps-and-pointers", "name": "Slices, maps & pointers", "sessions": 4 }
       ]
     },
     {

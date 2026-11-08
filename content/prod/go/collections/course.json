@@ -23,7 +23,7 @@
       "tier": "basic",
       "modules": [
         { "id": "append-and-copy", "name": "Append and copy", "sessions": 3 },
-        { "id": "stacks-queues-and-copies", "name": "Stacks, queues and copies", "sessions": 2 }
+        { "id": "stacks-queues-and-copies", "name": "Stacks, queues & copies", "sessions": 2 }
       ]
     },
     {
@@ -56,7 +56,7 @@
       "tier": "medium",
       "modules": [
         { "id": "slices-and-maps-packages", "name": "The slices package", "sessions": 3 },
-        { "id": "searching-and-editing-slices", "name": "Searching and editing slices", "sessions": 3 },
+        { "id": "searching-and-editing", "name": "Searching & editing", "sessions": 3 },
         { "id": "maps-package", "name": "The maps package", "sessions": 3 }
       ]
     }

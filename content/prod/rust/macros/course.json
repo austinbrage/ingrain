@@ -16,7 +16,7 @@
         { "id": "macro-rules-basics", "name": "macro_rules! basics", "sessions": 1 },
         { "id": "fragment-specifiers", "name": "Fragment specifiers", "sessions": 1 },
         { "id": "repetitions", "name": "Repetitions", "sessions": 1 },
-        { "id": "macro-items", "name": "Macros that generate items", "sessions": 1 }
+        { "id": "item-generating-macros", "name": "Item-generating macros", "sessions": 1 }
       ]
     },
     {

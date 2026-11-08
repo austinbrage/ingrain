@@ -6,8 +6,8 @@
       "tier": "basic",
       "modules": [
         { "id": "structs", "name": "Structs", "sessions": 1 },
-        { "id": "nested-and-anonymous-structs", "name": "Nested and anonymous structs", "sessions": 1 },
-        { "id": "comparing-and-copying-structs", "name": "Comparing and copying structs", "sessions": 1 },
+        { "id": "nested-and-anonymous", "name": "Nested & anonymous", "sessions": 1 },
+        { "id": "comparing-and-copying", "name": "Comparing & copying", "sessions": 1 },
         { "id": "constructors", "name": "Constructors", "sessions": 1 }
       ]
     },

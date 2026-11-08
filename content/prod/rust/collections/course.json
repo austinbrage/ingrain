@@ -22,7 +22,7 @@
       "name": "Sorting and searching",
       "tier": "medium",
       "modules": [
-        { "id": "sorting-and-searching", "name": "Sorting, deduping and searching", "sessions": 1 }
+        { "id": "sort-dedup-and-search", "name": "Sort, dedup & search", "sessions": 1 }
       ]
     },
     {

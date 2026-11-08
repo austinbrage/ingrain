@@ -10,7 +10,7 @@
         { "id": "subtests-and-helpers", "name": "Subtests and helpers", "sessions": 1 },
         { "id": "setup-and-cleanup", "name": "Setup and cleanup", "sessions": 1 },
         { "id": "test-doubles", "name": "Test doubles", "sessions": 1 },
-        { "id": "golden-files-and-testdata", "name": "Golden files and testdata", "sessions": 1 },
+        { "id": "golden-files-and-testdata", "name": "Golden files & testdata", "sessions": 1 },
         { "id": "parallel-tests", "name": "Parallel tests", "sessions": 1 }
       ]
     },

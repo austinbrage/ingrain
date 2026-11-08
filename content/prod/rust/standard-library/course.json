@@ -24,7 +24,7 @@
       "tier": "medium",
       "modules": [
         { "id": "paths", "name": "Paths", "sessions": 1 },
-        { "id": "reading-and-writing-files", "name": "Reading and writing files", "sessions": 1 },
+        { "id": "reading-and-writing-files", "name": "Reading & writing files", "sessions": 1 },
         { "id": "directories", "name": "Directories", "sessions": 1 }
       ]
     },
@@ -41,7 +41,7 @@
       "tier": "medium",
       "modules": [
         { "id": "mem-utilities", "name": "The mem module", "sessions": 1 },
-        { "id": "num-and-cmp-helpers", "name": "Number and comparison helpers", "sessions": 1 }
+        { "id": "number-and-cmp-helpers", "name": "Number & cmp helpers", "sessions": 1 }
       ]
     },
     {

@@ -8,7 +8,7 @@
         { "id": "panics", "name": "Panics", "sessions": 1 },
         { "id": "unwrap-and-expect", "name": "Unwrap and expect", "sessions": 1 },
         { "id": "handling-results", "name": "Recover or propagate", "sessions": 1 },
-        { "id": "question-mark", "name": "The question mark operator", "sessions": 1 }
+        { "id": "the-question-mark", "name": "The question mark", "sessions": 1 }
       ]
     },
     {
@@ -24,7 +24,7 @@
       "tier": "medium",
       "modules": [
         { "id": "custom-errors", "name": "Custom errors", "sessions": 1 },
-        { "id": "error-conversion", "name": "Error conversion with From", "sessions": 1 },
+        { "id": "converting-with-from", "name": "Converting with From", "sessions": 1 },
         { "id": "boxed-errors", "name": "Boxed errors", "sessions": 1 },
         { "id": "main-returning-result", "name": "Main returning Result", "sessions": 1 }
       ]

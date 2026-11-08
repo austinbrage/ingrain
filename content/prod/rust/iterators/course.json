@@ -6,8 +6,8 @@
       "tier": "basic",
       "modules": [
         {
-          "id": "iterator-basics",
-          "name": "The Iterator trait and next",
+          "id": "the-iterator-trait",
+          "name": "The Iterator trait",
           "sessions": 1
         },
         {
@@ -16,8 +16,8 @@
           "sessions": 1
         },
         {
-          "id": "iter-modes",
-          "name": "iter, iter_mut and into_iter",
+          "id": "the-three-iter-methods",
+          "name": "The three iter methods",
           "sessions": 1
         },
         {
@@ -26,8 +26,8 @@
           "sessions": 1
         },
         {
-          "id": "consumers",
-          "name": "Consumers, sum and min/max",
+          "id": "consumers-sum-min-max",
+          "name": "Consumers, sum, min/max",
           "sessions": 1
         }
       ]
@@ -42,8 +42,8 @@
           "sessions": 1
         },
         {
-          "id": "enumerate-zip-skip-take",
-          "name": "Enumerate, zip, skip and take",
+          "id": "enumerate-and-friends",
+          "name": "Enumerate & friends",
           "sessions": 1
         },
         {
@@ -73,8 +73,8 @@
           "sessions": 1
         },
         {
-          "id": "collect-results-and-options",
-          "name": "Collecting Results and Options",
+          "id": "collect-results-options",
+          "name": "Collect Results/Options",
           "sessions": 1
         },
         {
@@ -104,13 +104,13 @@
           "sessions": 1
         },
         {
-          "id": "into-iterator",
-          "name": "IntoIterator for own types",
+          "id": "your-own-intoiterator",
+          "name": "Your own IntoIterator",
           "sessions": 1
         },
         {
-          "id": "double-ended-and-exact-size",
-          "name": "DoubleEnded and ExactSize iterators",
+          "id": "doubleended-and-exactsize",
+          "name": "DoubleEnded & ExactSize",
           "sessions": 1
         },
         {

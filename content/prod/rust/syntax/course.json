@@ -9,7 +9,7 @@
         { "id": "printing", "name": "Printing", "sessions": 1 },
         { "id": "variables", "name": "Variables and mutability", "sessions": 1 },
         { "id": "shadowing", "name": "Shadowing", "sessions": 1 },
-        { "id": "expressions-and-statements", "name": "Expressions and statements", "sessions": 1 },
+        { "id": "expressions-and-statements", "name": "Expressions & statements", "sessions": 1 },
         { "id": "constants", "name": "Constants", "sessions": 1 },
         { "id": "type-aliases-and-statics", "name": "Type aliases and statics", "sessions": 1 }
       ]

@@ -5,9 +5,9 @@
       "name": "Generic types",
       "tier": "medium",
       "modules": [
-        { "id": "generic-functions", "name": "Generic functions and trait bounds", "sessions": 1 },
-        { "id": "turbofish-and-inference", "name": "Turbofish and type inference", "sessions": 1 },
-        { "id": "generic-structs-and-enums", "name": "Generic structs and enums", "sessions": 1 },
+        { "id": "generic-function-bounds", "name": "Generic function bounds", "sessions": 1 },
+        { "id": "turbofish-and-inference", "name": "Turbofish & inference", "sessions": 1 },
+        { "id": "generic-structs-and-enums", "name": "Generic structs & enums", "sessions": 1 },
         { "id": "generic-impls", "name": "Generic impl blocks", "sessions": 1 },
         { "id": "where-clauses", "name": "Where clauses", "sessions": 1 }
       ]

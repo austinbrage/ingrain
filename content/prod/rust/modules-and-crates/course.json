@@ -18,14 +18,14 @@
         { "id": "modules-in-files", "name": "Modules in files", "sessions": 1 },
         { "id": "nested-modules", "name": "Nested modules", "sessions": 1 },
         { "id": "restricted-visibility", "name": "Restricted visibility", "sessions": 1 },
-        { "id": "re-exports", "name": "Re-exports and the public API", "sessions": 1 }
+        { "id": "re-exports-and-public-api", "name": "Re-exports & public API", "sessions": 1 }
       ]
     },
     {
       "name": "Crates",
       "tier": "medium",
       "modules": [
-        { "id": "binary-and-library-crates", "name": "Binary and library crates", "sessions": 1 },
+        { "id": "binary-and-library-crates", "name": "Binary & library crates", "sessions": 1 },
         { "id": "dependencies", "name": "Using external crates", "sessions": 1 }
       ]
     }

@@ -31,7 +31,7 @@
         { "id": "worker-pools", "name": "Worker pools", "sessions": 1 },
         { "id": "pipelines", "name": "Pipelines", "sessions": 1 },
         { "id": "fan-out-fan-in", "name": "Fan-out and fan-in", "sessions": 1 },
-        { "id": "semaphores-and-rate-limiting", "name": "Semaphores and rate limiting", "sessions": 1 },
+        { "id": "semaphores-and-rate-limits", "name": "Semaphores & rate limits", "sessions": 1 },
         { "id": "races-and-leaks", "name": "Races and leaks", "sessions": 1 }
       ]
     }

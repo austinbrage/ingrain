@@ -40,7 +40,7 @@
       "tier": "medium",
       "modules": [
         { "id": "templates", "name": "Templates", "sessions": 3 },
-        { "id": "template-logic-and-functions", "name": "Template logic and functions", "sessions": 4 }
+        { "id": "template-logic-and-funcs", "name": "Template logic & funcs", "sessions": 4 }
       ]
     }
   ]

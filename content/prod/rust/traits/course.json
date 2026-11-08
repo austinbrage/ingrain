@@ -8,14 +8,14 @@
         { "id": "trait-definitions", "name": "Trait definitions", "sessions": 1 },
         { "id": "implementing-traits", "name": "Implementing traits", "sessions": 1 },
         { "id": "default-methods", "name": "Default methods", "sessions": 1 },
-        { "id": "associated-items-in-traits", "name": "Associated functions and consts in traits", "sessions": 1 }
+        { "id": "associated-items", "name": "Associated items", "sessions": 1 }
       ]
     },
     {
       "name": "Using traits",
       "tier": "medium",
       "modules": [
-        { "id": "trait-bounds", "name": "Bounds on impl Trait arguments", "sessions": 1 },
+        { "id": "impl-trait-arguments", "name": "impl Trait arguments", "sessions": 1 },
         { "id": "impl-trait", "name": "impl Trait", "sessions": 1 },
         { "id": "calling-trait-methods", "name": "Calling trait methods", "sessions": 1 }
       ]

@@ -5,7 +5,7 @@
       "name": "Matching beyond literals",
       "tier": "basic",
       "modules": [
-        { "id": "match-expression", "name": "Matching enums and exhaustiveness", "sessions": 1 },
+        { "id": "enums-and-exhaustiveness", "name": "Enums & exhaustiveness", "sessions": 1 },
         { "id": "literal-and-range-patterns", "name": "Ranges and or-patterns", "sessions": 1 },
         { "id": "if-let", "name": "If let", "sessions": 1 }
       ]
