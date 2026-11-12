@@ -7,9 +7,9 @@ description: Create or change the exercises of a module of a language in Ingrain
 
 Writes the exercises of one module, in `content/prod/<language>/<course>/<module>.json`. It is the third of three skills: `ingrain-courses` (the courses of a layer), `ingrain-modules` (the modules of a course) and this one. The module must already be in the `course.json` of its course.
 
-Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. It has three modes, picked by the arguments.
+Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. It has four modes, picked by the arguments.
 
-## The three modes
+## The four modes
 **1. A whole module: `<language> <course> <module>`.** Write all the exercises the concept needs, plus its intros.
 - **Never touch an exercise that is already written,** not its text, not its id, not its place. If the file already has exercises, add only what the concept still needs, with new ids, and say so. If the module looks complete, say so as a warning and change nothing
 
@@ -37,10 +37,16 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
   - **Overlap:** no two modules teach the same point. Using a piece again for another purpose is fine (`len` taught as a function in one module, then used to test for an empty string in a conditional in another); teaching the same point twice is not. A later module that revisits a concept with more context, another use or a harder form is reinforcement, not overlap; report it only when it re-introduces the basics
   - **Gaps:** nothing a module needs was left out between modules
   - **Progression:** the difficulty and the story hold from the first module to the last
+  - **Engagement:** the first modules of a course must run something the user can see early; a module that only has empty skeletons, comments or trivia is reported (`references/writing-rules.md`, "Engagement")
   
   The review **only reports**: each problem with its module and exercise id. It changes nothing. A fix goes through mode 2 (a named exercise and a prompt), so the ids and the saved progress stay safe
 - Do not commit anything
 - At the end, report one section per module with the report its subagent returned, the result of the flow review, then a list of every warning, every "needs a split" and every session count changed in `course.json`
+
+**4. Engagement review: `<language> <course> <module> review`, or `<language> <course> review` for every module of the course.** It only reports and changes nothing.
+- One fresh subagent per module, all in the same turn for a whole course. Each reads the module file and the modules before it, and applies the "Engagement" rules (`references/writing-rules.md`) to every exercise and intro
+- Each report lists, per weak exercise: its id, the rule it breaks, and a one-line prompt for mode 2 that would fix it. It also gives a verdict for the module (engaging, thin or empty) and says when the module as a whole needs a rewrite or a merge instead of exercise fixes
+- The parent ranks the modules by how many weak exercises they have and reports. The fixes are applied later, one mode 2 call each, with new ids for replaced exercises
 
 **The same idea holds for the other two skills:** a general call, with no request, never touches what already exists. Only a specific, named target with a request can change something that is written.
 
@@ -87,6 +93,9 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
 - **Never remove an exercise** unless the prompt names it and says to. Say what you removed
 - Change only what the prompt asks, and leave everything else exactly as it is
 - If the prompt would change the session count, say so and update `course.json`
+
+## Engagement
+Before you finish, check every exercise against "Engagement" in `references/writing-rules.md`: each typing exercise builds something that runs and shows a result, nothing is an empty skeleton or a trivia question, and a thin concept is merged into fewer, richer exercises instead of padded.
 
 ## Finish
 Run `cargo test --test content` and fix everything it reports. It checks the ids, the session count, the card limits, the quiz rules, the fill-blank rules (the gaps and the answers), the intro limits and the chunks (the `line` places, the ghost guides, the balanced code and the note anchors).

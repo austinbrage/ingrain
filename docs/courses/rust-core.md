@@ -38,7 +38,7 @@ Rules:
 
 ## Rules per module
 **syntax**
-- `printing`: only the basic `println!` forms; `format!` belongs to strings-and-text
+- `printing`: the first module of the course, and it presents the language: the `fn main` program, `println!` with `{}` values, `use` and `std::` paths (`std::cmp::max`, `std::f64::consts::PI`), a few simple methods on a text literal (`to_uppercase`, `repeat`, `len`) as a taste, one brief comments exercise, then the formatting forms (positional, `{:?}`, width, alignment, bases). No variables, `let`, `if` or loops. `format!` and real `String` work belong to strings-and-text
 - `match-basics`: integers, literals and `_`; no enums. It is the first contact with `match`
 - No exercise needs a function other than `main`, a `String` or a `Vec`
 

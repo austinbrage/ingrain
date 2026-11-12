@@ -65,6 +65,19 @@ A note is a hint under a piece of code, shown while the user types it.
 - The answers are spelled as in the code, letter for letter: the check is exact, case included
 - Vary the place of the gaps across a module (a keyword here, a type there), and alternate the exercise with typing exercises and quizzes
 
+## Engagement
+The module must make the user want to continue. It fails when the user types code that does nothing, or answers questions whose answer is a keyword. Check every exercise against this list:
+- **A typing exercise builds a program that runs and shows a result.** It has an `output` (unless the result is a TUI or a server). An empty skeleton (`fn main() {}`, braces with nothing in them) or a program made of comments only is not an exercise; it is at most a step of a larger one
+- **No more than 3 lines of the same kind in a typing exercise.** Four or more `println!` calls that only repeat the same shape (printing more text, one more placeholder, one more call of the same function) tire the user of typing the same thing: cut to at most 3, and keep a line only when it adds something new (a new placeholder form, a new function, a new escape). Lines that repeat a pattern already typed can be `auto` chunks. Concise beats complete: drop a piece that renders badly or adds nothing (the author, 2026-11-11)
+- **One exercise, one thing the user can see working,** with enough code to feel like building something: about 4 lines or more typed. When a concept is thin, write fewer and richer exercises (or one), never a string of small ones that each add a trivial piece
+- **The first module of a course runs a program in its first minute.** Do not hold back the thing the user came for (printing, a result) to keep a topic pure; a plain use of a later piece, named in the guide as "covered later", is better than a module with nothing to see
+- **Quizzes test understanding, not trivia.** "What does a comment change?", "which part is a comment?" and a fill-blank on `fn` or `main` teach nothing. A quiz asks what a program prints, why it is written one way, or which version is right, about code that does something
+- **A fill-blank hides a word the lesson is about,** and the user must think to find it
+- **Realistic names and situations** (a price, a score, a host) over `foo`, `x`, `a` and `b`, wherever the point is not the math
+- **Variety inside the module:** the programs differ from each other in what they do, not only in the keyword they show
+
+A module is **empty** when most of its exercises fail this list, **thin** when a few do, and **engaging** otherwise. An empty module is rewritten, not patched.
+
 ## Intros
 - **As much as the concept needs, not a fixed number.** An easy concept (conditionals) gets a short intro, a single slide, or none at all. A hard concept (concurrency) gets longer texts, more slides and snippets. Judge it from the course and the module
 - One idea per slide, in the markdown subset of the guide. The limits are in `docs/content-structure.md` ("Intro")
