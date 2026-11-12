@@ -1,0 +1,205 @@
+{
+  "id": "overflow",
+  "intro": {
+    "title": "Overflow",
+    "slides": [
+      {
+        "text": "Every integer type holds a fixed range. A `u8` holds 0 to 255, so asking it to hold 256 is an **overflow**. Going below 0 in an unsigned type is the same problem from the other side."
+      },
+      {
+        "text": "Rust does not agree with itself on what an overflow does. A debug build (`cargo run`) panics. A release build (`cargo run --release`) skips the check and wraps around silently, which hides the bug.\n\nSo code that can really overflow says what it wants, with a method that names the behavior."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Four ways to overflow",
+        "slides": [
+          {
+            "text": "Each integer has a family of methods, one per behavior. They share the operation name (`add`, `sub`, `mul`) and change the prefix. `x` and `y` below are placeholders. `Option` has its own course later: here it is only printed or unwrapped with `unwrap_or`.",
+            "code": "x.wrapping_add(y)\nx.checked_add(y)\nx.saturating_add(y)\nx.overflowing_add(y)"
+          },
+          {
+            "text": "- `wrapping_`: wraps around to the other end of the range\n- `checked_`: gives back an `Option`, `None` when the result does not fit\n- `saturating_`: stops at the nearest edge of the range\n- `overflowing_`: gives back the wrapped result and whether it wrapped\n\nThis session covers the first three."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "wrapping-add",
+          "title": "Wrap around",
+          "guide": "Add past the edge of a `u8` and let it wrap.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A `u8` close to its maximum of 255.", "text": "    let level: u8 = 250;"},
+            {"mode": "ghost", "line": 3, "guide": "250 plus 10 is 260, which does not fit. The result wraps around and counts on from 0.", "notes": [{"on": "wrapping_add", "text": "Adds, and wraps past the maximum back to zero."}], "text": "    let next = level.wrapping_add(10);\n    println!(\"{}\", next);"},
+            {"mode": "ghost", "line": 5, "guide": "Subtracting can wrap too, past 0 up to the top.", "notes": [{"on": "wrapping_sub", "text": "Goes below zero and lands at the top of the range."}], "text": "    let low = level.wrapping_sub(255);\n    println!(\"{}\", low);"}
+          ],
+          "output": {"command": "cargo run", "text": "4\n251"}
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "plain-plus-panic",
+          "title": "Debug or release?",
+          "guide": "Run the code in a debug build and in a release build, then pick what each prints.",
+          "code": "fn main() {\n    let mut level: u8 = 250;\n    for _ in 0..3 {\n        level = level + 4;\n        println!(\"{}\", level);\n    }\n}",
+          "options": [
+            "Both print 254, 2, 6",
+            "Debug: 254, then panic. Release: 254, 2, 6",
+            "Debug: 254, 2, 6. Release: 254, then panic",
+            "Both print 254, then panic"
+          ],
+          "answer": 1,
+          "explanation": "The second round needs 258, which does not fit a `u8`. A debug build panics there, a release build wraps to 2 and goes on to 6."
+        },
+        {
+          "type": "typing",
+          "id": "checked-add",
+          "title": "Check before you add",
+          "guide": "Ask for the sum and get `None` when it does not fit.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A `u8` close to its maximum.", "text": "    let stock: u8 = 250;"},
+            {"mode": "ghost", "line": 3, "guide": "250 plus 5 fits in a `u8`. 250 plus 6 does not.", "notes": [{"on": "stock.checked_add(5)", "text": "Gives Some(sum), or None when the sum does not fit."}], "text": "    let fits = stock.checked_add(5);\n    let full = stock.checked_add(6);"},
+            {"mode": "ghost", "line": 5, "guide": "Print both results. They are not plain numbers: each is `Some(number)` or `None`.", "notes": [{"on": "\"{:?}\", fits", "text": "Prints the Option, wrapper included."}], "text": "    println!(\"{:?}\", fits);\n    println!(\"{:?}\", full);"},
+            {"mode": "ghost", "line": 7, "guide": "Take the number out, with a fallback for `None`.", "notes": [{"on": "unwrap_or(0)", "text": "Gives the number, or 0 when there is none."}], "text": "    println!(\"{}\", full.unwrap_or(0));"}
+          ],
+          "output": {"command": "cargo run", "text": "Some(255)\nNone\n0"}
+        },
+        {
+          "type": "fill-blank",
+          "id": "safe-sum",
+          "title": "A sum that cannot wrap",
+          "guide": "Add 10 without wrapping, then print the sum, or 0 when it does not fit.",
+          "code": "fn main() {\n    let stock: u8 = 250;\n    let total = stock.___(10);\n    println!(\"{}\", total.___(0));\n}",
+          "gaps": [
+            {"answers": ["checked_add"]},
+            {"answers": ["unwrap_or"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "inventory-removal",
+          "title": "Removing too many",
+          "guide": "Handle an order bigger than the stock in two ways, and one that fits.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "An unsigned stock cannot go below 0, and an order may ask for more than it holds.", "text": "    let stock: u32 = 12;\n    let order: u32 = 15;"},
+            {"mode": "ghost", "line": 4, "guide": "Refuse the order: when it does not fit, the stock stays as it was.", "notes": [{"on": "unwrap_or(stock)", "text": "Falls back to the old stock when the order is too big."}], "text": "    let kept = stock.checked_sub(order).unwrap_or(stock);\n    println!(\"{}\", kept);"},
+            {"mode": "ghost", "line": 6, "guide": "Sell everything: the stock stops at zero.", "text": "    let emptied = stock.saturating_sub(order);\n    println!(\"{}\", emptied);"},
+            {"mode": "ghost", "line": 8, "guide": "A small order of 5 fits, so the refusing version removes it.", "text": "    let sold = stock.checked_sub(5).unwrap_or(stock);\n    println!(\"{}\", sold);"}
+          ],
+          "output": {"command": "cargo run", "text": "12\n0\n7"}
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "pick-the-method",
+          "title": "Pick the behavior",
+          "guide": "The three lines are pseudo code, not real Rust. A health bar stops at 0, a balance refuses a bad subtraction, a hash keeps growing. Pick the prefix for each line.",
+          "code": "health  = health  - damage\nbalance = balance - withdrawal\nhash    = hash    * 31",
+          "options": [
+            "checked_, saturating_, wrapping_",
+            "saturating_, wrapping_, checked_",
+            "saturating_, checked_, wrapping_",
+            "wrapping_, checked_, saturating_"
+          ],
+          "answer": 2,
+          "explanation": "A bar clamps at its edge, a balance must report that it cannot go below zero, and a hash is meant to wrap and keep only the low bits."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "checksum",
+          "title": "Count the wraps",
+          "guide": "Sum four bytes in a loop and count how many times the sum wrapped.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Four bytes, a running sum and a counter for wraps.", "text": "    let packet: [u8; 4] = [200, 100, 150, 120];\n    let mut sum: u8 = 0;\n    let mut wraps = 0;"},
+            {"mode": "ghost", "line": 5, "guide": "Add each byte. The method gives the wrapped sum and a flag, split by a pattern. Count a wrap when the flag is true.", "notes": [{"on": "overflowing_add", "text": "Gives the wrapped sum and whether it wrapped."}], "text": "    for byte in packet {\n        let (next, wrapped) = sum.overflowing_add(byte);\n        sum = next;\n        if wrapped {\n            wraps += 1;\n        }\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Print the checksum and the wraps: 300 wrapped to 44, and 314 to 58.", "text": "    println!(\"sum {} wrapped {}\", sum, wraps);"}
+          ],
+          "output": {"command": "cargo run", "text": "sum 58 wrapped 2"}
+        },
+        {
+          "type": "typing",
+          "id": "signed-edge",
+          "title": "The edges of i32",
+          "guide": "Cross both ends of an `i32`, and meet a trap of `abs`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The two edges of an `i32`, as in integers.", "text": "    let top = i32::MAX;\n    let bottom = i32::MIN;"},
+            {"mode": "ghost", "line": 4, "guide": "One past the maximum wraps to the minimum.", "text": "    println!(\"{}\", top.wrapping_add(1));"},
+            {"mode": "ghost", "line": 5, "guide": "One below the minimum wraps to the maximum.", "text": "    println!(\"{}\", bottom.wrapping_sub(1));"},
+            {"mode": "ghost", "line": 6, "guide": "Even `abs` can overflow: the minimum has no positive twin, so the fallback 0 is used.", "notes": [{"on": "checked_abs", "text": "The absolute value, or None when it does not fit."}], "text": "    println!(\"{}\", bottom.checked_abs().unwrap_or(0));"}
+          ],
+          "output": {"command": "cargo run", "text": "-2147483648\n2147483647\n0"}
+        },
+        {
+          "type": "fill-blank",
+          "id": "health-bar",
+          "title": "A health bar",
+          "guide": "`left` stops at 0 when the hit is too big. `safe` is 99 in that case.",
+          "code": "fn main() {\n    let hp: u8 = 20;\n    let hit: u8 = 30;\n    let left = hp.___(hit);\n    let try_hp = hp.___(hit);\n    let safe = try_hp.___(99);\n    println!(\"{} {}\", left, safe);\n}",
+          "gaps": [
+            {"answers": ["saturating_sub"]},
+            {"answers": ["checked_sub"]},
+            {"answers": ["unwrap_or"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "wrapping-purpose",
+          "title": "Why wrapping?",
+          "guide": "Read the code, then pick what it is for.",
+          "code": "fn main() {\n    let mut hash: u32 = 7;\n    for byte in [104, 105] {\n        hash = hash.wrapping_mul(31);\n        hash = hash.wrapping_add(byte);\n    }\n    println!(\"{}\", hash);\n}",
+          "options": [
+            "Mixes numbers, capping them at the maximum",
+            "Mixes numbers with arithmetic meant to wrap",
+            "Mixes numbers, panicking if they grow too big",
+            "Mixes numbers, giving None when they overflow"
+          ],
+          "answer": 1,
+          "explanation": "A hash grows past the range on purpose and keeps only the low bits, so it needs the wrapping methods, never a panic or a clamp."
+        },
+        {
+          "type": "typing",
+          "id": "counter-loop",
+          "title": "A counter that wraps",
+          "guide": "Count up past the top of a `u8` without panicking in a debug build.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A counter close to the top of a `u8`.", "text": "    let mut level: u8 = 250;"},
+            {"mode": "ghost", "line": 3, "guide": "Count up ten times. A plain `+= 1` would panic here, so the wrapping method does the step.", "text": "    for _ in 0..10 {\n        level = level.wrapping_add(1);\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "The counter passed 255 and went on from 0.", "text": "    println!(\"{}\", level);"}
+          ],
+          "output": {"command": "cargo run", "text": "4"}
+        }
+      ],
+      "intro": {
+        "title": "Flags and edges",
+        "slides": [
+          {
+            "text": "`overflowing_` gives back two values in a tuple: the wrapped result and a `bool` that says whether it wrapped. A pattern splits them into two names.",
+            "code": "let (prod, hit) = x.overflowing_mul(y);"
+          },
+          {
+            "text": "The constants you met in integers are the numbers a method reaches when it clamps or wraps. Two methods work at those edges: `overflowing_` hands back the wrapped result with a flag, and signed types have a trap of their own."
+          },
+          {
+            "text": "Signed types have one more trap: `abs`. The minimum has no positive twin, so `abs` can overflow like any other operation, and `checked_abs` exists for it."
+          }
+        ]
+      }
+    }
+  ]
+}

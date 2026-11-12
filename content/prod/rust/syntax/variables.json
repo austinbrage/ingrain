@@ -1,0 +1,284 @@
+{
+  "id": "variables",
+  "intro": {
+    "title": "Variables and mutability",
+    "slides": [
+      {
+        "text": "A variable gives a name to a value. In Rust a variable is **immutable by default**: once it has a value, it cannot be changed unless you ask for it.\n\nIn this module you create variables, make them changeable with `mut`, copy values between them and handle the ones you do not use."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Let and mut",
+        "slides": [
+          {
+            "text": "`let` creates a variable. A plain one keeps its first value for good. Add `mut` and it can be assigned again.\n\nPseudo code, not Rust.",
+            "code": "let name = value\n    name stays the same\n\nlet mut name = value\n    name = another value"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "let-binding",
+          "title": "Your first variables",
+          "guide": "Create three variables with `let` and print them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`let` gives a name to a value. Names are written in lowercase, with underscores between words.",
+              "notes": [
+                {
+                  "on": "let max_lives",
+                  "text": "Makes a variable and gives it a value."
+                },
+                {
+                  "on": "max_lives",
+                  "text": "Lowercase words joined by underscores."
+                }
+              ],
+              "text": "    let max_lives = 3;\n    let level = 7;\n    let coins = 120;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print all three variables. Each `{}` takes the next value, in order.",
+              "text": "    println!(\"lives {}, level {}, coins {}\", max_lives, level, coins);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "lives 3, level 7, coins 120"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "let-mut",
+          "title": "A variable that changes",
+          "guide": "Declare a variable with `mut`, then assign it a new value.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Write `mut` after `let` to allow the value to change later.",
+              "notes": [
+                {
+                  "on": "mut",
+                  "text": "Lets this variable be assigned again."
+                }
+              ],
+              "text": "    let mut score = 10;\n    println!(\"{}\", score);"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Assign a new value with `=`. Do not write `let` again: it is the same variable.",
+              "text": "    score = 25;\n    println!(\"{}\", score);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "10\n25"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "counter-steps",
+          "title": "What does it print?",
+          "guide": "`attempts` is assigned twice. Follow each step, then pick the output.",
+          "code": "fn main() {\n    let mut attempts = 1;\n    println!(\"{}\", attempts);\n    attempts = 2;\n    attempts = 3;\n    println!(\"{}\", attempts);\n}",
+          "options": [
+            "1\n1",
+            "1\n2",
+            "1\n3",
+            "3\n3"
+          ],
+          "answer": 2,
+          "explanation": "The first `println!` runs before any reassignment, so it shows 1. The last assignment wins, so the second shows 3."
+        },
+        {
+          "type": "typing",
+          "id": "mut-per-variable",
+          "title": "Only what changes",
+          "guide": "Each variable decides for itself: only the one that changes gets `mut`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`speed` will change, `limit` will not. Only `speed` is `mut`.",
+              "text": "    let mut speed = 40;\n    let limit = 90;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Print both.",
+              "text": "    println!(\"{} {}\", speed, limit);"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Change `speed`. Assigning to `limit` would be an error.",
+              "text": "    speed = 70;\n    println!(\"{} {}\", speed, limit);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "40 90\n70 90"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "copy-a-value",
+          "title": "Copy a value",
+          "guide": "Initialize a variable from another one. The copy keeps its own value.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`saved` takes the current value of `stock`.",
+              "notes": [
+                {
+                  "on": "= stock",
+                  "text": "Copies the number into the new variable."
+                }
+              ],
+              "text": "    let mut stock = 8;\n    let saved = stock;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Change `stock` after the copy.",
+              "text": "    stock = 20;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`saved` still holds the old value.",
+              "text": "    println!(\"{} {}\", stock, saved);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "20 8"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "mut-and-assign",
+          "title": "Change the original",
+          "guide": "The program must print `30 80`. Fill in the two names.",
+          "code": "fn main() {\n    let mut fuel = 80;\n    let reserve = fuel;\n    ___ = 30;\n    println!(\"{} {}\", fuel, ___);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "fuel"
+              ]
+            },
+            {
+              "answers": [
+                "reserve"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "assign-from-variable",
+          "title": "What does it print?",
+          "guide": "Follow each assignment, then pick the output.",
+          "code": "fn main() {\n    let mut best = 10;\n    let latest = 14;\n    best = latest;\n    println!(\"{} {}\", best, latest);\n}",
+          "options": [
+            "10 14",
+            "14 14",
+            "14 10",
+            "10 10"
+          ],
+          "answer": 1,
+          "explanation": "`best = latest` copies the value of `latest` into `best`, so both hold 14."
+        },
+        {
+          "type": "typing",
+          "id": "receipt",
+          "title": "Print a receipt",
+          "guide": "Build a small receipt: values that are used, one that is not, and one given later.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`_note` is never printed. The underscore tells the compiler that is on purpose.",
+              "notes": [
+                {
+                  "on": "_note",
+                  "text": "The leading underscore stops the unused warning."
+                }
+              ],
+              "text": "    let price = 12;\n    let qty = 3;\n    let _note = 5;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Declare `paid` now and give it its value on the next line.",
+              "notes": [
+                {
+                  "on": "let paid;",
+                  "text": "No value yet; it cannot be read until it has one."
+                },
+                {
+                  "on": "paid = 40",
+                  "text": "One assignment is allowed without mut."
+                }
+              ],
+              "text": "    let paid;\n    paid = 40;"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Print one line per value.",
+              "text": "    println!(\"price: {}\", price);\n    println!(\"qty: {}\", qty);\n    println!(\"paid: {}\", paid);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "price: 12\nqty: 3\npaid: 40"
+          }
+        }
+      ]
+    }
+  ]
+}

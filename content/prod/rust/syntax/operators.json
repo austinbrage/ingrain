@@ -1,0 +1,359 @@
+{
+  "id": "operators",
+  "intro": {
+    "title": "Operators",
+    "slides": [
+      {
+        "text": "Operators combine values into new ones: arithmetic, updating a variable in place, joining comparisons into one condition and working on bits. The snippet is a map of the operators, not Rust.",
+        "code": "arithmetic  + - * / %\nupdate      += -= *= /= %=\nlogic       && || !   (join comparisons)\nbits        & | ^ ! << >>"
+      },
+      {
+        "text": "Rust is strict about them. Both sides of an operator need the same type, there is no `++` or `--`, and there is no `**` for powers. Conditions use `&&`, `||` and `!`, never the words `and` or `or`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "arithmetic",
+          "title": "Arithmetic",
+          "guide": "Combine two whole numbers with the five arithmetic operators.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Two whole numbers to work with.", "text": "    let a = 17;\n    let b = 5;"},
+            {"mode": "ghost", "line": 4, "guide": "`+`, `-` and `*` work as in maths. `a` and `b` themselves do not change.", "text": "    println!(\"{} {} {}\", a + b, a - b, a * b);"},
+            {"mode": "ghost", "line": 5, "guide": "`/` on two whole numbers gives a whole number: the decimals are cut off. `%` gives the remainder of the division.", "notes": [{"on": "a / b", "text": "Whole-number division: decimals are cut off."}, {"on": "%", "text": "What is left over after dividing."}], "text": "    println!(\"{} {}\", a / b, a % b);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "22 12 85\n3 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "integer-division",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    println!(\"{}\", -7 / 2);\n    println!(\"{}\", 8 / 3 * 3);\n    println!(\"{}\", 8 * 3 / 3);\n}",
+          "options": [
+            "-4\n6\n8",
+            "-3\n8\n8",
+            "-3\n6\n8",
+            "-3\n6\n6"
+          ],
+          "answer": 2,
+          "explanation": "Whole-number division cuts toward zero, so -7 / 2 is -3, not -4. Each step is cut before the next one: 8 / 3 is 2 before it is tripled, but 8 * 3 is 24 before it is divided."
+        },
+        {
+          "type": "typing",
+          "id": "remainder-sign",
+          "title": "The sign of a remainder",
+          "guide": "See what `%` does with a negative number.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A negative number, typed as `i32` so methods can be called on it.", "text": "    let a: i32 = -7;"},
+            {"mode": "ghost", "line": 3, "guide": "The remainder takes the sign of the **left** number: -7 % 3 is -1, not 2.", "notes": [{"on": "a % 3", "text": "Negative on the left gives a negative result."}], "text": "    println!(\"{} {}\", a / 2, a % 3);"},
+            {"mode": "ghost", "line": 4, "guide": "`rem_euclid` is the remainder that is never negative.", "notes": [{"on": "rem_euclid", "text": "A method: the remainder, always zero or more."}], "text": "    println!(\"{}\", a.rem_euclid(3));"},
+            {"mode": "ghost", "line": 5, "guide": "A realistic use: an offset of -2 days from today, wrapped into the 7 days of a week.", "text": "    let day: i32 = -2;\n    println!(\"{}\", day.rem_euclid(7));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "-3 -1\n2\n5"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "quotient-remainder",
+          "title": "Groups and leftovers",
+          "guide": "Split 17 items into groups of 5: how many full groups, and how many are left over.",
+          "code": "fn main() {\n    let total = 17;\n    let groups = total ___ 5;\n    let left = total ___ 5;\n    println!(\"{} {}\", groups, left);\n}",
+          "gaps": [
+            {"answers": ["/"]},
+            {"answers": ["%"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "clock-wrap",
+          "title": "Wrap around the clock",
+          "guide": "It is 23:00 and 7 hours pass. Read the code, then pick the output.",
+          "code": "fn main() {\n    let hour = 23;\n    let passed = 7;\n    let total = hour + passed;\n    println!(\"{}\", total % 24);\n    println!(\"{}\", total / 24);\n}",
+          "options": [
+            "1\n6",
+            "6\n6",
+            "6\n1",
+            "30\n1"
+          ],
+          "answer": 2,
+          "explanation": "The total is 30. `%` keeps what is left after whole days of 24: 6, the hour on the clock. `/` counts the whole days: 1."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Grouping, signs and updates",
+        "slides": [
+          {
+            "text": "`*`, `/` and `%` go before `+` and `-`, and operators of the same level go left to right. Parentheses go first of all. A minus in front of a value flips its sign, and it goes before `*`. The snippet is pseudo code.\n\nSo a sum inside parentheses is worked out before anything around it.",
+            "code": "2 + 3 * 4     = 14\n(2 + 3) * 4   = 20\n-3 * 2        = -6\n-(3 * 2)      = -6\n10 - 4 - 3    = 3"
+          },
+          {
+            "text": "`+=`, `-=`, `*=`, `/=` and `%=` change a variable in place: `count += 5` is `count = count + 5`. The variable must be `mut`.\n\nRust has no `++`, so adding one is `+= 1`."
+          },
+          {
+            "text": "Both sides of an arithmetic operator must have the same type: an `i32` plus an `i32`, an `f64` times an `f64`. Mixing whole numbers and decimals is an error, even for a literal: `2.5 + 1` fails, `2.5 + 1.0` works."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "temperature-drop",
+          "title": "A night of cold",
+          "guide": "Work out a temperature that falls below zero, with a minus in front of values.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A morning temperature and how much it falls.", "text": "    let morning = 4;\n    let fall = 7;"},
+            {"mode": "ghost", "line": 4, "guide": "Subtracting more than there is gives a negative number.", "text": "    let night = morning - fall;\n    println!(\"{}\", night);"},
+            {"mode": "ghost", "line": 6, "guide": "A minus in front of a value flips its sign, and it goes before `*`.", "notes": [{"on": "-night", "text": "Unary minus: the same value with the opposite sign."}], "text": "    let rise = -night * 2;\n    println!(\"{}\", rise);"},
+            {"mode": "ghost", "line": 8, "guide": "Parentheses make the subtraction happen first, then the minus flips the result.", "notes": [{"on": "-(morning - night)", "text": "The gap between the two, as a negative."}], "text": "    let swing = -(morning - night);\n    println!(\"{}\", swing);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "-3\n6\n-7"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "bill-total",
+          "title": "The real total",
+          "guide": "The bill is a base price plus the sodas, minus half the coupon. Read the code, then pick the output.",
+          "code": "fn main() {\n    let base = 20;\n    let sodas = 5;\n    let soda = 3;\n    let coupon = 10;\n    let bill = base + sodas * soda\n        - coupon / 2;\n    println!(\"{}\", bill);\n}",
+          "options": [
+            "70",
+            "32",
+            "30",
+            "12"
+          ],
+          "answer": 2,
+          "explanation": "`*` and `/` go before `+` and `-`, so the sodas and the coupon are worked out first: 20 + 15 - 5 is 30. Adding the base to the sodas first would give 70, and dividing the whole sum would give 12 or 32."
+        },
+        {
+          "type": "typing",
+          "id": "update-in-place",
+          "title": "Update a variable",
+          "guide": "Change a variable with shorthand operators and print the result.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A number that will change, so it is `mut`.", "text": "    let mut count = 10;"},
+            {"mode": "ghost", "line": 3, "guide": "`+=` adds to the variable itself, and `*=` multiplies it. `count += 5` means `count = count + 5`.", "notes": [{"on": "+=", "text": "Adds to the variable in place."}, {"on": "*=", "text": "Multiplies the variable in place."}], "text": "    count += 5;\n    count *= 2;"},
+            {"mode": "ghost", "line": 5, "guide": "Print the value so far.", "text": "    println!(\"{}\", count);"},
+            {"mode": "ghost", "line": 6, "guide": "`-=` takes away from the variable. `%=` replaces it with its own remainder.", "notes": [{"on": "-=", "text": "Subtracts from the variable in place."}, {"on": "%=", "text": "Keeps only the remainder."}], "text": "    count -= 4;\n    count %= 5;"},
+            {"mode": "ghost", "line": 8, "guide": "Print the final value.", "text": "    println!(\"{}\", count);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "30\n1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "loyalty-points",
+          "title": "Points balance",
+          "guide": "A customer has 130 points: 30 earned, 50 spent. Then only the part below a full 100 stays.",
+          "code": "fn main() {\n    let mut points = 130;\n    points ___ 30;\n    points ___ 50;\n    points ___ 100;\n    println!(\"{}\", points);\n}",
+          "gaps": [
+            {"answers": ["+="]},
+            {"answers": ["-="]},
+            {"answers": ["%="]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "retry-counter",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let mut retries = 0;\n    retries += 1;\n    retries *= 3;\n    println!(\"{}\", retries);\n}",
+          "options": [
+            "0",
+            "1",
+            "3",
+            "4"
+          ],
+          "answer": 2,
+          "explanation": "`retries += 1` makes it 1, then `retries *= 3` triples it: 3. Each update works on the value the line before left."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "logic",
+          "title": "Combine conditions",
+          "guide": "Join bools with logic operators.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A number and a bool to work with.", "text": "    let age = 25;\n    let member = false;"},
+            {"mode": "ghost", "line": 4, "guide": "`||` is true when either side is true.", "notes": [{"on": "||", "text": "True when either side is true."}], "text": "    let free = age <= 12 || age > 65;"},
+            {"mode": "ghost", "line": 5, "guide": "`&&` needs both sides true, and `!` flips a bool.", "notes": [{"on": "&&", "text": "True only when both sides are true."}, {"on": "!member", "text": "True when member is false."}], "text": "    let discount = age >= 18 && !member;"},
+            {"mode": "ghost", "line": 6, "guide": "`!=` is true when the sides differ, and joins with `&&` like any bool.", "notes": [{"on": "!=", "text": "True when the two sides are different."}], "text": "    let regular = age != 30 && !free;"},
+            {"mode": "ghost", "line": 7, "guide": "Print the three bools.", "text": "    println!(\"{} {} {}\", free, discount, regular);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "false true true"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "logic-precedence",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let open = true;\n    let broken = false;\n    let ready = false;\n    println!(\"{}\", open || broken && ready);\n    println!(\"{}\", (open || broken) && ready);\n}",
+          "options": [
+            "true\ntrue",
+            "true\nfalse",
+            "false\nfalse",
+            "false\ntrue"
+          ],
+          "answer": 1,
+          "explanation": "`&&` binds tighter than `||`, so the first line is `open || (broken && ready)`: true. The parentheses in the second change the grouping: `true && false` is false."
+        },
+        {
+          "type": "fill-blank",
+          "id": "temperature-range",
+          "title": "Inside and outside a range",
+          "guide": "Check 21 against the range 18 to 26: is it inside, and is it outside?",
+          "code": "fn main() {\n    let temp = 21;\n    let comfortable = temp >= 18 ___ temp <= 26;\n    let outside = temp < 18 ___ temp > 26;\n    println!(\"{} {}\", comfortable, outside);\n}",
+          "gaps": [
+            {"answers": ["&&"]},
+            {"answers": ["||"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "float-equality",
+          "title": "Comparing decimals",
+          "guide": "Compare decimal results with `==` and `<=`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Halves and quarters are stored exactly. Tenths are not.", "text": "    let exact = 0.5 + 0.25;\n    let tripled = 0.1 * 3.0;"},
+            {"mode": "ghost", "line": 4, "guide": "An exact result matches.", "notes": [{"on": "exact == 0.75", "text": "Safe here: both sides are stored exactly."}], "text": "    println!(\"{}\", exact == 0.75);"},
+            {"mode": "ghost", "line": 5, "guide": "The tripled tenth misses 0.3, and `<=` does not save it.", "notes": [{"on": "tripled <= 0.3", "text": "Also false: the stored value is a bit above 0.3."}], "text": "    println!(\"{}\", tripled == 0.3);\n    println!(\"{}\", tripled <= 0.3);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true\nfalse\nfalse"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-4",
+      "intro": {
+        "title": "Bits",
+        "slides": [
+          {
+            "text": "A whole number is stored as bits. Bitwise operators work on every bit of two numbers at once. The snippet is pseudo code, with 12 and 10 written in bits.",
+            "code": "12     = 1100\n10     = 1010\n\n12 & 10 = 1000   both bits 1\n12 | 10 = 1110   either bit 1\n12 ^ 10 = 0110   only one bit 1"
+          },
+          {
+            "text": "`!` on a number flips every bit. Shifts slide all the bits: `<<` moves them left, which doubles the number for each place, and `>>` moves them right, which halves it and drops the rest.",
+            "code": "!00000101 = 11111010\n0011 << 1 = 0110\n0011 << 2 = 1100\n1100 >> 2 = 0011"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "bit-operators",
+          "title": "Bitwise operators",
+          "guide": "Combine the bits of two numbers.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "In bits, 12 is `1100` and 10 is `1010`. `u8` is a number of 8 bits.", "text": "    let a: u8 = 12;\n    let b: u8 = 10;"},
+            {"mode": "ghost", "line": 4, "guide": "`&` keeps the bits that are 1 in both: `1000`. `|` keeps the bits that are 1 in either: `1110`.", "notes": [{"on": "a & b", "text": "And: the bits set in both numbers."}, {"on": "a | b", "text": "Or: the bits set in either number."}], "text": "    println!(\"{} {}\", a & b, a | b);"},
+            {"mode": "ghost", "line": 5, "guide": "`^` keeps the bits that are 1 in only one: `0110`.", "notes": [{"on": "a ^ b", "text": "Xor: a bit that differs between the two."}], "text": "    println!(\"{}\", a ^ b);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "8 14\n6"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "not-and-shifts",
+          "title": "Flip and shift",
+          "guide": "Flip the bits of a number, then shift them.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "In bits, 5 is `00000101`.", "text": "    let x: u8 = 5;"},
+            {"mode": "ghost", "line": 3, "guide": "`!` flips all 8 bits: `11111010`, which is 250.", "notes": [{"on": "!x", "text": "On a number it flips every bit."}], "text": "    println!(\"{}\", !x);"},
+            {"mode": "ghost", "line": 4, "guide": "`<<` shifts left, doubling for each place. `>>` shifts right and halves.", "notes": [{"on": "x << 2", "text": "Moves the bits two places left: times four."}, {"on": "x >> 1", "text": "Moves the bits one place right: halves."}], "text": "    println!(\"{} {}\", x << 2, x >> 1);"},
+            {"mode": "ghost", "line": 5, "guide": "Pack two small numbers into one: shift the first four places left, then join the second with `|`. Shifting right brings the first back.", "text": "    let high: u8 = 3;\n    let low: u8 = 4;\n    let packed = (high << 4) | low;\n    println!(\"{} {}\", packed, packed >> 4);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "250\n20 2\n52 3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "bit-masks",
+          "title": "Pick the operator",
+          "guide": "Keep the bits set in both numbers, then the bits set in either, then the bits set in only one.",
+          "code": "fn main() {\n    let a: u8 = 12;\n    let b: u8 = 10;\n    let first = a ___ b;\n    let second = a ___ b;\n    let third = a ___ b;\n    println!(\"{} {} {}\", first, second, third);\n}",
+          "gaps": [
+            {"answers": ["&"]},
+            {"answers": ["|"]},
+            {"answers": ["^"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "permission-flags",
+          "title": "Flags in one number",
+          "guide": "Turn bits on, off and over, as permission flags do.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Each permission is one bit: 1, 2 and 4.", "text": "    let read: u8 = 1;\n    let write: u8 = 2;\n    let exec: u8 = 4;"},
+            {"mode": "ghost", "line": 5, "guide": "`|` joins the two flags into one number.", "text": "    let mut perms = read | write;"},
+            {"mode": "ghost", "line": 6, "guide": "`|=` turns a flag on. `&= !flag` turns it off. `^=` flips it.", "notes": [{"on": "|=", "text": "Turns the bits of the right side on."}, {"on": "&= !write", "text": "Keeps everything except the write bit."}, {"on": "^=", "text": "Flips the bits of the right side."}], "text": "    perms |= exec;\n    perms &= !write;\n    perms ^= read;"},
+            {"mode": "ghost", "line": 9, "guide": "Print the flags, then test one: `&` leaves the bit only if it is set.", "text": "    println!(\"{}\", perms);\n    println!(\"{}\", perms & exec);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "4\n4"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "shift-precedence",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    println!(\"{}\", 1 << 2 + 1);\n    println!(\"{}\", 12 >> 1 & 3);\n}",
+          "options": [
+            "5\n6",
+            "8\n6",
+            "5\n2",
+            "8\n2"
+          ],
+          "answer": 3,
+          "explanation": "`+` goes before `<<`, so the first is 1 << 3: 8. `>>` goes before `&`, so the second is (12 >> 1) & 3: 6 & 3 is 2."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,327 @@
+{
+  "id": "floats",
+  "intro": {
+    "title": "Floats",
+    "slides": [
+      {
+        "text": "Rust has two float types for numbers with a fractional part: `f32` and `f64`. `f64` is the default and the one to use unless memory matters.\n\nFloats are stored in binary, so many decimal values are close approximations, not exact."
+      },
+      {
+        "text": "A number is a float only when it is written like one: `2.0` is a float, `2` is an integer. Rust never converts between them on its own.",
+        "code": "let a = 2.0;\nlet b: f32 = 2.0;\nlet c = 2.5 * 4.0;"
+      },
+      {
+        "text": "You will write float literals and arithmetic, print floats with a fixed number of decimals, meet the surprises of binary storage, and use the methods floats come with."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Float basics",
+        "slides": [
+          {
+            "text": "A literal with a decimal point is a float, and without a type it is an `f64`. Add a type to choose `f32`.\n\nUnlike integers, dividing floats keeps the fraction."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "default-float",
+          "title": "Float variables",
+          "guide": "Declare two floats, price three items and print.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "`price` is an `f64`, the default float type. `rate` asks for the smaller `f32`.", "notes": [{"on": ": f64", "text": "Picks the 64-bit float."}, {"on": ": f32", "text": "Picks the 32-bit float."}], "text": "    let price: f64 = 20.5;\n    let rate: f32 = 0.5;"},
+            {"mode": "ghost", "line": 4, "guide": "A float times a float literal stays a float: three items at that price.", "text": "    let total = price * 3.0;"},
+            {"mode": "ghost", "line": 5, "guide": "Print the three values with `{}`.", "text": "    println!(\"{}\", price);\n    println!(\"{}\", rate);\n    println!(\"{}\", total);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "20.5\n0.5\n61.5"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "weight-ratio",
+          "title": "Write the weight",
+          "guide": "Write the weight so that `ratio` prints `0.0725`.",
+          "code": "fn main() {\n    let weight = ___;\n    let limit = 1_000.0;\n    let ratio = weight / limit;\n    println!(\"{}\", ratio);\n}",
+          "gaps": [{ "answers": ["72.5", "72.50"] }]
+        },
+        {
+          "type": "typing",
+          "id": "float-division",
+          "title": "Dividing floats",
+          "guide": "Divide two floats, then combine the result.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A bill to split between two people.", "text": "    let bill = 7.5;\n    let people = 2.0;"},
+            {"mode": "ghost", "line": 4, "guide": "Float division keeps the fraction, with no rounding down.", "text": "    let share = bill / people;\n    println!(\"{}\", share);"},
+            {"mode": "ghost", "line": 6, "guide": "`*` runs before `-`, with floats as with integers.", "text": "    let rest = bill - share * 1.5;\n    println!(\"{}\", rest);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3.75\n1.875"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "int-or-float-division",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let a = 7 / 2;\n    let b = 7.0 / 2.0;\n    println!(\"{} {}\", a, b);\n}",
+          "options": [
+            "3.5 3.5",
+            "3 3",
+            "3 3.5",
+            "3.0 3.5"
+          ],
+          "answer": 2,
+          "explanation": "Integer division drops the fraction, so `7 / 2` is `3`. With floats, `7.0 / 2.0` is `3.5`."
+        },
+        {
+          "type": "typing",
+          "id": "literal-forms",
+          "title": "Ways to write a float",
+          "guide": "Write floats with separators, exponents and a suffix.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Underscores split long numbers and change nothing.", "notes": [{"on": "1_250_000.5", "text": "Underscores are ignored, only for reading."}], "text": "    let big = 1_250_000.5;"},
+            {"mode": "ghost", "line": 3, "guide": "`e` means times ten to a power. An exponent alone makes a float, even with no decimal point.", "notes": [{"on": "2.5e-3", "text": "2.5 times ten to the power of minus 3."}, {"on": "3e8", "text": "3 times ten to the 8th, still a float."}], "text": "    let small = 2.5e-3;\n    let speed = 3e8;"},
+            {"mode": "ghost", "line": 5, "guide": "A suffix sets the type of a literal.", "notes": [{"on": "_f32", "text": "Same as writing the type on the variable."}], "text": "    let half = 0.5_f32;"},
+            {"mode": "ghost", "line": 6, "guide": "Print the four values.", "text": "    println!(\"{}\", big);\n    println!(\"{}\", small);\n    println!(\"{}\", speed);\n    println!(\"{}\", half);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1250000.5\n0.0025\n300000000\n0.5"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "mixed-types",
+          "title": "Which one compiles?",
+          "guide": "Pick the expression that compiles in the blank.",
+          "code": "fn main() {\n    let total = ___;\n    println!(\"{}\", total);\n}",
+          "options": [
+            "3 * 1.5",
+            "3.0 * 1.5",
+            "3 + 1.5",
+            "3 / 1.5"
+          ],
+          "answer": 1,
+          "explanation": "Rust never converts between integers and floats by itself, so both sides must be floats: `3.0 * 1.5`."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Precision",
+        "slides": [
+          {
+            "text": "A float prints with as many digits as it needs. `{:.2}` fixes the digits after the point, and rounds to fit.\n\nBinary storage means some results carry a tiny error.",
+            "code": "println!(\"{:.3}\", 2.0);\n// 2.000"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "fixed-decimals",
+          "title": "Fixed decimals",
+          "guide": "Print a total with a set number of decimals.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A price and a quantity.", "text": "    let price = 19.99;\n    let qty = 3.0;"},
+            {"mode": "ghost", "line": 4, "guide": "`.2` after the colon asks for two digits after the point.", "notes": [{"on": "{:.2}", "text": "Rounds to two decimals."}], "text": "    let total = price * qty;\n    println!(\"{:.2}\", total);"},
+            {"mode": "ghost", "line": 6, "guide": "One decimal rounds the value further.", "text": "    println!(\"{:.1}\", total);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "59.97\n60.0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "receipt-precision",
+          "title": "Print a receipt",
+          "guide": "Print the total the way a receipt shows money, so `13.5` appears as `13.50`.",
+          "code": "fn main() {\n    let price = 4.5;\n    let qty = 3.0;\n    let total = price * qty;\n    println!(\"{:.___}\", total);\n}",
+          "gaps": [{ "answers": ["2"] }]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "rounding-print",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let x = 2.71828;\n    println!(\"{:.2}\", x);\n    println!(\"{:.0}\", x);\n}",
+          "options": [
+            "2.71\n2",
+            "2.72\n3",
+            "2.72\n2.7",
+            "2.7\n3"
+          ],
+          "answer": 1,
+          "explanation": "The value is rounded, not cut: `2.72` for two decimals, and `3` when none are asked."
+        },
+        {
+          "type": "typing",
+          "id": "tenth-plus-fifth",
+          "title": "Adding 0.1 and 0.2",
+          "guide": "Add two simple floats and look at what is stored.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Two values that look exact. In binary, neither one is.", "text": "    let a = 0.1;\n    let b = 0.2;\n    let sum = a + b;"},
+            {"mode": "ghost", "line": 5, "guide": "Without a precision, every stored digit shows.", "text": "    println!(\"{}\", sum);"},
+            {"mode": "ghost", "line": 6, "guide": "Two decimals hide the tiny error.", "text": "    println!(\"{:.2}\", sum);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "0.30000000000000004\n0.30"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "f32-or-f64",
+          "title": "Two sizes of float",
+          "guide": "Store the same division in both float types.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The same division, once per type.", "text": "    let wide: f64 = 1.0 / 3.0;\n    let narrow: f32 = 1.0 / 3.0;"},
+            {"mode": "ghost", "line": 4, "guide": "The `f32` keeps fewer digits.", "text": "    println!(\"{}\", wide);\n    println!(\"{}\", narrow);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "0.3333333333333333\n0.33333334"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "special-values",
+          "title": "Dividing by zero",
+          "guide": "Divide floats by zero and print what comes out.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A float zero in a variable.", "text": "    let zero = 0.0;"},
+            {"mode": "ghost", "line": 3, "guide": "Float division by zero does not panic, unlike integer division. It gives a special value.", "text": "    let up = 1.0 / zero;\n    let down = -1.0 / zero;\n    let undefined = zero / zero;"},
+            {"mode": "ghost", "line": 6, "guide": "Print the three results.", "text": "    println!(\"{}\", up);\n    println!(\"{}\", down);\n    println!(\"{}\", undefined);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "inf\n-inf\nNaN"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Float methods",
+        "slides": [
+          {
+            "text": "A float has methods, called with a dot after the value. The value needs a known float type, so `2.0.cbrt()` does not compile: put it in a variable with a type first.\n\n`cbrt` is the cube root.",
+            "code": "let x: f64 = 8.0;\nlet y = x.cbrt();"
+          },
+          {
+            "text": "Several methods round a float, and each one treats the fractional part differently. Negative numbers show the difference best."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "roots-and-powers",
+          "title": "Roots and powers",
+          "guide": "Use methods to take a root and raise to powers.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The type is written so methods can be called on it.", "text": "    let side: f64 = 9.0;"},
+            {"mode": "ghost", "line": 3, "guide": "`powi` takes a whole-number exponent, `powf` a float one. A power of 0.5 is a square root.", "notes": [{"on": "sqrt()", "text": "Square root."}, {"on": "powi(2)", "text": "Whole-number exponent."}, {"on": "powf(0.5)", "text": "Float exponent."}], "text": "    let root = side.sqrt();\n    let squared = side.powi(2);\n    let again = squared.powf(0.5);"},
+            {"mode": "ghost", "line": 6, "guide": "Print each one with one decimal.", "text": "    println!(\"{:.1}\", root);\n    println!(\"{:.1}\", squared);\n    println!(\"{:.1}\", again);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3.0\n81.0\n9.0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "power-methods",
+          "title": "Pick the methods",
+          "guide": "Take the square root, then the whole-number power of 3, not the float one.",
+          "code": "fn main() {\n    let side: f64 = 25.0;\n    let root = side.___();\n    let cube = side.___(3);\n    println!(\"{:.1} {:.1}\", root, cube);\n}",
+          "gaps": [{ "answers": ["sqrt"] }, { "answers": ["powi"] }]
+        },
+        {
+          "type": "typing",
+          "id": "rounding-methods",
+          "title": "Four ways to round",
+          "guide": "Round one negative number four different ways.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A negative value with a half.", "text": "    let balance: f64 = -2.5;"},
+            {"mode": "ghost", "line": 3, "guide": "`floor` goes down, `ceil` goes up.", "notes": [{"on": "floor()", "text": "Rounds toward minus infinity."}, {"on": "ceil()", "text": "Rounds toward plus infinity."}], "text": "    println!(\"{:.1}\", balance.floor());\n    println!(\"{:.1}\", balance.ceil());"},
+            {"mode": "ghost", "line": 5, "guide": "`round` goes to the nearest, halves away from zero. `trunc` cuts the fraction.", "notes": [{"on": "round()", "text": "A half goes away from zero."}, {"on": "trunc()", "text": "Drops the fraction, toward zero."}], "text": "    println!(\"{:.1}\", balance.round());\n    println!(\"{:.1}\", balance.trunc());"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "-3.0\n-2.0\n-3.0\n-2.0"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "round-result",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let pay: f64 = 3.7;\n    println!(\"{} {}\", pay.floor(), pay.round());\n}",
+          "options": [
+            "3.0 4.0",
+            "4 4",
+            "3 3.7",
+            "3 4"
+          ],
+          "answer": 3,
+          "explanation": "`floor` gives 3 and `round` gives 4. With `{}`, a float with no fractional part prints without `.0`."
+        },
+        {
+          "type": "typing",
+          "id": "abs-min-max",
+          "title": "Absolute value, min and max",
+          "guide": "Compare two floats with their own methods.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A negative float and another one.", "text": "    let delta: f64 = -4.5;\n    let limit = 2.25;"},
+            {"mode": "ghost", "line": 4, "guide": "`abs` drops the sign.", "notes": [{"on": "abs()", "text": "The value without its sign."}], "text": "    println!(\"{}\", delta.abs());"},
+            {"mode": "ghost", "line": 5, "guide": "`min` and `max` take the other float as an argument and give back the smaller or larger.", "text": "    println!(\"{}\", delta.min(limit));\n    println!(\"{}\", delta.max(limit));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "4.5\n-4.5\n2.25"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "circle-measures",
+          "title": "Circle measures",
+          "guide": "Use the built-in value of pi to measure a circle.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "`::` reaches into a path: here std, then f64, then consts.", "notes": [{"on": "std::f64::consts::PI", "text": "A ready-made constant, no import needed."}], "text": "    let radius: f64 = 3.0;\n    let pi = std::f64::consts::PI;"},
+            {"mode": "ghost", "line": 4, "guide": "The area is pi times the radius squared.", "text": "    let area = pi * radius.powi(2);\n    println!(\"{:.2}\", area);"},
+            {"mode": "ghost", "line": 6, "guide": "The circumference is two times pi times the radius.", "text": "    let edge = 2.0 * pi * radius;\n    println!(\"{:.2}\", edge);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "28.27\n18.85"
+          }
+        }
+      ]
+    }
+  ]
+}

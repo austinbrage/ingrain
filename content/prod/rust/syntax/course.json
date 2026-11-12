@@ -5,50 +5,55 @@
       "name": "Foundations",
       "tier": "basic",
       "modules": [
-        { "id": "program-structure", "name": "Program structure", "sessions": 1 },
-        { "id": "printing", "name": "Printing", "sessions": 1 },
-        { "id": "variables", "name": "Variables and mutability", "sessions": 1 },
-        { "id": "shadowing", "name": "Shadowing", "sessions": 1 },
-        { "id": "expressions-and-statements", "name": "Expressions & statements", "sessions": 1 },
-        { "id": "constants", "name": "Constants", "sessions": 1 },
-        { "id": "type-aliases-and-statics", "name": "Type aliases and statics", "sessions": 1 }
+        { "id": "printing", "name": "Hello Rust & printing", "sessions": 3 },
+        { "id": "variables", "name": "Variables and mutability", "sessions": 2 },
+        { "id": "shadowing", "name": "Shadowing", "sessions": 2 },
+        { "id": "expressions-and-statements", "name": "Expressions & statements", "sessions": 2 }
       ]
     },
     {
       "name": "Scalar types",
       "tier": "basic",
       "modules": [
-        { "id": "integers", "name": "Integers", "sessions": 1 },
-        { "id": "floats", "name": "Floats", "sessions": 1 },
-        { "id": "booleans-and-chars", "name": "Booleans and chars", "sessions": 1 },
-        { "id": "operators", "name": "Operators", "sessions": 1 }
+        { "id": "integers", "name": "Integers", "sessions": 3 },
+        { "id": "floats", "name": "Floats", "sessions": 3 },
+        { "id": "booleans-and-chars", "name": "Booleans and chars", "sessions": 3 },
+        { "id": "operators", "name": "Operators", "sessions": 4 }
+      ]
+    },
+    {
+      "name": "Constants",
+      "tier": "basic",
+      "modules": [
+        { "id": "constants", "name": "Constants", "sessions": 2 },
+        { "id": "type-aliases-and-statics", "name": "Type aliases and statics", "sessions": 1 }
       ]
     },
     {
       "name": "Compound values",
       "tier": "basic",
       "modules": [
-        { "id": "tuples", "name": "Tuples", "sessions": 1 },
-        { "id": "arrays", "name": "Arrays", "sessions": 1 }
+        { "id": "tuples", "name": "Tuples", "sessions": 3 },
+        { "id": "arrays", "name": "Arrays", "sessions": 3 }
       ]
     },
     {
       "name": "Control flow",
       "tier": "basic",
       "modules": [
-        { "id": "if-expressions", "name": "If expressions", "sessions": 1 },
-        { "id": "match-basics", "name": "Match basics", "sessions": 1 },
-        { "id": "loop-and-while", "name": "Loop and while", "sessions": 1 },
-        { "id": "for-and-ranges", "name": "For and ranges", "sessions": 1 },
-        { "id": "loop-labels", "name": "Loop labels", "sessions": 1 }
+        { "id": "if-expressions", "name": "If expressions", "sessions": 3 },
+        { "id": "match-basics", "name": "Match basics", "sessions": 2 },
+        { "id": "loop-and-while", "name": "Loop and while", "sessions": 3 },
+        { "id": "for-and-ranges", "name": "For and ranges", "sessions": 3 },
+        { "id": "loop-labels", "name": "Loop labels", "sessions": 2 }
       ]
     },
     {
       "name": "Numeric conversions",
       "tier": "medium",
       "modules": [
-        { "id": "casts", "name": "Casts", "sessions": 1 },
-        { "id": "overflow", "name": "Overflow", "sessions": 1 }
+        { "id": "casts", "name": "Casts", "sessions": 3 },
+        { "id": "overflow", "name": "Overflow", "sessions": 2 }
       ]
     }
   ]

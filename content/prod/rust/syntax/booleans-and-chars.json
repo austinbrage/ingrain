@@ -1,0 +1,625 @@
+{
+  "id": "booleans-and-chars",
+  "intro": {
+    "title": "Booleans and chars",
+    "slides": [
+      {
+        "text": "This module covers two small types. A `bool` is a yes or no answer. A `char` is a single character, such as a letter, a digit or an emoji."
+      },
+      {
+        "text": "Comparisons produce a `bool`, and this module teaches them: `==`, `!=`, `<`, `<=`, `>` and `>=`. Many `char` methods answer a question about a character with a `bool` too. The operators module later combines bools with `&&` and `||`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "bool-literals",
+          "title": "Two values",
+          "guide": "Create bool variables, print them and change one.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A `bool` has only two values, `true` and `false`. The second line also names the type.",
+              "notes": [
+                {
+                  "on": "true",
+                  "text": "One of the only two bool values."
+                },
+                {
+                  "on": ": bool",
+                  "text": "A type goes after a colon."
+                }
+              ],
+              "text": "    let ready = true;\n    let done: bool = false;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "A bool can be `mut` like any variable. It starts off.",
+              "text": "    let mut logged_in = false;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A bool prints as the word `true` or `false`.",
+              "text": "    println!(\"{} {} {}\", ready, done, logged_in);"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Flip the flag, then print it again.",
+              "text": "    logged_in = true;\n    println!(\"logged in: {}\", logged_in);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true false false\nlogged in: true"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "comparison-results",
+          "title": "Comparisons",
+          "guide": "Store the result of four comparisons.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A number to compare.",
+              "text": "    let age = 20;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A comparison produces a bool, so its result fits in a variable. `<` is less than, `!=` is not equal.",
+              "notes": [
+                {
+                  "on": ">=",
+                  "text": "True when the left side is 18 or more."
+                },
+                {
+                  "on": "==",
+                  "text": "Two equal signs compare, one would assign."
+                },
+                {
+                  "on": "!=",
+                  "text": "True when the two sides differ."
+                }
+              ],
+              "text": "    let adult = age >= 18;\n    let exact = age == 18;\n    let minor = age < 18;\n    let other = age != 18;"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Print the four answers, two per line.",
+              "text": "    println!(\"{} {}\", adult, exact);\n    println!(\"{} {}\", minor, other);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true false\nfalse true"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "vote-check",
+          "title": "Who can vote",
+          "guide": "Fill in the two comparisons so the program prints `true false`.",
+          "code": "fn main() {\n    let age = 18;\n    let can_vote = age ___ 18;\n    let minor = age ___ 18;\n    println!(\"{} {}\", can_vote, minor);\n}",
+          "gaps": [
+            {
+              "answers": [
+                ">="
+              ]
+            },
+            {
+              "answers": [
+                "<"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "boundary-heat",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let temp = 30;\n    let warm = temp >= 30;\n    let hot = temp > 30;\n    let freezing = temp <= 0;\n    println!(\"{} {} {}\", warm, hot, freezing);\n}",
+          "options": [
+            "true true false",
+            "true false false",
+            "false false false",
+            "true false true"
+          ],
+          "answer": 1,
+          "explanation": "At exactly 30, `>=` is true and `>` is false. `30 <= 0` is false."
+        },
+        {
+          "type": "typing",
+          "id": "flag-status",
+          "title": "Feature flags",
+          "guide": "Compare feature flags with what is expected and print a status.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two flags that are on and one that is off, plus the value we expect.",
+              "text": "    let enabled = true;\n    let expected = true;\n    let beta_enabled = false;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`==` works on bools: it is true when both sides are the same.",
+              "notes": [
+                {
+                  "on": "beta_enabled == expected",
+                  "text": "False, because the flags differ."
+                }
+              ],
+              "text": "    let in_sync = enabled == expected;\n    let beta_in_sync = beta_enabled == expected;"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Print a status line for each flag.",
+              "text": "    println!(\"release flag in sync: {}\", in_sync);\n    println!(\"beta flag in sync: {}\", beta_in_sync);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "release flag in sync: true\nbeta flag in sync: false"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Chars",
+        "slides": [
+          {
+            "text": "A `char` holds one Unicode character, written in **single quotes**. It is not a one-letter string: double quotes make a different type.",
+            "code": "let initial = 'R';"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "char-literals",
+          "title": "Single characters",
+          "guide": "Create three chars and print them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A `char` is one character in single quotes. A digit in quotes is a char, not a number.",
+              "notes": [
+                {
+                  "on": "'A'",
+                  "text": "Single quotes make a char, not a string."
+                },
+                {
+                  "on": ": char",
+                  "text": "The type name of a single character."
+                }
+              ],
+              "text": "    let letter = 'A';\n    let digit: char = '7';\n    let symbol = '#';"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print the three chars.",
+              "text": "    println!(\"{} {} {}\", letter, digit, symbol);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "A 7 #"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "escape-chars",
+          "title": "Escapes",
+          "guide": "Write chars that need an escape.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A backslash starts an escape, for chars that cannot be written directly.",
+              "notes": [
+                {
+                  "on": "'\\''",
+                  "text": "The backslash keeps the quote from closing the char."
+                },
+                {
+                  "on": "'\\n'",
+                  "text": "A line break."
+                }
+              ],
+              "text": "    let quote = '\\'';\n    let slash = '\\\\';\n    let newline = '\\n';"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print the quote and slash. The newline goes between two letters.",
+              "text": "    println!(\"{}{}{}\", quote, slash, quote);\n    println!(\"a{}b\", newline);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "'\\'\na\nb"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "username-escapes",
+          "title": "Username chars",
+          "guide": "Fill in the two chars so the program prints `true`, then `a` and `b` on separate lines.",
+          "code": "fn main() {\n    let typed = '\\'';\n    let separator = ___;\n    let line_end = ___;\n    println!(\"{}\", typed == separator);\n    println!(\"a{}b\", line_end);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "'\\''"
+              ]
+            },
+            {
+              "answers": [
+                "'\\n'"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "unicode-size",
+          "title": "Any character",
+          "guide": "Write chars by Unicode code and measure them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`\\u{...}` writes any Unicode char by its hex code.",
+              "notes": [
+                {
+                  "on": "\\u{3b1}",
+                  "text": "The Greek letter alpha."
+                }
+              ],
+              "text": "    let a = 'a';\n    let alpha = '\\u{3b1}';\n    let crab = '\\u{1f980}';"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print the two special chars.",
+              "text": "    println!(\"{} {}\", alpha, crab);"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "`len_utf8` is how many bytes a char takes when stored as text, from 1 to 4.",
+              "notes": [
+                {
+                  "on": " a.len_utf8",
+                  "text": "Counts the bytes of the char as UTF-8 text."
+                }
+              ],
+              "text": "    println!(\"{}\", a.len_utf8());\n    println!(\"{}\", alpha.len_utf8());\n    println!(\"{}\", crab.len_utf8());"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "α 🦀\n1\n2\n4"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "byte-count",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let first = 'n';\n    let second = 'ñ';\n    let third = '€';\n    let total = first.len_utf8()\n        + second.len_utf8()\n        + third.len_utf8();\n    println!(\"{}\", total);\n}",
+          "options": [
+            "3",
+            "4",
+            "6",
+            "9"
+          ],
+          "answer": 2,
+          "explanation": "`n` takes 1 byte, `ñ` takes 2 and `€` takes 3, so the total is 6."
+        },
+        {
+          "type": "typing",
+          "id": "char-comparison",
+          "title": "Comparing chars",
+          "guide": "Compare chars with each other.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two chars to compare.",
+              "text": "    let first = 'a';\n    let last = 'z';"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Chars compare by their Unicode number, so letters follow the alphabet. Every capital comes before every lowercase letter.",
+              "notes": [
+                {
+                  "on": "'A' < 'a'",
+                  "text": "Capital A is 65 and a is 97."
+                }
+              ],
+              "text": "    let same = first == last;\n    let before = first < last;\n    let upper = 'A' < 'a';"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Print the three results.",
+              "text": "    println!(\"{} {} {}\", same, before, upper);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "false true true"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Char methods",
+        "slides": [
+          {
+            "text": "A method is called with a dot after the value. Most `char` methods ask a question about the character and answer with a `bool`.\n\nThe snippet is pseudo code, not Rust.",
+            "code": "character.is_something()  // bool"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "classify-chars",
+          "title": "Asking about a char",
+          "guide": "Ask three questions about chars.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A char to inspect.",
+              "text": "    let c = 'q';"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Char methods answer a question about the char and return a bool.",
+              "notes": [
+                {
+                  "on": "is_alphabetic",
+                  "text": "True for letters of any alphabet."
+                },
+                {
+                  "on": "is_ascii_digit",
+                  "text": "True only for 0 to 9."
+                }
+              ],
+              "text": "    let alpha = c.is_alphabetic();\n    let digit = c.is_ascii_digit();\n    let space = ' '.is_whitespace();"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print the three answers.",
+              "text": "    println!(\"{} {} {}\", alpha, digit, space);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true false true"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "is-it-a-digit",
+          "title": "Is it a digit?",
+          "guide": "Fill in the method so the program prints `true false`.",
+          "code": "fn main() {\n    let c = '9';\n    let digit = c.___();\n    let alpha = c.is_alphabetic();\n    println!(\"{} {}\", digit, alpha);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "is_ascii_digit",
+                "is_alphanumeric"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "case-checks",
+          "title": "Case and letters",
+          "guide": "Check the case of letters and symbols.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A capital and a lowercase letter.",
+              "text": "    let big = 'Q';\n    let small = 'q';"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Each method asks one question. `is_alphanumeric` is true for letters and digits.",
+              "notes": [
+                {
+                  "on": "big.is_alphanumeric",
+                  "text": "True for a letter or a digit."
+                }
+              ],
+              "text": "    let a = big.is_uppercase();\n    let b = small.is_lowercase();\n    let c = big.is_alphanumeric();\n    let d = '-'.is_alphanumeric();"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Print the four answers.",
+              "text": "    println!(\"{} {} {} {}\", a, b, c, d);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true true true false"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "change-case",
+          "title": "Changing case",
+          "guide": "Turn a letter into upper and lower case.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "These methods return a new char and leave the original alone. Only ASCII letters change.",
+              "notes": [
+                {
+                  "on": "to_ascii_uppercase",
+                  "text": "Returns the capital form of the char."
+                }
+              ],
+              "text": "    let letter = 'g';\n    let upper = letter.to_ascii_uppercase();\n    let back = upper.to_ascii_lowercase();"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A char that is not a letter comes back unchanged.",
+              "text": "    let digit = '7'.to_ascii_uppercase();"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print the results, two per line.",
+              "text": "    println!(\"{} {}\", letter, upper);\n    println!(\"{} {}\", back, digit);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "g G\ng 7"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "symbols-and-case",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let a = 'k'.to_ascii_uppercase();\n    let b = '3'.to_ascii_uppercase();\n    let c = '!'.is_ascii_punctuation();\n    println!(\"{} {} {}\", a, b, c);\n}",
+          "options": [
+            "k 3 true",
+            "K 3 false",
+            "K 3 true",
+            "K ! true"
+          ],
+          "answer": 2,
+          "explanation": "`k` becomes `K`, the digit has no capital form, and `!` is punctuation."
+        },
+        {
+          "type": "typing",
+          "id": "ticket-code",
+          "title": "Ticket code",
+          "guide": "Check the characters of a ticket code and print it shouted.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The two characters of a ticket code.",
+              "text": "    let first = 'k';\n    let second = '4';"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Ask what each char is, then shout the first one. The shout is a new char.",
+              "notes": [
+                {
+                  "on": "is_uppercase",
+                  "text": "False for k, it is lowercase."
+                }
+              ],
+              "text": "    let is_letter = first.is_alphabetic();\n    let is_digit = second.is_ascii_digit();\n    let was_upper = first.is_uppercase();\n    let shout = first.to_ascii_uppercase();"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Print the code, then the answers.",
+              "text": "    println!(\"ticket {}{}\", shout, second);\n    println!(\"letter {} digit {}\", is_letter, is_digit);\n    println!(\"was upper {}\", was_upper);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "ticket K4\nletter true digit true\nwas upper false"
+          }
+        }
+      ]
+    }
+  ]
+}

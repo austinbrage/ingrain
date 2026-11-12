@@ -1,0 +1,281 @@
+{
+  "id": "shadowing",
+  "intro": {
+    "title": "Shadowing",
+    "slides": [
+      {
+        "text": "You can declare a variable with a name that is already taken. The new variable **shadows** the old one: from that line on, the name means the new value.\n\nThe old value is not changed, it just stops being reachable by that name."
+      },
+      {
+        "text": "Shadowing is not `mut`. It makes a brand new variable, so it can even have another type. In this module you shadow, compare it with `mut` and see how far a shadow reaches.\n\nPseudo code, not Rust.",
+        "code": "name = first value\nname = new variable, same name\n  (the first one is hidden)"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "shadow-steps",
+          "title": "Shadow in steps",
+          "guide": "Shadow one name three times: text, then a number, then a calculation. Each step prints.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A text value, printed.",
+              "text": "    let reading = \"seven\";\n    println!(\"{}\", reading);"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "The same name now holds a number. This works because it is a new variable, not an assignment.",
+              "text": "    let reading = 7;\n    println!(\"{}\", reading);"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A third shadow, built from the number.",
+              "notes": [
+                {
+                  "on": "reading * 6",
+                  "text": "Reads the number 7, the latest reading so far."
+                }
+              ],
+              "text": "    let reading = reading * 6;\n    println!(\"{}\", reading);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "seven\n7\n42"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "shadow-chain",
+          "title": "What does it print?",
+          "guide": "Follow which `n` each line sees.",
+          "code": "fn main() {\n    let n = 2;\n    let n = n * 3;\n    println!(\"{}\", n);\n    let n = n + 1;\n    println!(\"{}\", n);\n}",
+          "options": [
+            "6\n6",
+            "2\n3",
+            "6\n7",
+            "7\n7"
+          ],
+          "answer": 2,
+          "explanation": "Each `let n` builds on the one before: 2, then 6, then 7. The first print runs before the last shadow."
+        },
+        {
+          "type": "typing",
+          "id": "unit-convert",
+          "title": "Meters to kilometers",
+          "guide": "Reuse one name to convert a distance from meters to kilometers, printing both stages.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The distance in meters, printed with a label.",
+              "text": "    let distance = 5000;\n    println!(\"meters: {}\", distance);"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Shadow the name with the same distance in kilometers. The old meters value is hidden, not changed.",
+              "notes": [
+                {
+                  "on": "distance / 1000",
+                  "text": "Reads the meters value, since the new distance does not exist yet."
+                }
+              ],
+              "text": "    let distance = distance / 1000;\n    println!(\"km: {}\", distance);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "meters: 5000\nkm: 5"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "price-gap",
+          "title": "Trace the price",
+          "guide": "The program must print 35. Pick the name that the last shadow reads from.",
+          "code": "fn main() {\n    let price = 20;\n    let discount = 5;\n    let price = price * 2;\n    let price = ___ - discount;\n    println!(\"{}\", price);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "price"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Shadow, mut and scope",
+        "slides": [
+          {
+            "text": "`mut` lets one variable change its value. A shadow replaces the variable with a new one, and the new one can have a different mutability.\n\nA shadow also lasts only as long as the braces it was declared in. Pseudo code, not Rust.",
+            "code": "x = 1\n{\n    x = 2  (new, inside only)\n    use x  -> 2\n}\nuse x  -> 1"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "freeze",
+          "title": "Freeze after changes",
+          "guide": "Change a `mut` variable, then shadow it without `mut` to lock it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A counter that is allowed to change, updated twice.",
+              "text": "    let mut total = 0;\n    total = total + 5;\n    total = total + 7;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Shadow it with a plain `let`. This new `total` has the same value, but it can no longer change.",
+              "notes": [
+                {
+                  "on": "let total = total",
+                  "text": "No mut here, so this one is locked."
+                }
+              ],
+              "text": "    let total = total;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print the final value.",
+              "text": "    println!(\"{}\", total);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "12"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "score-freeze",
+          "title": "Lock the score",
+          "guide": "Update a `mut` score, freeze it with a shadow, then print a summary.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A score that is allowed to change, updated twice.",
+              "text": "    let mut score = 0;\n    score = score + 40;\n    score = score + 25;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Shadow it without `mut`. The round is over, so the score is locked.",
+              "notes": [
+                {
+                  "on": "let score = score",
+                  "text": "No mut: later lines cannot change it."
+                }
+              ],
+              "text": "    let score = score;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "A bonus, then one summary line.",
+              "text": "    let bonus = 10;\n    println!(\"score {} + bonus {} = {}\", score, bonus, score + bonus);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "score 65 + bonus 10 = 75"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "block-scope",
+          "title": "A shadow inside braces",
+          "guide": "A shadow ends where its braces end, and the old one comes back.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The outer variable.",
+              "text": "    let level = 1;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Inside a pair of braces, shadow `level` and print it. The shadow lives only in here.",
+              "notes": [
+                {
+                  "on": "let level = 2",
+                  "text": "Hides the outer level until the closing brace."
+                }
+              ],
+              "text": "    {\n        let level = 2;\n        println!(\"{}\", level);\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Outside the braces, the outer `level` is back.",
+              "text": "    println!(\"{}\", level);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "2\n1"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "inner-assign",
+          "title": "What does it print?",
+          "guide": "One inner block shadows, the other assigns.",
+          "code": "fn main() {\n    let mut n = 1;\n    {\n        let n = 9;\n        println!(\"{}\", n);\n    }\n    {\n        n = 5;\n    }\n    println!(\"{}\", n);\n}",
+          "options": [
+            "9\n9",
+            "9\n5",
+            "9\n1",
+            "5\n5"
+          ],
+          "answer": 1,
+          "explanation": "`let n = 9` is a shadow that ends with its braces. `n = 5` has no `let`, so it changes the outer `n` for good."
+        }
+      ]
+    }
+  ]
+}

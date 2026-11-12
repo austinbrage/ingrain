@@ -1,0 +1,443 @@
+{
+  "id": "integers",
+  "intro": {
+    "title": "Integers",
+    "slides": [
+      {
+        "text": "Rust has many integer types. A name is a letter and a number of bits.\n\n- `i` is signed: negatives too\n- `u` is unsigned: zero and up\n- sizes: 8, 16, 32, 64, 128",
+        "code": "let small: i16 = -300;\nlet huge: u128 = 7;"
+      },
+      {
+        "text": "`isize` and `usize` take the size of the machine: 64 bits on a 64-bit computer.\n\nA number with no type at all becomes an `i32`.",
+        "code": "let plain = 7;\nlet machine: usize = 7;"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "signed-types",
+          "title": "Signed integers",
+          "guide": "Declare signed integers of different sizes.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Signed types hold negative numbers. The number in the name is how many bits the type takes.",
+              "notes": [
+                {
+                  "on": "i8",
+                  "text": "Small: it only fits -128 to 127."
+                },
+                {
+                  "on": "i32",
+                  "text": "The type Rust picks when you give none."
+                }
+              ],
+              "text": "    let temperature: i8 = -12;\n    let altitude: i32 = -420;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "A number above two billion needs a bigger type.",
+              "notes": [
+                {
+                  "on": "i64",
+                  "text": "Twice the bits, so it holds huge numbers."
+                }
+              ],
+              "text": "    let population: i64 = 8000000000;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print all three.",
+              "text": "    println!(\"{} {}\", temperature, altitude);\n    println!(\"{}\", population);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "-12 -420\n8000000000"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "inventory-total",
+          "title": "Stock totals",
+          "guide": "Add up stock counts and see what is still missing.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two small counts fit a u8, and so does their sum.",
+              "notes": [
+                {
+                  "on": "u8 = 120",
+                  "text": "Unsigned, 8 bits: it holds 0 to 255."
+                }
+              ],
+              "text": "    let north: u8 = 120;\n    let south: u8 = 95;\n    let shelves = north + south;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Orders are bigger, so they get a u32. Both sides of a sum share one type.",
+              "text": "    let ordered: u32 = 40_000;\n    let delivered: u32 = 12_500;\n    let missing = ordered - delivered;"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A warehouse holds up to 60000 boxes: too many for a u8, so a u16 is the smallest fit.",
+              "notes": [
+                {
+                  "on": "u16 = 60_000",
+                  "text": "Unsigned, 16 bits: it holds 0 to 65535."
+                }
+              ],
+              "text": "    let capacity: u16 = 60_000;\n    let used: u16 = 45_000;\n    let free = capacity - used;"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "Print the three totals.",
+              "text": "    println!(\"shelves: {}\", shelves);\n    println!(\"missing: {}\", missing);\n    println!(\"free: {}\", free);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "shelves: 215\nmissing: 27500\nfree: 15000"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "pick-by-range",
+          "title": "Pick by range",
+          "guide": "`balance` goes from -100 to 100. `stock` goes from 0 to 60000. Give each the smallest type that holds its range.",
+          "code": "fn main() {\n    let balance: ___ = -80;\n    let stock: ___ = 45000;\n    println!(\"{} {}\", balance, stock);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "i8"
+              ]
+            },
+            {
+              "answers": [
+                "u16"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "smallest-fit",
+          "title": "The smallest fit",
+          "guide": "The program prints a screen width. Widths are never negative and stay under 4000. Which is the smallest type that holds any width?",
+          "code": "fn main() {\n    let width = 3840;\n    println!(\"{}\", width);\n}",
+          "options": [
+            "u8",
+            "u16",
+            "u32",
+            "i8"
+          ],
+          "answer": 1,
+          "explanation": "`u8` stops at 255 and `i8` at 127, so 3840 does not fit. `u16` reaches 65535. `u32` works too but spends more bits than needed."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Writing numbers",
+        "slides": [
+          {
+            "text": "A number in code is a literal. You can make it easier to read, give it a type, or write it in another base.\n\n- `_` between digits is ignored\n- a suffix after the digits sets the type\n- a prefix picks the base: `0x`, `0o` or `0b`",
+            "code": "let a = 2_500;\nlet b = 7i64;\nlet c = 0x1F;"
+          },
+          {
+            "text": "Hex uses the digits 0 to 9 and a to f. Binary uses only 0 and 1. They are plain integers: printing one shows the decimal value.\n\n`b'A'` is the byte value of a letter, typed `u8`. Chars themselves come in a later module.",
+            "code": "let z = b'z';"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "digit-separators",
+          "title": "Underscores in numbers",
+          "guide": "Group the digits of big numbers, then compute with them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Underscores can go anywhere between digits. The value stays the same.",
+              "notes": [
+                {
+                  "on": "1_000_000",
+                  "text": "The compiler ignores the underscores."
+                }
+              ],
+              "text": "    let budget = 1_000_000;\n    let seconds_per_hour = 3_600;\n    let per_day = seconds_per_hour * 24;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Printing shows the numbers without them.",
+              "text": "    println!(\"{} {}\", budget, per_day);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1000000 86400"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "type-suffix",
+          "title": "Type suffix",
+          "guide": "Name the type in the number itself.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A suffix gives the literal its type, with no annotation on the variable.",
+              "notes": [
+                {
+                  "on": "200u8",
+                  "text": "The suffix makes this number a u8."
+                },
+                {
+                  "on": "5_u16",
+                  "text": "An underscore may come before the suffix."
+                }
+              ],
+              "text": "    let level = 200u8;\n    let ratio = 5_u16;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Three billion does not fit an i32, so the suffix is needed.",
+              "text": "    let views = 3_000_000_000u64;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print them.",
+              "text": "    println!(\"{} {}\", level, ratio);\n    println!(\"{}\", views);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "200 5\n3000000000"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "base-prefixes",
+          "title": "Bases and bytes",
+          "guide": "Write numbers in other bases, and letters as bytes.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A prefix picks the base. Hex is common for colors, octal for file permissions.",
+              "notes": [
+                {
+                  "on": "0xff",
+                  "text": "Hexadecimal: digits 0 to 9 and a to f."
+                },
+                {
+                  "on": "0o755",
+                  "text": "Octal: digits 0 to 7."
+                },
+                {
+                  "on": "0b1111_0000",
+                  "text": "Binary: only 0 and 1, grouped for reading."
+                }
+              ],
+              "text": "    let white = 0xff;\n    let perms = 0o755;\n    let mask = 0b1111_0000;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`b'A'` is the byte value of a letter, typed u8.",
+              "notes": [
+                {
+                  "on": "b'A'",
+                  "text": "The byte value of the letter A."
+                }
+              ],
+              "text": "    let upper = b'A';\n    let lower = b'a';\n    let gap = lower - upper;"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Everything prints as plain decimal.",
+              "text": "    println!(\"{} {} {}\", white, perms, mask);\n    println!(\"{} {} {}\", upper, lower, gap);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "255 493 240\n65 97 32"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "literal-values",
+          "title": "What does it print?",
+          "guide": "Read the literals, then pick the output.",
+          "code": "fn main() {\n    let a = 0x10;\n    let b = 0b11;\n    let c = 1_000;\n    println!(\"{} {} {}\", a, b, c);\n}",
+          "options": [
+            "10 11 1000",
+            "16 11 1000",
+            "16 3 1000",
+            "16 3 1"
+          ],
+          "answer": 2,
+          "explanation": "Printing shows decimal: `0x10` is 16 and `0b11` is 3. The underscore in `1_000` is ignored."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "The range of a type",
+        "slides": [
+          {
+            "text": "A type of n bits holds 2 to the power n different values.\n\n- unsigned: from 0 up to 2^n - 1\n- signed: from -2^(n-1) up to 2^(n-1) - 1\n\nWith 8 bits that is 256 values, split between negatives and positives when signed."
+          },
+          {
+            "text": "Every integer type exposes its limits as constants: `MIN`, `MAX`, and `BITS` for its size. You reach them through the type name. What happens past a limit is a later module.",
+            "code": "let top = i64::MAX;\nlet size = u64::BITS;"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "min-and-max",
+          "title": "MIN and MAX",
+          "guide": "Read the smallest and largest value of a type.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The limits of a type are constants on the type itself.",
+              "notes": [
+                {
+                  "on": "i8::MIN",
+                  "text": "The smallest value this type can hold."
+                },
+                {
+                  "on": "i8::MAX",
+                  "text": "The largest value this type can hold."
+                }
+              ],
+              "text": "    let low = i8::MIN;\n    let high = i8::MAX;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Print the limits of the signed one.",
+              "text": "    println!(\"{} {}\", low, high);"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Use them straight in a print. `BITS` is the size of the type.",
+              "notes": [
+                {
+                  "on": "u8::BITS",
+                  "text": "How many bits the type uses."
+                }
+              ],
+              "text": "    println!(\"{}\", u8::MAX);\n    println!(\"{}\", u16::MAX);\n    println!(\"{}\", i32::MAX);\n    println!(\"{}\", u8::BITS);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "-128 127\n255\n65535\n2147483647\n8"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "signed-top",
+          "title": "The top of i16",
+          "guide": "Work out the range from the bits, then pick the output.",
+          "code": "fn main() {\n    println!(\"{}\", i16::MAX);\n}",
+          "options": [
+            "32768",
+            "65535",
+            "65536",
+            "32767"
+          ],
+          "answer": 3,
+          "explanation": "16 bits hold 65536 values. A signed type shares them between negatives and positives, so the top is 2^15 - 1."
+        },
+        {
+          "type": "fill-blank",
+          "id": "type-of-the-top",
+          "title": "Which type tops at 255",
+          "guide": "The program must print 255. Choose the type whose largest value that is.",
+          "code": "fn main() {\n    let top = ___::MAX;\n    println!(\"{}\", top);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "u8"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "misfit-line",
+          "title": "The line that does not fit",
+          "guide": "One declaration is rejected by the compiler. Which variable is it?",
+          "code": "fn main() {\n    let floor: i8 = -128;\n    let age: u8 = 200;\n    let people = 3_000_000_000;\n    let items: u32 = 0;\n}",
+          "options": [
+            "floor",
+            "age",
+            "people",
+            "items"
+          ],
+          "answer": 2,
+          "explanation": "With no type, `people` is an `i32`, which stops at 2147483647, so three billion does not fit. The other values are inside their ranges."
+        }
+      ]
+    }
+  ]
+}

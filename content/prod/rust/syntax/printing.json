@@ -1,0 +1,643 @@
+{
+  "id": "printing",
+  "intro": {
+    "title": "Your first program",
+    "slides": [
+      {
+        "text": "A Rust program is a file with a function called `main`: it is where the program starts. Its steps run from top to bottom, and `println!` prints a line. A `use` line above it brings something from the standard library into reach.\n\nThe snippet is pseudo code.",
+        "code": "use something from the library\n\nfn main() {\n    step one\n    step two\n}"
+      },
+      {
+        "text": "First you type the shape of a file and call functions from the standard library. Then you shape text with methods, and finally control how `println!` shows values."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "first-program",
+          "title": "Your first program",
+          "guide": "A Rust program is a `main` function. Type one that prints.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "The program starts in `main`.",
+              "notes": [
+                {
+                  "on": "main",
+                  "text": "The entry point: the program starts here."
+                }
+              ],
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`println!` prints a line of text.",
+              "text": "    println!(\"Hello, Rust!\");"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Hello, Rust!"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "mix-values",
+          "title": "Mix text and numbers",
+          "guide": "Print lines that mix text and numbers.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Each `{}` takes the next value after the string, in order. Text and numbers can mix; braces can sit between any text.",
+              "text": "    println!(\"{} scored {}\", \"Ana\", 120);"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A value can be a small sum: Rust works it out first.",
+              "text": "    println!(\"{} + {} = {}\", 2, 3, 2 + 3);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Ana scored 120\n2 + 3 = 5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "use-max",
+          "title": "Borrow from the standard library",
+          "guide": "Bring two functions into reach, then call them.",
+          "chunks": [
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "`use` brings a function from the standard library into reach.",
+              "notes": [
+                {
+                  "on": "use",
+                  "text": "Brings something into reach so you can call it by its short name."
+                }
+              ],
+              "text": "use std::cmp::max;"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Each function needs its own `use`.",
+              "notes": [
+                {
+                  "on": "std",
+                  "text": "The standard library: the code that ships with Rust."
+                },
+                {
+                  "on": "cmp",
+                  "text": "A part of the standard library for comparing values."
+                },
+                {
+                  "on": "min",
+                  "text": "A function that gives back the smaller of two values."
+                }
+              ],
+              "text": "use std::cmp::min;"
+            },
+            {
+              "mode": "auto",
+              "line": 3,
+              "text": "\nfn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`max` returns the larger of two values.",
+              "text": "    println!(\"Best score: {}\", max(72, 95));"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "`min` returns the smaller one.",
+              "text": "    println!(\"Worst score: {}\", min(72, 95));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Best score: 95\nWorst score: 72"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "which-use",
+          "title": "Make the call work",
+          "guide": "The compiler cannot find `min`. Which line, placed above `main`, fixes it?",
+          "code": "fn main() {\n    println!(\"{}\", min(4, 9));\n}",
+          "options": [
+            "use std::cmp::min;",
+            "import std::cmp::min;",
+            "use cmp::min;",
+            "use std::min;"
+          ],
+          "answer": 0,
+          "explanation": "`min` lives in `std::cmp`, so the line names that full path after `use`. `import` is not Rust, and the other paths skip or invent a module."
+        },
+        {
+          "type": "typing",
+          "id": "full-path",
+          "title": "Skip the shortcut",
+          "guide": "No `use` this time: write the full path at each call.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`::` walks into a module. `std::cmp::min` names the function without a `use`.",
+              "text": "    println!(\"Short side: {}\", std::cmp::min(8, 5));"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "The standard library also holds constants, like pi.",
+              "notes": [
+                {
+                  "on": "f64",
+                  "text": "The decimal number type; here it also names a module."
+                },
+                {
+                  "on": "consts",
+                  "text": "A module that collects fixed values like pi and e."
+                },
+                {
+                  "on": "PI",
+                  "text": "The constant pi, with all the precision an f64 holds."
+                }
+              ],
+              "text": "    println!(\"Pi: {}\", std::f64::consts::PI);"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Paths work inside a sum too.",
+              "text": "    println!(\"Circle of 10: {}\", std::f64::consts::PI * 10.0);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Short side: 5\nPi: 3.141592653589793\nCircle of 10: 31.41592653589793"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Text has methods",
+        "slides": [
+          {
+            "text": "Text can do things. Write a dot after it, then the method name and brackets. Some methods take a value inside the brackets.\n\nThe snippet is pseudo code.",
+            "code": "\"text\".method()\n\"text\".method(value)"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "shout-banner",
+          "title": "Shout a banner",
+          "guide": "Build a title banner out of text methods.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A method is called with a dot after the text. It returns a new text.",
+              "notes": [
+                {
+                  "on": "repeat",
+                  "text": "Builds a new text by repeating the original."
+                }
+              ],
+              "text": "    println!(\"{}\", \"=\".repeat(24));"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Another method changes the letters.",
+              "text": "    println!(\"== {} ==\", \"ingrain\".to_uppercase());"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "========================\n== INGRAIN =="
+          }
+        },
+        {
+          "type": "typing",
+          "id": "letter-count",
+          "title": "Count the letters",
+          "guide": "Ask a text how long it is.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`len` gives the number of characters.",
+              "notes": [
+                {
+                  "on": ".len()",
+                  "text": "Returns how many characters the text has."
+                }
+              ],
+              "text": "    println!(\"{} has {} letters\", \"Ferris\", \"Ferris\".len());"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "`to_lowercase` is the opposite of `to_uppercase`.",
+              "text": "    println!(\"{}\", \"FERRIS\".to_lowercase());"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "One method can feed another: the length becomes the repeat count.",
+              "text": "    println!(\"{}\", \"*\".repeat(\"Ferris\".len()));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Ferris has 6 letters\nferris\n******"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "banner-output",
+          "title": "Work out the output",
+          "guide": "Follow each line. In the options, each `/` is a line break. Pick the output.",
+          "code": "fn main() {\n    println!(\"{}\", \"ab\".repeat(3));\n    println!(\"{}\", \"rust\".to_uppercase());\n    println!(\"{} {}\", \"-\".repeat(2), \"Ana\".len());\n    println!(\"{}\", \"ha\".repeat(\"go\".len()));\n}",
+          "options": [
+            "ababab / rust / -- 3 / haha",
+            "ababab / RUST / -- 3 / haha",
+            "ababab / RUST / -- 4 / haha",
+            "abab / RUST / -- 3 / haha"
+          ],
+          "answer": 1,
+          "explanation": "`\"ab\".repeat(3)` gives ababab and `to_uppercase` gives RUST. `\"-\".repeat(2)` is `--` and `\"Ana\".len()` is 3. `\"go\".len()` is 2, so `ha` repeats twice."
+        },
+        {
+          "type": "fill-blank",
+          "id": "repeat-gap",
+          "title": "Fill the method",
+          "guide": "The first line must print `*****` and the second `ha!ha!ha!`. Complete both lines.",
+          "code": "fn main() {\n    println!(\"{}\", \"*\".___(5));\n    println!(\"{}\", \"ha!\".repeat(___));\n}",
+          "gaps": [
+            {
+              "answers": [
+                "repeat"
+              ]
+            },
+            {
+              "answers": [
+                "3"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "escapes",
+          "title": "Escape sequences",
+          "guide": "Put special characters inside text, like an order slip.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A `\\n` inside a string starts a new line.",
+              "notes": [
+                {
+                  "on": "\\n",
+                  "text": "Breaks the line at this point."
+                }
+              ],
+              "text": "    println!(\"Order 1042\\nStatus: shipped\");"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A backslash before a double quote keeps it inside the string.",
+              "notes": [
+                {
+                  "on": "\\\"Dune\\\"",
+                  "text": "The quote is text here, it does not end the string."
+                }
+              ],
+              "text": "    println!(\"Book: \\\"Dune\\\"\");"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "To print one backslash, write two.",
+              "text": "    println!(\"Saved to C:\\\\Users\\\\ana\");"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Order 1042\nStatus: shipped\nBook: \"Dune\"\nSaved to C:\\Users\\ana"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "comment-out",
+          "title": "Comment a line out",
+          "guide": "Explain a step, and switch a line off.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Words after `//` are for people. The compiler skips them.",
+              "notes": [
+                {
+                  "on": "//",
+                  "text": "Everything after it on the line is ignored."
+                }
+              ],
+              "text": "    // show the app name\n    println!(\"{}\", \"ingrain\".to_uppercase());"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Put `//` before code and that line does not run.",
+              "text": "    // println!(\"debug: skipped\");\n    println!(\"done\");"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "INGRAIN\ndone"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Formatting values",
+        "slides": [
+          {
+            "text": "Inside the braces you can choose which value goes there, and after a colon how it looks.\n\nThe snippet is pseudo code: every part is optional.",
+            "code": "{ which : fill align width kind }"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "positional",
+          "title": "Pick by position",
+          "guide": "Choose which value each brace shows.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A number in the braces picks a value by its place in the list, counting from 0.",
+              "notes": [
+                {
+                  "on": "{1}",
+                  "text": "Index 1 is the second value."
+                }
+              ],
+              "text": "    println!(\"{0} loves {1}\", \"Ana\", \"Rust\");"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "The same number can appear many times, so the value is written once.",
+              "text": "    println!(\"{0}, {0}, {0}!\", \"Bye\");"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Reorder numbers to switch a date from day first to month first.",
+              "text": "    println!(\"{1}/{0}\", 8, 11);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Ana loves Rust\nBye, Bye, Bye!\n11/8"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "positional-output",
+          "title": "What does it print?",
+          "guide": "Pick the output.",
+          "code": "fn main() {\n    println!(\"{1}-{0}-{1}\", \"a\", \"b\");\n}",
+          "options": [
+            "a-b-a",
+            "a-b-b",
+            "b-a-b",
+            "b-b-a"
+          ],
+          "answer": 2,
+          "explanation": "`{1}` is the second value, `b`, and `{0}` is the first, `a`. The braces read b, a, b."
+        },
+        {
+          "type": "typing",
+          "id": "debug-format",
+          "title": "Debug format",
+          "guide": "Show a user name as the programmer sees it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`{}` shows a value the way a person reads it.",
+              "text": "    println!(\"{}\", \"Ana\");"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "`{:?}` shows it as the programmer sees it: strings keep their quotes.",
+              "notes": [
+                {
+                  "on": ":?",
+                  "text": "The debug form, meant for developers."
+                }
+              ],
+              "text": "    println!(\"{:?}\", \"Ana\");"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "The debug form also escapes special characters, like the quotes of a nickname.",
+              "text": "    println!(\"{:?}\", \"Ana \\\"Ace\\\" Ruiz\");"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Ana\n\"Ana\"\n\"Ana \\\"Ace\\\" Ruiz\""
+          }
+        },
+        {
+          "type": "typing",
+          "id": "width-align",
+          "title": "Width and alignment",
+          "guide": "Pad the cells of a price table to a fixed width.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A number after the colon is a minimum width. Text pads on the right by default.",
+              "notes": [
+                {
+                  "on": "8",
+                  "text": "The value takes at least 8 characters."
+                }
+              ],
+              "text": "    println!(\"|{:8}|\", \"tea\");"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Align a price to the right edge of the field.",
+              "notes": [
+                {
+                  "on": ">",
+                  "text": "Aligns to the right edge of the field."
+                }
+              ],
+              "text": "    println!(\"|{:>8}|\", \"$2.50\");"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Center the price in the field.",
+              "notes": [
+                {
+                  "on": "^",
+                  "text": "Centers the value in the field."
+                }
+              ],
+              "text": "    println!(\"|{:^8}|\", \"$2.50\");"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "|tea     |\n|   $2.50|\n| $2.50  |"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "pick-alignment",
+          "title": "Pick the alignment",
+          "guide": "Right-align the text on the first line and center it on the second.",
+          "code": "fn main() {\n    println!(\"|{:___6}|\", \"ab\");\n    println!(\"|{:___6}|\", \"ab\");\n}",
+          "gaps": [
+            {
+              "answers": [
+                ">"
+              ]
+            },
+            {
+              "answers": [
+                "^"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "number-bases",
+          "title": "Binary and hex",
+          "guide": "Print integers in other bases.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`b` prints a number in binary.",
+              "notes": [
+                {
+                  "on": "{:b}",
+                  "text": "Shows the binary digits of the number."
+                }
+              ],
+              "text": "    println!(\"{:b}\", 10);"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "`x` prints hexadecimal.",
+              "text": "    println!(\"{:x}\", 255);"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "`#` adds the `0x` prefix.",
+              "notes": [
+                {
+                  "on": "#",
+                  "text": "Adds the base prefix."
+                }
+              ],
+              "text": "    println!(\"{:#x}\", 255);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1010\nff\n0xff"
+          }
+        }
+      ]
+    }
+  ]
+}

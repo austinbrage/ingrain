@@ -1,0 +1,201 @@
+{
+  "id": "loop-labels",
+  "intro": {
+    "title": "Loop labels",
+    "slides": [
+      {
+        "text": "`break` and `continue` only act on the innermost loop. A label gives a loop a name, so a statement deep inside can leave or skip a loop further out.\n\nYou will label `for`, `while` and `loop`, break out of nested loops, return a value from one, and label a plain block."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Naming a loop",
+        "slides": [
+          {
+            "text": "In nested loops, `break` leaves only the loop it sits in. The outer loop keeps going.\n\nA label is a name that starts with a single quote, written before the loop. `break` and `continue` can then point at it.\n\nPseudo code, not Rust.",
+            "code": "outer: repeat for each row\n    repeat for each col\n        if match found\n            stop outer\n        if col is not wanted\n            skip to next outer"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "inner-break-only",
+          "title": "Break leaves one loop",
+          "guide": "See what an unlabeled `break` does inside nested loops.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Two nested loops that print a pair of numbers.", "text": "    for row in 1..4 {\n        for col in 1..4 {\n            println!(\"{}-{}\", row, col);\n        }\n    }"},
+            {"mode": "ghost", "line": 4, "guide": "Stop the inner loop when `col` reaches 2. The outer loop still moves on to the next row.", "notes": [{"on": "break", "text": "Ends only the inner loop."}], "text": "            if col == 2 {\n                break;\n            }"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1-1\n2-1\n3-1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "break-outer",
+          "title": "Break the outer loop",
+          "guide": "Label the outer loop and break out of both loops at once.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Name the outer loop with a label. Multiply each pair of numbers.", "notes": [{"on": "'outer:", "text": "A label: a quote, a name and a colon."}], "text": "    'outer: for row in 1..4 {\n        for col in 1..4 {\n            let product = row * col;\n        }\n    }"},
+            {"mode": "ghost", "line": 5, "guide": "When the product is 4, print the pair and leave both loops.", "notes": [{"on": "break 'outer", "text": "Ends the loop with that label."}], "text": "            if product == 4 {\n                println!(\"found {} x {}\", row, col);\n                break 'outer;\n            }"},
+            {"mode": "ghost", "line": 11, "guide": "This runs once the loops are over.", "text": "    println!(\"done\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "found 2 x 2\ndone"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "continue-outer",
+          "title": "Skip to the next row",
+          "guide": "Use `continue` with a label to jump to the next outer iteration.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Label the outer loop and print each pair.", "text": "    'rows: for row in 1..4 {\n        for col in 1..4 {\n            println!(\"{}{}\", row, col);\n        }\n    }"},
+            {"mode": "ghost", "line": 4, "guide": "When `col` passes `row`, skip the rest of this row.", "notes": [{"on": "continue 'rows", "text": "Jumps to the next row, skipping the inner loop."}], "text": "            if col > row {\n                continue 'rows;\n            }"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "11\n21\n22\n31\n32\n33"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "cheap-prefix",
+          "title": "Stop reading a row",
+          "guide": "Count the cheap items before the first overpriced one on each shelf.",
+          "code": "fn main() {\n    let prices = [[4, 9, 15], [3, 12, 7]];\n    let budget = 10;\n    let mut affordable = 0;\n    'rows: for row in prices {\n        for price in row {\n            if price > budget {\n                continue ___;\n            }\n            affordable += 1;\n        }\n    }\n    println!(\"{}\", affordable);\n}",
+          "gaps": [{ "answers": ["'rows"] }]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "continue-skips-end",
+          "title": "What does it print?",
+          "guide": "Follow the label, then pick the output.",
+          "code": "fn main() {\n    'a: for i in 0..2 {\n        for j in 0..3 {\n            if j == 1 {\n                continue 'a;\n            }\n            println!(\"{}{}\", i, j);\n        }\n        println!(\"end {}\", i);\n    }\n}",
+          "options": [
+            "00, end 0, 10, end 1",
+            "00, 10",
+            "00, 02, end 0, 10, 12, end 1",
+            "00"
+          ],
+          "answer": 1,
+          "explanation": "`continue 'a` jumps to the next `i` as soon as `j` is 1, so the `end` line after the inner loop never runs."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Labels beyond for",
+        "slides": [
+          {
+            "text": "Any loop can carry a label: `for`, `while` and `loop`.\n\nA labeled `loop` can also hand back a value: `break 'name value` ends that loop and the value becomes the result of the whole loop.\n\nEven a plain block can have a label, and `break` leaves it early."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "labeled-while",
+          "title": "A labeled while",
+          "guide": "Label a `while` loop and break out of it from an inner `for`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A counter for the number of tries.", "text": "    let mut tries = 0;"},
+            {"mode": "ghost", "line": 3, "guide": "Label the `while` loop. Each pass counts one try.", "notes": [{"on": "'retry:", "text": "The label goes before while, just like before for."}], "text": "    'retry: while tries < 5 {\n        tries += 1;\n    }"},
+            {"mode": "ghost", "line": 5, "guide": "Try three steps. When the product is 6, report it and leave the `while`.", "text": "        for step in 1..4 {\n            if tries * step == 6 {\n                println!(\"hit on try {}\", tries);\n                break 'retry;\n            }\n        }"},
+            {"mode": "ghost", "line": 12, "guide": "Show how many tries it took.", "text": "    println!(\"tries: {}\", tries);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "hit on try 2\ntries: 2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "first-free-seat",
+          "title": "Find the first free seat",
+          "guide": "Scan a theater for the first free seat and stop both loops.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Each row lists its seats: `true` means taken.", "text": "    let seats = [[true, true, true], [true, false, true], [false, false, true]];"},
+            {"mode": "ghost", "line": 3, "guide": "Label the loop over rows, and walk the seats of each row.", "notes": [{"on": "'rows:", "text": "The label lets the inner loop end the row loop."}], "text": "    'rows: for row in 0..3 {\n        for seat in 0..3 {\n        }\n    }"},
+            {"mode": "ghost", "line": 5, "guide": "On the first free seat, print it with numbers starting at 1 and stop searching.", "notes": [{"on": "break 'rows", "text": "Ends the row loop, so no later seat is checked."}], "text": "            if !seats[row][seat] {\n                println!(\"row {} seat {}\", row + 1, seat + 1);\n                break 'rows;\n            }"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "row 2 seat 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "grid-scan",
+          "title": "What is it for?",
+          "guide": "Pick what this code is for.",
+          "code": "fn main() {\n    let grid = [[1, 2], [3, 4], [5, 6]];\n    let mut at = (0, 0);\n    'scan: for r in 0..3 {\n        for c in 0..2 {\n            if grid[r][c] == 4 {\n                at = (r, c);\n                break 'scan;\n            }\n        }\n    }\n    println!(\"{} {}\", at.0, at.1);\n}",
+          "options": [
+            "Adds up every number in the grid",
+            "Finds where the first 4 sits in the grid",
+            "Counts how many 4s the grid holds",
+            "Prints every row of the grid"
+          ],
+          "answer": 1,
+          "explanation": "It records the row and column of the first 4, then `break 'scan` stops both loops because nothing more is needed."
+        },
+        {
+          "type": "typing",
+          "id": "break-with-value",
+          "title": "A loop that returns a value",
+          "guide": "Break out of a labeled `loop` and give back a value.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The crew size, which grows.", "text": "    let mut crew = 0;"},
+            {"mode": "ghost", "line": 3, "guide": "A labeled `loop` whose result is stored in `job_days`.", "notes": [{"on": "'staffing: loop", "text": "Its result is whatever a break hands back."}], "text": "    let job_days = 'staffing: loop {\n        crew += 1;\n    };"},
+            {"mode": "ghost", "line": 5, "guide": "Look for a number of `days` below `crew` so that crew times days is 24 worker-days. Break with `days` as the value.", "notes": [{"on": "break 'staffing days", "text": "Ends the loop and its value is days."}], "text": "        for days in 1..crew {\n            if crew * days == 24 {\n                break 'staffing days;\n            }\n        }"},
+            {"mode": "ghost", "line": 11, "guide": "Print the crew and the days it needs.", "text": "    println!(\"{} workers for {} days\", crew, job_days);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "6 workers for 4 days"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "first-composite",
+          "title": "Return the first hit",
+          "guide": "Make the labeled loop return the first number with a divisor. It prints 4.",
+          "code": "fn main() {\n    let mut n = 0;\n    let first = 'outer: loop {\n        n += 1;\n        for d in 2..n {\n            if n % d == 0 {\n                break ___ ___;\n            }\n        }\n    };\n    println!(\"{}\", first);\n}",
+          "gaps": [{ "answers": ["'outer"] }, { "answers": ["n"] }]
+        },
+        {
+          "type": "typing",
+          "id": "labeled-block",
+          "title": "Leave a block early",
+          "guide": "Label a plain block and break out of it with a value.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A score to grade.", "text": "    let level = 7;"},
+            {"mode": "ghost", "line": 3, "guide": "A labeled block. Its last expression is the value when no break fires.", "notes": [{"on": "'check: {", "text": "A block can be labeled too, with no loop."}], "text": "    let grade = 'check: {\n        \"low\"\n    };"},
+            {"mode": "ghost", "line": 4, "guide": "Leave the block early with a value when the level is high enough.", "notes": [{"on": "break 'check \"mid\"", "text": "Skips the rest of the block with this value."}], "text": "        if level > 9 {\n            break 'check \"high\";\n        }\n        if level > 4 {\n            break 'check \"mid\";\n        }"},
+            {"mode": "ghost", "line": 12, "guide": "Print the grade.", "text": "    println!(\"{}\", grade);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "mid"
+          }
+        }
+      ]
+    }
+  ]
+}

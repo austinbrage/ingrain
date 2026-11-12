@@ -1,0 +1,287 @@
+{
+  "id": "loop-and-while",
+  "intro": {
+    "title": "Loop and while",
+    "slides": [
+      {
+        "text": "A loop runs the same block again and again. Rust has `loop`, which repeats until you stop it, and `while`, which repeats as long as a condition is true.\n\nYou will stop loops with `break`, skip a round with `continue`, and see that a `loop` can hand back a value."
+      },
+      {
+        "text": "Pseudo code, not Rust. Both loops are a block that repeats, and the difference is who decides when to stop.",
+        "code": "repeat forever {\n    do this\n    if done, stop\n}\n\nwhile the condition is true {\n    do this\n}"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "The loop keyword",
+        "slides": [
+          {
+            "text": "`loop` has no condition: its block runs again as soon as it ends. Only `break` leaves it, so a `loop` without one never stops.\n\nPseudo code, not Rust.",
+            "code": "loop {\n    do this\n    if enough, break\n}\ncontinues here"
+          },
+          {
+            "text": "`continue` ends the current round and jumps to the start of the next one. And `break` can carry a value, because a `loop` is an expression: that value is what the whole loop evaluates to."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "loop-break",
+          "title": "Loop until break",
+          "guide": "Repeat a block with `loop` and leave it with `break`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A counter that starts at zero.", "text": "    let mut count = 0;"},
+            {"mode": "ghost", "line": 3, "guide": "The block repeats. Each round adds one and prints it, and the `if` ends the loop on the third.", "notes": [{"on": "loop", "text": "Repeats its block until a break."}, {"on": "break", "text": "Leaves the loop at once."}], "text": "    loop {\n        count += 1;\n        println!(\"round {}\", count);\n        if count == 3 {\n            break;\n        }\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Runs once, after the loop is over.", "text": "    println!(\"done\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "round 1\nround 2\nround 3\ndone"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "loop-trace",
+          "title": "Where does it stop?",
+          "guide": "Follow the loop, then pick what is printed.",
+          "code": "fn main() {\n    let mut n = 1;\n    loop {\n        if n > 20 {\n            break;\n        }\n        n *= 2;\n    }\n    println!(\"{}\", n);\n}",
+          "options": ["16", "20", "32", "64"],
+          "answer": 2,
+          "explanation": "The check comes before the doubling. At 16 it is not above 20 yet, so n becomes 32, and only then does the `if` break."
+        },
+        {
+          "type": "typing",
+          "id": "loop-value",
+          "title": "A loop that returns a value",
+          "guide": "Give `break` a value, and the loop evaluates to it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A counter for the attempts.", "text": "    let mut tries = 0;"},
+            {"mode": "ghost", "line": 3, "guide": "The loop is the value of `first_big`. When the condition holds, `break` hands out `tries`.", "notes": [{"on": "= loop", "text": "The loop is an expression, so it can be assigned."}, {"on": "break tries", "text": "Stops the loop and returns tries."}], "text": "    let first_big = loop {\n        tries += 1;\n        if tries * tries > 50 {\n            break tries;\n        }\n    };"},
+            {"mode": "ghost", "line": 9, "guide": "Print what the loop returned.", "text": "    println!(\"{}\", first_big);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "8"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "loop-value-fill",
+          "title": "Return from a loop",
+          "guide": "Name the variable that receives the loop, and hand back the first multiple of 5 that `n` reaches. The program prints it.",
+          "code": "fn main() {\n    let mut n = 0;\n    let ___ = loop {\n        n += 7;\n        if n % 5 == 0 {\n            break ___;\n        }\n    };\n    println!(\"{}\", found);\n}",
+          "gaps": [{"answers": ["found"]}, {"answers": ["n"]}]
+        },
+        {
+          "type": "typing",
+          "id": "continue-skip",
+          "title": "Skip a round",
+          "guide": "Use `continue` to jump to the next round.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A counter.", "text": "    let mut n = 0;"},
+            {"mode": "ghost", "line": 3, "guide": "When n is 2, `continue` skips the print and starts the next round. The loop ends at 4.", "notes": [{"on": "continue", "text": "Skips the rest of this round."}], "text": "    loop {\n        n += 1;\n        if n == 2 {\n            continue;\n        }\n        println!(\"{}\", n);\n        if n == 4 {\n            break;\n        }\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "Runs after the loop.", "text": "    println!(\"end\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1\n3\n4\nend"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "The while loop",
+        "slides": [
+          {
+            "text": "`while` checks its condition before every round. If it is false at the start, the block never runs. The condition must be a `bool`, and the loop only ends when something in the block changes what it checks.\n\nPseudo code, not Rust.",
+            "code": "while the condition is true {\n    do this\n    change what the condition checks\n}\ncontinues here"
+          },
+          {
+            "text": "A `while` loop that never changes what it checks never stops. When you use `continue`, make sure that change happens before it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "while-countdown",
+          "title": "Count down",
+          "guide": "Repeat a block while a condition is true.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Where the countdown starts.", "text": "    let mut seconds = 3;"},
+            {"mode": "ghost", "line": 3, "guide": "Each round prints the number and lowers it. The loop ends when it reaches 0.", "notes": [{"on": "while seconds > 0", "text": "Checked before each round. False ends the loop."}], "text": "    while seconds > 0 {\n        println!(\"{}\", seconds);\n        seconds -= 1;\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "Runs when the loop is over.", "text": "    println!(\"liftoff\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3\n2\n1\nliftoff"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "while-fill",
+          "title": "Drain the battery",
+          "guide": "Print the battery level and lower it every round. The output must be 10 and then 7, and nothing else.",
+          "code": "fn main() {\n    let mut battery = 10;\n    while battery ___ 4 {\n        println!(\"{}\", battery);\n        battery ___ 3;\n    }\n}",
+          "gaps": [{"answers": [">"]}, {"answers": ["-="]}]
+        },
+        {
+          "type": "typing",
+          "id": "while-sum",
+          "title": "Two conditions",
+          "guide": "Combine conditions with `&&` so the loop stops on either limit.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A running total and a round counter.", "text": "    let mut total = 0;\n    let mut count = 0;"},
+            {"mode": "ghost", "line": 4, "guide": "The loop runs only while both checks hold. Whichever fails first ends it.", "notes": [{"on": "&&", "text": "True only when both sides are true."}], "text": "    while total < 20 && count < 4 {\n        total += 9;\n        count += 1;\n    }"},
+            {"mode": "ghost", "line": 8, "guide": "Print both values.", "text": "    println!(\"{} {}\", total, count);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "27 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "while-step-quiz",
+          "title": "Overshooting the limit",
+          "guide": "Follow the loop, then pick what is printed.",
+          "code": "fn main() {\n    let mut n = 0;\n    while n < 10 {\n        n += 3;\n    }\n    println!(\"{}\", n);\n}",
+          "options": ["9", "12", "10", "15"],
+          "answer": 1,
+          "explanation": "At 9 the condition is still true, so the block runs once more and n becomes 12. The check happens only at the start of a round."
+        },
+        {
+          "type": "typing",
+          "id": "while-index",
+          "title": "Walk an array",
+          "guide": "Use a counter as an index to visit every item.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "An array of scores.", "text": "    let scores = [4, 8, 15, 16];"},
+            {"mode": "ghost", "line": 3, "guide": "An index and a sum, both starting at zero.", "text": "    let mut i = 0;\n    let mut sum = 0;"},
+            {"mode": "ghost", "line": 5, "guide": "Add the item at `i`, then move to the next index. Stop when the index passes the last item.", "notes": [{"on": "scores.len()", "text": "The number of items in the array."}, {"on": "scores[i]", "text": "The item at the current index."}], "text": "    while i < scores.len() {\n        sum += scores[i];\n        i += 1;\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "Print the sum.", "text": "    println!(\"{}\", sum);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "43"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "refund-skip",
+          "title": "Skip the refunds",
+          "guide": "Update the index before `continue`, or the loop never ends.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Order amounts, where a negative one is a refund, plus an index and a total.", "text": "    let orders = [40, -15, 25, -5, 30];\n    let mut i = 0;\n    let mut total = 0;"},
+            {"mode": "ghost", "line": 5, "guide": "The index grows first, so `continue` cannot skip it. Refunds jump to the next round without being added.", "notes": [{"on": "amount < 0", "text": "True when the order is a refund."}], "text": "    while i < orders.len() {\n        let amount = orders[i];\n        i += 1;\n        if amount < 0 {\n            continue;\n        }\n        total += amount;\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "Print the total of the orders.", "text": "    println!(\"{}\", total);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "95"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Putting loops to work",
+        "slides": [
+          {
+            "text": "Use `while` when the condition says it all, and `loop` when the end comes from the middle of the block or the loop must return a value."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "collatz-steps",
+          "title": "Count the steps",
+          "guide": "Count how many rounds a `while` needs to reach a goal.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A starting number and a step counter.", "text": "    let mut n = 6;\n    let mut steps = 0;"},
+            {"mode": "ghost", "line": 4, "guide": "Halve even numbers, and turn odd ones into 3n + 1. Count each round until n reaches 1.", "notes": [{"on": "n != 1", "text": "The loop runs until n becomes 1."}, {"on": "n /= 2", "text": "Divides n by 2 in place."}], "text": "    while n != 1 {\n        if n % 2 == 0 {\n            n /= 2;\n        } else {\n            n = 3 * n + 1;\n        }\n        steps += 1;\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Print how many steps it took.", "text": "    println!(\"{}\", steps);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "8"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "nested-break",
+          "title": "Break in a nested loop",
+          "guide": "Follow both loops, then pick what is printed.",
+          "code": "fn main() {\n    let mut outer = 0;\n    while outer < 3 {\n        outer += 1;\n        let mut inner = 0;\n        loop {\n            inner += 1;\n            if inner == 2 {\n                break;\n            }\n        }\n        println!(\"{} {}\", outer, inner);\n    }\n}",
+          "options": [
+            "Three lines: 1 2, 2 2, 3 2",
+            "One line: 1 2",
+            "Three lines: 1 1, 2 1, 3 1",
+            "Nothing, it loops forever"
+          ],
+          "answer": 0,
+          "explanation": "The `break` leaves only the inner loop. The `while` goes on, and every round starts with a fresh inner."
+        },
+        {
+          "type": "typing",
+          "id": "budget-loop",
+          "title": "Stop at the budget",
+          "guide": "Combine `while`, an index and `break`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Four prices, a budget, what is spent and how many items fit.", "text": "    let prices = [30, 25, 40, 15];\n    let budget = 80;\n    let mut spent = 0;\n    let mut items = 0;"},
+            {"mode": "ghost", "line": 6, "guide": "Walk the prices. Break when the next one would go over the budget, otherwise buy it.", "notes": [{"on": "spent + prices[items]", "text": "What the total would be after buying this item."}], "text": "    while items < 4 {\n        if spent + prices[items] > budget {\n            break;\n        }\n        spent += prices[items];\n        items += 1;\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "Print the count and the total.", "text": "    println!(\"{} {}\", items, spent);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "2 55"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "stock-purpose",
+          "title": "What is it for?",
+          "guide": "Pick what the loop is used for.",
+          "code": "let mut left = 100;\nlet mut days = 0;\nwhile left > 0 {\n    left -= 15;\n    days += 1;\n}",
+          "options": [
+            "Splits 100 into equal parts of 15",
+            "Counts the days a stock of 100 lasts at 15 a day",
+            "Finds how much is left after one day",
+            "Checks whether 100 is a multiple of 15"
+          ],
+          "answer": 1,
+          "explanation": "Each round uses up 15 and counts a day, until nothing is left. The counter ends as the number of days."
+        },
+        {
+          "type": "fill-blank",
+          "id": "continue-fill",
+          "title": "Only multiples of 3",
+          "guide": "The program must print 3, 6 and 9 and nothing else. Every other number must cut its round short before the print, and the loop must still end.",
+          "code": "fn main() {\n    let mut n = 0;\n    while n < 10 {\n        n ___ 1;\n        if n % 3 ___ 0 {\n            continue;\n        }\n        println!(\"{}\", n);\n    }\n}",
+          "gaps": [{"answers": ["+="]}, {"answers": ["!="]}]
+        }
+      ]
+    }
+  ]
+}

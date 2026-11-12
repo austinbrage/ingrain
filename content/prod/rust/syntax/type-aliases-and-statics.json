@@ -1,0 +1,115 @@
+{
+  "id": "type-aliases-and-statics",
+  "intro": {
+    "title": "Aliases and statics",
+    "slides": [
+      {
+        "text": "Two more items that live outside `main`, like constants.\n\nA **type alias** is a second name for a type that already exists. It does not create a new type: both names are the same type, and values move between them freely. Pseudo code, not Rust.",
+        "code": "name Score means u32\nname Level means u32\n\nScore, Level and u32 are one type"
+      },
+      {
+        "text": "Use an alias to say what a number is for, or to shorten a type you repeat. Aliases are written in PascalCase, and since an item is not a statement, one can be declared above or below `main`."
+      },
+      {
+        "text": "A `const` is pasted wherever it is used. A **static** is a single fixed place in memory: every use reads that same place, and it lives as long as the program runs.\n\nIt is written like a const, with the type required, in SCREAMING_CASE. Its value must be known before the program starts, so it is a literal or built from consts."
+      },
+      {
+        "text": "Statics that can change exist too, but they need `unsafe` and are out of scope here. In this course a static is read only, like a const."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "alias-basics",
+          "title": "Name a type",
+          "guide": "Give `u32` a name that says what it holds.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "An alias goes outside `main`. The new name comes first, then the type it stands for.", "notes": [{"on": "type", "text": "Makes a second name for an existing type."}], "text": "type Score = u32;\n"},
+            {"mode": "ghost", "line": 4, "guide": "Use the alias as the type of a variable.", "text": "    let best: Score = 90;\n    println!(\"{}\", best);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "90"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "crate-totals",
+          "title": "One type, two names",
+          "guide": "Read the code, then pick the output.",
+          "code": "type Celsius = i32;\ntype Offset = i32;\n\nfn main() {\n    let shift: Offset = -3;\n    let low: Celsius = shift;\n    let high: Celsius = low + 10;\n    println!(\"{} {}\", low, high);\n}",
+          "options": [
+            "Compile error",
+            "3 13",
+            "-3 -3",
+            "-3 7"
+          ],
+          "answer": 3,
+          "explanation": "An `Offset` is an `i32` and so is a `Celsius`, so `shift` fits in `low` unchanged: -3, and -3 + 10 is 7."
+        },
+        {
+          "type": "typing",
+          "id": "trip-speed",
+          "title": "A trip with units",
+          "guide": "Aliases name the unit of each number, so the speed formula reads clearly.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "One name per unit, all the same `u32` underneath.", "text": "type Km = u32;\ntype Minutes = u32;\ntype Kmh = u32;\n"},
+            {"mode": "ghost", "line": 6, "guide": "Kilometers per hour: scale the minutes to an hour.", "notes": [{"on": "distance * 60 / time", "text": "Km times 60, divided by minutes, gives km per hour."}], "text": "    let distance: Km = 180;\n    let time: Minutes = 120;\n    let speed: Kmh = distance * 60 / time;"},
+            {"mode": "ghost", "line": 9, "guide": "Print the trip and its speed.", "text": "    println!(\"{} km in {} min\", distance, time);\n    println!(\"speed: {} km/h\", speed);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "180 km in 120 min\nspeed: 90 km/h"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "ride-units",
+          "title": "A bike ride",
+          "guide": "The ride must print 40 km/h. Fill what `Km` stands for and the alias that labels the time.",
+          "code": "type Km = ___;\ntype Minutes = u32;\ntype Kmh = u32;\n\nfn main() {\n    let ride: Km = 30;\n    let time: ___ = 45;\n    let pace: Kmh = ride * 60 / time;\n    println!(\"{} km/h\", pace);\n}",
+          "gaps": [{"answers": ["u32"]}, {"answers": ["Minutes", "u32"]}]
+        },
+        {
+          "type": "typing",
+          "id": "startup-banner",
+          "title": "A startup banner",
+          "guide": "A static can start from a const, and a static can be read as often as needed.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Declare the limit as a const first.", "text": "const MAX_USERS: u32 = 40;\n"},
+            {"mode": "ghost", "line": 2, "guide": "A static needs its type written out, and a const can feed it. A text literal is `&str`.", "notes": [{"on": "static APP_NAME", "text": "One value in one place for the whole program."}], "text": "static APP_NAME: &str = \"ingrain\";\nstatic SEATS: u32 = MAX_USERS * 3;"},
+            {"mode": "ghost", "line": 6, "guide": "Print the banner, the numbers, and sign off with the name again.", "text": "    println!(\"== {} ==\", APP_NAME);\n    println!(\"users: {}\", MAX_USERS);\n    println!(\"seats: {}\", SEATS);\n    println!(\"spare: {}\", SEATS - MAX_USERS);\n    println!(\"bye from {}\", APP_NAME);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "== ingrain ==\nusers: 40\nseats: 120\nspare: 80\nbye from ingrain"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "static-assign",
+          "title": "Seats left",
+          "guide": "Read the code, then pick the output.",
+          "code": "const BASE_FEE: u32 = 5;\nstatic TOTAL_SEATS: u32 = 20;\n\nfn main() {\n    let booked = 8;\n    let free = TOTAL_SEATS - booked;\n    println!(\"{}\", free);\n    println!(\"{}\", TOTAL_SEATS);\n    println!(\"{}\", free * BASE_FEE);\n}",
+          "options": [
+            "12\n12\n60",
+            "12\n20\n100",
+            "12\n20\n60",
+            "12\n20\n40"
+          ],
+          "answer": 2,
+          "explanation": "The subtraction builds a new value and leaves the static alone, so `TOTAL_SEATS` still prints 20. Then 12 * 5 is 60."
+        }
+      ]
+    }
+  ]
+}

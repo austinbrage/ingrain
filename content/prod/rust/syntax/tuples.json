@@ -1,0 +1,652 @@
+{
+  "id": "tuples",
+  "intro": {
+    "title": "Tuples",
+    "slides": [
+      {
+        "text": "A tuple groups a fixed number of values into one. The values can have different types, and the size never changes.\n\nThe snippet is pseudo code, not Rust.",
+        "code": "tuple = (value, value, value)\n\nread one  -> by its position\nunpack    -> one name per value"
+      },
+      {
+        "text": "A tuple has no plain print format, so the exercises print it with `{:?}`, the debug format."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "weather-tuple",
+          "title": "Weather report",
+          "guide": "Group a city, a temperature and a humidity in one tuple, then read parts of it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The type is a tuple of types, one per value, in the same order. Two reports of the same shape.",
+              "text": "    let report: (&str, i16, u8) = (\"Lima\", 21, 80);\n    let before: (&str, i16, u8) = (\"Lima\", 18, 85);",
+              "notes": [
+                {
+                  "on": "report: (&str, i16, u8)",
+                  "text": "One type for each value, in order."
+                }
+              ]
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Print the whole tuples with the debug format.",
+              "text": "    println!(\"{:?}\", report);\n    println!(\"{:?}\", before);"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Read values by position, and compare two of them.",
+              "text": "    println!(\"{} {}\", report.0, report.1);\n    println!(\"{}\", report.1 - before.1);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "(\"Lima\", 21, 80)\n(\"Lima\", 18, 85)\nLima 21\n3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "index-fields",
+          "title": "Tuple fields",
+          "guide": "Read one value of a tuple by its position.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A tuple with no type written. Rust works it out.",
+              "text": "    let reading = ('C', 21, 0.5);"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A dot and the position read one value. Positions start at 0.",
+              "text": "    println!(\"{}\", reading.0);\n    println!(\"{}\", reading.1);\n    println!(\"{}\", reading.2);",
+              "notes": [
+                {
+                  "on": "reading.0",
+                  "text": "Dot, then the position, counted from 0."
+                },
+                {
+                  "on": "reading.2",
+                  "text": "Three values, so the last position is 2."
+                }
+              ]
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "C\n21\n0.5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "mutate-field",
+          "title": "Change a field",
+          "guide": "Assign to one field of a mutable tuple.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A tuple that changes is declared with `mut`.",
+              "text": "    let mut score = (0, 0);",
+              "notes": [
+                {
+                  "on": "mut",
+                  "text": "Without it, no field can be assigned."
+                }
+              ]
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Assign to a field by its position, as to a variable.",
+              "text": "    score.0 = 3;\n    score.1 += 2;",
+              "notes": [
+                {
+                  "on": "score.0 = 3",
+                  "text": "Only this field changes. The others stay."
+                }
+              ]
+            },
+            {
+              "mode": "copy",
+              "line": 5,
+              "guide": "Print it.",
+              "text": "    println!(\"{:?}\", score);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "(3, 2)"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "which-prints",
+          "title": "Mutated fields",
+          "guide": "Pick what the program prints.",
+          "code": "fn main() {\n    let mut order = (20, 3, 'p');\n    order.0 -= 5;\n    order.1 += order.0;\n    println!(\"{} {}\", order.0, order.1);\n}",
+          "options": [
+            "15 18",
+            "15 3",
+            "20 18",
+            "18 15"
+          ],
+          "answer": 0,
+          "explanation": "`order.0` becomes 15. Then `order.1` becomes 3 + 15 = 18, using the new first field. Positions start at 0, so `.1` is the second value."
+        },
+        {
+          "type": "fill-blank",
+          "id": "tuple-ranges",
+          "title": "Fit the values",
+          "guide": "Pick the smallest type that holds each value.",
+          "code": "fn main() {\n    let sample: (___, ___) = (200, -5000);\n    println!(\"{:?}\", sample);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "u8"
+              ]
+            },
+            {
+              "answers": [
+                "i16"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Destructuring",
+        "slides": [
+          {
+            "text": "Destructuring unpacks a tuple into separate variables with one `let`. The pattern on the left has the same shape as the tuple on the right.\n\nThe snippet is pseudo code, not Rust.",
+            "code": "let (name_a, name_b) = a_pair\n\nname_a -> the first value\nname_b -> the second value"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "destructure-tuple",
+          "title": "Unpack a tuple",
+          "guide": "Split a tuple into one variable per value.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A tuple to unpack.",
+              "text": "    let reading = ('C', 21, 0.5);"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A pattern shaped like the tuple goes on the left. Each name takes the value at its position.",
+              "text": "    let (scale, value, error) = reading;",
+              "notes": [
+                {
+                  "on": "(scale, value, error)",
+                  "text": "Three names for three values, in order."
+                }
+              ]
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "The values are now plain variables.",
+              "text": "    println!(\"{} {} {}\", scale, value, error);"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A tuple written in place can be unpacked too. Then use the parts.",
+              "text": "    let (city, temp) = (\"Lima\", 21);\n    println!(\"{} is {}\", city, temp);"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "The right side can compute its values.",
+              "text": "    let (low, high) = (value - 5, value + 5);\n    println!(\"{} to {}\", low, high);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "C 21 0.5\nLima is 21\n16 to 26"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "destructure-literal",
+          "title": "Unpack in place",
+          "guide": "Destructure a tuple written in place, then use the parts.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The tuple on the right needs no variable of its own.",
+              "text": "    let (width, height) = (1920, 1080);"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "The parts are ordinary numbers.",
+              "text": "    let area = width * height;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Print the parts and the result.",
+              "text": "    println!(\"{}x{} = {}\", width, height, area);"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Unpack halves of both numbers at once.",
+              "text": "    let (half_w, half_h) = (width / 2, height / 2);\n    println!(\"{}x{}\", half_w, half_h);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1920x1080 = 2073600\n960x540"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "skip-values",
+          "title": "Skip values",
+          "guide": "Keep some values of a tuple and ignore the rest.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A tuple of an id, a letter and a flag.",
+              "text": "    let job = (7, 'B', false);"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Put `_` where a value is not needed. It takes the place without a name.",
+              "text": "    let (id, _, done) = job;\n    println!(\"{} {}\", id, done);",
+              "notes": [
+                {
+                  "on": "_",
+                  "text": "Matches any value and throws it away."
+                }
+              ]
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`..` skips all the values left, however many. It can sit at either end.",
+              "text": "    let (.., last) = job;\n    println!(\"{}\", last);",
+              "notes": [
+                {
+                  "on": "..",
+                  "text": "Skips every value before the name."
+                }
+              ]
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "7 false\nfalse"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "skip-values-fill",
+          "title": "Skip in a pattern",
+          "guide": "Skip the values the names leave out, in each pattern.",
+          "code": "fn main() {\n    let job = (7, 'B', false);\n    let (id, ___, done) = job;\n    let (first, ___) = job;\n    println!(\"{} {}\", id, done);\n    println!(\"{}\", first);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "_",
+                ".."
+              ]
+            },
+            {
+              "answers": [
+                ".."
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "swap-values",
+          "title": "Swap two values",
+          "guide": "Swap two variables with one tuple assignment.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Both need `mut`, because both change.",
+              "text": "    let mut home = 3;\n    let mut away = 1;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "The right side is built first, from the old values. Then both names are assigned.",
+              "text": "    (home, away) = (away, home);",
+              "notes": [
+                {
+                  "on": "= (away, home)",
+                  "text": "Reads both old values before it assigns."
+                }
+              ]
+            },
+            {
+              "mode": "copy",
+              "line": 5,
+              "guide": "Print them.",
+              "text": "    println!(\"{} {}\", home, away);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "swap-and-add",
+          "title": "Next step",
+          "guide": "Pick what the program prints.",
+          "code": "fn main() {\n    let mut prev = 1;\n    let mut curr = 2;\n    (prev, curr) = (curr, prev + curr);\n    println!(\"{} {}\", prev, curr);\n}",
+          "options": [
+            "3 3",
+            "2 3",
+            "2 4",
+            "1 3"
+          ],
+          "answer": 1,
+          "explanation": "The right side is `(2, 1 + 2)`, built with the old values. Then `prev` becomes 2 and `curr` becomes 3."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Comparing and nesting",
+        "slides": [
+          {
+            "text": "Tuples compare from the first field on. They are equal when every field is equal, and the first field that differs decides which one is smaller.\n\nThe snippet is pseudo code, not Rust.",
+            "code": "(1, 9) vs (2, 0)  -> 1 decides\n(4, 5) vs (4, 7)  -> tie, 5 decides"
+          },
+          {
+            "text": "A tuple can hold other tuples, and `()` is the empty tuple, the value that means nothing."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "nested-tuples",
+          "title": "Nested tuples",
+          "guide": "Put tuples inside a tuple and reach into them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two points, each one a tuple of two values.",
+              "text": "    let segment = ((0, 0), (3, 4));"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Chain the positions: first the point, then the value inside it.",
+              "text": "    println!(\"{}\", segment.1.0);",
+              "notes": [
+                {
+                  "on": ".1.0",
+                  "text": "The second point, then its first value."
+                }
+              ]
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "A pattern nests the same way as the tuple.",
+              "text": "    let ((x1, y1), (x2, y2)) = segment;\n    println!(\"{}\", (x2 - x1) + (y2 - y1));",
+              "notes": [
+                {
+                  "on": "((x1, y1), (x2, y2))",
+                  "text": "An inner pattern for each inner tuple."
+                }
+              ]
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3\n7"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "segment-names",
+          "title": "Name the parts",
+          "guide": "Print the width and the height of the segment.",
+          "code": "fn main() {\n    let segment = ((1, 2), (4, 6));\n    let ((x1, y1), (x2, y2)) = segment;\n    println!(\"{}\", ___ - x1);\n    println!(\"{}\", ___ - y1);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "x2"
+              ]
+            },
+            {
+              "answers": [
+                "y2"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "compare-tuples",
+          "title": "Compare versions",
+          "guide": "Compare tuples with `==` and `<`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two versions as (major, minor), with the same values.",
+              "text": "    let installed = (1, 4);\n    let required = (1, 4);"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "`==` is true when every field is equal.",
+              "text": "    println!(\"{}\", installed == required);"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Two versions that share the major number.",
+              "text": "    let current = (2, 30);\n    let latest = (2, 45);"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "`<` compares field by field from the first. A tie moves on to the next field.",
+              "text": "    println!(\"{}\", current < latest);\n    println!(\"{}\", (3, 0) < (2, 99));",
+              "notes": [
+                {
+                  "on": "(3, 0)",
+                  "text": "The first fields already differ, so the rest is skipped."
+                }
+              ]
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true\ntrue\nfalse"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "first-field-wins",
+          "title": "Which is smaller?",
+          "guide": "Pick what the program prints.",
+          "code": "fn main() {\n    let a = (5, 1, 9);\n    let b = (5, 2, 0);\n    println!(\"{}\", a < b);\n}",
+          "options": [
+            "true",
+            "false"
+          ],
+          "answer": 0,
+          "explanation": "The first fields tie, so the second decide: 1 is less than 2. The last field is never looked at."
+        },
+        {
+          "type": "typing",
+          "id": "empty-and-single",
+          "title": "Empty and single",
+          "guide": "The empty tuple, and the comma of a one-value tuple.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`()` is the empty tuple, a value that holds nothing.",
+              "text": "    let empty = ();"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "One value needs a trailing comma. Without it, the parentheses only group.",
+              "text": "    let single = (5,);\n    let plain = (5);",
+              "notes": [
+                {
+                  "on": "(5,)",
+                  "text": "The comma is what makes it a tuple."
+                },
+                {
+                  "on": "(5)",
+                  "text": "Only the number 5, wrapped in parentheses."
+                }
+              ]
+            },
+            {
+              "mode": "copy",
+              "line": 5,
+              "guide": "Print the three.",
+              "text": "    println!(\"{:?}\", empty);\n    println!(\"{:?}\", single);\n    println!(\"{:?}\", plain);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "()\n(5,)\n5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "copy-tuple",
+          "title": "Copy a tuple",
+          "guide": "Copy a tuple, change the copy, and keep the original.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A starting point.",
+              "text": "    let start = (0, 0);"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A tuple of numbers is copied on assignment. The copy is a separate value.",
+              "text": "    let mut pos = start;",
+              "notes": [
+                {
+                  "on": "let mut pos = start",
+                  "text": "Copies the values. Both stay usable."
+                }
+              ]
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Change one field of the copy only.",
+              "text": "    pos.0 += 4;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "The original did not change.",
+              "text": "    println!(\"{:?} {:?}\", pos, start);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "(4, 0) (0, 0)"
+          }
+        }
+      ]
+    }
+  ]
+}

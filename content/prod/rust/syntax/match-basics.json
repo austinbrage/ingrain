@@ -1,0 +1,224 @@
+{
+  "id": "match-basics",
+  "intro": {
+    "title": "Choosing with match",
+    "slides": [
+      {
+        "text": "`match` compares one value with a list of patterns, from the top, and runs the first arm that fits. Here the patterns are plain values and `_`.\n\nThe snippet is pseudo code, not Rust.",
+        "code": "match the value {\n    pattern one => do this\n    pattern two => do that\n    anything else => do the other\n}"
+      },
+      {
+        "text": "You will use `match` as a statement and as an expression that gives a value, on integers, bools and chars.\n\nRanges, several patterns in one arm and conditions on an arm are taught in `literal-and-range-patterns`. Enums come later too."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Arms and the catch-all",
+        "slides": [
+          {
+            "text": "Each arm is `pattern => code`. The arms are tried from the top, the first that fits runs and the rest are skipped.\n\n`_` fits any value, so it goes last to catch what the other arms did not.",
+            "code": "fn main() {\n    let coins = 2;\n    match coins {\n        0 => println!(\"none\"),\n        _ => println!(\"some\"),\n    }\n}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "first-match",
+          "title": "Your first match",
+          "guide": "Pick a message for a number with `match`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A number to test.", "text": "    let day = 3;"},
+            {"mode": "ghost", "line": 3, "guide": "Each arm is a value, `=>` and the code to run. The first arm that equals `day` runs. The last arm catches every other number.", "notes": [{"on": "match day", "text": "Compares day with each arm, top to bottom."}, {"on": "1 =>", "text": "Pattern on the left, code to run on the right."}, {"on": "_ =>", "text": "Fits any value the arms above missed."}], "text": "    match day {\n        1 => println!(\"Mon\"),\n        2 => println!(\"Tue\"),\n        3 => println!(\"Wed\"),\n        _ => println!(\"Other\"),\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "This line runs after the match, whichever arm ran.", "text": "    println!(\"done\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Wed\ndone"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "status-retries",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let code = 404;\n    let a = match code {\n        200 => 1,\n        404 => 2,\n        _ => 3,\n    };\n    let b = match code {\n        200 => 10,\n        404 => 20,\n        _ => 30,\n    };\n    println!(\"{}\", a + b);\n}",
+          "options": [
+            "12",
+            "22",
+            "23",
+            "32"
+          ],
+          "answer": 1,
+          "explanation": "`code` is 404. The first match gives 2 and the second gives 20, because each has its own arm values. The sum is 22."
+        },
+        {
+          "type": "typing",
+          "id": "match-value",
+          "title": "A match that gives a value",
+          "guide": "Pick a shipping fee with `match`, then use it in a total.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A parcel size to test.", "text": "    let size = 2;"},
+            {"mode": "ghost", "line": 3, "guide": "A match is an expression: the arm that runs gives its value to `fee`. Every arm must give the same type.", "notes": [{"on": "let fee = match size", "text": "The value of the chosen arm is stored in fee."}, {"on": "};", "text": "A let ends with a semicolon, even after a brace."}], "text": "    let fee = match size {\n        1 => 5,\n        2 => 8,\n        _ => 12,\n    };"},
+            {"mode": "ghost", "line": 8, "guide": "The match result is a plain number, so it can be multiplied like any other.", "text": "    let parcels = 3;\n    let total = fee * parcels;\n    println!(\"total: {}\", total);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "total: 24"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-refill",
+          "title": "Pick the arm",
+          "guide": "Fill the pattern so the program prints `refill: 4`.",
+          "code": "fn main() {\n    let stock = 1;\n    let refill = match stock {\n        0 => 10,\n        ___ => 4,\n        _ => 0,\n    };\n    println!(\"refill: {}\", refill);\n}",
+          "gaps": [
+            {"answers": ["1"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "match-block",
+          "title": "An arm with a block",
+          "guide": "Run several statements in one arm.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A number to test.", "text": "    let hp = 0;"},
+            {"mode": "ghost", "line": 3, "guide": "When an arm needs more than one statement, use braces. A block arm needs no comma after it.", "notes": [{"on": "0 => {", "text": "Braces let one arm run many statements."}], "text": "    match hp {\n        0 => {\n            println!(\"You lost\");\n            println!(\"Try again\");\n        }\n        _ => println!(\"Keep going\"),\n    }"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "You lost\nTry again"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "one-arm-runs",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let temp = 30;\n    match temp {\n        0 => println!(\"freezing\"),\n        30 => {\n            println!(\"warm\");\n            println!(\"sunny\");\n        }\n        _ => println!(\"unknown\"),\n    }\n    println!(\"end\");\n}",
+          "options": [
+            "warm\nsunny",
+            "warm\nsunny\nend",
+            "warm\nsunny\nunknown\nend",
+            "warm\nend"
+          ],
+          "answer": 1,
+          "explanation": "Only the `30` arm runs, with both of its statements. The match then ends, and the line after it prints `end`. `_` is skipped."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Covering every value",
+        "slides": [
+          {
+            "text": "A `match` must cover every possible value, or the program does not compile.\n\nA bool has two values, so `true` and `false` are enough. An integer has far too many to list, so a match on one ends with `_`."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "login-match",
+          "title": "Matching a bool",
+          "guide": "Match a bool twice to build a message and a number.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A login state and a count.", "text": "    let logged_in = true;\n    let unread = 7;"},
+            {"mode": "ghost", "line": 4, "guide": "A bool has only two values. With both arms written, the match covers everything.", "notes": [{"on": "false =>", "text": "true and false cover every bool, so no catch-all is needed."}], "text": "    let banner = match logged_in {\n        true => \"welcome back\",\n        false => \"please sign in\",\n    };"},
+            {"mode": "ghost", "line": 8, "guide": "The same bool can feed another match. Here the arms give numbers.", "text": "    let badge = match logged_in {\n        true => unread,\n        false => 0,\n    };"},
+            {"mode": "ghost", "line": 12, "guide": "Print both results.", "text": "    println!(\"{} ({} new)\", banner, badge);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "welcome back (7 new)"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-bool-arm",
+          "title": "Cover the bool",
+          "guide": "Complete the match so it compiles.",
+          "code": "fn main() {\n    let open = true;\n    let sign = match open {\n        true => \"open\",\n        ___ => \"closed\",\n    };\n    println!(\"{}\", sign);\n}",
+          "gaps": [
+            {"answers": ["false", "_"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "catch-all-first",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let n = 3;\n    match n {\n        _ => println!(\"any\"),\n        3 => println!(\"three\"),\n    }\n}",
+          "options": [
+            "three",
+            "any\nthree",
+            "any",
+            "Nothing, it does not compile"
+          ],
+          "answer": 2,
+          "explanation": "Arms are tried from the top and `_` fits everything, so it wins. The `3` arm can never run: the compiler only warns about it."
+        },
+        {
+          "type": "typing",
+          "id": "match-expression",
+          "title": "Match on an expression",
+          "guide": "Match on a calculation, not only a variable.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A number to test.", "text": "    let n = 7;"},
+            {"mode": "ghost", "line": 3, "guide": "The remainder of a division by 2 is 0 for even numbers. Match on that result.", "notes": [{"on": "n % 2", "text": "Any expression can be matched, not only a variable."}], "text": "    let kind = match n % 2 {\n        0 => \"even\",\n        _ => \"odd\",\n    };"},
+            {"mode": "ghost", "line": 7, "guide": "Print the number and its kind.", "text": "    println!(\"{} is {}\", n, kind);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "7 is odd"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "char-match",
+          "title": "A command letter",
+          "guide": "Move a position with a char command.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A command and a starting position.", "text": "    let command = 'd';\n    let mut row = 5;\n    let mut col = 5;"},
+            {"mode": "ghost", "line": 5, "guide": "Char patterns are char literals in single quotes. Each arm changes the position, and the catch-all reports a letter it does not know.", "notes": [{"on": "'u' =>", "text": "A char pattern is a char literal in single quotes."}, {"on": "row += 1", "text": "The arm runs this statement when the command is 'd'."}], "text": "    match command {\n        'u' => row -= 1,\n        'd' => row += 1,\n        'l' => col -= 1,\n        'r' => col += 1,\n        _ => println!(\"unknown command\"),\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Print the new position.", "text": "    println!(\"at {}, {}\", row, col);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "at 6, 5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "discount-tier",
+          "title": "Skip the rest",
+          "guide": "Print a discounted total for some tiers and do nothing for the rest.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A customer tier and a price.", "text": "    let tier = 2;\n    let price = 80;"},
+            {"mode": "ghost", "line": 4, "guide": "A match statement needs no value from its arms. An empty block does nothing for the tiers without a discount.", "notes": [{"on": "_ => {}", "text": "An empty block does nothing for the other tiers."}, {"on": "price / 10", "text": "Tier 2 takes a tenth off the price."}], "text": "    match tier {\n        1 => println!(\"total: {}\", price - 5),\n        2 => println!(\"total: {}\", price - price / 10),\n        _ => {}\n    }"},
+            {"mode": "ghost", "line": 9, "guide": "This line always runs.", "text": "    println!(\"thanks\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "total: 72\nthanks"
+          }
+        }
+      ]
+    }
+  ]
+}

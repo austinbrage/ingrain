@@ -1,0 +1,666 @@
+{
+  "id": "arrays",
+  "intro": {
+    "title": "Arrays",
+    "slides": [
+      {
+        "text": "An array holds a fixed number of values, all of the same type, side by side. Its length is part of its type and never changes after it is created.\n\nA list that grows is a different type, and it comes in a later course.",
+        "code": "let marks = [7, 9, 4];"
+      },
+      {
+        "text": "An element is reached by its index, counting from 0. The index goes in square brackets after the name.",
+        "code": "let marks = [7, 9, 4];\nlet first = marks[0];\nlet third = marks[2];"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "literal-index",
+          "title": "Array and index",
+          "guide": "Create an array and read its elements by position.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "An array holds a fixed number of values of one type.",
+              "notes": [
+                {
+                  "on": "[2, 3, 5, 7]",
+                  "text": "Square brackets, commas, one type for all."
+                }
+              ],
+              "text": "    let primes = [2, 3, 5, 7];"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Read one element by its index. Counting starts at 0.",
+              "notes": [
+                {
+                  "on": "primes[0]",
+                  "text": "The index goes in brackets. The first is 0."
+                }
+              ],
+              "text": "    println!(\"{}\", primes[0]);\n    println!(\"{}\", primes[3]);"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`{:?}` prints the whole array.",
+              "notes": [
+                {
+                  "on": "{:?}",
+                  "text": "Debug format: shows the brackets and commas."
+                }
+              ],
+              "text": "    println!(\"{:?}\", primes);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "2\n7\n[2, 3, 5, 7]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "type-annotation",
+          "title": "Array type",
+          "guide": "Write the type of an array, then ask for its length.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The type has the element type and the length, in brackets.",
+              "notes": [
+                {
+                  "on": "[u8; 3]",
+                  "text": "Element type, a semicolon, then the count."
+                }
+              ],
+              "text": "    let scores: [u8; 3] = [90, 75, 60];"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Decimals work the same way: type, semicolon, count.",
+              "text": "    let temps: [f64; 4] = [20.5, 18.0, 19.5, 21.0];"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "`len` returns how many elements the array holds.",
+              "notes": [
+                {
+                  "on": "len()",
+                  "text": "Counts the elements without you counting them."
+                }
+              ],
+              "text": "    println!(\"{}\", scores.len());"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Three scores means the last one is at index 2. Four temperatures, index 3.",
+              "text": "    println!(\"{}\", scores[2]);\n    println!(\"{}\", temps[3]);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3\n60\n21"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "annotation-gaps",
+          "title": "Fill the type",
+          "guide": "Complete the type, then the two reads of the readings.",
+          "code": "fn main() {\n    let readings: [f64; ___] = [\n        20.5, 18.0, 19.5, 21.0, 17.0,\n    ];\n    let hottest = readings[___];\n    println!(\"{} of {}\", hottest, readings.___());\n}",
+          "gaps": [
+            {
+              "answers": [
+                "5"
+              ]
+            },
+            {
+              "answers": [
+                "3"
+              ]
+            },
+            {
+              "answers": [
+                "len"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "zero-based",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let scores = [72, 88, 95, 64];\n    let last = scores.len() - 1;\n    let total = scores[0] + scores[last];\n    println!(\"{}\", total);\n}",
+          "options": [
+            "160",
+            "136",
+            "167",
+            "183"
+          ],
+          "answer": 1,
+          "explanation": "The first score is `scores[0]`, 72. The length is 4, so the last is `scores[3]`, 64. The sum is 136."
+        },
+        {
+          "type": "typing",
+          "id": "repeat-form",
+          "title": "Repeat a value",
+          "guide": "Fill an array with the same value without listing it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Write the value, a semicolon and the length.",
+              "notes": [
+                {
+                  "on": "[0; 5]",
+                  "text": "Five copies of 0. No need to list them."
+                }
+              ],
+              "text": "    let scores = [0; 5];"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Any value works, a `bool` for example.",
+              "text": "    let doors_open = [false; 3];"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Print both arrays.",
+              "text": "    println!(\"{:?}\", scores);\n    println!(\"{:?}\", doors_open);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "[0, 0, 0, 0, 0]\n[false, false, false]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "item-prices",
+          "title": "Prices and the last item",
+          "guide": "Read the first and the last price of an order.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Five item prices.",
+              "text": "    let prices = [12, 8, 20, 5, 15];"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "The last index is the length minus one, so it never has to be counted by hand.",
+              "notes": [
+                {
+                  "on": "prices.len() - 1",
+                  "text": "Length is 5, so the last index is 4."
+                }
+              ],
+              "text": "    let last = prices[prices.len() - 1];"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Print labeled lines: the count, both ends and their sum.",
+              "text": "    println!(\"items: {}\", prices.len());\n    println!(\"first: {}\", prices[0]);\n    println!(\"last: {}\", last);\n    println!(\"both: {}\", prices[0] + last);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "items: 5\nfirst: 12\nlast: 15\nboth: 27"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "update-in-place",
+          "title": "Update in place",
+          "guide": "Use an element in operators and compound assignment.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Three counters. An array can change only when its variable is `mut`.",
+              "text": "    let mut counts = [0, 0, 0];"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Operators like `+=` work on one element. An element can also feed another.",
+              "notes": [
+                {
+                  "on": "counts[1] * 2",
+                  "text": "Reads one element to compute another."
+                }
+              ],
+              "text": "    counts[1] += 5;\n    counts[2] = counts[1] * 2;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print the counters.",
+              "text": "    println!(\"{:?}\", counts);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "[0, 5, 10]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "seat-map",
+          "title": "Book the seats",
+          "guide": "Book the last seat and the middle one.",
+          "code": "fn main() {\n    let mut seats: [bool; ___] = [\n        false, false, false, false, false,\n    ];\n    seats[seats.___() - 1] = true;\n    seats[seats.len() / ___] = true;\n    println!(\"{:?}\", seats);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "5"
+              ]
+            },
+            {
+              "answers": [
+                "len"
+              ]
+            },
+            {
+              "answers": [
+                "2"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "config-ports",
+          "title": "Named positions",
+          "guide": "Name each position of a ports array with a constant.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A constant holds a position. Indexes are `usize`.",
+              "text": "    const HTTP: usize = 0;\n    const HTTPS: usize = 1;\n    const ALT: usize = 2;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Ports in the same order as the constants.",
+              "text": "    let ports = [80, 443, 8080];"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "The constant works as the index.",
+              "notes": [
+                {
+                  "on": "ports[HTTPS]",
+                  "text": "Same as ports[1], but it says what it means."
+                }
+              ],
+              "text": "    println!(\"http: {}\", ports[HTTP]);\n    println!(\"https: {}\", ports[HTTPS]);\n    println!(\"alt: {}\", ports[ALT]);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "http: 80\nhttps: 443\nalt: 8080"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "swap-reverse",
+          "title": "Swap and reverse",
+          "guide": "Rearrange an array in place.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The array must be `mut` to be rearranged.",
+              "text": "    let mut row = [1, 2, 3, 4];"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "`swap` exchanges the elements at two indexes.",
+              "notes": [
+                {
+                  "on": "swap",
+                  "text": "Takes two positions, not two values."
+                }
+              ],
+              "text": "    row.swap(0, 3);"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Print the swapped array.",
+              "text": "    println!(\"{:?}\", row);"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`reverse` flips the whole array.",
+              "notes": [
+                {
+                  "on": "reverse()",
+                  "text": "Changes the array itself, returns nothing."
+                }
+              ],
+              "text": "    row.reverse();"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print it again.",
+              "text": "    println!(\"{:?}\", row);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "[4, 2, 3, 1]\n[1, 3, 2, 4]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "copy-on-assign",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let a = [1, 2, 3];\n    let mut b = a;\n    b[0] = 9;\n    println!(\"{:?} {:?}\", a, b);\n}",
+          "options": [
+            "[9, 2, 3] [9, 2, 3]",
+            "[1, 2, 3] [1, 2, 3]",
+            "It does not compile: `a` is unusable after `b = a`",
+            "[1, 2, 3] [9, 2, 3]"
+          ],
+          "answer": 3,
+          "explanation": "An array of integers is copied when assigned, so `b` is a separate array. Changing it leaves `a` alone."
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "len-as-index",
+          "title": "What happens?",
+          "guide": "This program builds. Read it, then pick what happens when it runs.",
+          "code": "fn main() {\n    let seats = [3, 5, 8];\n    let i = seats.len();\n    println!(\"{}\", seats[i]);\n}",
+          "options": [
+            "It prints 8, the last seat",
+            "It prints 0, nothing is there",
+            "It panics when it runs",
+            "It does not compile"
+          ],
+          "answer": 2,
+          "explanation": "The length is 3, so `i` is 3, but the last index is 2. The program builds, because the index is only known at run time. Then it panics with index out of bounds, and never reads past the array."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Nested arrays",
+        "slides": [
+          {
+            "text": "An array can hold arrays. The outer array holds the rows, and each row is an array of columns. Two indexes reach one cell: the row first, then the column.\n\nThe snippet is pseudo code, not Rust.",
+            "code": "table = [ row0, row1 ]\nrow0  = [ cell, cell, cell ]\ntable[1][2]  ->  row 1, column 2"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "length-constant",
+          "title": "Length from a constant",
+          "guide": "Size an array with a constant.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A constant can give the length of an array.",
+              "text": "    const SLOTS: usize = 4;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "The length must be known when compiling, so a normal variable cannot be used here.",
+              "notes": [
+                {
+                  "on": "[0; SLOTS]",
+                  "text": "The constant stands where a number would."
+                }
+              ],
+              "text": "    let slots: [u8; SLOTS] = [0; SLOTS];"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Check the length and the content.",
+              "text": "    println!(\"{}\", slots.len());\n    println!(\"{:?}\", slots);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "4\n[0, 0, 0, 0]"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "nested-arrays",
+          "title": "Arrays inside arrays",
+          "guide": "Build a table: an array of rows.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "An array can hold arrays. Here, two rows of three numbers.",
+              "notes": [
+                {
+                  "on": "[[i32; 3]; 2]",
+                  "text": "Two rows, each an array of three i32."
+                }
+              ],
+              "text": "    let table: [[i32; 3]; 2] = [\n        [1, 2, 3],\n        [4, 5, 6],\n    ];"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "The first index picks the row, the second the column.",
+              "notes": [
+                {
+                  "on": "[1][2]",
+                  "text": "Row 1 first, then column 2 inside it."
+                }
+              ],
+              "text": "    println!(\"{}\", table[1][2]);"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Print the whole table.",
+              "text": "    println!(\"{:?}\", table);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "6\n[[1, 2, 3], [4, 5, 6]]"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "nested-gaps",
+          "title": "Size the table",
+          "guide": "Fill the two lengths in the type of the table.",
+          "code": "fn main() {\n    let rows: [[u8; ___]; ___] = [\n        [1, 2],\n        [3, 4],\n        [5, 6],\n    ];\n    println!(\"{:?}\", rows[2]);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "2"
+              ]
+            },
+            {
+              "answers": [
+                "3"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "grid-of-zeros",
+          "title": "A grid of zeros",
+          "guide": "Repeat an array inside a repeat, then edit cells.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Repeat a row to build a grid: two rows of four zeros.",
+              "notes": [
+                {
+                  "on": "[[0; 4]; 2]",
+                  "text": "Two copies of the row [0; 4]."
+                }
+              ],
+              "text": "    let mut grid = [[0; 4]; 2];"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A cell takes two indexes, row then column.",
+              "text": "    grid[1][3] = 7;\n    grid[0][0] = 1;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print the grid.",
+              "text": "    println!(\"{:?}\", grid);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "[[1, 0, 0, 0], [0, 0, 0, 7]]"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "grid-lengths",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let grid = [[0; 4]; 2];\n    println!(\"{}\", grid.len());\n    println!(\"{}\", grid[0].len());\n}",
+          "options": [
+            "4\n2",
+            "8\n4",
+            "2\n4",
+            "8\n8"
+          ],
+          "answer": 2,
+          "explanation": "`grid.len()` counts the rows, which is 2. `grid[0]` is one row, and its length is 4."
+        },
+        {
+          "type": "typing",
+          "id": "array-equality",
+          "title": "Compare arrays",
+          "guide": "Compare arrays with `==`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Three arrays: the third has the same elements in another order.",
+              "text": "    let a = [1, 2, 3];\n    let b = [1, 2, 3];\n    let c = [3, 2, 1];"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`==` compares two arrays element by element, in order.",
+              "notes": [
+                {
+                  "on": "a == b",
+                  "text": "True when every position holds the same value."
+                }
+              ],
+              "text": "    println!(\"{}\", a == b);\n    println!(\"{}\", a == c);\n    println!(\"{}\", a != c);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true\nfalse\ntrue"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,316 @@
+{
+  "id": "for-and-ranges",
+  "intro": {
+    "title": "For and ranges",
+    "slides": [
+      {
+        "text": "A `for` loop runs its block once for every value of a sequence. The sequence you will use most is a **range** of numbers, and an array is another one.\n\nYou will write ranges that stop before the end or include it, reshape them to count down or skip, and loop over the elements of an array."
+      },
+      {
+        "text": "Pseudo code, not Rust. The loop takes the values one by one, and the block sees one value at a time.",
+        "code": "for each value in the sequence {\n    use the value\n}"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Ranges",
+        "slides": [
+          {
+            "text": "A range is written `start..end`. It begins at `start` and stops **before** `end`. The loop variable is a new name on each pass, and it only exists inside the loop.",
+            "code": "for i in 10..13 {\n    println!(\"{}\", i);\n}"
+          },
+          {
+            "text": "Add an `=` to include the end. Pseudo code, not Rust.",
+            "code": "1..4   gives 1, 2, 3\n1..=4  gives 1, 2, 3, 4"
+          },
+          {
+            "text": "When the number itself is not needed, name the variable `_` and the loop only repeats the block."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "exclusive-range",
+          "title": "Count with a range",
+          "guide": "Repeat a block for every number in a range with `for`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Loop over a range. `i` holds the current number on each pass.", "notes": [{"on": "for", "text": "Runs the block once for each value."}, {"on": "0..3", "text": "Counts 0, 1, 2. The end is left out."}], "text": "    for i in 0..3 {\n        println!(\"{}\", i);\n    }"},
+            {"mode": "ghost", "line": 5, "guide": "This line runs once, after the loop ends.", "text": "    println!(\"done\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "0\n1\n2\ndone"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "inclusive-range",
+          "title": "Include the end",
+          "guide": "A range with `=` also visits its last number.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Visit the days 1 to 4, both included.", "notes": [{"on": "1..=4", "text": "The = keeps the end: 1, 2, 3, 4."}], "text": "    for day in 1..=4 {\n        println!(\"day {}\", day);\n    }"},
+            {"mode": "ghost", "line": 5, "guide": "Printed once, when the loop is over.", "text": "    println!(\"week over\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "day 1\nday 2\nday 3\nday 4\nweek over"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-range-end",
+          "title": "Reach the last day",
+          "guide": "Fill the gap so the printed days include day 5.",
+          "code": "fn main() {\n    for day in 1..___5 {\n        println!(\"day {}\", day);\n    }\n}",
+          "gaps": [{ "answers": ["="] }]
+        },
+        {
+          "type": "typing",
+          "id": "running-total",
+          "title": "Add up a range",
+          "guide": "Keep a total outside the loop and grow it on every pass.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The total starts at zero and changes, so it is `mut`.", "text": "    let mut total = 0;"},
+            {"mode": "ghost", "line": 3, "guide": "Add every number from 1 to 5.", "notes": [{"on": "total += n", "text": "Adds the current number to the total."}], "text": "    for n in 1..=5 {\n        total += n;\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "After the loop the total is complete.", "text": "    println!(\"{}\", total);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "15"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "exclusive-sum",
+          "title": "What does it print?",
+          "guide": "Work out the total, then pick the output.",
+          "code": "fn main() {\n    let mut total = 0;\n    for n in 1..4 {\n        total += n;\n    }\n    println!(\"{}\", total);\n}",
+          "options": ["10", "6", "9", "3"],
+          "answer": 1,
+          "explanation": "`1..4` stops before 4, so the loop adds 1, 2 and 3."
+        },
+        {
+          "type": "typing",
+          "id": "repeat-with-underscore",
+          "title": "Retry without a counter",
+          "guide": "Repeat a block a fixed number of times when the number does not matter.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Try the connection three times. The count is never read.", "notes": [{"on": "_", "text": "A throwaway name: the count is not used."}], "text": "    for _ in 0..3 {\n        println!(\"retrying connection...\");\n    }"},
+            {"mode": "ghost", "line": 5, "guide": "After the last attempt, report the failure.", "text": "    println!(\"gave up\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "retrying connection...\nretrying connection...\nretrying connection...\ngave up"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Shaping a range",
+        "slides": [
+          {
+            "text": "A range is a value with methods. `.rev()` walks it backwards and `.step_by(n)` moves `n` at a time. Put the range in parentheses so the method applies to all of it. Methods like these are called adapters, and they get their own course later. Pseudo code, not Rust.",
+            "code": "(1..=3).rev()        gives 3, 2, 1\n(0..10).step_by(4)   gives 0, 4, 8"
+          },
+          {
+            "text": "A range only counts up. When the start is already past the end, the range is empty and the loop body never runs. To count down, reverse a range that counts up.\n\nRanges also work on `char` values, letter by letter."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "count-down",
+          "title": "Count down",
+          "guide": "Reverse a range to walk it from the end.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Count 3, 2, 1 with `.rev()`.", "notes": [{"on": "(1..=3)", "text": "Parentheses: the method acts on the whole range."}, {"on": ".rev()", "text": "Walks the range from its end to its start."}], "text": "    for n in (1..=3).rev() {\n        println!(\"{}\", n);\n    }"},
+            {"mode": "ghost", "line": 5, "guide": "Print after the countdown.", "text": "    println!(\"liftoff\");"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3\n2\n1\nliftoff"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "empty-range",
+          "title": "What does it print?",
+          "guide": "Think about which way a range counts, then pick the output.",
+          "code": "fn main() {\n    let start = 5;\n    let end = 2;\n    let mut count = 0;\n    for _ in start..end {\n        count += 1;\n    }\n    println!(\"{}\", count);\n}",
+          "options": ["3", "0", "5", "The program panics"],
+          "answer": 1,
+          "explanation": "A range counts up only. With the start past the end it is empty, so the body never runs. Use `.rev()` to count down."
+        },
+        {
+          "type": "typing",
+          "id": "step-by",
+          "title": "Skip ahead",
+          "guide": "Take every n-th number of a range with `.step_by()`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Print 0, 3, 6 and 9.", "notes": [{"on": ".step_by(3)", "text": "Moves 3 forward on each pass, not 1."}], "text": "    for n in (0..10).step_by(3) {\n        println!(\"{}\", n);\n    }"},
+            {"mode": "ghost", "line": 5, "guide": "Methods chain. Reverse first, then take every 5th.", "notes": [{"on": ".rev().step_by(5)", "text": "Applied in order: reverse, then skip ahead."}], "text": "    for n in (0..=10).rev().step_by(5) {\n        println!(\"{}\", n);\n    }"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "0\n3\n6\n9\n10\n5\n0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-countdown",
+          "title": "Laps and countdown",
+          "guide": "Visit the laps 1, 3 and 5, then count down from 3 to 1.",
+          "code": "fn main() {\n    for lap in (1..=6).___(2) {\n        println!(\"lap {}\", lap);\n    }\n    for n in (1..=3).___() {\n        println!(\"{}\", n);\n    }\n}",
+          "gaps": [{ "answers": ["step_by"] }, { "answers": ["rev"] }]
+        },
+        {
+          "type": "typing",
+          "id": "char-range",
+          "title": "A range of letters",
+          "guide": "A range can walk over characters too.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Print the letters from a to e.", "notes": [{"on": "'a'..='e'", "text": "Letters in order, both ends included."}], "text": "    for letter in 'a'..='e' {\n        println!(\"{}\", letter);\n    }"},
+            {"mode": "ghost", "line": 5, "guide": "The methods work on letters too.", "text": "    for letter in ('a'..='i').step_by(4) {\n        println!(\"{}\", letter);\n    }"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "a\nb\nc\nd\ne\na\ne\ni"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "step-by-sum",
+          "title": "What does it print?",
+          "guide": "Work out which numbers the loop visits, then pick the output.",
+          "code": "fn main() {\n    let mut total = 0;\n    for n in (1..=10).step_by(4) {\n        total += n;\n    }\n    println!(\"{}\", total);\n}",
+          "options": ["10", "14", "15", "55"],
+          "answer": 2,
+          "explanation": "The loop starts at 1 and adds 4 each time: 1, 5 and 9. The next one, 13, is past 10."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "For over arrays",
+        "slides": [
+          {
+            "text": "A `for` can walk the elements of an array directly, with no index. When you need the position, loop over the indexes with a range instead: `0..array.len()`.",
+            "code": "for each element in the array {\n    use the element\n}"
+          },
+          {
+            "text": "The loop variable is an ordinary value inside the block, so it can feed a calculation on every pass, and a `for` can sit inside another `for`."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "for-array",
+          "title": "Loop over an array",
+          "guide": "Take the elements of an array one by one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Three readings to loop over.", "text": "    let temps = [18, 21, 19];"},
+            {"mode": "ghost", "line": 3, "guide": "Print every reading.", "notes": [{"on": "in temps", "text": "Gives each element in turn, no index needed."}], "text": "    for t in temps {\n        println!(\"{}\", t);\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "Loop over the same array again to add the readings up.", "text": "    let mut total = 0;\n    for t in temps {\n        total += t;\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Print the total.", "text": "    println!(\"{}\", total);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "18\n21\n19\n58"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "array-index-loop",
+          "title": "Loop over the indexes",
+          "guide": "Use a range of indexes when you need positions or want to change elements.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The readings can change, so the array is `mut`.", "text": "    let mut temps = [18, 21, 19];"},
+            {"mode": "ghost", "line": 3, "guide": "Print each position with its reading.", "notes": [{"on": "temps.len()", "text": "The length keeps the range inside the array."}, {"on": "temps[i]", "text": "Reads the element at position i."}], "text": "    for i in 0..temps.len() {\n        println!(\"{}: {}\", i, temps[i]);\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "An index loop can change elements. Add 1 to every reading.", "text": "    for i in 0..temps.len() {\n        temps[i] += 1;\n    }\n    println!(\"{}\", temps[0]);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "0: 18\n1: 21\n2: 19\n19"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-array-loop",
+          "title": "Two ways to loop",
+          "guide": "Loop over every index of the array, then over every element.",
+          "code": "fn main() {\n    let temps = [18, 21, 19];\n    for i in 0..temps.___() {\n        println!(\"{}\", temps[i]);\n    }\n    for t in ___ {\n        println!(\"{}\", t);\n    }\n}",
+          "gaps": [{ "answers": ["len"] }, { "answers": ["temps"] }]
+        },
+        {
+          "type": "typing",
+          "id": "price-table",
+          "title": "A price table",
+          "guide": "Use the loop variable in a calculation to print a table.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The unit price never changes.", "text": "    let price = 3;"},
+            {"mode": "ghost", "line": 3, "guide": "Price the quantities 1 to 4.", "notes": [{"on": "qty * price", "text": "The loop variable feeds the calculation on every pass."}], "text": "    for qty in 1..=4 {\n        println!(\"{} x {} = {}\", qty, price, qty * price);\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "Bulk quantities, five at a time.", "text": "    for qty in (5..=15).step_by(5) {\n        println!(\"{} x {} = {}\", qty, price, qty * price);\n    }"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1 x 3 = 3\n2 x 3 = 6\n3 x 3 = 9\n4 x 3 = 12\n5 x 3 = 15\n10 x 3 = 30\n15 x 3 = 45"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "best-score",
+          "title": "Find the best score",
+          "guide": "Loop over the indexes of two arrays that line up, and keep the position of the best.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Two arrays: the name at each position matches the score at the same position.", "text": "    let names = [\"ana\", \"ben\", \"cleo\", \"dan\"];\n    let scores = [72, 91, 85, 64];\n    let mut best = 0;"},
+            {"mode": "ghost", "line": 5, "guide": "Remember the position of the highest score.", "notes": [{"on": "scores[best]", "text": "The best score found so far."}], "text": "    for i in 0..names.len() {\n        if scores[i] > scores[best] {\n            best = i;\n        }\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "The same position gives both the name and the score.", "text": "    println!(\"{}: {}\", names[best], scores[best]);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "ben: 91"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "nested-loops",
+          "title": "A loop inside a loop",
+          "guide": "Put one `for` inside another to cover every pair.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A sum to collect every product.", "text": "    let mut sum = 0;"},
+            {"mode": "ghost", "line": 3, "guide": "For each row, the inner loop runs through all the columns.", "notes": [{"on": "for col", "text": "Runs completely again on every pass of the outer loop."}], "text": "    for row in 1..=2 {\n        for col in 1..=3 {\n            let product = row * col;\n            println!(\"{}\", product);\n            sum += product;\n        }\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "Both loops are done, so print the sum of all products.", "text": "    println!(\"{}\", sum);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1\n2\n3\n2\n4\n6\n18"
+          }
+        }
+      ]
+    }
+  ]
+}

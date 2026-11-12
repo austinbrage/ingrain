@@ -1,0 +1,290 @@
+{
+  "id": "constants",
+  "intro": {
+    "title": "Constants",
+    "slides": [
+      {
+        "text": "A constant is a named value that never changes. You declare it with `const`, and unlike `let` it can never be `mut`.",
+        "code": "const TIMEOUT_SECS: i32 = 30;"
+      },
+      {
+        "text": "A constant has three rules:\n\n- its name is in `SCREAMING_SNAKE_CASE`\n- its type is always written, Rust does not guess it\n- its value must be known when the program is compiled"
+      },
+      {
+        "text": "A constant can live above `main`, where the whole file sees it, or inside a function, where only that function does. The first session uses constants in small calculations, the second builds them from each other and looks at their scope."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "app-banner",
+          "title": "An app status line",
+          "guide": "Name the facts of an app once, then print them as one status line.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "The app name, its version and its user limit, each a constant above `main`. `&str` is the type of a text in quotes.",
+              "notes": [
+                {
+                  "on": "&str",
+                  "text": "&str is the type of a text in quotes."
+                },
+                {
+                  "on": "const APP_NAME",
+                  "text": "Declares a value that never changes."
+                }
+              ],
+              "text": "const APP_NAME: &str = \"ingrain\";\nconst VERSION: u32 = 2;\nconst MAX_USERS: u32 = 500;\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print all three in one line.",
+              "text": "    println!(\"{} v{} - up to {} users\", APP_NAME, VERSION, MAX_USERS);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "ingrain v2 - up to 500 users"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "order-total",
+          "title": "Order total",
+          "guide": "Expected output: 4 items, total 105.",
+          "code": "const PRICE: u32 = 25;\nconst QTY: u32 = 4;\nconst SHIPPING: ___ = 5;\n\nfn main() {\n    let total = PRICE * QTY + SHIPPING;\n    println!(\"{} items, total {}\", ___, total);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "u32"
+              ]
+            },
+            {
+              "answers": [
+                "QTY"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "login-attempts",
+          "title": "Attempts left",
+          "guide": "A limit that only one function needs lives inside it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The limit as a constant, and how many attempts were used.",
+              "notes": [
+                {
+                  "on": "MAX_ATTEMPTS",
+                  "text": "Visible only from here to the end of main."
+                }
+              ],
+              "text": "    const MAX_ATTEMPTS: u32 = 5;\n    let attempts_used = 3;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Work out what is left and the share already used.",
+              "text": "    let attempts_left = MAX_ATTEMPTS - attempts_used;\n    let percent_used = attempts_used * 100 / MAX_ATTEMPTS;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Report both numbers.",
+              "text": "    println!(\"attempts left: {}\", attempts_left);\n    println!(\"used: {}%\", percent_used);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "attempts left: 2\nused: 60%"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "receipt-total",
+          "title": "What does it print?",
+          "guide": "Follow the constants into the calculation.",
+          "code": "const TICKET_PRICE: i32 = 12;\nconst DISCOUNT: i32 = 5;\n\nfn main() {\n    let tickets = 4;\n    let total = TICKET_PRICE * tickets - DISCOUNT;\n    println!(\"{}\", total);\n}",
+          "options": [
+            "48",
+            "55",
+            "43",
+            "-12"
+          ],
+          "answer": 2,
+          "explanation": "The multiplication comes first: 12 * 4 is 48, then the discount of 5 comes off, which leaves 43."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "built-from-constants",
+          "title": "Constants from constants",
+          "guide": "Build constants from other constants, even one declared below `main`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Two plain constants: hours in a day and minutes in an hour.",
+              "text": "const DAY_HOURS: i32 = 24;\nconst HOUR_MINS: i32 = 60;\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A constant can be an expression of other constants.",
+              "notes": [
+                {
+                  "on": "DAY_HOURS * HOUR_MINS",
+                  "text": "Calculated while compiling, never at run time."
+                }
+              ],
+              "text": "const DAY_MINS: i32 = DAY_HOURS * HOUR_MINS;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print the minutes of a day and of a week. The week one does not exist yet.",
+              "text": "    println!(\"{}\", DAY_MINS);\n    println!(\"{}\", WEEK_MINS);"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Declare it below `main`. A constant is visible in the whole file, whatever its position.",
+              "notes": [
+                {
+                  "on": "WEEK_MINS",
+                  "text": "Found even though it comes after its use."
+                }
+              ],
+              "text": "\nconst WEEK_MINS: i32 = DAY_MINS * 7;"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1440\n10080"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "week-hours",
+          "title": "Hours in a week",
+          "guide": "Expected output: 168.",
+          "code": "const DAY_HOURS: i32 = 24;\nconst WEEK_DAYS: i32 = 7;\nconst ___: ___ = DAY_HOURS * WEEK_DAYS;\n\nfn main() {\n    println!(\"{}\", WEEK_HOURS);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "WEEK_HOURS"
+              ]
+            },
+            {
+              "answers": [
+                "i32"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "constant-and-variable",
+          "title": "A constant next to a variable",
+          "guide": "Use a constant in the calculation of a `let` variable.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A tax rate that never changes.",
+              "text": "    const TAX_PERCENT: i32 = 20;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A variable for the price.",
+              "text": "    let price = 50;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "The variable and the constant work together in one expression.",
+              "text": "    let tax = price * TAX_PERCENT / 100;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print the tax.",
+              "text": "    println!(\"{}\", tax);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "10"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "inner-scope",
+          "title": "What does it print?",
+          "guide": "A constant lives in the block that declares it.",
+          "code": "fn main() {\n    const LIMIT: i32 = 3;\n    {\n        const LIMIT: i32 = 10;\n        println!(\"{}\", LIMIT);\n    }\n    println!(\"{}\", LIMIT);\n}",
+          "options": [
+            "3 then 3",
+            "10 then 3",
+            "10 then 10",
+            "3 then 10"
+          ],
+          "answer": 1,
+          "explanation": "The inner `LIMIT` exists only inside its braces, so the first print uses 10. After the block, the outer `LIMIT` is 3 again."
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "why-constant",
+          "title": "Why a constant here?",
+          "guide": "Pick what the constant is for.",
+          "code": "const MAX_RETRIES: i32 = 3;\n\nfn main() {\n    println!(\"try 1 of {}\", MAX_RETRIES);\n    println!(\"try 2 of {}\", MAX_RETRIES);\n}",
+          "options": [
+            "Counts how many retries have happened",
+            "Lets the retry limit change while running",
+            "Saves memory compared with a variable",
+            "Names a fixed number once, so uses agree"
+          ],
+          "answer": 3,
+          "explanation": "The number is written once and given a name. Changing the limit later means editing one line, and no use can drift out of sync."
+        }
+      ]
+    }
+  ]
+}

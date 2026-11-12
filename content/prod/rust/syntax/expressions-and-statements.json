@@ -1,0 +1,189 @@
+{
+  "id": "expressions-and-statements",
+  "intro": {
+    "title": "Expressions & statements",
+    "slides": [
+      {
+        "text": "Rust code is made of statements and expressions. A statement does something and gives no value. An expression gives a value.\n\n`let n = 5;` is a statement. The `5` inside it is an expression.",
+        "code": "let n = 5;"
+      },
+      {
+        "text": "A block `{ ... }` is an expression too. Its value is its last line, as long as that line has no semicolon.",
+        "code": "let ready = {\n    let step = 4;\n    step\n};"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "block-value",
+          "title": "A block with a value",
+          "guide": "Give a variable the value of a whole block.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The block is an expression: the last line, with no `;`, is the value it gives.", "notes": [{"on": "level = {", "text": "The whole block becomes the value of the variable."}, {"on": "base\n    };", "text": "No semicolon: this is the value of the block."}], "text": "    let level = {\n        let base = 3;\n        base\n    };"},
+            {"mode": "ghost", "line": 6, "guide": "Print what the block gave.", "text": "    println!(\"{}\", level);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "mut-then-freeze",
+          "title": "Prepare, then freeze",
+          "guide": "Use a mutable variable inside a block to prepare a value that stays fixed outside.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "`s` lives only inside the block. The last value it holds is what `speed` receives, and `speed` is not mutable.", "notes": [{"on": "s = 8", "text": "Changes the variable before the block ends."}], "text": "    let speed = {\n        let mut s = 5;\n        println!(\"start {}\", s);\n        s = 8;\n        s\n    };"},
+            {"mode": "ghost", "line": 8, "guide": "Print the final value.", "text": "    println!(\"{}\", speed);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "start 5\n8"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "mut-block-gaps",
+          "title": "Finish the block",
+          "guide": "The program prints 55.",
+          "code": "fn main() {\n    let ___ = {\n        let mut points = 40;\n        let bonus = 15;\n        points = points + bonus;\n        ___\n    };\n    println!(\"{}\", total);\n}",
+          "gaps": [
+            {"answers": ["total"]},
+            {"answers": ["points"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "block-order",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let a = {\n        let b = 7;\n        println!(\"b is {}\", b);\n        b\n    };\n    println!(\"a is {}\", a);\n}",
+          "options": [
+            "a is 7",
+            "b is 7\na is 7",
+            "b is 7",
+            "a is 7\nb is 7"
+          ],
+          "answer": 1,
+          "explanation": "The block runs when `a` is defined, so it prints `b is 7` first and hands back 7. Then `a is 7` prints."
+        },
+        {
+          "type": "typing",
+          "id": "receipt-block",
+          "title": "A discounted receipt",
+          "guide": "Apply a discount inside a block, shadowing the price only there.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The price before any discount.", "text": "    let price = 120;"},
+            {"mode": "ghost", "line": 3, "guide": "The block discounts the price, adds shipping and gives the total.", "notes": [{"on": "let price = price - 30", "text": "A new price, visible only until the block ends."}], "text": "    let total = {\n        let price = price - 30;\n        let shipping = 5;\n        price + shipping\n    };"},
+            {"mode": "ghost", "line": 8, "guide": "Print the original price, then the total.", "text": "    println!(\"{}\", price);\n    println!(\"{}\", total);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "120\n95"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Statements and values",
+        "slides": [
+          {
+            "text": "A `let` is a statement: it gives no value, so it cannot sit where a value is expected. In a block, the lines before the last are statements that run in order. The last one, with no `;`, is the value.",
+            "code": "let total = {\n    let part = 4;\n    part * 2\n};"
+          },
+          {
+            "text": "A semicolon turns an expression into a statement and throws its value away. The calculation still runs, but nothing is kept, and rustc warns about the unused result.",
+            "code": "let kept = 3 + 4;\n3 + 4;"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "block-in-print",
+          "title": "A block as an argument",
+          "guide": "A block can stand anywhere a value is expected.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "A value to read inside the block.", "text": "    let width = 8;"},
+            {"mode": "ghost", "line": 3, "guide": "The block sits where `println!` expects its value, and gives what its last line holds.", "notes": [{"on": "side\n", "text": "The value that gets printed."}], "text": "    println!(\"{}\", {\n        let side = width;\n        side\n    });"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "8"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "discarded-line",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let n = 2;\n    let result = {\n        n * 10;\n        n + 1\n    };\n    println!(\"{}\", result);\n}",
+          "options": [
+            "20",
+            "21",
+            "3",
+            "23"
+          ],
+          "answer": 2,
+          "explanation": "`n * 10;` ends with a semicolon, so its value is thrown away. The block gives the last line, `n + 1`."
+        },
+        {
+          "type": "fill-blank",
+          "id": "score-block-gaps",
+          "title": "Finish the score",
+          "guide": "The program prints 10.",
+          "code": "fn main() {\n    let multiplier = 2;\n    let ___ = {\n        let coins = 5;\n        let total = coins * multiplier;\n        ___\n    };\n    println!(\"{}\", score);\n}",
+          "gaps": [
+            {"answers": ["score"]},
+            {"answers": ["total"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "unit-block",
+          "title": "The empty value",
+          "guide": "Compare a block with a final value and one that ends in `;`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "Both blocks hold a `4`. Only the second one has a semicolon after it.", "notes": [{"on": "{ 4; }", "text": "The block gives (), a value that means nothing."}], "text": "    let attempts = { 4 };\n    let pending = { 4; };"},
+            {"mode": "ghost", "line": 4, "guide": "Print both with the debug format, which can show `()`.", "text": "    println!(\"{:?} {:?}\", attempts, pending);"},
+            {"mode": "ghost", "line": 5, "guide": "Two more blocks with other names: this one ends with its value, the other with a semicolon.", "notes": [{"on": "spent;", "text": "The semicolon makes the block give ()."}], "text": "    let retries = {\n        let left = 2;\n        left\n    };\n    let waiting = {\n        let spent = 9;\n        spent;\n    };"},
+            {"mode": "ghost", "line": 13, "guide": "Print the new pair.", "text": "    println!(\"{:?} {:?}\", retries, waiting);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "4 ()\n2 ()"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "stray-semicolon",
+          "title": "The bill that vanished",
+          "guide": "Trace the side effect and the value of each block, then pick the output.",
+          "code": "fn main() {\n    let items = 3;\n    let price = 12;\n    let bill = {\n        let subtotal = items * price;\n        println!(\"subtotal {}\", subtotal);\n        subtotal + 4;\n    };\n    let tip = {\n        let rate = 5;\n        rate\n    };\n    println!(\"{:?} {:?}\", bill, tip);\n}",
+          "options": [
+            "subtotal 36\n40 5",
+            "subtotal 36\n36 5",
+            "subtotal 36\n() 5",
+            "() 5"
+          ],
+          "answer": 2,
+          "explanation": "`bill` runs its block: the `println!` prints `subtotal 36` right away. The last line `subtotal + 4;` has a `;`, so 40 is thrown away and `bill` holds `()`. `tip` ends with `rate` and holds 5."
+        }
+      ]
+    }
+  ]
+}

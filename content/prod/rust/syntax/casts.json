@@ -1,0 +1,633 @@
+{
+  "id": "casts",
+  "intro": {
+    "title": "Casting numbers",
+    "slides": [
+      {
+        "text": "Rust never turns one number type into another by itself. The `as` keyword does it, and it never fails: it always gives a value, even when the value changes."
+      },
+      {
+        "text": "Pseudo code, not Rust. `as` goes after the value and names the type you want.",
+        "code": "value as target_type\n\n7 as a wider type  -> same 7\n300 as a smaller type -> may change"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Bits and casts",
+        "slides": [
+          {
+            "text": "A cast keeps the bits of the value and fits them into the new type. A smaller type keeps only the low bits.\n\nPseudo code, not Rust. 300 in 16 bits, cut to 8:",
+            "code": "300 = 0000 0001 0010 1100\nkeep the low 8 bits:\n            0010 1100 = 44"
+          },
+          {
+            "text": "A signed type reads the top bit as a sign, an unsigned type reads it as part of the number. The same bits can mean two different values."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "widen-with-as",
+          "title": "Widen with as",
+          "guide": "Turn a number into a wider type with `as`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two numbers, then a wider copy of the first.",
+              "notes": [
+                {
+                  "on": "as i64",
+                  "text": "as converts the number to the type after it."
+                }
+              ],
+              "text": "    let small: i32 = 42;\n    let wide = small as i64;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "A `u8` widened to a `u32`. The value stays the same, and adding after the cast cannot overflow.",
+              "text": "    let byte: u8 = 200;\n    let bigger = byte as u32;\n    let sum = bigger + 100;"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Print the copies and the sum.",
+              "text": "    println!(\"{} {} {}\", wide, bigger, sum);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "42 200 300"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "mixed-types-fix",
+          "title": "Fix the subtraction",
+          "guide": "Rust never mixes number types by itself. Pick the fix that compiles and keeps an `i64`.",
+          "code": "fn main() {\n    let count: i32 = 5;\n    let total: i64 = 100;\n    let left = total - count;\n}",
+          "options": [
+            "`total - (i64) count`",
+            "`total - i64(count)`",
+            "`total - count as i64`",
+            "`total - count.i64()`"
+          ],
+          "answer": 2,
+          "explanation": "`as` is Rust's way to change a number's type. The other forms come from other languages and do not exist in Rust."
+        },
+        {
+          "type": "typing",
+          "id": "narrow-truncates",
+          "title": "Narrow a number",
+          "guide": "A cast to a smaller type keeps only the bits that fit.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`300` does not fit in a `u8`, which stops at 255. The cast keeps the low 8 bits.",
+              "notes": [
+                {
+                  "on": "as u8",
+                  "text": "No error: the value wraps around instead."
+                }
+              ],
+              "text": "    let big: i32 = 300;\n    let small = big as u8;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "`513` is 2 more than twice 256, so it wraps to a small number.",
+              "text": "    let more: i32 = 513;\n    let tiny = more as u8;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print the two results.",
+              "text": "    println!(\"{} {}\", small, tiny);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "44 1"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "volume-fill",
+          "title": "One byte of volume",
+          "guide": "Cast `volume` to the one-byte type that makes the program print `232`.",
+          "code": "fn main() {\n    let volume: i32 = 1000;\n    let level = volume as ___;\n    println!(\"{}\", level);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "u8"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "narrow-quiz",
+          "title": "Cut to 32 bits",
+          "guide": "Pick what the program prints.",
+          "code": "fn main() {\n    let big: i64 = 4294967297;\n    println!(\"{}\", big as i32);\n}",
+          "options": [
+            "1",
+            "4294967297",
+            "2147483647",
+            "0"
+          ],
+          "answer": 0,
+          "explanation": "`4294967297` is 2^32 + 1. An `i32` keeps only the low 32 bits, so what is left is 1."
+        },
+        {
+          "type": "typing",
+          "id": "sign-flip",
+          "title": "Change the sign",
+          "guide": "A cast between signed and unsigned keeps the bits and reads them again.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "`-1` is stored as all bits set. Read as unsigned, that is the largest number.",
+              "notes": [
+                {
+                  "on": "as u32",
+                  "text": "Same bits, now read without a sign."
+                }
+              ],
+              "text": "    let neg: i32 = -1;\n    let as_unsigned = neg as u32;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "The other way: a `u8` with its top bit set becomes negative.",
+              "text": "    let high: u8 = 200;\n    let as_signed = high as i8;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Narrowing and changing the sign in one cast keeps the low 8 bits.",
+              "text": "    let narrow = neg as u8;"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Print the three results.",
+              "text": "    println!(\"{} {} {}\", as_unsigned, as_signed, narrow);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "4294967295 -56 255"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Floats and integers",
+        "slides": [
+          {
+            "text": "A float cast does not keep bits. Going to an integer cuts the fraction toward zero and stops at the smallest or biggest value the integer holds. `NaN` becomes 0.\n\nGoing from an integer to a float keeps the value, so small integers stay exact."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "int-to-float",
+          "title": "Integer to float",
+          "guide": "Cast an integer to `f64` to mix it with a float.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "An integer count and a float price.",
+              "text": "    let items: i32 = 7;\n    let price: f64 = 2.5;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "`as` binds tighter than `*`, so only `items` is cast.",
+              "notes": [
+                {
+                  "on": "items as f64",
+                  "text": "Without the cast, i32 times f64 does not compile."
+                }
+              ],
+              "text": "    let total = items as f64 * price;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print the total.",
+              "text": "    println!(\"{}\", total);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "17.5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "float-to-int",
+          "title": "Float to integer",
+          "guide": "Casting a float to an integer cuts the fraction.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A positive float cast to `i32` loses its decimals.",
+              "notes": [
+                {
+                  "on": "as i32",
+                  "text": "The fraction is cut off, not rounded."
+                }
+              ],
+              "text": "    let temp: f64 = 36.9;\n    let whole = temp as i32;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "A negative float is cut toward zero, not down.",
+              "text": "    let drop: f64 = -2.7;\n    let toward_zero = drop as i32;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print both results.",
+              "text": "    println!(\"{} {}\", whole, toward_zero);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "36 -2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "float-saturates",
+          "title": "A float too big",
+          "guide": "Pick what the program prints.",
+          "code": "fn main() {\n    let huge: f64 = 10000000000.0;\n    println!(\"{}\", huge as i32);\n}",
+          "options": [
+            "1410065408",
+            "2147483647",
+            "10000000000",
+            "0"
+          ],
+          "answer": 1,
+          "explanation": "Unlike integer casts, a float cast never wraps. It stops at the biggest `i32`, 2147483647."
+        },
+        {
+          "type": "typing",
+          "id": "integer-division-trap",
+          "title": "Cast before dividing",
+          "guide": "Compare casting after a division with casting before it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two integer counts.",
+              "text": "    let hits: i32 = 3;\n    let total: i32 = 4;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Casting after the division is too late: the fraction is already gone.",
+              "notes": [
+                {
+                  "on": "(hits / total)",
+                  "text": "Integer division runs first, so 3 / 4 is 0."
+                }
+              ],
+              "text": "    let late = (hits / total) as f64;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Cast both sides first. `as` binds tighter than `/`.",
+              "notes": [
+                {
+                  "on": "total as f64",
+                  "text": "Both sides are floats now, so the fraction stays."
+                }
+              ],
+              "text": "    let early = hits as f64 / total as f64;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print both ratios.",
+              "text": "    println!(\"{} {}\", late, early);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "0 0.75"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "ratio-fill",
+          "title": "A pass rate",
+          "guide": "Both counts are integers, and `9 / 12` would print `0`. Cast both operands to the float type so the program prints `0.75`.",
+          "code": "fn main() {\n    let passed: u32 = 9;\n    let tried: u32 = 12;\n    let rate = passed as ___ / tried as ___;\n    println!(\"{}\", rate);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "f64",
+                "f32"
+              ]
+            },
+            {
+              "answers": [
+                "f64",
+                "f32"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "float-negative-unsigned",
+          "title": "A negative float",
+          "guide": "Pick what the program prints.",
+          "code": "fn main() {\n    let cold: f64 = -5.0;\n    println!(\"{}\", cold as u8);\n}",
+          "options": [
+            "251",
+            "-5",
+            "5",
+            "0"
+          ],
+          "answer": 3,
+          "explanation": "A float cast stops at the limits of the target. A `u8` cannot go below 0, so -5.0 becomes 0, not 251."
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "intro": {
+        "title": "Chars, bools and indexes",
+        "slides": [
+          {
+            "text": "Only a `u8` can be cast to a `char`, because every byte is a valid char. A `char` cast to a number gives its code, and a `bool` gives 1 or 0.\n\nIndexes and lengths are `usize`, so a number of another type is cast before it is used there."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "char-and-numbers",
+          "title": "Chars and numbers",
+          "guide": "A `u8` becomes a `char`, and a `char` becomes a number.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The number 65 is the code of a letter.",
+              "notes": [
+                {
+                  "on": "as char",
+                  "text": "Only a u8 can become a char with as."
+                }
+              ],
+              "text": "    let code: u8 = 65;\n    let letter = code as char;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "A char cast to a number gives its code.",
+              "text": "    let initial = 'z';\n    let position = initial as u32;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print both.",
+              "text": "    println!(\"{} {}\", letter, position);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "A 122"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "shift-a-letter",
+          "title": "Shift a letter",
+          "guide": "Move a letter forward by going through its number.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "How far to move.",
+              "text": "    let offset: u8 = 3;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Cast to a number, add, and cast back. The parentheses make the sum happen before the second cast.",
+              "notes": [
+                {
+                  "on": "'a' as u8",
+                  "text": "A char cannot be added, its number can."
+                }
+              ],
+              "text": "    let shifted = ('a' as u8 + offset) as char;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Go backwards too: subtract the offset from the number of `'z'`.",
+              "text": "    let back = ('z' as u8 - offset) as char;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Print both letters.",
+              "text": "    println!(\"{} {}\", shifted, back);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "d w"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "digit-fill",
+          "title": "A score digit",
+          "guide": "`score` is a `u8` holding 7. Build the character `'7'` from `'0'` plus the score, so the program prints `7`.",
+          "code": "fn main() {\n    let score: u8 = 7;\n    let digit = ('0' as ___ + score) as ___;\n    println!(\"{}\", digit);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "u8"
+              ]
+            },
+            {
+              "answers": [
+                "char"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "bool-to-int",
+          "title": "Booleans as numbers",
+          "guide": "A `bool` cast to an integer is 1 or 0.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Three flags.",
+              "text": "    let sunny = true;\n    let windy = false;\n    let rainy = true;"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Cast each flag to add them up. This counts the true ones.",
+              "notes": [
+                {
+                  "on": "sunny as i32",
+                  "text": "true becomes 1 and false becomes 0."
+                }
+              ],
+              "text": "    let count = sunny as i32\n        + windy as i32\n        + rainy as i32;"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Print the count.",
+              "text": "    println!(\"{}\", count);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "index-with-usize",
+          "title": "Index with usize",
+          "guide": "Indexes and lengths are `usize`. Cast to mix them with `i32`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "An array and an `i32` position.",
+              "text": "    let scores = [90, 85, 70];\n    let pick: i32 = 1;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "An index must be a `usize`, so cast the position.",
+              "notes": [
+                {
+                  "on": "pick as usize",
+                  "text": "i32 cannot index an array, usize can."
+                }
+              ],
+              "text": "    let chosen = scores[pick as usize];"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "`len` gives a `usize`. Cast it to subtract an `i32`.",
+              "text": "    let left = scores.len() as i32 - pick;"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Print both.",
+              "text": "    println!(\"{} {}\", chosen, left);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "85 2"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "cast-chain",
+          "title": "Two casts in a row",
+          "guide": "Pick what the program prints.",
+          "code": "fn main() {\n    let value: i32 = 321;\n    println!(\"{}\", value as u8 as char);\n}",
+          "options": [
+            "321",
+            "a",
+            "A",
+            "B"
+          ],
+          "answer": 2,
+          "explanation": "321 as `u8` keeps the low 8 bits, 321 - 256 = 65, and 65 as a `char` is the letter A."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,507 @@
+{
+  "id": "if-expressions",
+  "intro": {
+    "title": "If expressions",
+    "slides": [
+      {
+        "text": "An `if` picks which code runs. The condition must be a `bool`, it has no parentheses, and the braces are always required."
+      },
+      {
+        "text": "In Rust an `if` is also an expression: it can produce a value. This module covers both uses.\n\nThe snippet is pseudo code, not Rust.",
+        "code": "if the condition is true\n    do this\notherwise if another is true\n    do that\notherwise\n    do the other"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "if-else",
+          "title": "If and else",
+          "guide": "Choose between two paths with `if` and `else`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A number to test.",
+              "text": "    let score = 72;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "The block after `if` runs when the condition is true. Otherwise the block after `else` runs.",
+              "notes": [
+                {
+                  "on": "score >= 50",
+                  "text": "No parentheses around the condition."
+                },
+                {
+                  "on": "else",
+                  "text": "Runs the block when the check was false."
+                }
+              ],
+              "text": "    if score >= 50 {\n        println!(\"pass\");\n    } else {\n        println!(\"fail\");\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Two more checks: `==` tests for equal, `<` for less than.",
+              "notes": [
+                {
+                  "on": "tries == 1",
+                  "text": "Two equal signs compare. One would assign."
+                }
+              ],
+              "text": "    let tries = 2;\n    if tries == 1 {\n        println!(\"first try\");\n    } else if tries < 3 {\n        println!(\"retry\");\n    } else {\n        println!(\"give up\");\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 16,
+              "guide": "This line runs whichever path was taken.",
+              "text": "    println!(\"done\");"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "pass\nretry\ndone"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "stock-gaps",
+          "title": "Complete the chain",
+          "guide": "Label a stock level: 0 is `sold out`, 3 is `low`, 5 is `ok`. Stock is 5 now, so it must print `ok`.",
+          "code": "fn main() {\n    let stock = 5;\n    if stock ___ 0 {\n        println!(\"sold out\");\n    } else if stock ___ 5 {\n        println!(\"low\");\n    } else {\n        println!(\"ok\");\n    }\n}",
+          "gaps": [
+            {
+              "answers": [
+                "==",
+                "<="
+              ]
+            },
+            {
+              "answers": [
+                "<"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "else-if-chain",
+          "title": "Several choices",
+          "guide": "Pick one of four paths with an `else if` chain.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A status code to test.",
+              "text": "    let status = 404;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "The checks run from the top. The first true one runs its block and the rest are skipped. `else` catches what is left.",
+              "notes": [
+                {
+                  "on": "status >= 400",
+                  "text": "Tried only if the checks above were false."
+                }
+              ],
+              "text": "    if status >= 500 {\n        println!(\"server error\");\n    } else if status >= 400 {\n        println!(\"client error\");\n    } else if status >= 200 {\n        println!(\"ok\");\n    } else {\n        println!(\"unknown\");\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Print the code.",
+              "text": "    println!(\"{}\", status);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "client error\n404"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "first-match",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn main() {\n    let n = 15;\n    if n > 5 {\n        println!(\"big\");\n    } else if n > 10 {\n        println!(\"huge\");\n    } else {\n        println!(\"small\");\n    }\n}",
+          "options": [
+            "huge",
+            "big",
+            "big\nhuge",
+            "small"
+          ],
+          "answer": 1,
+          "explanation": "`n > 5` is true, so its block runs and the chain stops there. `n > 10` is never checked."
+        },
+        {
+          "type": "typing",
+          "id": "road-rules",
+          "title": "Combined conditions",
+          "guide": "Keep a check in a variable and join checks with `&&` and `||`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two values to check.",
+              "text": "    let speed = 72;\n    let raining = true;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "A comparison gives a `bool`, so it can be stored and used as a condition. `&&` needs both sides true.",
+              "notes": [
+                {
+                  "on": "&&",
+                  "text": "True only when both sides are true."
+                }
+              ],
+              "text": "    let too_fast = speed > 60;\n    if too_fast && raining {\n        println!(\"slow down, wet road\");\n    } else if too_fast {\n        println!(\"slow down\");\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "`||` needs only one side true. With no `else`, a false check prints nothing.",
+              "text": "    if raining || speed < 30 {\n        println!(\"lights on\");\n    }"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "slow down, wet road\nlights on"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "If as a value",
+        "slides": [
+          {
+            "text": "Every branch of an `if` is a block, and a block gives the value of its last line when that line has no `;`.\n\nSo the whole `if` can be the value. Pseudo code:",
+            "code": "size = if big then 10 otherwise 1"
+          },
+          {
+            "text": "Because the `if` has one value, all its branches must give the same type, and an `else` is required."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "if-value",
+          "title": "An if with a value",
+          "guide": "Store the result of an `if` in a variable.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A number to test.",
+              "text": "    let temp = 25;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "An `if` is an expression: the block that runs gives its last line as the value. Leave out the `;` on that line.",
+              "notes": [
+                {
+                  "on": "\"warm\"",
+                  "text": "No semicolon: this line is the branch's value."
+                }
+              ],
+              "text": "    let label = if temp > 20 {\n        \"warm\"\n    } else {\n        \"cold\"\n    };"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Print what the `if` produced.",
+              "text": "    println!(\"{}\", label);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "warm"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "regen-gaps",
+          "title": "Complete the value",
+          "guide": "A fighter at 0 hp stays down, one at 5 hp gets 2 more. With `hp` at 0 it must print 0.",
+          "code": "fn main() {\n    let hp = 0;\n    let regen = if hp ___ 0 {\n        2\n    } else {\n        ___\n    };\n    println!(\"{}\", hp + regen);\n}",
+          "gaps": [
+            {
+              "answers": [
+                ">",
+                "!="
+              ]
+            },
+            {
+              "answers": [
+                "0"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "branch-value-math",
+          "title": "What does it print?",
+          "guide": "Work out which branch gives the value, then use it.",
+          "code": "fn main() {\n    let lives = 0;\n    let bonus = if lives > 0 {\n        50\n    } else {\n        5\n    };\n    println!(\"{}\", bonus * 2);\n}",
+          "options": [
+            "100",
+            "5",
+            "10",
+            "50"
+          ],
+          "answer": 2,
+          "explanation": "`lives > 0` is false, so the `else` branch gives 5 as the value of the `if`. Then `bonus * 2` is 10."
+        },
+        {
+          "type": "typing",
+          "id": "block-value",
+          "title": "Statements before the value",
+          "guide": "A branch can do some work before it gives its value.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A price and a flag.",
+              "text": "    let price = 80;\n    let member = true;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "A branch is a block: it can hold statements, and its last line without `;` is the value.",
+              "notes": [
+                {
+                  "on": "let discount",
+                  "text": "Local to this branch only."
+                }
+              ],
+              "text": "    let total = if member {\n        let discount = price / 10;\n        price - discount\n    } else {\n        price\n    };"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Print the total.",
+              "text": "    println!(\"{}\", total);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "72"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "if-inline",
+          "title": "An if inside println",
+          "guide": "Use an `if` directly as an argument.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A count to test.",
+              "text": "    let items = 1;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "An `if` expression can sit wherever a value fits, like an argument of `println!`.",
+              "text": "    println!(\n        \"{} {}\",\n        items,\n        if items == 1 { \"item\" } else { \"items\" }\n    );"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1 item"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-3",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "nested-if",
+          "title": "An if inside an if",
+          "guide": "Put a second check inside a branch.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two values to check.",
+              "text": "    let age = 30;\n    let member = true;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "The inner `if` runs only when the outer check is true.",
+              "text": "    if age >= 18 {\n        if member {\n            println!(\"member price\");\n        } else {\n            println!(\"full price\");\n        }\n    } else {\n        println!(\"child price\");\n    }"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "member price"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "tuple-value",
+          "title": "A tuple from an if",
+          "guide": "Sort two numbers by giving back a tuple.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Two numbers.",
+              "text": "    let a = 9;\n    let b = 4;"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "A branch can give any value, here a tuple. Both branches give the same shape, and `let` unpacks it.",
+              "notes": [
+                {
+                  "on": "(a, b)",
+                  "text": "The tuple is the value of this branch."
+                }
+              ],
+              "text": "    let (low, high) = if a < b {\n        (a, b)\n    } else {\n        (b, a)\n    };"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Print the sorted pair.",
+              "text": "    println!(\"{} to {}\", low, high);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "4 to 9"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "cap-value",
+          "title": "Cap a value",
+          "guide": "Cap `level` at `max`: a raw 150 shows 100, a raw 40 shows 40.",
+          "code": "fn main() {\n    let raw = 150;\n    let max = 100;\n    let level = if raw ___ max {\n        ___\n    } else {\n        raw\n    };\n    println!(\"{}\", level);\n}",
+          "gaps": [
+            {
+              "answers": [
+                ">",
+                ">="
+              ]
+            },
+            {
+              "answers": [
+                "max"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "two-ifs",
+          "title": "What does it print?",
+          "guide": "Look at where the `else` belongs.",
+          "code": "fn main() {\n    let n = 12;\n    if n > 5 {\n        println!(\"A\");\n    }\n    if n > 10 {\n        println!(\"B\");\n    } else {\n        println!(\"C\");\n    }\n}",
+          "options": [
+            "A",
+            "B",
+            "A\nC",
+            "A\nB"
+          ],
+          "answer": 3,
+          "explanation": "The two `if`s are separate. The first prints `A`. In the second, `n > 10` is true, so it prints `B` and the `else` is skipped."
+        },
+        {
+          "type": "typing",
+          "id": "specific-first",
+          "title": "Most specific first",
+          "guide": "Order the checks so the narrowest one comes first.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A number to test.",
+              "text": "    let n = 15;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A multiple of 15 is also a multiple of 3 and 5, so that check must come first, or it would never be reached.",
+              "text": "    let word = if n % 15 == 0 {\n        \"fizzbuzz\"\n    } else if n % 3 == 0 {\n        \"fizz\"\n    } else if n % 5 == 0 {\n        \"buzz\"\n    } else {\n        \"number\"\n    };"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Print the word.",
+              "text": "    println!(\"{}\", word);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "fizzbuzz"
+          }
+        }
+      ]
+    }
+  ]
+}
