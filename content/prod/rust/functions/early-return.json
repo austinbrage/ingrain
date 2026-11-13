@@ -1,0 +1,212 @@
+{
+  "id": "early-return",
+  "intro": {
+    "title": "Early return",
+    "slides": [
+      {
+        "text": "A function normally ends by giving back its last expression. `return` gives a value back **right now**, and the rest of the function never runs."
+      },
+      {
+        "text": "Its best use is to handle the special cases first and leave, so the normal work stays flat at the end. This is pseudo code, not Rust.",
+        "code": "if the input is no good\n    give back an answer now\n\nthe normal work\ngive back the normal answer"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "guard-clause",
+          "title": "Leave early",
+          "guide": "Handle the bad case first and return at once.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Dividing by zero would panic. When `b` is zero, give back 0 right away.", "notes": [{"on": "return", "text": "Leaves the function now with this value."}], "text": "fn safe_divide(a: i32, b: i32) -> i32 {\n    if b == 0 {\n        return 0;\n    }\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "The normal case. The last expression is the answer when no `return` ran.", "text": "    a / b"},
+            {"mode": "ghost", "line": 9, "guide": "Call it with a good and a bad divisor.", "text": "    println!(\"{}\", safe_divide(20, 4));\n    println!(\"{}\", safe_divide(7, 0));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "5\n0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "ticket-gaps",
+          "title": "Free for children",
+          "guide": "Children under 12 ride free. Fill the check, and the keyword that gives back 0 at once.",
+          "code": "fn ticket_price(age: u32) -> u32 {\n    if age ___ 12 {\n        ___ 0;\n    }\n    10\n}\n\nfn main() {\n    println!(\"{}\", ticket_price(8));\n    println!(\"{}\", ticket_price(30));\n}",
+          "gaps": [
+            {"answers": ["<"]},
+            {"answers": ["return"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "first-negative",
+          "title": "Return from a loop",
+          "guide": "Search an array and return the first match without finishing the loop.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "A function that takes five readings and walks through them.", "text": "fn first_negative(readings: [i32; 5]) -> i32 {\n    for value in readings {\n    }\n}\n"},
+            {"mode": "ghost", "line": 3, "guide": "On the first negative reading, `return` leaves the whole function, not only the loop.", "notes": [{"on": "return value", "text": "The loop stops and the function ends here."}], "text": "        if value < 0 {\n            return value;\n        }"},
+            {"mode": "ghost", "line": 7, "guide": "Only reached when the loop found nothing.", "text": "    0"},
+            {"mode": "ghost", "line": 11, "guide": "One array with negatives, one without.", "text": "    println!(\"{}\", first_negative([4, 8, -3, 5, -9]));\n    println!(\"{}\", first_negative([1, 2, 3, 4, 5]));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "-3\n0"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "skipped-line",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn check(n: i32) -> i32 {\n    if n > 10 {\n        return 1;\n    }\n    println!(\"small\");\n    2\n}\n\nfn main() {\n    println!(\"{}\", check(20));\n    println!(\"{}\", check(3));\n}",
+          "options": [
+            "1\n2",
+            "small\n1\nsmall\n2",
+            "1\nsmall\n2",
+            "1\nsmall"
+          ],
+          "answer": 2,
+          "explanation": "`check(20)` returns 1 before the `println!` is reached. `check(3)` skips the `if`, prints `small` and then gives back 2."
+        },
+        {
+          "type": "typing",
+          "id": "valid-port",
+          "title": "Several guards",
+          "guide": "Stack guards, one for each way the input can be wrong.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Port 0 is never valid. A function that returns a `bool` can return `false` early.", "text": "fn is_valid_port(port: u32) -> bool {\n    if port == 0 {\n        return false;\n    }\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "A second guard for a port that is too large.", "text": "    if port > 65535 {\n        return false;\n    }"},
+            {"mode": "ghost", "line": 8, "guide": "Every guard passed, so the port is valid.", "text": "    true"},
+            {"mode": "ghost", "line": 12, "guide": "Try a good port, zero and a large one.", "text": "    println!(\"{}\", is_valid_port(8080));\n    println!(\"{}\", is_valid_port(0));\n    println!(\"{}\", is_valid_port(70000));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true\nfalse\nfalse"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "bare-return",
+          "title": "Return with no value",
+          "guide": "Leave a function that gives back nothing.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Non-members pay full price and the function stops there.", "notes": [{"on": "return;", "text": "No value: this function gives back nothing."}], "text": "fn print_total(price: u32, member: bool) {\n    if !member {\n        println!(\"total: {}\", price);\n        return;\n    }\n}\n"},
+            {"mode": "ghost", "line": 6, "guide": "Members get 10% off. Only members reach this line.", "text": "    println!(\"total: {}\", price - price / 10);"},
+            {"mode": "ghost", "line": 10, "guide": "A non-member and a member.", "text": "    print_total(200, false);\n    print_total(200, true);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "total: 200\ntotal: 180"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "warn-gaps",
+          "title": "Warn only when low",
+          "guide": "Warn only when the level is below 20. At 20 or more, leave the function right away.",
+          "code": "fn warn_low(level: u32) {\n    if level ___ 20 {\n        ___;\n    }\n    println!(\"battery low: {}\", level);\n}\n\nfn main() {\n    warn_low(80);\n    warn_low(5);\n}",
+          "gaps": [
+            {"answers": [">="]},
+            {"answers": ["return"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "odd-then-even",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn first_even(limit: u32) -> u32 {\n    for n in 1..limit {\n        if n % 2 == 0 {\n            return n;\n        }\n        println!(\"odd {}\", n);\n    }\n    0\n}\n\nfn main() {\n    println!(\"{}\", first_even(6));\n}",
+          "options": [
+            "2",
+            "odd 1\nodd 3\nodd 5\n0",
+            "odd 1\n2"
+          ],
+          "answer": 2,
+          "explanation": "`1` is odd, so it prints `odd 1`. At `2` the `return` ends the function, so the loop never reaches 3, 4 or 5."
+        },
+        {
+          "type": "typing",
+          "id": "find-pair",
+          "title": "Out of two loops",
+          "guide": "Return a pair from inside nested loops.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Look for two numbers below 10 that multiply to `target`. The function gives back a pair.", "text": "fn find_pair(target: u32) -> (u32, u32) {\n    for a in 1..10 {\n        for b in 1..10 {\n        }\n    }\n}\n"},
+            {"mode": "ghost", "line": 4, "guide": "A `break` would leave only the inner loop. `return` leaves both and the function.", "notes": [{"on": "return (a, b)", "text": "Gives back the pair and ends both loops."}], "text": "            if a * b == target {\n                return (a, b);\n            }"},
+            {"mode": "ghost", "line": 9, "guide": "No pair was found.", "text": "    (0, 0)"},
+            {"mode": "ghost", "line": 13, "guide": "13 has no pair below 10.", "text": "    println!(\"{:?}\", find_pair(12));\n    println!(\"{:?}\", find_pair(13));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "(2, 6)\n(0, 0)"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "tier-discount",
+          "title": "Return in a match",
+          "guide": "Return from inside a `match` arm.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Tier 0 gets nothing and tier 1 gets 10%. Those arms leave the function.", "notes": [{"on": "_ => {}", "text": "Any other tier does nothing here and keeps going."}], "text": "fn discount(tier: u32, total: u32) -> u32 {\n    match tier {\n        0 => return 0,\n        1 => return total / 10,\n        _ => {}\n    }\n}\n"},
+            {"mode": "ghost", "line": 7, "guide": "Every other tier gets 20%.", "text": "    total / 5"},
+            {"mode": "ghost", "line": 11, "guide": "Try tiers 0, 1 and 2.", "text": "    println!(\"{}\", discount(0, 200));\n    println!(\"{}\", discount(1, 200));\n    println!(\"{}\", discount(2, 200));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "0\n20\n40"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "power-loop",
+          "title": "A loop that only returns",
+          "guide": "Use `return` as the only way out of a `loop`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Find the first power of 2 above a limit. Start at 1.", "text": "fn first_power_over(limit: u32) -> u32 {\n    let mut n = 1;\n}\n"},
+            {"mode": "ghost", "line": 3, "guide": "This `loop` has no `break`. It ends only when `return` fires.", "notes": [{"on": "return n", "text": "The only exit, so no value is needed after the loop."}], "text": "    loop {\n        if n > limit {\n            return n;\n        }\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "Double `n` on every pass.", "text": "        n *= 2;"},
+            {"mode": "ghost", "line": 12, "guide": "Two limits.", "text": "    println!(\"{}\", first_power_over(100));\n    println!(\"{}\", first_power_over(1000));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "128\n1024"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "recursive-countdown",
+          "title": "A function that calls itself",
+          "guide": "Compute a factorial by letting the function call itself.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "The base case: 1 and below stop the chain, so it can never go on forever.", "text": "fn factorial(n: u32) -> u32 {\n    if n <= 1 {\n        return 1;\n    }\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "Any larger `n` is `n` times the factorial of the number below it.", "notes": [{"on": "factorial(n - 1)", "text": "The function calls itself with a smaller number."}], "text": "    n * factorial(n - 1)"},
+            {"mode": "ghost", "line": 9, "guide": "Try the base case and two larger numbers.", "text": "    println!(\"{}\", factorial(1));\n    println!(\"{}\", factorial(5));\n    println!(\"{}\", factorial(10));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "1\n120\n3628800"
+          }
+        }
+      ]
+    }
+  ]
+}

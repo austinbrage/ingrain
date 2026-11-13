@@ -5,26 +5,26 @@
       "name": "Foundations",
       "tier": "basic",
       "modules": [
-        { "id": "defining-functions", "name": "Defining functions", "sessions": 1 },
-        { "id": "parameters", "name": "Parameters", "sessions": 1 },
-        { "id": "return-values", "name": "Return values", "sessions": 1 },
-        { "id": "early-return", "name": "Early return", "sessions": 1 }
+        { "id": "defining-functions", "name": "Defining functions", "sessions": 2 },
+        { "id": "parameters", "name": "Parameters", "sessions": 2 },
+        { "id": "return-values", "name": "Return values", "sessions": 2 },
+        { "id": "early-return", "name": "Early return", "sessions": 2 }
       ]
     },
     {
       "name": "Functions as values",
       "tier": "medium",
       "modules": [
-        { "id": "nested-functions", "name": "Nested functions", "sessions": 1 },
-        { "id": "function-pointers", "name": "Function pointers", "sessions": 1 }
+        { "id": "nested-functions", "name": "Nested functions", "sessions": 2 },
+        { "id": "function-pointers", "name": "Function pointers", "sessions": 2 }
       ]
     },
     {
       "name": "Special functions",
       "tier": "medium",
       "modules": [
-        { "id": "const-fn", "name": "Const functions", "sessions": 1 },
-        { "id": "diverging-functions", "name": "Diverging functions", "sessions": 1 }
+        { "id": "const-fn", "name": "Const functions", "sessions": 2 },
+        { "id": "diverging-functions", "name": "Diverging functions", "sessions": 2 }
       ]
     }
   ]

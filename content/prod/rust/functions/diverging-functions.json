@@ -1,0 +1,172 @@
+{
+  "id": "diverging-functions",
+  "intro": {
+    "title": "Diverging functions",
+    "slides": [
+      {
+        "text": "Some code never produces a value: it ends the program, loops forever or jumps somewhere else. Rust gives that kind of expression its own type, `!`, called the never type.\n\nA function that ends this way is a diverging function, and it is written `-> !`."
+      },
+      {
+        "text": "You will write functions that never return, see why `loop` and `std::process::exit` fit one, and learn the rule that makes `panic!`, `continue` and `unreachable!` fit any type.\n\n`todo!` and `dbg!` are macros, taught in `std-macros-expanded`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "Never coming back",
+        "slides": [
+          {
+            "text": "A normal function ends by handing control back to its caller. A function marked `-> !` promises control never comes back: it stops the program or repeats forever.\n\nIts body can never end normally, so it has no final value and no `break` out of its loop.\n\nPseudo code, not Rust.",
+            "code": "fn name() -> ! {\n    stop the whole program\n    or\n    repeat forever\n}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "stop-function",
+          "title": "A function that never returns",
+          "guide": "Write a function that ends the whole program.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "`-> !` means the function never returns. It stops the program with `std::process::exit`.", "notes": [{"on": "-> !", "text": "No value ever comes back from this function."}, {"on": "std::process::exit(code)", "text": "Ends the program at once, with this exit code."}], "text": "fn stop(code: i32) -> ! {\n    println!(\"stopping: {}\", code);\n    std::process::exit(code);\n}\n"},
+            {"mode": "ghost", "line": 7, "guide": "Print a line, then call `stop`.", "text": "    println!(\"starting\");\n    stop(3);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "starting\nstopping: 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "after-exit",
+          "title": "Code after a diverging call",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn fail() -> ! {\n    println!(\"fail\");\n    std::process::exit(0);\n}\n\nfn main() {\n    println!(\"a\");\n    fail();\n    println!(\"b\");\n}",
+          "options": [
+            "a\nfail\nb",
+            "a\nfail",
+            "a",
+            "a\nb"
+          ],
+          "answer": 1,
+          "explanation": "`fail` never returns, so the program ends inside it. The last `println!` can never run; the compiler only warns about unreachable code."
+        },
+        {
+          "type": "typing",
+          "id": "countdown-loop",
+          "title": "A loop that never ends",
+          "guide": "Build a countdown that never returns.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "A `loop` with no `break` never ends, so it fits a `-> !` function. The exit inside is the only way out.", "notes": [{"on": "loop {", "text": "No break inside, so it never finishes normally."}], "text": "fn countdown() -> ! {\n    let mut n = 3;\n    loop {\n        println!(\"{}\", n);\n        if n == 0 {\n            std::process::exit(0);\n        }\n        n -= 1;\n    }\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Start the countdown.", "text": "    countdown();"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3\n2\n1\n0"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-serve",
+          "title": "Never-ending function",
+          "guide": "Fill the return type of a function that never returns, and the statement that repeats forever.",
+          "code": "fn serve() -> ___ {\n    let mut tick = 0;\n    ___ {\n        println!(\"tick {}\", tick);\n        if tick == 2 {\n            std::process::exit(0);\n        }\n        tick += 1;\n    }\n}\n\nfn main() {\n    serve();\n}",
+          "gaps": [
+            {"answers": ["!"]},
+            {"answers": ["loop"]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "The type that fits anywhere",
+        "slides": [
+          {
+            "text": "Every branch of an `if` or `match` must give the same type. An expression of type `!` gives no value at all, so Rust lets it stand in for any type.\n\n`return`, `break`, `continue` and `panic!` are all of type `!`. This is how a branch can bail out while the others give a number.",
+            "code": "fn main() {\n    let ready = true;\n    let n: u32 = if ready {\n        7\n    } else {\n        return\n    };\n    println!(\"{}\", n);\n}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "panic-arm",
+          "title": "A panic in a match arm",
+          "guide": "Pick a port for an environment, and stop on an unknown one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Two arms give a `u32`. `panic!` stops the program with a message, and its type `!` fits the last arm.", "notes": [{"on": "panic!(\"bad env\")", "text": "Stops the program with a message; fits any type."}], "text": "fn port(env: u32) -> u32 {\n    match env {\n        0 => 3000,\n        1 => 8080,\n        _ => panic!(\"bad env\"),\n    }\n}\n"},
+            {"mode": "ghost", "line": 10, "guide": "Both calls use a known environment, so no panic happens.", "text": "    println!(\"dev: {}\", port(0));\n    println!(\"prod: {}\", port(1));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "dev: 3000\nprod: 8080"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "continue-in-let",
+          "title": "Skip with continue",
+          "guide": "Add up the even numbers, skipping the odd ones from inside a `let`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 2, "guide": "The running total.", "text": "    let mut total = 0;"},
+            {"mode": "ghost", "line": 3, "guide": "The `if` gives `n` for even numbers. The `else` branch is `continue`, of type `!`, so `even` is always a number.", "notes": [{"on": "continue", "text": "Jumps to the next number; it never gives a value."}], "text": "    for n in 1..7 {\n        let even = if n % 2 == 0 {\n            n\n        } else {\n            continue\n        };\n        total += even;\n    }"},
+            {"mode": "ghost", "line": 11, "guide": "Show the sum of 2, 4 and 6.", "text": "    println!(\"total: {}\", total);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "total: 12"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "why-it-compiles",
+          "title": "Why does it compile?",
+          "guide": "The `else` branch has no number. Pick why this is allowed.",
+          "code": "fn main() {\n    let limit = 5;\n    let size: u32 = if limit > 0 {\n        limit\n    } else {\n        panic!(\"limit must be positive\")\n    };\n    println!(\"{}\", size);\n}",
+          "options": [
+            "The else branch is skipped at compile time",
+            "panic! gives 0 when the branch types differ",
+            "panic! has type !, which fits any type",
+            "panic! is converted to u32 at run time"
+          ],
+          "answer": 2,
+          "explanation": "`panic!` never produces a value, so its type is `!`, and `!` can stand in for `u32` here. Nothing is skipped or converted."
+        },
+        {
+          "type": "typing",
+          "id": "unreachable-arm",
+          "title": "An arm that cannot run",
+          "guide": "Score a number by its remainder, and mark the impossible arm.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "A remainder of 3 is only 0, 1 or 2, but the compiler cannot know that, so `_` is still needed. `unreachable!()` says it can never happen.", "notes": [{"on": "unreachable!()", "text": "Panics if ever reached, so it points at a bug."}], "text": "fn bonus(n: u32) -> u32 {\n    match n % 3 {\n        0 => 10,\n        1 => 20,\n        2 => 30,\n        _ => unreachable!(),\n    }\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "4 leaves 1, and 9 leaves 0.", "text": "    println!(\"{}\", bonus(4));\n    println!(\"{}\", bonus(9));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "20\n10"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "fill-lane",
+          "title": "Skip the unpaid orders",
+          "guide": "Orders of 0 are not paid yet. Fill the keyword that jumps to the next order from inside the `else`.",
+          "code": "fn collected(orders: [u32; 4]) -> u32 {\n    let mut total = 0;\n    for amount in orders {\n        total += if amount > 0 {\n            amount\n        } else {\n            ___\n        };\n    }\n    total\n}\nfn main() {\n    println!(\"{}\", collected([30, 0, 20, 0]));\n}",
+          "gaps": [
+            {"answers": ["continue"]}
+          ]
+        }
+      ]
+    }
+  ]
+}

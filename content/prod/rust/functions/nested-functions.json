@@ -1,0 +1,331 @@
+{
+  "id": "nested-functions",
+  "intro": {
+    "title": "Nested functions",
+    "slides": [
+      {
+        "text": "A function can be defined inside the body of another one. It is a normal function with a name, parameters and a return value, but it exists only inside the function that holds it.\n\nPseudo code, not Rust.",
+        "code": "fn outer() {\n    fn helper() {\n        (only outer can call it)\n    }\n}"
+      },
+      {
+        "text": "Use it for a small helper that only one function needs, so the rest of the file never sees it. This module covers how to define one, how helpers call each other and what a nested function can reach."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "tax-helper",
+          "title": "A helper inside main",
+          "guide": "Put a function that adds 10% tax inside `main`, then call it twice.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "Define the helper inside the body of `main`, like any function.",
+              "notes": [
+                {
+                  "on": "fn with_tax",
+                  "text": "Only main can call this function."
+                }
+              ],
+              "text": "    fn with_tax(price: i32) -> i32 {\n        price + price / 10\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Call it with two prices.",
+              "text": "    println!(\"total: {}\", with_tax(200));\n    println!(\"total: {}\", with_tax(50));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "total: 220\ntotal: 55"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "call-before-definition",
+          "title": "What does it print?",
+          "guide": "Look at where `area` is called and where it is defined.",
+          "code": "fn main() {\n    println!(\"{}\", area(3, 4));\n    fn area(w: i32, h: i32) -> i32 {\n        w * h\n    }\n}",
+          "options": [
+            "Nothing, it does not compile",
+            "12",
+            "7",
+            "34"
+          ],
+          "answer": 1,
+          "explanation": "A nested function belongs to the whole body it sits in, so it can be called above its definition. Unlike a `let`, it does not wait for its line."
+        },
+        {
+          "type": "typing",
+          "id": "distance-helpers",
+          "title": "Helpers using helpers",
+          "guide": "Write two helpers in `main`: one squares a number, the other calls it to build a squared distance.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "The first helper squares a number.",
+              "text": "    fn square(n: i32) -> i32 {\n        n * n\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "The second helper adds two squares.",
+              "notes": [
+                {
+                  "on": "square(dx)",
+                  "text": "A nested function can call its sibling helpers."
+                }
+              ],
+              "text": "    fn distance_squared(dx: i32, dy: i32) -> i32 {\n        square(dx) + square(dy)\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "A step of 3 east and 4 north.",
+              "text": "    println!(\"{}\", distance_squared(3, 4));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "25"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "volume-calls",
+          "title": "Reuse a helper",
+          "guide": "Make the volume helper reuse the area helper, then print the volume of a 2 by 3 by 4 box.",
+          "code": "fn main() {\n    fn area(w: i32, h: i32) -> i32 {\n        w * h\n    }\n    fn volume(w: i32, h: i32, d: i32) -> i32 {\n        ___(w, h) * d\n    }\n    println!(\"{}\", ___(2, 3, 4));\n}",
+          "gaps": [
+            {
+              "answers": ["area"]
+            },
+            {
+              "answers": ["volume"]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "why-nested",
+          "title": "Why inside main?",
+          "guide": "Pick the real reason to write `cap` inside `main`.",
+          "code": "fn main() {\n    fn cap(score: i32) -> i32 {\n        if score > 100 { 100 } else { score }\n    }\n    println!(\"{}\", cap(130));\n}",
+          "options": [
+            "It makes `cap` run faster than a normal one",
+            "It lets `cap` read the variables of `main`",
+            "It keeps `cap` next to its only caller",
+            "It lets other functions in the file call `cap`"
+          ],
+          "answer": 2,
+          "explanation": "A nested function is private to the function around it. It is a way to keep a small helper close to the one place that uses it."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "What a nested function sees",
+        "slides": [
+          {
+            "text": "A nested function can see other functions and constants of the body around it. It cannot see the `let` variables of that body, so any value it needs must come in as a parameter.\n\nPseudo code, not Rust.",
+            "code": "fn outer() {\n    const LIMIT = ...   (visible)\n    let count = ...     (not visible)\n    fn helper(value) {\n        use LIMIT\n        use value\n    }\n}"
+          },
+          {
+            "text": "Names follow the braces. A nested function lives in the block where it is written, and a nested function in an inner block can reuse a name from an outer one."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "fee-parameter",
+          "title": "Pass the value in",
+          "guide": "Compute a fee from a rate. The helper cannot see the rate in `main`, so it receives it as a parameter.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A rate in percent.",
+              "text": "    let rate = 8;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "The helper takes the amount and the rate. It has no way to read `rate` from `main`.",
+              "notes": [
+                {
+                  "on": "rate: i32",
+                  "text": "The rate arrives here, since main's rate is out of reach."
+                }
+              ],
+              "text": "    fn fee(amount: i32, rate: i32) -> i32 {\n        amount * rate / 100\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Hand `rate` over in every call.",
+              "text": "    println!(\"fee: {}\", fee(250, rate));\n    println!(\"fee: {}\", fee(1000, rate));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "fee: 20\nfee: 80"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "fix-the-limit",
+          "title": "Which limit counts?",
+          "guide": "`over` has its own `limit` parameter, and `main` has a `limit` variable. Follow the value the call hands over.",
+          "code": "fn main() {\n    let limit = 100;\n    fn over(score: i32, limit: i32) -> bool {\n        score > limit\n    }\n    println!(\"{}\", over(120, 150));\n}",
+          "options": [
+            "true",
+            "false",
+            "Nothing, `limit` is declared twice",
+            "120"
+          ],
+          "answer": 1,
+          "explanation": "The helper cannot see the `limit` of `main`. It only knows the value it receives, 150, and 120 is not over 150."
+        },
+        {
+          "type": "typing",
+          "id": "centered-text",
+          "title": "Center with a constant",
+          "guide": "A `const` is the one kind of value a nested function can read directly. Center a label in a 40 column line.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A constant of the line width, declared in `main`.",
+              "text": "    const WIDTH: i32 = 40;"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "The helper computes the padding on the left.",
+              "notes": [
+                {
+                  "on": "WIDTH - len",
+                  "text": "Reads the const directly, no parameter needed."
+                }
+              ],
+              "text": "    fn centered(len: i32) -> i32 {\n        (WIDTH - len) / 2\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Padding for a label of 10 characters and one of 24.",
+              "text": "    println!(\"{}\", centered(10));\n    println!(\"{}\", centered(24));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "15\n8"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "limit-and-score",
+          "title": "Constant and argument",
+          "guide": "Cap the score at the limit. Read the constant inside the helper and hand over the variable at the call.",
+          "code": "fn main() {\n    const LIMIT: i32 = 100;\n    let score = 120;\n    fn capped(points: i32) -> i32 {\n        if points > ___ {\n            LIMIT\n        } else {\n            points\n        }\n    }\n    println!(\"{}\", capped(___));\n}",
+          "gaps": [
+            {
+              "answers": ["LIMIT", "100"]
+            },
+            {
+              "answers": ["score", "120"]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "shadowed-helper",
+          "title": "Same name, inner block",
+          "guide": "Define a helper, then define another with the same name inside a block. Print before, inside and after.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 2,
+              "guide": "A helper that returns a tax rate, printed.",
+              "text": "    fn tax_rate() -> i32 {\n        5\n    }\n    println!(\"{}\", tax_rate());"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "In a block, define a new `tax_rate`. Inside the block, it is the one that counts.",
+              "notes": [
+                {
+                  "on": "{\n        fn",
+                  "text": "A new helper that exists only inside this block."
+                }
+              ],
+              "text": "    {\n        fn tax_rate() -> i32 {\n            10\n        }\n        println!(\"{}\", tax_rate());\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Back outside the block, the first one is the one in view again.",
+              "text": "    println!(\"{}\", tax_rate());"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "5\n10\n5"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "same-name-helpers",
+          "title": "What does it print?",
+          "guide": "The two helpers call each other. Follow each call down to zero.",
+          "code": "fn main() {\n    fn is_even(n: u32) -> bool {\n        n == 0 || is_odd(n - 1)\n    }\n    fn is_odd(n: u32) -> bool {\n        n != 0 && is_even(n - 1)\n    }\n    println!(\"{} {}\", is_even(4), is_odd(3));\n}",
+          "options": [
+            "true false",
+            "false true",
+            "true true",
+            "Nothing, `is_odd` is used before its definition"
+          ],
+          "answer": 2,
+          "explanation": "Sibling helpers can call each other in any order. `is_even(4)` ends at `is_even(0)`, which is true, and `is_odd(3)` also ends at `is_even(0)`: true true."
+        }
+      ]
+    }
+  ]
+}

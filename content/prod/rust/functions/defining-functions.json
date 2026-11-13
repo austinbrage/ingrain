@@ -1,0 +1,207 @@
+{
+  "id": "defining-functions",
+  "intro": {
+    "title": "Defining functions",
+    "slides": [
+      {
+        "text": "A function is a named block of code. You write it once with `fn`, and run it whenever you want by using its name.",
+        "code": "fn say_hello() {\n    println!(\"Hello!\");\n}\n\nfn main() {\n    say_hello();\n}"
+      },
+      {
+        "text": "Writing a function does not run it. Only a **call** runs it: the name, then `()`, then `;`.\n\n`main` is a function too. Rust calls it for you when the program starts, and from there you call the others."
+      },
+      {
+        "text": "Function names are written in `snake_case` and say what the function does, like `print_banner` or `show_menu`."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "banner",
+          "title": "A banner function",
+          "guide": "Move two print lines into a function, then run them from `main`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "A function starts with `fn`, a name and `()`. Its body sits in braces and runs only when it is called.", "notes": [{"on": "fn print_banner", "text": "Declares the function. Nothing runs yet."}], "text": "fn print_banner() {\n    println!(\"=== Ingrain ===\");\n    println!(\"Type to learn\");\n}\n"},
+            {"mode": "ghost", "line": 7, "guide": "Call it by name, with parentheses. This is when its lines run.", "notes": [{"on": "print_banner();", "text": "Runs the body of the function."}], "text": "    print_banner();"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "=== Ingrain ===\nType to learn"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "repeat-call",
+          "title": "One function, two runs",
+          "guide": "Write a function once and call it twice.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Write the function above `main`.", "text": "fn beep() {\n    println!(\"beep!\");\n}\n"},
+            {"mode": "ghost", "line": 6, "guide": "Call it twice, with a line between the calls. One definition runs as many times as you call it.", "text": "    beep();\n    println!(\"charging...\");\n    beep();"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "beep!\ncharging...\nbeep!"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "call-order",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn open_shop() {\n    println!(\"open\");\n}\n\nfn close_shop() {\n    println!(\"closed\");\n}\n\nfn main() {\n    close_shop();\n    open_shop();\n    close_shop();\n}",
+          "options": [
+            "open\nclosed",
+            "closed\nopen\nclosed",
+            "open\nclosed\nopen",
+            "closed\nopen"
+          ],
+          "answer": 1,
+          "explanation": "The functions run in the order they are called, not the order they are written. `main` calls `close_shop` twice."
+        },
+        {
+          "type": "fill-blank",
+          "id": "menu-calls",
+          "title": "Call the right ones",
+          "guide": "`main` prints the welcome line, then the menu. Call the matching function in each gap.",
+          "code": "fn greet_user() {\n    println!(\"Welcome back\");\n}\n\nfn show_menu() {\n    println!(\"1) Play  2) Quit\");\n}\n\nfn main() {\n    ___();\n    ___();\n}",
+          "gaps": [
+            {"answers": ["greet_user"]},
+            {"answers": ["show_menu"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "never-called",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn send_alert() {\n    println!(\"ALERT\");\n}\n\nfn main() {\n    println!(\"checking\");\n    println!(\"all clear\");\n}",
+          "options": [
+            "ALERT\nchecking\nall clear",
+            "checking\nall clear\nALERT",
+            "checking\nall clear",
+            "ALERT"
+          ],
+          "answer": 2,
+          "explanation": "`send_alert` is defined but never called, so its body never runs. Rust only warns that the function is unused."
+        },
+        {
+          "type": "typing",
+          "id": "report-sections",
+          "title": "A function that calls another",
+          "guide": "Build a small report where one function calls another.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "A small function that draws a line.", "text": "fn print_rule() {\n    println!(\"--------\");\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "A function can call another one, exactly as `main` does. This report frames its text with the rule.", "notes": [{"on": "Daily sales", "text": "The text between the two rules."}], "text": "fn print_report() {\n    print_rule();\n    println!(\"Daily sales: 42\");\n    print_rule();\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "`main` only needs to call the report.", "text": "    print_report();"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "--------\nDaily sales: 42\n--------"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "What a function sees",
+        "slides": [
+          {
+            "text": "A variable made with `let` inside a function belongs to that function. It exists while the function runs, and no other function can see it.\n\nTwo functions may even use the same name for different variables."
+          },
+          {
+            "text": "A `const` written outside every function is different: all the functions of the file can read it.",
+            "code": "const LIMIT: u32 = 3;\n\nfn show_limit() {\n    println!(\"{}\", LIMIT);\n}"
+          },
+          {
+            "text": "The order of definitions does not matter. `main` can call a function written below it, as long as it is in the same file."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "const-and-locals",
+          "title": "Shared constant, private variable",
+          "guide": "Read a constant from two functions, and keep a variable private to one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "The constant is outside every function, so `show_status` can read it. `health` exists only inside `show_status`.", "notes": [{"on": "let health", "text": "A local variable: only this function sees it."}], "text": "const MAX_HEALTH: i32 = 100;\n\nfn show_status() {\n    let health = MAX_HEALTH - 35;\n    println!(\"Health: {}\", health);\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "`main` reads the same constant, then calls the function.", "text": "    println!(\"Max: {}\", MAX_HEALTH);\n    show_status();"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Max: 100\nHealth: 65"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "same-name",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn tick() {\n    let count = 10;\n    println!(\"tick {}\", count);\n}\n\nfn main() {\n    let count = 1;\n    tick();\n    println!(\"main {}\", count);\n}",
+          "options": [
+            "tick 10\nmain 10",
+            "tick 1\nmain 1",
+            "tick 10\nmain 1",
+            "main 1\ntick 10"
+          ],
+          "answer": 2,
+          "explanation": "Each `count` lives in its own function, so `tick` cannot change the one in `main`. The call to `tick` comes first, so it prints first."
+        },
+        {
+          "type": "fill-blank",
+          "id": "tax-gaps",
+          "title": "Read the constant",
+          "guide": "Print the constant inside the function, then run the function from `main`.",
+          "code": "const TAX_RATE: u32 = 8;\n\nfn show_tax() {\n    println!(\"Tax: {}%\", ___);\n}\n\nfn main() {\n    ___();\n}",
+          "gaps": [
+            {"answers": ["TAX_RATE"]},
+            {"answers": ["show_tax"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "below-main",
+          "title": "Functions below main",
+          "guide": "Call two functions first, then write them under `main`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}\n\n"},
+            {"mode": "ghost", "line": 2, "guide": "Call two functions that are not written yet. Rust reads the whole file before it runs, so this is fine.", "text": "    pack_bag();\n    close_bag();"},
+            {"mode": "ghost", "line": 6, "guide": "The first function goes below `main`.", "text": "fn pack_bag() {\n    println!(\"Packing the bag\");\n}\n"},
+            {"mode": "ghost", "line": 10, "guide": "And the second one.", "text": "fn close_bag() {\n    println!(\"Zipping it shut\");\n}"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Packing the bag\nZipping it shut"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "cheer-loop",
+          "title": "A function inside a loop",
+          "guide": "Call a function on every round of a loop.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "The function that runs on every round.", "text": "fn cheer() {\n    println!(\"Hip hip hooray!\");\n}\n"},
+            {"mode": "ghost", "line": 6, "guide": "Count three rounds. Each one prints its number and calls `cheer`.", "notes": [{"on": "cheer();", "text": "Runs the function again on every round."}], "text": "    for round in 1..=3 {\n        println!(\"Round {}\", round);\n        cheer();\n    }"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Round 1\nHip hip hooray!\nRound 2\nHip hip hooray!\nRound 3\nHip hip hooray!"
+          }
+        }
+      ]
+    }
+  ]
+}

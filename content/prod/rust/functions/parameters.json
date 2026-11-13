@@ -1,0 +1,376 @@
+{
+  "id": "parameters",
+  "intro": {
+    "title": "Parameters",
+    "slides": [
+      {
+        "text": "A parameter is a named input of a function. The function declares it, and every call fills it with an **argument**.\n\nThe snippet is pseudo code, not Rust.",
+        "code": "function name(input: type, input: type)\n    use the inputs\n\nname(value, value)"
+      },
+      {
+        "text": "Rust is strict about parameters:\n\n- every one has a name and a type\n- arguments go by position, there are no names at the call\n- there are no default values\n- the count and the types must match"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "one-param",
+          "title": "One parameter",
+          "guide": "Give a function an input and call it with different values.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "A function that takes the floor number as input.",
+              "notes": [
+                {
+                  "on": "floor: u8",
+                  "text": "A parameter is a name, a colon and its type."
+                }
+              ],
+              "text": "fn announce(floor: u8) {\n    println!(\"Arriving at floor {}\", floor);\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Call it twice. Each argument fills the parameter.",
+              "text": "    announce(3);\n    announce(12);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Arriving at floor 3\nArriving at floor 12"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "two-params",
+          "title": "Two parameters",
+          "guide": "Take two inputs and compute from both.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Parameters are separated by commas, and each one has its own type.",
+              "notes": [
+                {
+                  "on": "width: u32, height: u32",
+                  "text": "Repeat the type even when two parameters share it."
+                }
+              ],
+              "text": "fn rectangle(width: u32, height: u32) {\n    let area = width * height;\n    println!(\"{}x{} = {}\", width, height, area);\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "The arguments are matched to the parameters in order.",
+              "text": "    rectangle(4, 3);\n    rectangle(10, 2);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "4x3 = 12\n10x2 = 20"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "speed-gaps",
+          "title": "Complete the signature",
+          "guide": "Give the second parameter its type, then divide the distance by it.",
+          "code": "fn speed(km: f64, hours: ___) {\n    println!(\"{} km/h\", km / ___);\n}\n\nfn main() {\n    speed(150.0, 2.5);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "f64",
+                "f32"
+              ]
+            },
+            {
+              "answers": [
+                "hours"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "id": "argument-order",
+          "title": "Order of arguments",
+          "guide": "What does this program print?",
+          "kind": "output",
+          "code": "fn gap(high: i32, low: i32) {\n    println!(\"{}\", high - low);\n}\n\nfn main() {\n    gap(3, 10);\n}",
+          "options": [
+            "7",
+            "3",
+            "-7",
+            "10"
+          ],
+          "answer": 2,
+          "explanation": "Arguments fill the parameters by position: `high` is 3 and `low` is 10, so the result is 3 - 10."
+        },
+        {
+          "type": "typing",
+          "id": "mixed-types",
+          "title": "Mixed types",
+          "guide": "Parameters can all have different types.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "A sensor reading with an id, a temperature and an alarm flag.",
+              "notes": [
+                {
+                  "on": "temp: f64",
+                  "text": "Each argument must match the type of its parameter."
+                }
+              ],
+              "text": "fn reading(id: char, temp: f64, alarm: bool) {\n    println!(\"{}: {}C {}\", id, temp, alarm);\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "One argument of each type, in the same order as the signature.",
+              "text": "    reading('A', 21.5, false);\n    reading('B', 38.2, true);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "A: 21.5C false\nB: 38.2C true"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "which-call-works",
+          "title": "A valid call",
+          "guide": "Which call of `area` is accepted by Rust?",
+          "code": "fn area(w: f64, h: f64) {\n    println!(\"{}\", w * h);\n}",
+          "options": [
+            "area(3, 4)",
+            "area(3.0, 4.0)",
+            "area(3.0)",
+            "area(h: 4.0, w: 3.0)"
+          ],
+          "answer": 1,
+          "explanation": "Two `f64` values by position. An integer literal is not a float, a call needs every argument, and Rust has no named arguments."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Parameters as variables",
+        "slides": [
+          {
+            "text": "Inside the function, a parameter is an ordinary local variable, so the rules of variables apply: it is immutable unless declared `mut`.\n\nWith numbers, bools and chars the function receives a copy of the value."
+          },
+          {
+            "text": "A parameter can be shadowed like any variable, and its place in the signature can hold a pattern, so a tuple can be split into names right there.\n\nThe arguments themselves can be any expression of the right type."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "expression-args",
+          "title": "Expressions as arguments",
+          "guide": "Pass variables, constants and calculations as arguments.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "A price per kilogram, to pass to the function.",
+              "text": "const BASE_RATE: u32 = 5;\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "Shipping cost from the weight and the rate.",
+              "text": "fn ship(weight: u32, rate: u32) {\n    let cost = weight * rate;\n    println!(\"{} kg costs {}\", weight, cost);\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "An argument can be any expression. It is computed before the call.",
+              "notes": [
+                {
+                  "on": "boxes * 2",
+                  "text": "Computed first, then handed to the parameter."
+                }
+              ],
+              "text": "    let boxes = 3;\n    ship(boxes * 2, BASE_RATE);\n    ship(boxes + 1, BASE_RATE * 2);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "6 kg costs 30\n4 kg costs 40"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "mut-parameter",
+          "title": "A mutable parameter",
+          "guide": "Change a parameter inside the function and see what the caller keeps.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "A runner loses stamina every lap. The parameter is changed, so it is `mut`.",
+              "notes": [
+                {
+                  "on": "mut stamina",
+                  "text": "Lets the function change its own copy."
+                }
+              ],
+              "text": "fn run(mut stamina: u32, laps: u32) {\n    for _ in 0..laps {\n        stamina -= 10;\n    }\n    println!(\"stamina left: {}\", stamina);\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Call it with a variable.",
+              "text": "    let stamina = 100;\n    run(stamina, 3);"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "The function worked on a copy, so the original is untouched.",
+              "text": "    println!(\"still {}\", stamina);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "stamina left: 70\nstill 100"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "drain-gaps",
+          "title": "Change a parameter",
+          "guide": "The function lowers its own copy of the tank. Fill in what allows it.",
+          "code": "fn drain(___ tank: u32) {\n    tank -= 25;\n    println!(\"{} left\", tank);\n}\n\nfn main() {\n    drain(100);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "mut"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "shadow-parameter",
+          "title": "Shadow a parameter",
+          "guide": "Redeclare parameters with a new type to compute with them.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "The parameters are integers, but an average needs floats. Shadow them with `f64` versions.",
+              "notes": [
+                {
+                  "on": "let sum = sum as f64;",
+                  "text": "A new sum, as a float, replaces the parameter."
+                }
+              ],
+              "text": "fn average(sum: u32, count: u32) {\n    let sum = sum as f64;\n    let count = count as f64;\n    println!(\"avg {}\", sum / count);\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Call it with whole numbers.",
+              "text": "    average(7, 2);\n    average(9, 3);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "avg 3.5\navg 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "shadow-output",
+          "title": "Shadowed parameter",
+          "guide": "What does this program print?",
+          "kind": "output",
+          "code": "fn show(x: i32) {\n    let x = x * 2;\n    {\n        let x = x + 1;\n        println!(\"{}\", x);\n    }\n    println!(\"{}\", x);\n}\n\nfn main() {\n    show(5);\n}",
+          "options": [
+            "10 then 11",
+            "11 then 11",
+            "6 then 10",
+            "11 then 10"
+          ],
+          "answer": 3,
+          "explanation": "The parameter 5 is shadowed by 10. The inner block shadows it again with 11, and that ends with the block, so 10 is back."
+        },
+        {
+          "type": "typing",
+          "id": "tuple-parameter",
+          "title": "Split a tuple argument",
+          "guide": "Take a tuple as one argument and split it in the signature.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "One point in, two names out.",
+              "notes": [
+                {
+                  "on": "(x, y): (i32, i32)",
+                  "text": "A pattern in place of a name splits the tuple."
+                }
+              ],
+              "text": "fn square_dist((x, y): (i32, i32)) {\n    let sq = x * x + y * y;\n    println!(\"{},{} -> {}\", x, y, sq);\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "Pass a tuple literal, then a tuple in a variable.",
+              "text": "    square_dist((3, 4));\n    let spot = (-1, 2);\n    square_dist(spot);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3,4 -> 25\n-1,2 -> 5"
+          }
+        }
+      ]
+    }
+  ]
+}

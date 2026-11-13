@@ -1,0 +1,205 @@
+{
+  "id": "return-values",
+  "intro": {
+    "title": "Return values",
+    "slides": [
+      {
+        "text": "A function can hand a value back to the code that called it. Its type goes after the parameters, behind an arrow `->`. With no arrow, the function hands back nothing.",
+        "code": "fn double(n: i32) -> i32 {\n    n * 2\n}"
+      },
+      {
+        "text": "The value is the last expression of the body, with no semicolon. A call is an expression too, so it can sit in a `let`, inside `println!` or in a bigger calculation.",
+        "code": "let twice = double(4);\nlet more = double(4) + 1;"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "room-area",
+          "title": "Area of a room",
+          "guide": "Write a function that hands back a number, then use that number.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "`area` takes two numbers and gives back an `i32`. The last line is the value it returns.", "notes": [{"on": "-> i32", "text": "The type of the value the function hands back."}, {"on": "width * height", "text": "No semicolon: this line is the returned value."}], "text": "fn area(width: i32, height: i32) -> i32 {\n    width * height\n}\n"},
+            {"mode": "ghost", "line": 6, "guide": "Keep the returned value in a variable and print it.", "text": "    let room = area(4, 3);\n    println!(\"Room: {}\", room);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Room: 12"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "adult-check",
+          "title": "Is it an adult ticket?",
+          "guide": "A function can give back a `bool`. Its last line is a comparison.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "The comparison is an expression, so its `bool` is the value the function returns.", "notes": [{"on": "age >= 18", "text": "True or false: this is what the caller gets."}], "text": "fn is_adult(age: u32) -> bool {\n    age >= 18\n}\n"},
+            {"mode": "ghost", "line": 6, "guide": "Store one result, and print the other call directly.", "text": "    let ticket = is_adult(21);\n    println!(\"{}\", ticket);\n    println!(\"{}\", is_adult(15));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true\nfalse"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "arrow-and-type",
+          "title": "Declare what comes back",
+          "guide": "Complete the two signatures. The program prints 8 and true.",
+          "code": "fn double(n: i32) ___ i32 {\n    n * 2\n}\n\nfn is_free(price: i32) -> ___ {\n    price == 0\n}\n\nfn main() {\n    println!(\"{}\", double(4));\n    println!(\"{}\", is_free(0));\n}",
+          "gaps": [
+            {"answers": ["->"]},
+            {"answers": ["bool"]}
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "call-in-expression",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn bonus(score: i32) -> i32 {\n    score / 10\n}\n\nfn main() {\n    let score = 85;\n    println!(\"{}\", bonus(score) + 1);\n}",
+          "options": [
+            "8",
+            "86",
+            "9",
+            "85"
+          ],
+          "answer": 2,
+          "explanation": "`bonus(score)` is replaced by the value it returns, 8 (integer division). Then 1 is added, so it prints 9."
+        },
+        {
+          "type": "quiz",
+          "id": "semicolon-trap",
+          "title": "Make it return 8",
+          "guide": "The function should hand back 8. Which change does it?",
+          "code": "fn double(n: i32) -> i32 {\n    n * 2;\n}\n\nfn main() {\n    println!(\"{}\", double(4));\n}",
+          "options": [
+            "Change `-> i32` to `-> u32`",
+            "Remove the semicolon after `n * 2`",
+            "Write `(n * 2);` with parentheses",
+            "Write `2 * n;` with the factors swapped"
+          ],
+          "answer": 1,
+          "explanation": "The semicolon turns `n * 2` into a statement, so the body gives no value. Without it, `n * 2` is the last expression and becomes the returned value."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Other shapes of return",
+        "slides": [
+          {
+            "text": "With no `->`, a function returns `()`, the unit value: an empty tuple, with nothing in it to use. Functions that only print are of this kind.",
+            "code": "fn log(level: u32) {\n    println!(\"level {}\", level);\n}"
+          },
+          {
+            "text": "A function returns one value, but it can be a tuple. The caller unpacks it with a `let` pattern.",
+            "code": "fn pair() -> (i32, bool) {\n    (7, true)\n}\n\nlet (n, flag) = pair();"
+          },
+          {
+            "text": "An `if`/`else` is an expression, so it can be the last thing in a function. Each branch gives the value, with no semicolon.",
+            "code": "fn sign(n: i32) -> i32 {\n    if n < 0 { -1 } else { 1 }\n}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "split-bill",
+          "title": "Split a bill",
+          "guide": "Return two numbers at once, packed in a tuple, and unpack them in `main`.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "The tuple type lists what comes back: the share of each person and the coins left over.", "notes": [{"on": "-> (i32, i32)", "text": "Two values come back packed in one tuple."}], "text": "fn divide(total: i32, people: i32) -> (i32, i32) {\n    (total / people, total % people)\n}\n"},
+            {"mode": "ghost", "line": 6, "guide": "Unpack the tuple into two variables and print them.", "text": "    let (each, left) = divide(17, 5);\n    println!(\"{} each, {} left\", each, left);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "3 each, 2 left"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "nothing-back",
+          "title": "A function with no value",
+          "guide": "A function with no arrow still returns something. Catch it and look.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "No arrow here: the function only prints.", "notes": [{"on": "fn announce", "text": "No arrow, so it returns the empty tuple ()."}], "text": "fn announce(score: u32) {\n    println!(\"Score: {}\", score);\n}\n"},
+            {"mode": "ghost", "line": 6, "guide": "Keep what the call returns, then print it with `{:?}`.", "text": "    let result = announce(90);\n    println!(\"{:?}\", result);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Score: 90\n()"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "temperature-check",
+          "title": "Functions using functions",
+          "guide": "Build one function on top of the value another one returns.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Converts Celsius to Fahrenheit with whole numbers.", "text": "fn to_fahrenheit(celsius: i32) -> i32 {\n    celsius * 9 / 5 + 32\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "The call to `to_fahrenheit` inside the comparison is replaced by its returned value.", "notes": [{"on": "to_fahrenheit(celsius)", "text": "The value it returns takes part in the comparison."}], "text": "fn is_hot(celsius: i32) -> bool {\n    to_fahrenheit(celsius) > 100\n}\n"},
+            {"mode": "ghost", "line": 10, "guide": "Print a conversion and two checks.", "text": "    println!(\"{}\", to_fahrenheit(100));\n    println!(\"{}\", is_hot(40));\n    println!(\"{}\", is_hot(30));"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "212\ntrue\nfalse"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "tuple-return-gaps",
+          "title": "Return and unpack",
+          "guide": "Complete the second type of the tuple and the variable that gets printed. The program prints 20 true.",
+          "code": "fn describe(age: u32) -> (u32, ___) {\n    (age, age >= 18)\n}\n\nfn main() {\n    let (years, adult) = describe(20);\n    println!(\"{} {}\", years, ___);\n}",
+          "gaps": [
+            {"answers": ["bool"]},
+            {"answers": ["adult"]}
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "grade-letter",
+          "title": "An if as the last line",
+          "guide": "Let an `if` / `else` chain be the value the function returns.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "fn main() {\n}"},
+            {"mode": "ghost", "line": 1, "guide": "Each branch gives a `char`. The chain is the last expression, so its value is returned.", "notes": [{"on": "'A'", "text": "A branch value with no semicolon becomes the result."}], "text": "fn grade(score: u32) -> char {\n    if score >= 90 {\n        'A'\n    } else if score >= 70 {\n        'B'\n    } else {\n        'C'\n    }\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "Grade a score and print it.", "text": "    let mark = grade(82);\n    println!(\"Grade {}\", mark);"}
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Grade B"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "swapped-tuple",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "fn swap(a: i32, b: i32) -> (i32, i32) {\n    (b, a)\n}\n\nfn main() {\n    let (x, y) = swap(3, 8);\n    println!(\"{} {}\", x - y, x);\n}",
+          "options": [
+            "-5 3",
+            "5 8",
+            "-5 8",
+            "5 3"
+          ],
+          "answer": 1,
+          "explanation": "`swap` returns `(8, 3)`, so `x` is 8 and `y` is 3. Then `x - y` is 5, and `x` is 8."
+        }
+      ]
+    }
+  ]
+}

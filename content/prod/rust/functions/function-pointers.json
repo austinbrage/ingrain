@@ -1,0 +1,414 @@
+{
+  "id": "function-pointers",
+  "intro": {
+    "title": "Function pointers",
+    "slides": [
+      {
+        "text": "A function is a value. You can keep it in a variable, hand it to another function and call it later. The variable holds a **function pointer**.\n\nPseudo code, not Rust.",
+        "code": "op = the function double\nop(5)  ->  runs double with 5"
+      },
+      {
+        "text": "The type of a pointer is the signature of the functions it can hold: the parameters and the return type. Only a function with exactly that signature fits.\n\nUse the bare name to hand a function over. With parentheses it runs and you get its result.",
+        "code": "fn(i32) -> i32\nfn(i32, i32) -> bool\nfn()"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "store-and-call",
+          "title": "Keep a function in a variable",
+          "guide": "Store a function in a variable, call it through the variable, then point the variable at another function.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "`main` is already in the file. A function that doubles a number.",
+              "text": "fn double(n: i32) -> i32 {\n    n * 2\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A second function with the same signature: it flips the sign.",
+              "text": "fn negate(n: i32) -> i32 {\n    -n\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "Keep `double` in a variable and call it through the variable.",
+              "notes": [
+                {
+                  "on": "fn(i32) -> i32",
+                  "text": "The type: any function taking an i32 and returning an i32"
+                },
+                {
+                  "on": "= double",
+                  "text": "Only the name: the function is not called here"
+                }
+              ],
+              "text": "    let mut op: fn(i32) -> i32 = double;\n    println!(\"{}\", op(21));"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Point the same variable at the other function and call it again.",
+              "notes": [
+                {
+                  "on": "op = negate",
+                  "text": "A mut variable can hold a different function later"
+                }
+              ],
+              "text": "    op = negate;\n    println!(\"{}\", op(21));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "42\n-21"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "pointer-fits",
+          "title": "Which function fits?",
+          "guide": "Pick the function that can be stored in `f`.",
+          "code": "fn limit(n: i32) -> bool { n < 10 }\nfn show(n: i32) { println!(\"{}\", n); }\nfn bump(n: i32) -> i32 { n + 1 }\nfn avg(a: i32, b: i32) -> i32 { (a + b) / 2 }\n\nlet f: fn(i32) -> i32 = ???;",
+          "options": [
+            "limit",
+            "show",
+            "bump",
+            "avg"
+          ],
+          "answer": 2,
+          "explanation": "A pointer type fixes the parameters and the return type. Only `bump` takes one `i32` and returns an `i32`."
+        },
+        {
+          "type": "typing",
+          "id": "pass-a-function",
+          "title": "Pass a function to a function",
+          "guide": "Write a function that applies another function twice, then pass it two different ones.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "`main` is already in the file. A price with 10% tax added.",
+              "text": "fn add_tax(price: i32) -> i32 {\n    price + price / 10\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A flat discount of 10.",
+              "text": "fn discount(price: i32) -> i32 {\n    price - 10\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "This function receives a function in `f` and calls it on its own result.",
+              "notes": [
+                {
+                  "on": "f: fn(i32) -> i32",
+                  "text": "A parameter whose value is a function"
+                },
+                {
+                  "on": "f(f(n))",
+                  "text": "Runs f on n, then runs f on that result"
+                }
+              ],
+              "text": "fn twice(f: fn(i32) -> i32, n: i32) -> i32 {\n    f(f(n))\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Pass each function by name, with no parentheses.",
+              "notes": [
+                {
+                  "on": "add_tax, 100",
+                  "text": "No parentheses: hands the function over, does not run it"
+                }
+              ],
+              "text": "    println!(\"{}\", twice(add_tax, 100));\n    println!(\"{}\", twice(discount, 100));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "121\n80"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "call-and-pass",
+          "title": "Call it, then pass it",
+          "guide": "Call the function that `apply` received, then hand it the one defined above.",
+          "code": "fn triple(n: i32) -> i32 {\n    n * 3\n}\n\nfn apply(f: fn(i32) -> i32, n: i32) -> i32 {\n    ___(n)\n}\n\nfn main() {\n    println!(\"{}\", apply(___, 4));\n}",
+          "gaps": [
+            {
+              "answers": [
+                "f"
+              ]
+            },
+            {
+              "answers": [
+                "triple"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "pipeline-array",
+          "title": "Run a pipeline of functions",
+          "guide": "Keep two functions in an array and run a number through them one by one.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "`main` is already in the file. Adds ten.",
+              "text": "fn add_ten(n: i32) -> i32 {\n    n + 10\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Squares the number.",
+              "text": "fn square(n: i32) -> i32 {\n    n * n\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 10,
+              "guide": "An array whose items are functions, and a number to start from.",
+              "notes": [
+                {
+                  "on": "[fn(i32) -> i32; 2]",
+                  "text": "Array type: two function pointers"
+                }
+              ],
+              "text": "    let steps: [fn(i32) -> i32; 2] =\n        [add_ten, square];\n    let mut value = 2;"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Loop over the functions and feed each one the running value.",
+              "notes": [
+                {
+                  "on": "step(value)",
+                  "text": "Calls whichever function the loop holds right now"
+                }
+              ],
+              "text": "    for step in steps {\n        value = step(value);\n        println!(\"{}\", value);\n    }"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "12\n144"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "run-an-action",
+          "title": "Run an action by name",
+          "guide": "A pointer can take nothing and return nothing: its type is `fn()`.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "`main` is already in the file. An action that prints.",
+              "text": "fn start() {\n    println!(\"Starting\");\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A second action with the same shape.",
+              "text": "fn stop() {\n    println!(\"Stopping\");\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Runs whatever action it receives.",
+              "notes": [
+                {
+                  "on": "action: fn()",
+                  "text": "No parameters and no return value"
+                }
+              ],
+              "text": "fn run(action: fn()) {\n    action();\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Run the actions in any order you like.",
+              "text": "    run(start);\n    run(stop);\n    run(start);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "Starting\nStopping\nStarting"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "pick-operation",
+          "title": "Choose a function by symbol",
+          "guide": "Write a function that returns a function, picked with a match.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "`main` is already in the file. Adds two numbers.",
+              "text": "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "Same signature, so either fits one pointer type.",
+              "text": "fn sub(a: i32, b: i32) -> i32 {\n    a - b\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Returns one of the two functions, never calls it.",
+              "notes": [
+                {
+                  "on": "fn(i32, i32) -> i32",
+                  "text": "The return type is itself a function"
+                },
+                {
+                  "on": "=> add",
+                  "text": "Hands back the function, it is not called"
+                }
+              ],
+              "text": "fn pick(symbol: char) -> fn(i32, i32) -> i32 {\n    match symbol {\n        '+' => add,\n        _ => sub,\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 17,
+              "guide": "Get both functions, then call them.",
+              "text": "    let plus = pick('+');\n    let minus = pick('-');\n    println!(\"{}\", plus(9, 4));\n    println!(\"{}\", minus(9, 4));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "13\n5"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "return-the-right-one",
+          "title": "Return the right function",
+          "guide": "Fill the gaps so `choose(true)` hands back the multiplier and `choose(false)` the adder.",
+          "code": "fn add(a: i32, b: i32) -> i32 { a + b }\nfn mul(a: i32, b: i32) -> i32 { a * b }\nfn choose(times: bool) -> fn(i32, i32) -> i32 {\n    if ___ {\n        ___\n    } else {\n        ___\n    }\n}\n\nfn main() {\n    let op = choose(true);\n    println!(\"{}\", op(3, 4));\n}",
+          "gaps": [
+            {
+              "answers": [
+                "times"
+              ]
+            },
+            {
+              "answers": [
+                "mul"
+              ]
+            },
+            {
+              "answers": [
+                "add"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "name-the-type",
+          "title": "Name a pointer type",
+          "guide": "Give the pointer type a name with `type`, then keep two checks in an array.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Name the type once: a check takes a number and says yes or no.",
+              "notes": [
+                {
+                  "on": "type Check",
+                  "text": "A short name for the long pointer type"
+                }
+              ],
+              "text": "type Check = fn(i32) -> bool;\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 3,
+              "guide": "A check for even numbers.",
+              "text": "fn is_even(n: i32) -> bool {\n    n % 2 == 0\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "A check for big numbers.",
+              "text": "fn is_big(n: i32) -> bool {\n    n > 100\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 12,
+              "guide": "Use the alias in the array type, then run each check on 64.",
+              "text": "    let checks: [Check; 2] = [is_even, is_big];\n    for check in checks {\n        println!(\"{}\", check(64));\n    }"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "true\nfalse"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "moves-output",
+          "title": "Where does it end up?",
+          "guide": "Follow the functions in the order of the array.",
+          "code": "fn up(n: i32) -> i32 { n + 1 }\nfn down(n: i32) -> i32 { n - 1 }\n\nfn main() {\n    let moves: [fn(i32) -> i32; 4] =\n        [up, down, up, up];\n    let mut pos = 10;\n    for step in moves {\n        pos = step(pos);\n    }\n    println!(\"{}\", pos);\n}",
+          "options": [
+            "11",
+            "12",
+            "13",
+            "10"
+          ],
+          "answer": 1,
+          "explanation": "The array runs up, down, up, up: 10 becomes 11, 10, 11 and finally 12."
+        }
+      ]
+    }
+  ]
+}

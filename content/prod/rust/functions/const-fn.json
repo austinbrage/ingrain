@@ -1,0 +1,344 @@
+{
+  "id": "const-fn",
+  "intro": {
+    "title": "Const functions",
+    "slides": [
+      {
+        "text": "A constant needs its value at compile time, so it cannot call a normal function. A `const fn` is a function the compiler is allowed to run while it builds the program.",
+        "code": "const fn double(n: u32) -> u32 {\n    n * 2\n}\n\nconst LIMIT: u32 = double(50);"
+      },
+      {
+        "text": "A `const fn` is still a normal function: call it with any value at run time too. The only difference is the word `const` in front, and a body that the compiler can run."
+      },
+      {
+        "text": "What fits in the body of a `const fn`:\n\n- arithmetic, `let` and `let mut`\n- `if`, `match` and `while`\n- calls to other `const fn`\n\nNo `for` loops and no printing. A constant that overflows stops the build, not the run."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "workday-minutes",
+          "title": "Workday in minutes",
+          "guide": "Write a function a constant can call, then use it for a constant and at run time.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "A `const fn` converts hours into minutes. It reads like any function, with `const` in front.",
+              "notes": [
+                {
+                  "on": "const fn",
+                  "text": "Lets a constant call this function."
+                }
+              ],
+              "text": "const fn minutes(hours: u32) -> u32 {\n    hours * 60\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 5,
+              "guide": "A constant calls it. The compiler works out the value while it builds.",
+              "text": "const WORKDAY_MINUTES: u32 = minutes(8);\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Print the constant, then call the same function at run time.",
+              "text": "    println!(\"workday: {} min\", WORKDAY_MINUTES);\n    println!(\"short day: {} min\", minutes(3));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "workday: 480 min\nshort day: 180 min"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "cube-constant",
+          "title": "Volume of a crate",
+          "guide": "Make `cube` usable by a constant, then call it there.",
+          "code": "___ fn cube(n: u32) -> u32 {\n    n * n * n\n}\n\nconst VOLUME: u32 = ___(3);\n\nfn main() {\n    println!(\"{} litres\", VOLUME);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "const"
+              ]
+            },
+            {
+              "answers": [
+                "cube"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "typing",
+          "id": "seat-grid",
+          "title": "A grid of seats",
+          "guide": "An array length must be known at compile time. A `const fn` can compute it.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "The number of seats is rows times columns, computed by a `const fn`.",
+              "text": "const fn slots(rows: usize, cols: usize) -> usize {\n    rows * cols\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 6,
+              "guide": "Use the call as the length of the array, then take the first seat.",
+              "notes": [
+                {
+                  "on": "slots(3, 4)",
+                  "text": "A length has to be known before the program runs."
+                }
+              ],
+              "text": "    let mut seats = [false; slots(3, 4)];\n    seats[0] = true;"
+            },
+            {
+              "mode": "ghost",
+              "line": 8,
+              "guide": "Report the size of the grid and the first seat.",
+              "text": "    println!(\"{} seats\", seats.len());\n    println!(\"first taken: {}\", seats[0]);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "12 seats\nfirst taken: true"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "same-function-twice",
+          "title": "Compile time and run time",
+          "kind": "output",
+          "guide": "What does the program print?",
+          "code": "const fn area(w: u32, h: u32) -> u32 {\n    w * h\n}\n\nconst SMALL: u32 = area(2, 3);\n\nfn main() {\n    let w = 10;\n    println!(\"{} {}\", SMALL, area(w, 4));\n}",
+          "options": [
+            "6 24",
+            "6 40",
+            "A compile error"
+          ],
+          "answer": 1,
+          "explanation": "`area` is a normal function too. With the variable `w` it runs at run time and gives 10 * 4, and `SMALL` was computed at compile time."
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "plain-fn-in-const",
+          "title": "Why only one const?",
+          "guide": "Read the code, then pick the reason `double` is a `const fn` and `triple` is not.",
+          "code": "const fn double(n: u32) -> u32 {\n    n * 2\n}\n\nfn triple(n: u32) -> u32 {\n    n * 3\n}\n\nconst LIMIT: u32 = double(50);\n\nfn main() {\n    println!(\"{}\", LIMIT + triple(2));\n}",
+          "options": [
+            "`double` gets a literal and `triple` a variable",
+            "A `const fn` runs faster than a normal one",
+            "`LIMIT` calls `double`, so it must be a `const fn`",
+            "`main` calls `triple`, so it needs `const` too"
+          ],
+          "answer": 2,
+          "explanation": "A constant is computed at compile time, so it may only call a `const fn`. `triple` is only called at run time, where a normal function is fine."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Inside a const fn",
+        "slides": [
+          {
+            "text": "The body of a `const fn` can decide and repeat, as long as the compiler can follow it: `if`, `match` and `while` all work, and so does a function calling itself.\n\nThis session builds three of them."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "plan-rates",
+          "title": "Plan prices",
+          "guide": "A `match` inside a `const fn` picks the price of a plan while compiling.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Tier 1 costs 10, tier 2 costs 8, and any other tier costs 5.",
+              "text": "const fn rate(tier: u32) -> u32 {\n    match tier {\n        1 => 10,\n        2 => 8,\n        _ => 5,\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "Two constants, each computed by a call.",
+              "text": "const STARTER: u32 = rate(1);\nconst FALLBACK: u32 = rate(7);\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Print both prices.",
+              "text": "    println!(\"tier 1: {} a month\", STARTER);\n    println!(\"tier 7: {} a month\", FALLBACK);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "tier 1: 10 a month\ntier 7: 5 a month"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "sum-to",
+          "title": "Adding up a range",
+          "guide": "A `while` loop with `let mut` variables runs inside a `const fn` too.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Start the function with a running total and a counter. The total is the result.",
+              "text": "const fn sum_to(n: u32) -> u32 {\n    let mut total = 0;\n    let mut i = 1;\n    total\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 4,
+              "guide": "Add every number from 1 up to `n`.",
+              "notes": [
+                {
+                  "on": "while",
+                  "text": "The loop is run by the compiler, not at run time."
+                }
+              ],
+              "text": "    while i <= n {\n        total += i;\n        i += 1;\n    }"
+            },
+            {
+              "mode": "ghost",
+              "line": 11,
+              "guide": "A constant holds the sum of 1 to 10.",
+              "text": "const TRIANGLE: u32 = sum_to(10);\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 14,
+              "guide": "Print the constant, then another sum computed at run time.",
+              "text": "    println!(\"sum 1 to 10: {}\", TRIANGLE);\n    println!(\"sum 1 to 4: {}\", sum_to(4));"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "sum 1 to 10: 55\nsum 1 to 4: 10"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "power-loop",
+          "title": "A power of two",
+          "guide": "Repeat the multiplication while steps are left, then give back the product.",
+          "code": "const fn power(base: u32, exp: u32) -> u32 {\n    let mut result = 1;\n    let mut i = 0;\n    ___ i < exp {\n        result *= base;\n        i += 1;\n    }\n    ___\n}\n\nconst KIB: u32 = power(2, 10);\nfn main() {\n    println!(\"{} bytes\", KIB);\n}",
+          "gaps": [
+            {
+              "answers": [
+                "while"
+              ]
+            },
+            {
+              "answers": [
+                "result"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "purpose",
+          "id": "for-in-const-fn",
+          "title": "Why a while loop?",
+          "guide": "Read the code, then pick why it uses `while` and not `for`.",
+          "code": "const fn total(n: u32) -> u32 {\n    let mut sum = 0;\n    let mut i = 0;\n    while i < n {\n        sum += i;\n        i += 1;\n    }\n    sum\n}\n\nconst SUM: u32 = total(5);",
+          "options": [
+            "A `for` loop runs slower inside a constant",
+            "A `for` needs iterators, which it cannot run",
+            "A `const fn` may only loop a fixed number of times",
+            "A `for` loop cannot change a `let mut` variable"
+          ],
+          "answer": 1,
+          "explanation": "`for` relies on iterators, which the compiler cannot run yet. Variables and `+=` are fine in a `const fn`, and `while` does the same job."
+        },
+        {
+          "type": "typing",
+          "id": "factorial-seatings",
+          "title": "Ways to seat guests",
+          "guide": "A `const fn` can call itself. Its result can fill a constant and a static.",
+          "chunks": [
+            {
+              "mode": "auto",
+              "line": 1,
+              "text": "fn main() {\n}"
+            },
+            {
+              "mode": "ghost",
+              "line": 1,
+              "guide": "Multiply `n` by the factorial of the number below it. It stops at 1.",
+              "text": "const fn factorial(n: u32) -> u32 {\n    if n <= 1 {\n        1\n    } else {\n        n * factorial(n - 1)\n    }\n}\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 9,
+              "guide": "One constant and one static, both filled by calls.",
+              "notes": [
+                {
+                  "on": "static FOUR_GUESTS",
+                  "text": "A static also needs a value known at compile time."
+                }
+              ],
+              "text": "const FIVE_GUESTS: u32 = factorial(5);\nstatic FOUR_GUESTS: u32 = factorial(4);\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 13,
+              "guide": "Print how many seatings each has.",
+              "text": "    println!(\"5 guests: {} seatings\", FIVE_GUESTS);\n    println!(\"4 guests: {} seatings\", FOUR_GUESTS);"
+            }
+          ],
+          "output": {
+            "command": "cargo run",
+            "text": "5 guests: 120 seatings\n4 guests: 24 seatings"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "overflow-in-const",
+          "title": "When does it overflow?",
+          "guide": "Read the code, then pick what happens on `cargo run`.",
+          "code": "const fn square(n: u8) -> u8 {\n    n * n\n}\n\nconst SAFE: u8 = square(10);\nconst BIG: u8 = square(20);\n\nfn main() {\n    println!(\"{}\", SAFE);\n}",
+          "options": [
+            "100, then a panic at run time",
+            "The build stops, nothing is printed",
+            "100, as `BIG` is never used",
+            "100, with `BIG` wrapping around to 144"
+          ],
+          "answer": 1,
+          "explanation": "The compiler computes every constant while building, used or not. `square(20)` is 400, which does not fit in a `u8`, so the overflow stops the build."
+        }
+      ]
+    }
+  ]
+}
