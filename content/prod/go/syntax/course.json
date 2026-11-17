@@ -9,8 +9,7 @@
         { "id": "variables", "name": "Variables", "sessions": 3 },
         { "id": "printing-values", "name": "Printing values", "sessions": 1 },
         { "id": "constants", "name": "Constants", "sessions": 2 },
-        { "id": "basic-types", "name": "Basic types", "sessions": 3 },
-        { "id": "operators", "name": "Operators", "sessions": 2 }
+        { "id": "basic-types", "name": "Basic types", "sessions": 3 }
       ]
     },
     {
