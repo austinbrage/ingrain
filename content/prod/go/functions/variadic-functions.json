@@ -1,0 +1,106 @@
+{
+  "id": "variadic-functions",
+  "intro": {
+    "title": "Variadic functions",
+    "slides": [
+      {
+        "text": "The last parameter can be written `...type`. It accepts any number of values, even none, and inside the function it is a plain slice of that type. It must come last.\n\nThe snippet is pseudo code, not Go.",
+        "code": "func name(fixed type, rest ...type) {\n    // rest behaves like []type\n}\n\nname(a)\nname(a, b, c)"
+      },
+      {
+        "text": "To pass a slice you already have, put `...` after it. The slice's type must match exactly.\n\nThis module uses two concepts taught in depth later. A slice is a list of values, and the collections course teaches it. `any` is a type that accepts a value of any type, so `...any` takes mixed values, as `Printf` does, and the interfaces course teaches it."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "variadic-parameter",
+          "title": "Accept any number of values",
+          "guide": "Write a function that takes a level and any number of messages.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "`...string` lets `msgs` take any number of strings. Inside, it is a slice, so `len` and `range` work.", "notes": [{"on": "...string", "text": "Zero or more strings, always the last parameter."}], "text": "func report(level string, msgs ...string) {\n    fmt.Println(level, len(msgs))\n    for _, msg := range msgs {\n        fmt.Println(\"-\", msg)\n    }\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "Call it with several messages, then with none.", "notes": [{"on": "report(\"info\")", "text": "With no values, msgs is empty."}], "text": "func main() {\n    report(\"warn\", \"disk low\", \"retry soon\")\n    report(\"info\")\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "warn 2\n- disk low\n- retry soon\ninfo 0"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "spread-slice",
+          "title": "Spread a slice",
+          "guide": "Pass a slice to a function that takes separate values.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Finds the longest of any number of words.", "text": "func longest(words ...string) string {\n    best := \"\"\n    for _, word := range words {\n        if len(word) > len(best) {\n            best = word\n        }\n    }\n    return best\n}\n"},
+            {"mode": "ghost", "line": 15, "guide": "A slice is not a list of arguments. Add `...` after it to pass its elements one by one.", "notes": [{"on": "[]string{", "text": "A list of strings."}, {"on": "names...", "text": "Spreads the slice into separate arguments."}], "text": "func main() {\n    names := []string{\"ana\", \"bartholomew\", \"li\"}\n    fmt.Println(longest(names...))\n    fmt.Println(longest(\"go\", \"rust\"))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "bartholomew\nrust"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "variadic-gaps",
+          "title": "Mark the variadic and the spread",
+          "guide": "Make `items` accept any number of strings, then pass the whole slice as separate arguments.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc count(items ___) int {\n    return len(items)\n}\n\nfunc main() {\n    tags := []string{\"go\", \"cli\"}\n    fmt.Println(count(___))\n}",
+          "gaps": [{ "answers": ["...string"] }, { "answers": ["tags..."] }]
+        },
+        {
+          "type": "typing",
+          "id": "forward-args",
+          "title": "Forward the arguments",
+          "guide": "Wrap `Printf` in a logging function.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "A wrapper takes `...any` and hands the values on. Without `...` after `args`, `Printf` would get them as one slice.", "notes": [{"on": "any", "text": "Accepts any type. A []string cannot be spread into it."}, {"on": "args...", "text": "Passes each value on to Printf separately."}], "text": "func logf(format string, args ...any) {\n    fmt.Printf(\"> \"+format+\"\\n\", args...)\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Log a line with values, then one without.", "text": "func main() {\n    logf(\"%s has %d items\", \"cart\", 3)\n    logf(\"ready\")\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "> cart has 3 items\n> ready"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "shared-elements",
+          "title": "A spread shares the slice",
+          "guide": "Change a slice's elements from inside a variadic function.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Halves every price it receives.", "text": "func discount(prices ...int) {\n    for i := range prices {\n        prices[i] = prices[i] / 2\n    }\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "A spread passes the same slice, not a copy. Check `cart` after the call.", "notes": [{"on": "cart...", "text": "The function works on cart's own elements."}], "text": "func main() {\n    cart := []int{40, 10, 6}\n    discount(cart...)\n    fmt.Println(cart)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[20 5 3]"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "spread-vs-values",
+          "title": "What does it print?",
+          "guide": "Pick the output.",
+          "kind": "output",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc bump(nums ...int) { nums[0] = 99 }\n\nfunc main() {\n    a := 1\n    bump(a)\n    list := []int{1, 2}\n    bump(list...)\n    fmt.Println(a, list)\n}",
+          "options": [
+            "1 [1 2]",
+            "99 [99 2]",
+            "99 [1 2]",
+            "1 [99 2]"
+          ],
+          "answer": 3,
+          "explanation": "Separate values are copied into a new slice, so `a` stays 1. A spread passes `list` itself, so the change shows."
+        }
+      ]
+    }
+  ]
+}

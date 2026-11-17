@@ -49,7 +49,7 @@ Rules:
 ## Later concepts used simply
 | Module | Uses | Taught in |
 |---|---|---|
-| functions / variadic-functions | slices (the spread `xs...`) | collections |
+| functions / variadic-functions | slices (the spread `xs...`), `any` | collections, interfaces |
 | functions / pass-by-value | slices, maps, pointers | collections, pointers |
 | functions / multiple-returns | `error`, `errors.New` | error-handling |
 | functions / defer | `os.Open` as a copied idiom | standard-library |
