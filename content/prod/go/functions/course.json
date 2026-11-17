@@ -7,8 +7,7 @@
       "modules": [
         { "id": "declaring-and-returning", "name": "Declaring & returning", "sessions": 1 },
         { "id": "multiple-returns", "name": "Multiple & named returns", "sessions": 1 },
-        { "id": "variadic-functions", "name": "Variadic functions", "sessions": 1 },
-        { "id": "pass-by-value", "name": "Pass by value", "sessions": 1 }
+        { "id": "variadic-functions", "name": "Variadic functions", "sessions": 1 }
       ]
     },
     {

@@ -5,7 +5,7 @@ The scope file of Go core: what the module names do not show. Read by `ingrain-e
 **Audience.** The reader already codes in another language and knows nothing about Go. Every module teaches the Go form and what differs from other languages, never a general idea.
 
 Rules:
-- An exercise uses what the module teaches and what the modules before it taught (the catalog order, `content/prod/go/catalog.json`). A concept from a later course only when used simply and named as taught later (`writing-rules.md`, "Concepts taught later")
+- An exercise uses what the module teaches and what the modules before it taught (the catalog order, `content/prod/go/catalog.json`). A concept from a later course only when used simply and explained briefly on a slide, never by pointing to the course (`writing-rules.md`, "Concepts taught later")
 - A line here wins over what the module name suggests
 - When a module is renamed, moved or removed, change its line here
 - Typing exercises follow "Order of the code" in `writing-rules.md`: helpers first, `main` last. In Go the `auto` chunk is `"package main\n\nimport \"fmt\"\n"`, each helper starts at line 5 and ends with `\n`, and `main` is the last chunk, one balanced block
@@ -34,8 +34,8 @@ Rules:
       return a / b, nil
   }
   ```
-- `variadic-functions` (basic): `nums ...int` is a `[]int` inside the function, called with zero or more arguments, and `xs...` spreads a slice at the call site. It must be the last parameter. Trap: `fmt.Println(strs...)` does not compile for a `[]string`, because it wants `[]any`. A spread slice shares its backing array with the caller: use it simply, name `collections` as the place where slices are taught in depth
-- `pass-by-value` (basic): everything is copied. Teach the visible effects, not the machinery: an `int` parameter changes nothing for the caller, an element changed through a slice is seen by the caller, `append` inside the function is not, a map change is seen, and `*n++` on a pointer parameter changes the caller's value. Slices, maps and pointers are later concepts used simply: the slide names `pointers` and `collections` as where they are taught in depth. No exercise is about nil pointers, capacity growth or pointer receivers
+- `variadic-functions` (basic): `nums ...int` is a `[]int` inside the function, called with zero or more arguments, and `xs...` spreads a slice at the call site. It must be the last parameter. Trap: `fmt.Println(strs...)` does not compile for a `[]string`, because it wants `[]any`. A spread slice shares its backing array with the caller: use it simply, and explain what a slice is in a sentence
+- There is no `pass-by-value` module. Arguments are copied, and what a copy shares is taught in `pointers` (`pointers-and-functions`, `slices-maps-and-pointers`) and `collections` (`append-and-copy`). Do not add one to `functions`
 - `function-values` (medium, named `Function values & types`): `type Op func(int, int) int`, anonymous functions, calling one immediately (`func() {...}()`), passing a function as an argument (own helpers such as `apply`), and functions stored in a `map[string]Op` or a slice. Method values belong to structs-and-methods and generic callbacks to generics. `sort.Slice` is named as a later idiom only; no exercise depends on it
 - `closures` (medium): a closure captures the variable, not its value. Forms: a `counter()` returning a function, two closures sharing one variable, and the Go 1.22 rule that each loop iteration has its own variable (`for i := 0; i < 3; i++ { fns = append(fns, func() int { return i }) }`). Say what changed in 1.22, and show the old behavior only as a note. Goroutine capture belongs to concurrency. Loops are already known from `syntax`
 - `defer` (medium): the resource idiom first (`defer f.Close()`, with `os.Open` as an idiom the reader copies and `fmt.Println("done")` for plain ordering), then the traps, each its own exercise:
@@ -46,11 +46,18 @@ Rules:
   - `recover` and `panic` belong to error-handling and are never used here
 - `what-go-leaves-out` (medium, named `No overloads & init`): there is no overloading (a second `connect` is a "redeclared" compile error), no default arguments and no optional parameters. The substitutes are a different name, a config struct, and functional options, which are only named and never taught (they are advanced). Then `init()`: runs automatically before `main`, once per package, may appear more than once in a package, and is never called by hand. `main` itself was taught in `syntax` (`program-structure`)
 
+## What `functions` leaves to other courses
+
+`functions` has no `pass-by-value` module (dropped 2026-11-17: the idea is general, and the Go-specific part belongs to the courses below). When `pointers` and `collections` are drawn or redrawn, they must cover it, because no `functions` module does. Each module intro explains what it uses from zero, since the reader has met none of it.
+
+- **pointers / `pointers-and-functions`:** Go copies every argument, so changing a parameter never reaches the caller. The forms `*T`, `&x` and `*p`, and a pointer parameter that changes the caller's variable
+- **pointers / `slices-maps-and-pointers`:** a slice or map parameter is a copy of a small header that points at the same data. A write to an element or a key reaches the caller. Reassigning the parameter to a new slice or map only rebinds the copy
+- **collections / `append-and-copy`:** `append` inside a function is lost for the caller, so the function returns the slice and the caller stores it (`s = f(s)`)
+
 ## Later concepts used simply
 | Module | Uses | Taught in |
 |---|---|---|
 | functions / variadic-functions | slices (the spread `xs...`), `any` | collections, interfaces |
-| functions / pass-by-value | slices, maps, pointers | collections, pointers |
 | functions / multiple-returns | `error`, `errors.New` | error-handling |
 | functions / defer | `os.Open` as a copied idiom | standard-library |
 | functions / what-go-leaves-out | a config struct | structs-and-methods |
