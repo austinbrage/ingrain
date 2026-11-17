@@ -24,7 +24,7 @@ One axis, three points. The middle is the goal.
 | **engaging** | "I'm learning something, and I can do it" | one new thing, a form or a rule or a trap the reader could not guess |
 | **overwhelming** | "too much at once" | too many new things together (density), or a step that uses what was not shown yet (gap) |
 
-A verdict is judged against **a programmer who knows another language and knows only what the modules before it taught**, with **the bar of the module's position** (`writing-rules.md`, "The bar moves with position"). The same exercise can be engaging in the first module and condescending in a `medium` one. A general programming idea is condescending at every position.
+A verdict is judged against **a programmer who knows another language and knows only what the modules before it taught, plus any later concept the module names and uses simply** (`writing-rules.md`, "Concepts taught later"), with **the bar of the module's position** (`writing-rules.md`, "The bar moves with position"). The same exercise can be engaging in the first module and condescending in a `medium` one. A general programming idea is condescending at every position.
 
 **A new thing** is a hinge (one of the five) that the module introduces for the first time. A syntax form counts once, when it is first typed, and never again. A quiz, a fill-blank or a note on a piece already typed counts zero. The test: could the reader do this exercise after the ones before it, without reading anything new? If yes, it adds nothing new.
 
@@ -40,6 +40,7 @@ Judgment, backed by counts. Every verdict quotes its evidence.
   - **Gap** (fix: add a bridge exercise, or move the exercise later):
     - an exercise that uses a form or a rule no earlier exercise or module showed
     - an intro that relies on something not taught yet
+    - not a gap: a later concept used in its plain form, named on the slide as taught in depth in a later course, with no exercise hinging on it. If the exercise hinges on the later concept, or the slide does not name it, it is a gap
 - **Repetitive is a flag, not a verdict.** A module whose exercises repeat the same forms (three exercises of the same declarations), or whose 3 or more sessions are not filled by named traps or forms, is padded. It is not overwhelming. Its fix is to trim or merge, so it gets its own label next to the verdict
 - **Irrelevant is a flag, not a verdict, and it is lax.** It marks an exercise whose hinge a working programmer never meets in real code (the test is in `writing-rules.md`, "The hinge must also be used in real code"). Its fix is cut. Flag only the clear cases, like `&^`. A rare-but-real topic is not irrelevant: it gets one light exercise. In doubt, do not flag
 - **Engaging signals:** one hinge named and hit, a program that shows a result, variety across the module, the next exercise builds on the last
@@ -64,4 +65,4 @@ Judgment, backed by counts. Every verdict quotes its evidence.
 - No fixing, no second run, no other review: what to change is the author's answer
 
 ## Not its job
-The mechanical rules stay in `cargo test --test content`. Forward use shows up here as a **gap**, and overlap with earlier modules as **repetitive**.
+The mechanical rules stay in `cargo test --test content`. Forward use that is not simple and named shows up here as a **gap**, and overlap with earlier modules as **repetitive**.

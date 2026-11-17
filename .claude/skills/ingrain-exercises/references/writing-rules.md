@@ -47,6 +47,13 @@ Syntax that must be known still gets taught: every kind of loop, `if`, `match`, 
 - never one exercise per trivial form, and never a concept explained from zero
 - the traps of the construct then get their own exercises
 
+## Concepts taught later
+A module may use a concept that a later course teaches in depth, when leaving it out would make the topic false or thin (slices and maps in `Pass by value`, which `collections` teaches later). Never skip a concept for the sake of order.
+- **Keep it simple:** the plain behavior only, one form, nothing the reader must have learned to follow the exercise. The exercise hinges on the module's own concept, never on the later one
+- **Name it on the slide:** the intro slide or the note says the concept is taught in depth in a later course (`taught in depth in the collections course`). No other explanation
+- **It raises no questions:** no exercise, quiz or fill-blank is about the later concept. If the reader would need to ask what it is, show less of it
+- Using a later concept this way is not a gap for the scorer
+
 ## Modes
 **Ghost is the majority at every tier,** around 90% of the chunks of a typing exercise. The rest is `auto` and `copy`, and what decides between them is how many times the user has already written the piece (`docs/content-structure.md`, "The mode of a chunk"):
 - **ghost:** new code, and code the user has written only a few times
@@ -56,6 +63,11 @@ Syntax that must be known still gets taught: every kind of loop, `if`, `match`, 
 When a chunk is `auto`, the guide of the next typed chunk says what was added ("the imports are already in the file").
 
 The clearest case is the line every Go program starts with, `package main`: it is `auto` in every module, except in the first module of the first course of the language, where it is ghost so the user types it once. Any piece the user has already written many times follows the same reasoning.
+
+## Order of the code
+- **In a typing exercise, helper functions come first and the entry function (`main`) comes last,** in every language. It is coherent and good teaching: nobody uses a function before defining it, so the user types the function and then the code that uses it
+- Never start a chunk with `\n`, and never put a chunk after the closing brace of `main`: the editor has no line to insert it before, so the learner has to press Enter first
+- A blank line between two pieces is the trailing `\n` of the first chunk
 
 ## Go code
 - **Indent with 4 spaces, never tabs.** `gofmt` uses tabs, but the editor of the exercise types a Tab key as 4 spaces and fills the indentation of a new line with spaces, so a tab in a chunk can never be typed correctly. That `gofmt` would reformat the code to tabs is fine (the author, 2026-11-02): the goal is to learn by seeing, typing and debugging the code
@@ -136,7 +148,7 @@ Cutting has a floor. The rules above remove weak exercises; this says what must 
 - The module intro is an overview of what the module covers. A session intro teaches what its exercises practice
 - The text teaches. It never gives away the answer of an exercise that follows
 - **Pseudo code is welcome in an intro snippet,** especially for a new concept: it shows the idea before the syntax. Say in the text that it is pseudo code. A snippet that is real code uses real syntax and APIs, and compiles
-- A snippet only when the slide is about code. It is illustrative: it may use placeholder names to show a shape (`pattern_a => do_this`), but every piece of syntax and every API in it is real, and a snippet meant as real code compiles. It uses only what the course has taught or what the slide itself introduces
+- A snippet only when the slide is about code. It is illustrative: it may use placeholder names to show a shape (`pattern_a => do_this`), but every piece of syntax and every API in it is real, and a snippet meant as real code compiles. It uses only what the course has taught, what the slide itself introduces, or a later concept used simply and named as such (see "Concepts taught later")
 - The snippet does not repeat the code of an exercise, so there is still something to type or to find
 
 ## Changing a module that exists

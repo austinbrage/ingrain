@@ -23,7 +23,7 @@ Arguments: `$ARGUMENTS` is `<language> <layer> [<course> [request]]`. The course
 - **Layer review.** Launch one fresh subagent that reads every `course.json` of the layer, in order, and checks:
   - **Overlap:** no two courses have a module for the same concept. Using a concept again in another course is fine; drawing it twice is not. A later module may come back to a concept when it adds something (more context, another use, a harder form): that is reinforcement, not overlap. Report it only when the later module would re-introduce the basics
   - **Gaps:** nothing the layer needs falls between two courses
-  - **Forward dependency:** no module needs a concept that only a later course teaches
+  - **Forward dependency:** no module depends on a concept that only a later course teaches. A module may use one simply, named as taught in depth in that later course (`writing-rules.md`, "Concepts taught later"). Report it only when the module cannot be taught without the later concept in depth, or when a needed concept is skipped altogether and the topic would be left false or thin
   - **Sections and tiers:** the sections are cohesive, the tiers rise with the difficulty, and no course is thin or oversized next to the others
 
   The review **only reports**: each problem with its course and module id. It changes nothing. A fix goes through mode 1 with a request that names the course and the change
@@ -89,8 +89,15 @@ Run `cargo test --test content` and fix everything it reports. In the layer mode
 
 Then run `ingrain-score` once on the list, show only its report, and wait for the author.
 
+Then ask the author whether to record the scope in `docs/courses/<language>-<layer>.md` (the scope file), and write only after a yes. The file is the recap of your thinking, so that `ingrain-exercises` can write the exercises in another chat without this one. If the file does not exist, create it in the shape of `docs/courses/rust-core.md`. Touch only the courses of this run:
+- the row of the course in "Where each course stops": what it leaves to later courses, and any topic dropped on purpose, with why
+- **"Rules per module": one entry for every module of the run.** Each says the tier, then what the module teaches in order (the forms, rules and traps, with a short snippet where the form is not obvious), what it must not teach and which course owns it, and the idioms it uses as a black box. Write what you decided and why, not a copy of the module name
+- a row in "Later concepts used simply" for each module that uses a later concept (`Pass by value` uses slices and maps, taught in `collections`), so the exercises skill names it on the slide (`writing-rules.md`, "Concepts taught later")
+- when a module is renamed, moved or removed, change its entry
+
 Then report:
 - what you added, changed or left as it was
+- whether the scope file was written, and which lines
 - what the request asked and you did not do, and why
 - every module the universal-concept ban stopped or merged, and where its content went
 - the modules that have no file yet, so `ingrain-exercises` is the next step for each
