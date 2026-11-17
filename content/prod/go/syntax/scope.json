@@ -434,43 +434,31 @@
         {
           "type": "typing",
           "id": "declared-after-main",
-          "title": "Declared after main",
-          "guide": "Use a package-level variable that is written below `main`.",
+          "title": "Change a package variable",
+          "guide": "Change a package-level variable from inside a loop.",
           "chunks": [
             {
               "mode": "auto",
               "line": 1,
-              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
+              "text": "package main\n\nimport \"fmt\"\n"
             },
             {
               "mode": "ghost",
-              "line": 6,
-              "guide": "`counter` is not declared yet in this file. That is fine.",
-              "text": "    fmt.Println(counter)"
-            },
-            {
-              "mode": "ghost",
-              "line": 7,
-              "guide": "A package-level variable is visible inside every block, and the changes stay.",
-              "text": "    for i := 0; i < 3; i++ {\n        counter++\n    }"
-            },
-            {
-              "mode": "ghost",
-              "line": 10,
-              "guide": "The loop changed the package-level variable.",
-              "text": "    fmt.Println(counter)"
-            },
-            {
-              "mode": "ghost",
-              "line": 12,
-              "guide": "Package-level names can be declared in any order, even below the code that uses them.",
+              "line": 5,
+              "guide": "A package-level variable, written outside every function.",
               "notes": [
                 {
                   "on": "var counter",
                   "text": "Visible in the whole file."
                 }
               ],
-              "text": "\nvar counter = 10"
+              "text": "var counter = 10\n"
+            },
+            {
+              "mode": "ghost",
+              "line": 7,
+              "guide": "A package-level variable is visible inside every block, and the changes stay.",
+              "text": "func main() {\n    fmt.Println(counter)\n    for i := 0; i < 3; i++ {\n        counter++\n    }\n    fmt.Println(counter)\n}"
             }
           ],
           "output": {
