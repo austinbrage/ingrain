@@ -74,6 +74,17 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
 - **A module that already has exercises:** never split it on your own. Splitting moves exercises to another file, and the saved progress points at them. Report "needs a split" with the proposed modules and which exercises move, and change nothing. Only a prompt that names the module and asks for the split can do it
 - `ingrain-modules` never calls this skill back: this skill writes the exercises of the modules it added
 
+## Draft first
+Modes 1 and 2 never write the file before the author has seen it. Mode 3 is exempt: its subagents write in parallel and the scorer reviews the result.
+1. Draft the module in the chat, with nothing written to disk. Per session, each exercise gets its type and title, and its code as readable Go (never JSON):
+   - typing: the program as it ends up in `main.go`, with its output and the notes it will carry
+   - fill-blank: the code with the `___` gaps, and the answers
+   - quiz: the code, the options with the right one marked, and the explanation
+   - the intro slides: their text and snippets
+2. **Say what was left out and why:** every item of the mastery list that got no exercise, with the reason (a later module owns it, every language does it the same way, or it is too rare to matter), and the module that owns it. Add a one-line mastery check: which exercise covers which item
+3. Stop and wait. The author approves or corrects the draft
+4. Write exactly what was approved. If `cargo test --test content` forces a change (a card limit, a line count), say what changed and why
+
 ## Writing
 - Ids are slugs, unique inside their session. The tier of the module only says how hard the concept is: it does not change the shape of the exercises
 - Follow `references/writing-rules.md` for the guides, the notes, the quizzes and the intros, and `docs/content-structure.md` for the limits (the card limits, the quiz limits, the intro limits)

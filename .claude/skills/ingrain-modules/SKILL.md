@@ -67,6 +67,15 @@ The shape of `course.json`:
 - **A module made by splitting a concept** is named for its theme (`Slices in functions`, `Maps of maps`), never `Slices 2`. Each one is still one concept
 - A core course covers the language itself, nothing tied to an external library. An ecosystem course covers its own library
 
+## Draft first
+Mode 1 (one course) never writes `course.json` before the author has seen the list. Mode 2 already waits for the author on the scope table.
+1. Draft the module list in the chat, with nothing written to disk, as bullet points per section (its name and tier), and per module:
+   - its name, in at most 24 characters
+   - what it teaches, in one line: the forms, rules and traps that are specific to the language or library
+2. **Say what was left out and why:** each topic that got no module, with the reason (a universal concept the ban stops, a dense neighbor that absorbed it, a rare edge case, or a later course that owns it), and where its content went
+3. Stop and wait. The author approves or corrects the list
+4. Write exactly what was approved
+
 ## Writing
 - **A general call is a call with no request.** On a course with no `course.json`, write the whole file and create the course folder. On a course that already has one, **warn** that it has, add only the modules that are missing, and touch nothing that is already there
 - **To change a module that exists** (rename, move, remove, change a tier), the user names it in a request. Change only what the request asks and leave everything else exactly as it is
