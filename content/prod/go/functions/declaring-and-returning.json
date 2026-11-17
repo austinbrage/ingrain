@@ -1,0 +1,106 @@
+{
+  "id": "declaring-and-returning",
+  "intro": {
+    "title": "Declaring and returning",
+    "slides": [
+      {
+        "text": "In Go the type comes after the name, for the parameters and for the result. Names that share a type share one declaration. No result type means the function returns nothing.\n\nThe snippet is pseudo code, not Go.",
+        "code": "func name(first, second type) result {\n    ...\n}"
+      },
+      {
+        "text": "Go reads the whole file, so a function can be written below the code that calls it.\n\nA call never converts an argument for you, and a function with a result must return on every path."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "type-after-name",
+          "title": "Declare a function",
+          "guide": "Write a function that adds two numbers and call it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The type comes after the name. `a, b int` gives both names one type, and the result type goes before the brace.", "notes": [{"on": "a, b int", "text": "One type for both names."}, {"on": "int {", "text": "The result type goes after the parameters."}], "text": "func add(a, b int) int {\n    return a + b\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Call `add` and print its result.", "text": "func main() {\n    fmt.Println(add(3, 4))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "7"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "mixed-types",
+          "title": "Mixed types, no result",
+          "guide": "Write a function with two kinds of parameter and nothing to return.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Names of different types cannot share a type: each group gets its own. With no result type, nothing is returned.", "notes": [{"on": "item string, qty int", "text": "Each group of names gets its own type."}], "text": "func report(item string, qty int) {\n    fmt.Println(item, qty > 0)\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "A function that returns nothing is called as a statement.", "text": "func main() {\n    report(\"tea\", 3)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "tea true"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "signature-gaps",
+          "title": "Complete the signature",
+          "guide": "Give the parameter and the result their types.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc describe(name string, age ___) ___ {\n    return fmt.Sprintf(\"%s is %d\", name, age)\n}\n\nfunc main() {\n    fmt.Println(describe(\"Ana\", 31))\n}",
+          "gaps": [{ "answers": ["int"] }, { "answers": ["string"] }]
+        },
+        {
+          "type": "typing",
+          "id": "convert-argument",
+          "title": "No automatic conversion",
+          "guide": "Pass an int to a function that wants a float.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The parameter and the result are both `float64`.", "text": "func half(n float64) float64 {\n    return n / 2\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "`half` takes a `float64`. An `int` is never converted for you, so convert it in the call.", "notes": [{"on": "float64(count)", "text": "Without it, the call does not compile."}], "text": "func main() {\n    count := 7\n    fmt.Println(half(float64(count)))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3.5"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "every-path-returns",
+          "title": "Every path returns",
+          "guide": "Write a function whose result depends on a chain of conditions.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Two branches return a value, but a number can match neither.", "text": "func sign(n int) string {\n    if n < 0 {\n        return \"negative\"\n    } else if n > 0 {\n        return \"positive\"\n    }\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "Go checks that every path ends in a `return`. This one covers the numbers no branch matched.", "notes": [{"on": "return \"zero\"", "text": "Without it, Go reports a missing return."}], "text": "    return \"zero\""},
+            {"mode": "ghost", "line": 14, "guide": "Three numbers to classify.", "text": "func main() {\n    fmt.Println(sign(-5), sign(0), sign(8))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "negative zero positive"
+          }
+        },
+        {
+          "type": "quiz",
+          "id": "unused-parameter",
+          "title": "What does it print?",
+          "guide": "Pick the output.",
+          "kind": "output",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc label(name string, count int) string {\n    return \"item: \" + name\n}\n\nfunc main() {\n    fmt.Println(label(\"tea\", 3))\n}",
+          "options": [
+            "item: tea 3",
+            "It does not compile: `count` is unused",
+            "item: tea"
+          ],
+          "answer": 2,
+          "explanation": "An unused parameter is allowed. Only unused local variables and unused imports are errors, so the program compiles and prints `item: tea`."
+        }
+      ]
+    }
+  ]
+}

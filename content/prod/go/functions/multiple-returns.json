@@ -1,287 +1,109 @@
 {
   "id": "multiple-returns",
   "intro": {
-    "title": "Multiple returns",
+    "title": "Multiple and named returns",
     "slides": [
       {
-        "text": "Most languages let a function give back one value. A Go function can give back several at once, and the caller receives each of them. You will return pairs, ignore the ones you do not need, and use a second value to say whether the first one is usable.\n\nThe snippet is pseudo code, not Go.",
-        "code": "first, second = name(input)\n\nname(input):\n    give back a, b"
+        "text": "A Go function can return several values: list the types in parentheses. The caller takes all of them in one `:=`, or discards one with `_`.\n\nThe snippet is pseudo code, not Go.",
+        "code": "func name() (first type, second type) {\n    return a, b\n}\n\nx, y := name()"
+      },
+      {
+        "text": "The common use is a result plus an `error`. By convention the error comes last, and `nil` means it worked. The caller checks it right away.\n\n`error` and `errors.New` are used as they come here. They are taught in depth in the error handling course."
+      },
+      {
+        "text": "Results can have names. They start at their zero value, and a bare `return` sends them back."
       }
     ]
   },
   "sessions": [
     {
       "id": "session-1",
-      "intro": {
-        "title": "Returning several values",
-        "slides": [
-          {
-            "text": "Instead of one type after the parentheses, the function lists a type for each value it returns, inside their own parentheses. `return` then lists as many values, in the same order.",
-            "code": "func name(...) (type1, type2) {\n    return value1, value2\n}"
-          },
-          {
-            "text": "The caller must receive every value. If it does not need one, it can drop it with `_`, the blank name that Go never asks you to use."
-          }
-        ]
-      },
       "exercises": [
         {
           "type": "typing",
-          "id": "two-values",
+          "id": "two-results",
           "title": "Return two values",
-          "guide": "Write a function that gives its two inputs back in reverse order.",
+          "guide": "Return a quotient and a remainder from one function.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "List one type per returned value, in parentheses. `return` gives the values in that order.", "notes": [{"on": "(string, string)", "text": "Two values come back, both strings."}, {"on": "return b, a", "text": "Gives back two values at once."}], "text": "func swap(a, b string) (string, string) {\n    return b, a\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "The caller names one variable for each returned value, in order.", "notes": [{"on": "x, y :=", "text": "One variable per returned value."}], "text": "func main() {\n    x, y := swap(\"left\", \"right\")\n    fmt.Println(x, y)\n}"}
+            {"mode": "ghost", "line": 5, "guide": "Two result types go in parentheses, and `return` gives two values.", "notes": [{"on": "(int, int)", "text": "Several result types are listed in parentheses."}], "text": "func divmod(a, b int) (int, int) {\n    return a / b, a % b\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "One call gives two results. You must take every result: to keep one, discard the other with `_`.", "notes": [{"on": "_", "text": "A result you do not need is still taken: discard it."}], "text": "func main() {\n    quotient, rest := divmod(17, 5)\n    fmt.Println(quotient, rest)\n    only, _ := divmod(20, 6)\n    fmt.Println(only)\n}"}
           ],
           "output": {
             "command": "go run main.go",
-            "text": "right left"
+            "text": "3 2\n3"
           }
         },
         {
           "type": "typing",
-          "id": "min-and-max",
-          "title": "Order two numbers",
-          "guide": "Give back the smaller number first and the larger one second.",
+          "id": "value-and-error",
+          "title": "A value and an error",
+          "guide": "Return a result and an error, and check the error.",
           "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. A function can return from several places, always with the same number of values.", "text": "func minMax(a, b int) (int, int) {\n    if a < b {\n        return a, b\n    }\n    return b, a\n}\n"},
-            {"mode": "ghost", "line": 12, "guide": "The values arrive in the order the function returned them.", "text": "func main() {\n    low, high := minMax(8, 3)\n    fmt.Println(low, high)\n}"}
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"errors\"\n    \"fmt\"\n)\n"},
+            {"mode": "ghost", "line": 8, "guide": "The error is the last result. `nil` says nothing went wrong.", "notes": [{"on": "error", "text": "A built-in type for failures."}, {"on": "nil", "text": "nil means no error."}], "text": "func divide(a, b float64) (float64, error) {\n    return a / b, nil\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "On failure return a zero value and an error.", "notes": [{"on": "errors.New", "text": "Makes an error from a text."}], "text": "    if b == 0 {\n        return 0, errors.New(\"divide by zero\")\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "Check the error right after the call. Anything but `nil` means it failed.", "notes": [{"on": "err != nil", "text": "The usual check, right after the call."}], "text": "func main() {\n    result, err := divide(1, 0)\n    if err != nil {\n        fmt.Println(\"error:\", err)\n        return\n    }\n    fmt.Println(result)\n}"}
           ],
           "output": {
             "command": "go run main.go",
-            "text": "3 8"
+            "text": "error: divide by zero"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "results-as-arguments",
+          "title": "Pass results straight on",
+          "guide": "Feed the two results of one call into another call.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Returns its two values in the other order.", "text": "func swap(a, b string) (string, string) {\n    return b, a\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Takes two strings and returns one.", "text": "func join(a, b string) string {\n    return a + \"-\" + b\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "`swap` returns two values and `join` takes exactly two: pass the call straight in.", "notes": [{"on": "swap(\"up\", \"down\")", "text": "Both results become the two arguments."}], "text": "func main() {\n    fmt.Println(join(swap(\"up\", \"down\")))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "down-up"
           }
         },
         {
           "type": "fill-blank",
-          "id": "neighbors",
-          "title": "Type and receive",
-          "guide": "Give the second returned value its type, and declare the two variables that receive the results.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc neighbors(n int) (int, ___) {\n    return n - 1, n + 1\n}\n\nfunc main() {\n    before, after ___ neighbors(10)\n    fmt.Println(before, after)\n}",
-          "gaps": [{ "answers": ["int"] }, { "answers": [":="] }]
-        },
-        {
-          "type": "typing",
-          "id": "ignore-one",
-          "title": "Ignore a value",
-          "guide": "Keep only one of the two values a function returns.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Quotient and remainder of a division, returned together.", "text": "func divmod(a, b int) (int, int) {\n    return a / b, a % b\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "`_` stands where a value you do not need would go. It discards that value, so no variable is left unused.", "notes": [{"on": "_, r", "text": "The quotient is thrown away."}], "text": "func main() {\n    _, r := divmod(17, 5)\n    fmt.Println(r)\n}"},
-            {"mode": "ghost", "line": 12, "guide": "`_` can sit in any position. Now keep the quotient and drop the remainder.", "notes": [{"on": "q, _", "text": "Keeps the quotient and drops the remainder."}], "text": "    q, _ := divmod(17, 5)\n    fmt.Println(q)\n"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "2\n3"
-          }
-        },
-        {
-          "type": "quiz",
-          "kind": "output",
-          "id": "swap-twice",
-          "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc swap(a, b int) (int, int) {\n    return b, a\n}\n\nfunc main() {\n    x, y := swap(1, 2)\n    x, y = swap(x, y)\n    fmt.Println(x, y)\n}",
-          "options": [
-            "2 1",
-            "1 2",
-            "1 1",
-            "2 2"
-          ],
-          "answer": 1,
-          "explanation": "The first call gives `2, 1`. Swapping those two values again puts them back as `1, 2`."
-        }
-      ]
-    },
-    {
-      "id": "session-2",
-      "intro": {
-        "title": "A second value that says more",
-        "slides": [
-          {
-            "text": "A common use of two values: the first is the result, and the second is a `bool` that says whether the result can be trusted. The caller checks the flag before using the result. The snippet is pseudo code.",
-            "code": "result, ok = attempt(input)\n\nif ok:\n    use result\nelse:\n    handle the failure"
-          },
-          {
-            "text": "You can also **name** the returned values in the signature. They start as zero values inside the function, you assign them like variables, and a bare `return` gives them back."
-          }
-        ]
-      },
-      "exercises": [
-        {
-          "type": "typing",
-          "id": "safe-divide",
-          "title": "Result and flag",
-          "guide": "Divide two numbers, and say whether the division was possible.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The second value is a `bool`: `false` when the first value means nothing.", "notes": [{"on": "(int, bool)", "text": "A number, plus whether it is valid."}], "text": "func safeDivide(a, b int) (int, bool) {\n    if b == 0 {\n        return 0, false\n    }\n    return a / b, true\n}\n"},
-            {"mode": "ghost", "line": 12, "guide": "Assign to variables that already exist with `=`, not `:=`.", "notes": [{"on": "result, ok =", "text": "Reuses the variables instead of declaring new ones."}], "text": "func main() {\n    result, ok := safeDivide(10, 2)\n    fmt.Println(result, ok)\n    result, ok = safeDivide(1, 0)\n    fmt.Println(result, ok)\n}"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "5 true\n0 false"
-          }
-        },
-        {
-          "type": "typing",
-          "id": "check-the-flag",
-          "title": "Check before using",
-          "guide": "Use the flag to decide what to print.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Half of a number, and whether it was exact.", "notes": [{"on": "n % 2 == 0", "text": "The comparison itself is the returned flag."}], "text": "func half(n int) (int, bool) {\n    return n / 2, n % 2 == 0\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "The flag is a `bool`, so it works directly as a condition.", "notes": [{"on": "if even", "text": "A bool works as a condition by itself."}], "text": "func main() {\n    h, even := half(7)\n    if even {\n        fmt.Println(\"half is\", h)\n    } else {\n        fmt.Println(7, \"is odd\")\n    }\n}"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "7 is odd"
-          }
-        },
-        {
-          "type": "fill-blank",
-          "id": "flag-type-and-test",
-          "title": "Type and test the flag",
-          "guide": "Give the flag its type, and print the result only when the flag allows it.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc positive(n int) (int, ___) {\n    return n, n > 0\n}\n\nfunc main() {\n    value, ok := positive(6)\n    if ___ {\n        fmt.Println(value)\n    }\n}",
-          "gaps": [{ "answers": ["bool"] }, { "answers": ["ok"] }]
+          "id": "error-gaps",
+          "title": "Complete the error result",
+          "guide": "Add the result type for a failure, and return the value that means nothing went wrong.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc pick(n int) (int, ___) {\n    return n, ___\n}\n\nfunc main() {\n    n, err := pick(3)\n    fmt.Println(n, err)\n}",
+          "gaps": [{ "answers": ["error"] }, { "answers": ["nil"] }]
         },
         {
           "type": "typing",
           "id": "named-results",
-          "title": "Name the results",
-          "guide": "Split a number into its tens and its ones.",
+          "title": "Named results",
+          "guide": "Name the results and return them with a bare `return`.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Give each result a name. They exist from the start, so you assign them. A bare `return` gives them back.", "notes": [{"on": "return\n", "text": "No values listed: it returns the named ones."}, {"on": "whole, rest int", "text": "Names the two results, both ints."}], "text": "func split(total int) (whole, rest int) {\n    whole = total / 10\n    rest = total % 10\n    return\n}\n"},
-            {"mode": "ghost", "line": 11, "guide": "The caller does not see the names. It receives two plain values.", "text": "func main() {\n    tens, ones := split(47)\n    fmt.Println(tens, ones)\n}"}
+            {"mode": "ghost", "line": 5, "guide": "The results have names, so they are variables inside the function. A bare `return` sends them back.", "notes": [{"on": "(width, height int)", "text": "Named results are variables that start at 0."}, {"on": "return", "text": "A bare return sends both back."}], "text": "func split(total int) (width, height int) {\n    width = total * 4 / 5\n    height = total - width\n    return\n}\n"},
+            {"mode": "ghost", "line": 11, "guide": "Split a total into two sizes and print them.", "text": "func main() {\n    w, h := split(100)\n    fmt.Println(w, h)\n}"}
           ],
           "output": {
             "command": "go run main.go",
-            "text": "4 7"
+            "text": "80 20"
           }
         },
         {
           "type": "quiz",
-          "kind": "output",
-          "id": "named-then-return",
+          "id": "forgotten-result",
           "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc order() (first, second int) {\n    first = 1\n    second = 2\n    return second, first\n}\n\nfunc main() {\n    a, b := order()\n    fmt.Println(a, b)\n}",
-          "options": [
-            "1 2",
-            "1 1",
-            "2 1",
-            "2 2"
-          ],
-          "answer": 2,
-          "explanation": "A `return` that lists values gives exactly those, in that order, whatever the named results hold. The caller gets `2, 1`."
-        }
-      ]
-    },
-    {
-      "id": "session-3",
-      "intro": {
-        "title": "More than a pair",
-        "slides": [
-          {
-            "text": "A function can return more than two values, of different types. And when a call returns several values, you can hand that whole call to another function as its arguments, with no variables in between. The snippet is pseudo code.",
-            "code": "outer(inner())\n\ninner() gives back a, b\nouter receives a and b"
-          },
-          {
-            "text": "Named results start at the zero value of their type, so you only assign them when the answer is not zero. A bare `return` can sit anywhere, even inside a loop, and gives back whatever the names hold at that moment."
-          }
-        ]
-      },
-      "exercises": [
-        {
-          "type": "typing",
-          "id": "three-values",
-          "title": "Three values, three types",
-          "guide": "Return the area, the perimeter and a flag that tells whether a rectangle is a square.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "List as many types as values, and they can differ. `return` gives the three in that order.", "notes": [{"on": "(int, int, bool)", "text": "Two numbers and a flag."}], "text": "func measure(w, h int) (int, int, bool) {\n    return w * h, 2 * (w + h), w == h\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "Receive all three, in the same order.", "text": "func main() {\n    area, perimeter, square := measure(3, 3)\n    fmt.Println(area, perimeter, square)\n}"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "9 12 true"
-          }
-        },
-        {
-          "type": "typing",
-          "id": "pass-the-call",
-          "title": "Pass a call as arguments",
-          "guide": "Give the two values of one call straight to another function.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "One function returns two numbers, the other takes two.", "text": "func pair() (int, int) {\n    return 9, 4\n}\n"},
-            {"mode": "ghost", "line": 9, "guide": "A function that takes two numbers.", "text": "func gap(a, b int) int {\n    return a - b\n}\n"},
-            {"mode": "ghost", "line": 13, "guide": "Put the call inside the other call. Its two values become the two arguments. `Println` takes them too.", "notes": [{"on": "gap(pair())", "text": "pair's two values become gap's arguments."}, {"on": "Println(pair())", "text": "Println takes both values too."}], "text": "func main() {\n    fmt.Println(gap(pair()))\n    fmt.Println(pair())\n}"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "5\n9 4"
-          }
-        },
-        {
-          "type": "typing",
-          "id": "zero-start",
-          "title": "Results start at zero",
-          "guide": "Add up the numbers from 1 to n, counting them, without ever setting the results to zero.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Both named results begin at 0, so the loop can add to them right away.", "notes": [{"on": "total += i", "text": "total already holds 0 here."}], "text": "func sumTo(n int) (total, count int) {\n    for i := 1; i <= n; i++ {\n        total += i\n        count++\n    }\n    return\n}\n"},
-            {"mode": "ghost", "line": 13, "guide": "When the loop never runs, the bare `return` gives back the zeros.", "text": "func main() {\n    t, c := sumTo(4)\n    fmt.Println(t, c)\n    t, c = sumTo(0)\n    fmt.Println(t, c)\n}"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "10 4\n0 0"
-          }
-        },
-        {
-          "type": "typing",
-          "id": "early-bare-return",
-          "title": "Return early",
-          "guide": "Find the first number in a range that a divisor divides, and say whether there is one.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Set the results only when you find a match, then leave with a bare `return`. If nothing matches, the last `return` gives the zeros.", "notes": [{"on": "ok = true", "text": "The flag says the number is valid."}, {"on": "n int, ok bool", "text": "Named results can have different types."}], "text": "func find(k, lo, hi int) (n int, ok bool) {\n    for i := lo; i <= hi; i++ {\n        if i%k == 0 {\n            n = i\n            ok = true\n            return\n        }\n    }\n    return\n}\n"},
-            {"mode": "ghost", "line": 16, "guide": "Check each range. The second has no multiple of 7.", "text": "func main() {\n    n, ok := find(7, 10, 20)\n    fmt.Println(n, ok)\n    n, ok = find(7, 15, 20)\n    fmt.Println(n, ok)\n}"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "14 true\n0 false"
-          }
-        },
-        {
-          "type": "fill-blank",
-          "id": "clamp-result",
-          "title": "Change a result",
-          "guide": "Cap the result at 100: assign to the named result inside the condition, and finish with the return that gives the named result back.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc clamp(n int) (result int) {\n    result = n\n    if n > 100 {\n        ___ = 100\n    }\n    ___\n}\nfunc main() {\n    fmt.Println(clamp(250), clamp(40))\n}",
-          "gaps": [{ "answers": ["result"] }, { "answers": ["return"] }]
-        },
-        {
-          "type": "quiz",
+          "guide": "Pick the output.",
           "kind": "output",
-          "id": "change-before-return",
-          "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc shift() (a, b int) {\n    a = 1\n    b = a + 1\n    a = b * 3\n    return\n}\n\nfunc main() {\n    fmt.Println(shift())\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc clamp(n int) (result int) {\n    if n > 10 {\n        result = 10\n    }\n    return\n}\n\nfunc main() {\n    fmt.Println(clamp(25), clamp(4))\n}",
           "options": [
-            "1 2",
-            "6 2",
-            "3 2",
-            "6 6"
+            "10 4",
+            "10 0",
+            "It does not compile: `result` is unset",
+            "10 10"
           ],
           "answer": 1,
-          "explanation": "A bare `return` gives the names as they are at that moment. `b` is 2, then `a` is reassigned to `2 * 3`, so the result is `6 2`."
+          "explanation": "`result` is a variable that starts at 0. `clamp(4)` never sets it, so the bare `return` sends back 0, not 4."
         }
       ]
     }
