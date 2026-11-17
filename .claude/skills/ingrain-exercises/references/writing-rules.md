@@ -48,9 +48,9 @@ Syntax that must be known still gets taught: every kind of loop, `if`, `match`, 
 - the traps of the construct then get their own exercises
 
 ## Concepts taught later
-A module may use a concept that a later course teaches in depth, when leaving it out would make the topic false or thin (slices and maps in `Pass by value`, which `collections` teaches later). Never skip a concept for the sake of order.
+A module may use a concept that a later course teaches in depth, when leaving it out would make the topic false or thin. Example: a module whose code passes a slice or a pointer needs the reader to know what it is. Its intro says what the concept is and how it behaves, in a few sentences, so the reader can follow the module without having met it. Never skip a concept for the sake of order.
 - **Keep it simple:** the plain behavior only, one form, nothing the reader must have learned to follow the exercise. The exercise hinges on the module's own concept, never on the later one
-- **Name it on the slide:** the intro slide or the note says the concept is taught in depth in a later course (`taught in depth in the collections course`). No other explanation
+- **Explain it briefly, never point to a course:** the intro says what the concept is and how it behaves, only as far as this module needs. No slide, guide or note says it is "taught later" or names the course that teaches it
 - **It raises no questions:** no exercise, quiz or fill-blank is about the later concept. If the reader would need to ask what it is, show less of it
 - Using a later concept this way is not a gap for the scorer
 
@@ -148,7 +148,7 @@ Cutting has a floor. The rules above remove weak exercises; this says what must 
 - The module intro is an overview of what the module covers. A session intro teaches what its exercises practice
 - The text teaches. It never gives away the answer of an exercise that follows
 - **Pseudo code is welcome in an intro snippet,** especially for a new concept: it shows the idea before the syntax. Say in the text that it is pseudo code. A snippet that is real code uses real syntax and APIs, and compiles
-- A snippet only when the slide is about code. It is illustrative: it may use placeholder names to show a shape (`pattern_a => do_this`), but every piece of syntax and every API in it is real, and a snippet meant as real code compiles. It uses only what the course has taught, what the slide itself introduces, or a later concept used simply and named as such (see "Concepts taught later")
+- A snippet only when the slide is about code. It is illustrative: it may use placeholder names to show a shape (`pattern_a => do_this`), but every piece of syntax and every API in it is real, and a snippet meant as real code compiles. It uses only what the course has taught, what the slide itself introduces, or a later concept used simply and explained on a slide (see "Concepts taught later")
 - The snippet does not repeat the code of an exercise, so there is still something to type or to find
 
 ## Changing a module that exists
