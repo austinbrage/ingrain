@@ -14,12 +14,13 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
 - **Never touch an exercise that is already written,** not its text, not its id, not its place. If the file already has exercises, add only what the concept still needs, with new ids, and say so. If the module looks complete, say so as a warning and change nothing
 
 **2. One exercise: `<language> <course> <module> <exercise> [prompt]`.** The `exercise` is its id, a slug.
-- **It does not exist:** create it. The prompt, if there is one, says what it must be. Without a prompt, decide from the module. Put it where it makes sense in the session
+- **It does not exist:** run the guard below on the module first, then create it. The prompt, if there is one, says what it must be. Without a prompt, decide from the module. Put it where it makes sense in the session
 - **It exists, with a prompt:** change it as the prompt says, and nothing else
 - **It exists, without a prompt:** give a **warning** (the exercise is already written and nothing says what to change) and change nothing
 
-**3. A whole course: `<language> <course>`.** Run mode 1 for every module of the course, all in parallel, then review the flow of the whole course.
+**3. A whole course: `<language> <course>`.** Run mode 1 for every module of the course, all in parallel, then review the course once with `ingrain-score`.
 - Read the modules of `content/prod/<language>/<course>/course.json`, in the order they are listed
+- **Universal-concept guard first.** Before launching anything, run the guard below on every module of the list. List the flagged ones in the chat with the reason and the proposed alternative, launch subagents only for the rest, and write nothing for a flagged module until the author confirms
 - **Skip every module whose file already exists,** whether it is complete or not: do not launch a subagent for it and do not touch it. The course call only creates the modules that have no file yet. List the skipped ones in the report
 - Launch one **fresh subagent** for every other module, **all in the same turn**. A module is self-contained: its fill-blanks repeat pieces typed in the same module, so no module waits for another
 - Each subagent gets the three-argument call (`<language> <course> <module>`), so it runs mode 1 and never starts a loop of its own. Tell it to follow this skill, and give it the ordered module list of the course in two parts:
@@ -31,38 +32,28 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
   1. Updates `sessions` in `course.json` for every count reported
   2. Handles every "needs a split": calls `ingrain-modules` to add the modules, then runs a second batch of subagents for the added modules, in parallel, with the same two-part list
   3. Runs `cargo test --test content` for the whole course and fixes what it reports. If a module still fails, report which one and why
-  4. Runs the **flow review** below
-- **Flow review.** Launch one fresh subagent that reads every module file of the course, in order, and checks:
-  - **Forward use:** no exercise uses something that only a later module teaches
-  - **Overlap:** no two modules teach the same point. Using a piece again for another purpose is fine (`len` taught as a function in one module, then used to test for an empty string in a conditional in another); teaching the same point twice is not. A later module that revisits a concept with more context, another use or a harder form is reinforcement, not overlap; report it only when it re-introduces the basics
-  - **Gaps:** nothing a module needs was left out between modules
-  - **Progression:** the difficulty and the story hold from the first module to the last
-  - **Engagement:** the first modules of a course must run something the user can see early; a module that only has empty skeletons, comments or trivia is reported (`references/writing-rules.md`, "Engagement")
-  
-  The review **only reports**: each problem with its module and exercise id. It changes nothing. A fix goes through mode 2 (a named exercise and a prompt), so the ids and the saved progress stay safe
+  4. Runs `ingrain-score` once for the course, shows its report, and stops. There is no flow review and no second pass
 - Do not commit anything
-- At the end, report one section per module with the report its subagent returned, the result of the flow review, then a list of every warning, every "needs a split" and every session count changed in `course.json`
+- At the end, report the exercises written per module, every warning, every "needs a split" and every session count changed in `course.json`, then the scorer's report and nothing after it. The author decides what changes; a fix goes through mode 2 (a named exercise and a prompt), so the ids and the saved progress stay safe
 
-**4. Engagement review: `<language> <course> <module> review`, or `<language> <course> review` for every module of the course.** It only reports and changes nothing.
-- One fresh subagent per module, all in the same turn for a whole course. Each reads the module file and the modules before it, and applies the "Engagement" rules (`references/writing-rules.md`) to every exercise and intro
-- Each report lists, per weak exercise: its id, the rule it breaks, and a one-line prompt for mode 2 that would fix it. It also gives a verdict for the module (engaging, thin or empty) and says when the module as a whole needs a rewrite or a merge instead of exercise fixes
-- The parent ranks the modules by how many weak exercises they have and reports. The fixes are applied later, one mode 2 call each, with new ids for replaced exercises
+**4. Review: `<language> <course> <module> review`, or `<language> <course> review`.** It runs `ingrain-score` and shows its report. It changes nothing.
 
 **The same idea holds for the other two skills:** a general call, with no request, never touches what already exists. Only a specific, named target with a request can change something that is written.
 
 ## Read first
 1. `docs/content-structure.md`: the schema of the module file, the typing exercise, the quiz, the fill-blank and the intro, with their limits
 2. `docs/course-structure.md`: "Tiers"
-3. `references/writing-rules.md` next to this file: how to write guides, notes, quizzes, fill-blanks and intros
+3. `references/writing-rules.md` next to this file: how to write guides, notes, quizzes, fill-blanks and intros. Start with "Audience", "The non-obvious test" and "The bar moves with position": they decide what an exercise may teach
 4. The module's entry in the `course.json` of its course (its tier and its session count), and the modules before it in the course: the user has done them
 5. The module file, if it exists
 6. If a `docs/courses/<language>-<layer>.md` file exists (for example `docs/courses/rust-core.md`): where the course stops and the rules of the module. A rule there wins over what the module name suggests
 7. For the format, an existing module: `content/prod/go/syntax/conditionals.json` (typing) and `content/prod/go/pointers/nil-pointers.json` (quizzes and intros)
 
 ## What the exercises must be
-- **The user must master the concept.** A module has as many exercises as that takes, from a few to many. There is no fixed number: decide from the course and the module
-- **Mastery is checked against a list, not felt.** Before writing a module, list everything the concept involves in real use: its operations, its common traps and bugs, its idioms and the standard-library helpers people reach for. Each item gets an exercise, or is left out on purpose because a later module covers it (name that module). After drafting, check the exercises against the list and add what is missing. Mastery means the user can use the concept in real code and avoid its traps, not only recognize its basics
-- **A module has 3 sessions at most, or 4 when one more session is all it needs.** A rich concept (slices, maps, interfaces, concurrency) gets up to 3, each on a theme, and you change the module's `sessions` number in `course.json`. A 4th session is allowed when the mastery list needs just one more session, because 4 sessions are better than a module of 3 and another of 1. When the list needs 5 or more, split the concept into more modules (see "When a module needs 5 or more sessions")
+- **Guard: a universal concept is never written.** Before writing (modes 1, 2 for a new exercise, and 3), check the module. A module is **universal** when it is named for an idea every programmer already knows (`Variables`, `Functions`, `Booleans`, `Conditionals`, `Comments`, loops taught from zero) and not for what the language does differently with it. If it is, **stop and warn, and write nothing:** say which module, why it is universal, and propose the alternative (fold it into a dense neighbor, or retitle it for the Rust-specific part, for example `Immutability & shadowing`). Go on only when the author confirms or changes the module in `course.json`. A module that already has a file is not guarded: mode 2 on it works as before
+- **The reader is a programmer, and must master what is new to them.** There is no fixed number of exercises: decide from the course and the module, and never pad
+- **Mastery is checked against a list, not felt.** Before writing a module, list what a programmer who knows another language still needs: the form this language uses, how it differs from other languages, its traps and bugs, its idioms and the standard-library helpers people reach for. Leave out what the reader already knows: an item that works as everywhere gets no exercise, unless its syntax must be shown (then it goes in one dense exercise, `references/writing-rules.md`, "Syntax coverage"). Each item gets an exercise, or is left out on purpose because a later module covers it (name that module). After drafting, check the exercises against the list and add what is missing. Mastery means the reader can use the concept in real code and avoid its traps
+- **A module has 1 or 2 sessions by default, 3 at most, or 4 when one more session is all it needs.** A syntax module is usually 1 or 2. A concept with real traps and forms (ownership, slices, interfaces, concurrency) gets up to 3, each on a theme. More than 2 sessions needs a reason in the report (the traps or forms that fill them), never "a rich concept". Change the module's `sessions` number in `course.json`. A 4th session is allowed when the mastery list needs just one more session, because 4 sessions are better than a module of 3 and another of 1. When the list needs 5 or more, split the concept into more modules (see "When a module needs 5 or more sessions")
 - **Combine every type of exercise when possible,** and do not force it: typing exercises, quizzes of every kind (`purpose`, `output`, `compiler`, `error`) and fill-blanks. Alternate them
 - **The author likes the `compiler` and `error` quizzes the least.** Write them rarely, and only when the lesson is the message itself or a layout rule that one word cannot show (the place of a brace, the scope of a variable). The `error` quiz is the weakest: its answer is almost always "A compile error".
 - **A fill-blank repeats an established pattern.** It is never the first contact with something new. Use it only for a piece the user has already met and practiced: typed in an earlier exercise of the same module (a module never counts on the exercises of another). Check the earlier exercises before writing one, and if the piece has not been typed yet, write a typing exercise (or leave the slot to a quiz) instead
@@ -74,7 +65,7 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
 - **Use `output` only when the program prints plain text.** The output card on the complete screen is for plain printed lines (the command and the text it prints). Decide by what the program does, not by the course: a program whose result is plain lines (a cobra command that prints a greeting, the help text) keeps `output`. A program whose result a card of lines cannot show (a rendered TUI screen, a running web server, an interactive session) gets no `output`: leave it out right away and do not think about what it would print. The complete screen then shows only the code card. An `output` quiz is not affected
 - **Do not repeat what other exercises already teach.** Before you create an exercise, read the titles, the guides and the code of the other exercises of the module, and the entries in `course.json` of the modules before it (their files may not exist yet when the course is written in parallel; read them when they do). Each exercise is about one specific thing that none of them covers. When you write a whole module, check its exercises against each other the same way, so no two practice the same point. Using a piece a previous module taught, for another purpose, is fine, and so is a deeper or richer form of a concept an earlier module introduced (the exercise starts from what was taught and never re-introduces it)
 - **Use only what the user has learned:** the concept of the module, and what the modules before it taught. An exercise never needs something that comes later in the course, and a module never teaches what a later module is there to show
-- **Intros are as long as the concept is hard.** An easy concept (conditionals) gets a short intro, one slide, or none. A hard concept (concurrency) gets longer texts, more slides and snippets, and pseudo code in a snippet is welcome for a new concept. A module intro says what the user is about to see, and the session intro explains how the concept works in the abstract and what the short guides cannot (`references/writing-rules.md`, "Intros")
+- **Intros are as long as the difference is hard.** A concept that works as in other languages gets one slide on what differs, or none; it never defines a general concept. A hard concept (ownership, concurrency) gets longer texts, more slides and snippets, and pseudo code in a snippet is welcome for a new concept. A module intro says what the user is about to see, and the session intro explains how the concept works in the abstract and what the short guides cannot (`references/writing-rules.md`, "Intros")
 - **Sessions:** group the exercises in sessions of about 4 to 6. A module that needs more gets more sessions (`session-2`, `session-3`), up to 4, and you update its `sessions` number in the course's `course.json` to match, and say so
 
 ## When a module needs 5 or more sessions
@@ -95,7 +86,7 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
 - If the prompt would change the session count, say so and update `course.json`
 
 ## Engagement
-Before you finish, check every exercise against "Engagement" in `references/writing-rules.md`: each typing exercise builds something that runs and shows a result, nothing is an empty skeleton or a trivia question, and a thin concept is merged into fewer, richer exercises instead of padded.
+Before you finish, check the module against "Balance" in `references/writing-rules.md`: mostly typing exercises that build something that runs, every syntax form typed at least once with its notes, and quizzes only for real traps.
 
 ## Finish
 Run `cargo test --test content` and fix everything it reports. It checks the ids, the session count, the card limits, the quiz rules, the fill-blank rules (the gaps and the answers), the intro limits and the chunks (the `line` places, the ghost guides, the balanced code and the note anchors).
@@ -103,9 +94,7 @@ Run `cargo test --test content` and fix everything it reports. It checks the ids
 A pass does not mean the content is good. Read each program as a compiler would, and trace each output by hand once.
 
 Then report:
-- what you wrote or changed, exercise by exercise, and what you left as it was
-- every warning: an exercise that exists and had no prompt, a module that looked complete
-- the mastery list: each item of it, and the exercise that covers it, or the later module that does, or "not covered" with the reason
-- for each session, whether it got a fill-blank, and if not, why (no established piece to repeat)
-- any session count you changed in `course.json`
-- every module you added with `ingrain-modules`, and every existing module that "needs a split"
+- the exercises written or changed: id, type and title, per session
+- warnings: an exercise that exists and had no prompt, a module that looked complete, a universal-concept module
+- any session count changed in `course.json`, every module added with `ingrain-modules`, and every existing module that "needs a split"
+- then the `ingrain-score` report, run once, and nothing after it. Stop and wait for the author

@@ -2,10 +2,50 @@
 
 What a test cannot check. The schema, the limits and the ids are in `docs/content-structure.md`, and this file does not copy them. The mechanical rules (ids, session counts, the card limits, quiz options, fill-blank gaps, chunk lines, note anchors) are checked by `cargo test --test content` (`tests/content.rs`). Everything below is judgment, and it is yours to get right.
 
-## The idea behind the content
-- **Each course assumes the user knows nothing about its own concept, but knows everything outside it.** The ratatui course assumes nothing about the crate, but assumes the user knows Rust and general programming (loops, variables, `?`, closures, `if let`). Guides and notes never teach what is outside the course concept
+## Audience
+The reader is a programmer who already codes. They come to learn a new language from scratch, to reinforce one they know, or to learn a library of its ecosystem. They never come to learn what programming is.
+- **Assume general programming.** The reader knows what a variable, a function, a loop, a conditional, a type, recursion, an error and a collection are. They need how this language writes them, and what is not obvious beyond the syntax
+- **Core course:** assume programming, know nothing about the language. **Ecosystem course:** assume the language too, know nothing about the library
+- **Never define a general concept.** Guides, notes and intros name the form and the difference, never the idea
+  - bad: "A variable gives a name to a value"
+  - good: "`let` is immutable here. Add `mut` to allow a change"
 - Write every guide and note in your own words, never in the author's phrasing
 - The user learns by typing the code, so the code is the lesson. Text only adds what the code does not show
+
+## The non-obvious test
+Every exercise hinges on one of these. Name which one when you report:
+1. **A syntax form the reader could not guess** (`..=`, `'label: loop`, `let else`, `impl` blocks)
+2. **A rule of this language** that differs from the ones they know (immutability by default, shadowing, expression-vs-statement, exhaustive `match`, overflow behavior, move semantics)
+3. **A trap or a bug** people really hit
+4. **An idiom or a standard-library helper** people reach for
+5. **For a library:** how it is used, wired and configured
+
+If a programmer from another language would get it right without reading anything, cut the exercise or merge it into a richer one. "Print three variables" and "call the right function" fail the test.
+
+**The hinge must also be used in real code.** A form nobody could guess is still not worth an exercise if a working programmer never writes it. Be lax: the bar is clearly-never, not rarely.
+- **Used every week:** keep
+- **Rare, but standard in real code** (the standard library and well-known projects use it): at most one light exercise, in the module where it is used (`1 << iota` flags in `constants`)
+- **Never in everyday work:** cut. The model case is Go's `&^`: it is unguessable and almost nobody writes it, so it hinges on nothing the reader needs. Boolean algebra for its own sake is the same
+- When in doubt, keep it
+
+**The bar moves with position, for language-specific forms only.** The reader always knows programming, but their knowledge of the language grows as the course goes on. A simple form that is new to the language passes early and fails later. A general programming idea never passes, at any position.
+
+| Position (from `course.json` and the catalog order) | A simple language-specific form | A general programming idea |
+|---|---|---|
+| First module of the first course of a language | passes (`import "fmt"`, `Println`) | never |
+| Any other module of the `basic` tier | passes if it is new to the language and the modules before did not show it | never |
+| `medium` | needs a rule or a trap | never |
+| `advanced` | needs a trap or an interaction between features | never |
+
+- A general idea is anything a programmer knows from any language: what a comment, a variable, a call order or a loop is. Typing it never earns the exercise, even in the first module
+- The tier changes only what counts as non-obvious. It never changes the shape of the exercises (the mix of modes, the quiz kinds)
+- Be lax at the top too: when in doubt about the bar, keep the exercise
+
+## Syntax coverage
+Syntax that must be known still gets taught: every kind of loop, `if`, `match`, `fn`, `struct`. Teach it as "how this language writes it", dense and compact:
+- one typing exercise shows the forms side by side (`loop`, `while`, `for`, a range) and the one non-obvious part (`if` is an expression, `loop` returns a value, `for` takes a range or an iterator)
+- never one exercise per trivial form, and never a concept explained from zero
+- the traps of the construct then get their own exercises
 
 ## Modes
 **Ghost is the majority at every tier,** around 90% of the chunks of a typing exercise. The rest is `auto` and `copy`, and what decides between them is how many times the user has already written the piece (`docs/content-structure.md`, "The mode of a chunk"):
@@ -35,6 +75,7 @@ The clearest case is the line every Go program starts with, `package main`: it i
 A note is a hint under a piece of code, shown while the user types it.
 - **New syntax gets a note.** The learner reads the code they are typing, not the guide above it, so the note is where a piece is explained. Put one on every new piece of syntax the first time it appears, and on each new form of it (`[1:3]`, then `[:2]` and `[3:]` each get their own). Do not note a piece the learner has already typed, and do not note every line: a chunk with one note on its new piece is the norm
 - **Only where the user needs one.** Many chunks need none. A piece of the course's own API that does something non-obvious (like `ratatui::run`) is worth one
+- **Notes scale with position** (see "The bar moves with position"): in the first module of a language and in the `basic` tier, every new piece of syntax gets a note, even a simple one, and a chunk may carry two or three. In `medium` and `advanced`, only the non-obvious piece gets one. A chunk holding a piece the reader has not typed yet is never left without a note at the low end of the bar
 - **Plain text, one short sentence,** about 60 characters. No markdown, no backticks. It does not repeat the name of its anchor
 - **Written for the user's goal:** what the piece does for the app, never where it comes from or how the library is organized. If the user would ask "what is this and why do I need it?", the note answers that in a few words
   - bad: "ratatui's own copy of the crossterm crate, so you never add it to Cargo.toml"
@@ -47,7 +88,8 @@ A note is a hint under a piece of code, shown while the user types it.
 - A `purpose` option says what the code is **for**, never what it prints (printed results are the `output` kind)
 - The wrong options are plausible mistakes someone could really make reading the code, never jokes or absurdities. None of them is also right
 - The right answer is not always the first or the longest. Vary the `answer` index and the `kind` across a module
-- The code is short, uses a feature of the module's concept and not general programming, and has no comments that give the answer away
+- The code is short, hinges on a rule the reader could get wrong (shadowing scope, integer wrap, a trailing `;` changing a value), and has no comments that give the answer away
+- **An `output` quiz never traces a plain sequence** (two calls in order, three assignments). If anyone gets it right by reading top to bottom, it is cut
 - The `explanation` says why the answer is right, in a sentence or two, and does not repeat the option
 - **Never run the code.** The `answer` of an `output` quiz, and the `output` of a typing exercise, are what you can predict by reading the program. Keep every program deterministic, so the output is certain: no randomness, no current time, no map iteration order, no goroutines racing for the output. If you cannot be sure of an output, change the program
 - **`output` only for plain printed text.** The output card shows plain printed lines only. When the program prints plain text, even in an ecosystem course (a cobra command that prints a line), write `output`. When its result is a rendered TUI screen, a running web server or an interactive session, omit `output` right away. This does not apply to `output` quizzes
@@ -56,7 +98,7 @@ A note is a hint under a piece of code, shown while the user types it.
 - The shape and the limits are in `docs/content-structure.md` ("Module file: fill-blank")
 - **Only for a pattern the user has already practiced.** A fill-blank repeats something that was typed before, in an earlier exercise of the module or in a module before it, and never teaches a new thing. Before you write one, find where the user typed that piece. A rule that only a quiz explained (for instance, that an unused variable is an error) is not established yet: a fill-blank on it would be a first contact. Its order matters too: it goes after the typing exercise that practices the piece, never before
 - **The author prefers fill-blanks to quizzes overall,** so choose one when a slot could be either and the pattern is established. A fill-blank is its own type, not a replacement for a `compiler` or `error` quiz, and it does not take a one-word fix just because a quiz did. Never quote a compiler message in a fill-blank guide: it is not the real output and it gives hints away. State the goal in plain words
-- **A gap hides the word that holds the idea of the exercise:** a keyword, a name, a type or an operator that the module's concept is about. Never trivia (a brace, `fn`, `main`) and never a whole expression, because an answer is one word
+- **A gap hides the word that holds the idea of the exercise:** a keyword, a name, a type or an operator that the module's concept is about, and it must be specific to this language (`mut`, `&`, `?`, `as`, `u8`), never a word every language needs (`fn`, `if`, `return`). Never trivia (a brace, `main`) and never a whole expression, because an answer is one word
 - **The rest of the code must make the answer certain.** Someone who understands the concept can work the word out from the lines around it, and nothing else fits. If two words would work, list both in `answers`, only when each is really right in that place, and put the best one first because it is the one shown after a mistake
 - Two or three gaps are usual, one is fine, six is the limit. At most two gaps on a line, never next to each other, and each one asks a different thing
 - **The guide says what to fill, never the answers.** Nothing else in the exercise gives one away: no comment, no name, no other line that repeats the word
@@ -76,10 +118,20 @@ The module must make the user want to continue. It fails when the user types cod
 - **Realistic names and situations** (a price, a score, a host) over `foo`, `x`, `a` and `b`, wherever the point is not the math
 - **Variety inside the module:** the programs differ from each other in what they do, not only in the keyword they show
 
-A module is **empty** when most of its exercises fail this list, **thin** when a few do, and **engaging** otherwise. An empty module is rewritten, not patched.
+- **No condescension.** The exercise never treats the reader as a beginner. Banned: printing a few variables, calling the function that matches a name, "which part is a comment", tracing calls in order, a fill-blank on a word any language needs, an intro that defines a general concept. Each of these fails the non-obvious test
+
+A module is **condescending** when most of its exercises fail the non-obvious test, **empty** when most fail the rest of this list, **thin** when a few do, and **engaging** otherwise. A condescending or empty module is rewritten, not patched.
+
+## Balance
+Cutting has a floor. The rules above remove weak exercises; this says what must stay.
+- **A module is mostly typing:** about two thirds of its exercises are typing exercises that build a program and show a result
+- **Quizzes and fill-blanks are for real traps and practiced patterns,** about a third at most
+- **Every syntax form the module teaches is typed at least once, with its notes** (see "Syntax coverage")
+- **Simple is correct at the low end of the bar.** A module is never trimmed below what it needs to teach its forms, even when every exercise left is simple
+- **The scorer's cuts are advice.** When a cut would break this floor, keep the exercise
 
 ## Intros
-- **As much as the concept needs, not a fixed number.** An easy concept (conditionals) gets a short intro, a single slide, or none at all. A hard concept (concurrency) gets longer texts, more slides and snippets. Judge it from the course and the module
+- **As much as the difference needs, not a fixed number.** A concept that works as in other languages (conditionals) gets one slide on what is different, or none. A hard concept (ownership, concurrency) gets longer texts, more slides and snippets. An intro never defines a general concept: it says what is different here and what the user is about to see. Judge it from the course and the module
 - One idea per slide, in the markdown subset of the guide. The limits are in `docs/content-structure.md` ("Intro")
 - The module intro is an overview of what the module covers. A session intro teaches what its exercises practice
 - The text teaches. It never gives away the answer of an exercise that follows

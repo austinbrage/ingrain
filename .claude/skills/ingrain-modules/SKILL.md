@@ -52,16 +52,18 @@ The shape of `course.json`:
 `id` is the course id and the name of its folder. A module id is a slug, and it is also the name of its file.
 
 ## What the modules must be
-- **A module is one concept.** Its name says which: `Variables`, `Slices`, `Channels`
+- **A module is one thing a programmer must learn about the language or library.** Its name says which: `Immutability & shadowing`, `Slices`, `Channels`. It is never named for an idea every programmer already knows
+- **Universal-concept ban.** Never create a module for a concept every programmer already knows, named for the idea: `Variables`, `Functions`, `Booleans`, `Conditionals`, `Comments`. Check every module before writing `course.json`. Its name and scope must be the language-specific part (`Immutability & shadowing`, `Expressions as values`), or its content is folded into a dense neighbor. The same check applies to a request that adds a module and to a call from the exercises skill. A request that asks for one anyway gets a warning and no write, until the author confirms
 - **A module name is at most 24 characters,** spaces included, so it fits its cell in the explorer (`Slices in functions` has 19). Write `&` instead of `and` to stay under it (`Stacks, queues & copies`), which saves 2 characters, and spell it `and` in the id. If the concept still needs a longer name, shorten the name and let the module's content carry the detail
-- **Mastery is the measure:** completing all the modules of the course must let the user master the course. No fewer, and none that the course does not need. There is no fixed number
-- **Keep the list lean:** cover every topic needed for mastery, but give no module to a rare edge case. Merge small related topics into one module instead of one module each, and prefer a few well-sized modules over many thin ones
+- **Mastery is the measure:** completing all the modules of the course must let a **competent programmer** use the language or library in real code. No fewer, and none that the course does not need. There is no fixed number
+- **Keep the list lean:** cover every topic needed for mastery, but give no module to a rare edge case, and none to what every language does the same way. Merge small related topics into one dense module instead of one module each (integers, floats, booleans and chars are one or two modules on the scalar types and their traps: no implicit conversion, overflow, `char` is 4 bytes), and prefer a few well-sized modules over many thin ones
+- **Syntax that must be known stays,** grouped and dense: every kind of loop (`loop`, `while`, `for`, ranges, labels) lives in a small number of modules, not one module per form and not left out. It is taught as "how the language writes it"
 - **Module sections** group related modules, stacked from the easiest concepts to the hardest. A section has a name that says what its modules share (`Foundations`, `Data types`), at most 24 characters, with `&` for `and`. The tier takes cells on the same row, so a short name reads best
 - **The tier of a section is the difficulty of its concepts,** not the shape of the exercises (`docs/course-structure.md`, "Tiers"): `basic`, `medium` or `advanced`. Decide it **from your own knowledge of the language or the library**: how many other concepts a concept needs first, how abstract it is, how easy it is to get wrong. Do not match it to a list of examples
 - **A section is cohesive:** every module in it fits the section's name and tier. When you add or move a module, check it against its section. If it does not fit, rename the section so the name covers all its modules, move the module to the section where it belongs, or make a new section for it (a module that is a rare topic goes to its own section with the medium tier, not into a basic one). Check the sections after a split too: a section must never become a pile of unrelated modules
 - **The order is the order of study** inside a section and across sections, and it follows what depends on what
 - **A concept may come back in a later module** when that module adds something: more context, another use, or a harder form (plain or-patterns first, then or-patterns inside other patterns). Its name and scope say the new angle, and it never re-introduces the basics
-- **One session per module to start:** `"sessions": 1`. The exercises skill raises it up to 4 when a module needs more, and asks this skill for more modules when a concept needs 5 or more sessions
+- **One session per module to start:** `"sessions": 1`. The exercises skill raises it when a module has real traps or forms to fill more (2 for most syntax modules, up to 4), and asks this skill for more modules when a concept needs 5 or more sessions
 - **A module made by splitting a concept** is named for its theme (`Slices in functions`, `Maps of maps`), never `Slices 2`. Each one is still one concept
 - A core course covers the language itself, nothing tied to an external library. An ecosystem course covers its own library
 
@@ -71,7 +73,7 @@ The shape of `course.json`:
 - Keep every existing id, and the `id` of the course
 
 ## Called by the exercises skill
-When `ingrain-exercises` needs more modules because a concept does not fit in 4 sessions, it calls this skill with a request: the modules to add, the module they go right after, and the tier. Add them right after that module, in its section when they fit it, or in a section of their own, with the right tier, when they do not (rare topics get a medium section of their own). Each starts with `"sessions": 1` and has no file. Do not touch the module they follow. This skill never calls `ingrain-exercises` back
+When `ingrain-exercises` needs more modules because a concept does not fit in 4 sessions, it calls this skill with a request: the modules to add, the module they go right after, and the tier. Apply the universal-concept ban to them like to any module. Add them right after that module, in its section when they fit it, or in a section of their own, with the right tier, when they do not (rare topics get a medium section of their own). Each starts with `"sessions": 1` and has no file. Do not touch the module they follow. This skill never calls `ingrain-exercises` back
 
 ## Modifying: be careful
 - **Never rename or reuse the id of a module that has a file.** The saved progress points at `<language>/<course>/<module>`
@@ -85,7 +87,10 @@ When `ingrain-exercises` needs more modules because a concept does not fit in 4 
 ## Finish
 Run `cargo test --test content` and fix everything it reports. In the layer mode, this is the parent's run after the subagents return. Among other checks, it fails when an id is not a slug or repeats, when a module file is not listed in `course.json`, and when a written module has a different id or number of sessions than `course.json` says, and when a module name or a section name is longer than 24 characters.
 
+Then run `ingrain-score` once on the list, show only its report, and wait for the author.
+
 Then report:
 - what you added, changed or left as it was
 - what the request asked and you did not do, and why
+- every module the universal-concept ban stopped or merged, and where its content went
 - the modules that have no file yet, so `ingrain-exercises` is the next step for each

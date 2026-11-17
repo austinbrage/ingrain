@@ -28,6 +28,8 @@ A course id is a slug (lowercase letters, digits and hyphens), and it is also th
 
 ## What the courses of a layer must be
 - **A course is one topic** of the language, and its modules are the concepts of that topic
+- **Courses are sized for a programmer who already codes.** A topic with little that is specific to the language (for example `functions`) is a module of a larger course, not a course of its own
+- **Universal-concept ban.** No course is named for an idea every programmer already knows (`Variables`, `Functions`, `Loops`). Name it for what the language does with it, or fold it into a neighbor. A request that asks for one anyway gets a warning and no write, until the author confirms
 - **Core** is the language itself. Its courses must together evaluate every everyday aspect of the language, and nothing tied to an external library or crate
 - **Ecosystem** is the libraries and frameworks of the language, one course for each (for example `cobra`, `gin`, `ratatui`). The same rule of mastery holds
 - **Mastery is the measure:** completing all the courses of a layer must let the user master that layer. Add what is missing, leave out what is not needed to master it
@@ -57,4 +59,5 @@ Run `cargo test --test content` and fix everything it reports. Among other check
 Then report:
 - what you added, changed or left as it was
 - what the request asked and you did not do, and why
+- every course the universal-concept ban stopped or merged, and where its topic went
 - the next step: `ingrain-modules <language> <layer>` for the courses that have no `course.json` yet
