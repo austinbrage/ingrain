@@ -6,9 +6,9 @@ A terminal app that teaches Rust and Go the old-fashioned way: you type every ch
 
 ## 🎬 Demo
 
-<!-- TODO: add the demo video or GIF here -->
+<video src="https://github.com/austinbrage/ingrain/raw/main/docs/assets/typing-demo.mp4" controls muted width="100%"></video>
 
-> _Demo coming soon._
+[Watch the demo](docs/assets/typing-demo.mp4)
 
 ## 🧠 Why Ingrain
 
