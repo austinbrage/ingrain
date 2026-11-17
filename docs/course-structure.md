@@ -21,6 +21,13 @@ Language (Rust, Go)
 - **Module section:** the legacy "Section": a group of related modules inside a course, ordered from basic to advanced
 - **Module, Session, Exercise:** unchanged from legacy
 
+## Audience
+Ingrain is for programmers who already code. They come to learn a language from scratch (they know what a variable or a loop is, and need how this language writes it and what is not obvious beyond the syntax), to reinforce a language they know, or to learn a library of the ecosystem.
+- Every course, module and exercise is written for that reader. None of them explains or tests an idea every programmer already knows
+- A module is named for what the language does differently, not for a universal concept (`Immutability & shadowing`, not `Variables`). `ingrain-modules` and `ingrain-courses` refuse to create one, and `ingrain-exercises` warns before writing one
+- Syntax that must be known (every kind of loop, `if`, `match`) is still taught, dense and compact, as "how the language writes it"
+- The rules for the writer are in `.claude/skills/ingrain-exercises/references/writing-rules.md` ("Audience", "The non-obvious test")
+
 ## Navigation
 Home → Languages → Course navigator → Exercise
 
@@ -37,6 +44,7 @@ Home → Languages → Course navigator → Exercise
 
 ## Tiers
 A module section belongs to a tier, and **a tier is the difficulty of the concepts it shows, not the shape of the exercises** (the author, 2026-11-02). Every tier uses the same kinds of exercises and the same mix of modes (`docs/content-structure.md`, "The mode of a chunk"). What changes from a tier to the next is what the user learns.
+- **The tier also sets the bar for the writer and the scorer:** a simple language-specific form passes in the first module and the `basic` tier, and needs a rule or a trap in `medium` and `advanced`. A general programming idea never passes (`.claude/skills/ingrain-exercises/references/writing-rules.md`, "The bar moves with position")
 
 | Tier | Concepts | Access |
 |---|---|---|

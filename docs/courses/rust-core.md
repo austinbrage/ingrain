@@ -2,6 +2,8 @@
 
 What the module names do not show. Read by `ingrain-exercises` before it writes the exercises of a Rust core module. The modules themselves are in each `course.json`; this file holds only where a course stops and the rules that follow from it.
 
+**Audience.** The reader already codes in another language and knows nothing about Rust. Every module teaches the Rust form and what differs from other languages, never a general idea. The modules written before this rule (most of `syntax` and `functions`) were written for a beginner and are kept as they are; the modules written from now on follow it.
+
 Rules:
 - An exercise uses what the module teaches and what the modules before it taught (the catalog order, `content/prod/rust/catalog.json`). Never a concept from a later course
 - A line here wins over what the module name suggests
@@ -38,6 +40,7 @@ Rules:
 
 ## Rules per module
 **syntax**
+- A module covers what is specific to Rust (immutability and shadowing, expressions as values, no implicit conversion, overflow, exhaustive `match`) and shows the syntax forms dense and side by side (the loop forms, ranges, labels), never a concept from zero
 - `printing`: the first module of the course, and it presents the language: the `fn main` program, `println!` with `{}` values, `use` and `std::` paths (`std::cmp::max`, `std::f64::consts::PI`), a few simple methods on a text literal (`to_uppercase`, `repeat`, `len`) as a taste, one brief comments exercise, then the formatting forms (positional, `{:?}`, width, alignment, bases). No variables, `let`, `if` or loops. `format!` and real `String` work belong to strings-and-text
 - `match-basics`: integers, literals and `_`; no enums. It is the first contact with `match`
 - No exercise needs a function other than `main`, a `String` or a `Vec`
