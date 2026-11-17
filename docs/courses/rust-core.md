@@ -1,11 +1,11 @@
-# Rust core: boundaries for the exercises
+# Rust core: scope of each course
 
-What the module names do not show. Read by `ingrain-exercises` before it writes the exercises of a Rust core module. The modules themselves are in each `course.json`; this file holds only where a course stops and the rules that follow from it.
+The scope file of Rust core: what the module names do not show. Read by `ingrain-exercises` before it writes the exercises of a Rust core module. The modules themselves are in each `course.json`; this file holds only the scope (where a course stops) and the rules that follow from it. Terms: `docs/glossary.md`.
 
 **Audience.** The reader already codes in another language and knows nothing about Rust. Every module teaches the Rust form and what differs from other languages, never a general idea. The modules written before this rule (most of `syntax` and `functions`) were written for a beginner and are kept as they are; the modules written from now on follow it.
 
 Rules:
-- An exercise uses what the module teaches and what the modules before it taught (the catalog order, `content/prod/rust/catalog.json`). Never a concept from a later course
+- An exercise uses what the module teaches and what the modules before it taught (the catalog order, `content/prod/rust/catalog.json`). A concept from a later course only when used simply and named as taught later (`writing-rules.md`, "Concepts taught later")
 - A line here wins over what the module name suggests
 - When a module is renamed, moved or removed, change its line here
 
