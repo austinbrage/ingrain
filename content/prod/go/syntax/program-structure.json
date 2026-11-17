@@ -67,35 +67,18 @@
         },
         {
           "type": "quiz",
-          "kind": "compiler",
-          "id": "brace-on-the-same-line",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:5:12: syntax error:\n  unexpected semicolon or newline\n  before {",
+          "id": "rejected-function",
+          "title": "Which one is rejected?",
+          "guide": "All three sit in a file with the right imports. One does not compile. Which?",
+          "code": "func a() {\n    fmt.Println(\"a\")\n}\n\nfunc b()\n{\n    fmt.Println(\"b\")\n}\n\nfunc c() { fmt.Println(\"c\") }",
           "options": [
-            "The opening brace must be on the same line",
-            "`main` must have parameters",
-            "`func` must be written with a capital",
-            "The braces must end with a semicolon"
+            "a",
+            "b",
+            "c",
+            "None: Go accepts all three"
           ],
-          "answer": 0,
-          "explanation": "Go ends a line with an implicit semicolon, so a brace on its own line closes `func main()` too early. The opening brace stays on the same line."
-        },
-        {
-          "type": "typing",
-          "id": "comments",
-          "title": "Comments",
-          "guide": "Add a comment, then print. Go ignores comments when it runs the program.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "The package and the import are already in the file. Type `main`.", "text": "func main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`//` starts a comment: the rest of the line is ignored. Go also has `/* ... */` for several lines.", "notes": [{"on": "//", "text": "Go ignores everything after this on the line."}], "text": "    // A comment explains the code"},
-            {"mode": "ghost", "line": 7, "guide": "The comment changes nothing: the program prints as usual.", "text": "    fmt.Println(\"Comments are ignored.\")"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "Comments are ignored."
-          }
+          "answer": 1,
+          "explanation": "Go ends a line with an implicit semicolon, so a brace on its own line closes `func b()` too early. The opening brace stays on the `func` line."
         }
       ]
     },
@@ -143,36 +126,35 @@
         },
         {
           "type": "typing",
-          "id": "first-program",
-          "title": "Put it together",
-          "guide": "Greet in three lines, with a comment. Statements run from top to bottom.",
+          "id": "banner-line",
+          "title": "A shouted banner",
+          "guide": "Print a banner using two helpers from `strings`.",
           "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "The skeleton is already in the file. Start with a comment.", "text": "    // Three lines, one after another"},
-            {"mode": "ghost", "line": 7, "guide": "Each `Println` prints its own line.", "text": "    fmt.Println(\"Hello!\")"},
-            {"mode": "ghost", "line": 8, "guide": "Lines run in the order they are written.", "text": "    fmt.Println(\"This is my first Go program.\")"},
-            {"mode": "ghost", "line": 9, "guide": "The last statement runs last.", "text": "    fmt.Println(\"It runs top to bottom.\")"}
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"strings\"\n)\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 9, "guide": "The skeleton and both imports are already in the file. `Print` leaves the line open for the next call.", "text": "    fmt.Print(\"Go \")"},
+            {"mode": "ghost", "line": 10, "guide": "`ToUpper` returns the text in capitals. Its capital `T` matters: only capitalized names are visible from another package.", "notes": [{"on": "strings.ToUpper", "text": "A function of the strings package."}], "text": "    fmt.Println(strings.ToUpper(\"rocks\"))"},
+            {"mode": "ghost", "line": 11, "guide": "`strings.Repeat` builds a line by repeating a piece of text.", "notes": [{"on": "strings.Repeat", "text": "Repeats the text as many times as you say."}], "text": "    fmt.Println(strings.Repeat(\"=\", 8))"}
           ],
           "output": {
             "command": "go run main.go",
-            "text": "Hello!\nThis is my first Go program.\nIt runs top to bottom."
+            "text": "Go ROCKS\n========"
           }
         },
         {
           "type": "quiz",
           "kind": "output",
-          "id": "output-order",
+          "id": "print-spacing",
           "title": "What does it print?",
           "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Print(\"a\")\n    fmt.Print(\"b\")\n    fmt.Println(\"c\")\n}",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Print(\"a\", \"b\")\n    fmt.Print(1, 2)\n    fmt.Println()\n}",
           "options": [
-            "cba",
-            "a b c",
-            "abc on three lines",
-            "abc"
+            "a b 1 2",
+            "ab12",
+            "ab 1 2",
+            "ab1 2"
           ],
           "answer": 3,
-          "explanation": "`Print` does not add a new line, so `a` and `b` stay on the line. `Println` adds `c` and then moves on."
+          "explanation": "`Print` adds a space between two operands only when neither one is a string. `\"a\", \"b\"` stay together, `1, 2` get a space."
         }
       ]
     }
