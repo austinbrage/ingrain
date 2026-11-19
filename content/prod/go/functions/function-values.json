@@ -1,0 +1,93 @@
+{
+  "id": "function-values",
+  "intro": {
+    "title": "Functions as values",
+    "slides": [
+      {
+        "text": "Go has first-class functions. A function is a value: you can keep it in a variable, pass it or return it.\n\nIts **function type** is its shape, the parameter and result types with no name. The snippet is pseudo code, not Go.",
+        "code": "add    has type  func(int, int) int\nhalve  has type  func(int) int"
+      },
+      {
+        "text": "A **function literal**, also called an anonymous function, has no name. Inside a function it is the only way to write one.\n\nPut `(args)` right after its closing brace and it runs on the spot. That is an **IIFE**, an immediately invoked function expression. The snippet is pseudo code, not Go.",
+        "code": "func(params) result {\n    body\n}(args)"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "function-literals",
+          "title": "Function literals",
+          "guide": "Store a function literal in a variable, then replace it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A function literal has no name. Inside a function you can only write literals, never `func name()`.", "notes": [{"on": "func(amount int) int", "text": "A function literal, stored in a variable."}], "text": "    price := 40\n\n    withTax := func(amount int) int {\n        return amount + amount/5\n    }\n    fmt.Println(withTax(price))\n"},
+            {"mode": "ghost", "line": 13, "guide": "The variable holds a value, so assign it another literal with the same type.", "notes": [{"on": "withTax = func", "text": "Allowed: same parameters and result."}], "text": "    withTax = func(amount int) int {\n        return amount + amount/10\n    }\n    fmt.Println(withTax(price))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "48\n44"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "iife",
+          "title": "Call a literal on the spot (IIFE)",
+          "guide": "Declare a function literal and call it at once.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "An IIFE (immediately invoked function expression) declares a literal and calls it at once. The arguments go in the parentheses after the brace. Without them the code does not compile.", "notes": [{"on": "}(\"ana\")", "text": "The parentheses call the literal right away."}], "text": "    func(name string) {\n        fmt.Println(\"thanks,\", name)\n    }(\"ana\")\n"},
+            {"mode": "ghost", "line": 10, "guide": "An IIFE with a result stores what the call returns.", "notes": [{"on": "}(250)", "text": "fee holds the result, not the function."}], "text": "    fee := func(amount int) int {\n        return amount / 10\n    }(250)\n"},
+            {"mode": "ghost", "line": 14, "guide": "Print the stored result.", "text": "    fmt.Println(\"fee:\", fee)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "thanks, ana\nfee: 25"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "pass-a-function",
+          "title": "Pass a callback",
+          "guide": "Write a function that takes a function as an argument.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "A plain function that will be passed on as a value.", "text": "func halve(price int) int {\n    return price / 2\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "A function passed as an argument is a callback. A function that takes one is a higher-order function.", "notes": [{"on": "rule func(int) int", "text": "A parameter whose type is a function type."}], "text": "func apply(price int, rule func(int) int) int {\n    return rule(price)\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Pass `halve` by name, then a literal written in place.", "notes": [{"on": "apply(80, halve)", "text": "No parentheses: passes the function, not its result."}], "text": "func main() {\n    fmt.Println(apply(80, halve))\n    fmt.Println(apply(80, func(p int) int {\n        return p - 10\n    }))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "40\n70"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "nil-function",
+          "title": "A function that was never set",
+          "guide": "Check a function value before you call it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The zero value of a function type is `nil`. Calling a nil function stops the program, so check first.", "notes": [{"on": "op == nil", "text": "The only comparison functions allow."}], "text": "func run(op func(int, int) int) {\n    if op == nil {\n        fmt.Println(\"no operation\")\n        return\n    }\n    fmt.Println(op(2, 3))\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Run it with a nil function, then with a real one.", "notes": [{"on": "var op func(int, int) int", "text": "No value yet, so op is nil."}], "text": "func main() {\n    var op func(int, int) int\n    run(op)\n\n    op = func(a, b int) int { return a + b }\n    run(op)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "no operation\n5"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "callback-gaps",
+          "title": "An optional callback",
+          "guide": "Make `hook` an optional callback: give it its type and guard the call.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc save(name string, hook ___) {\n    if hook != ___ {\n        hook(name)\n    }\n}\n\nfunc main() {\n    save(\"log\", func(n string) { fmt.Println(n) })\n    save(\"tmp\", nil)\n}",
+          "gaps": [{ "answers": ["func(string)"] }, { "answers": ["nil"] }]
+        }
+      ]
+    }
+  ]
+}
