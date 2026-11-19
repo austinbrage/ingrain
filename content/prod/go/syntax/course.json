@@ -10,7 +10,7 @@
         { "id": "printing-values", "name": "Printing values", "sessions": 1 },
         { "id": "constants", "name": "Constants", "sessions": 2 },
         { "id": "basic-types", "name": "Basic types", "sessions": 3 },
-        { "id": "slices-and-maps-basics", "name": "Slices & maps", "sessions": 1 }
+        { "id": "slices-and-maps-basics", "name": "Slices & maps", "sessions": 2 }
       ]
     },
     {

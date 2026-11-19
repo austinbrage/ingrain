@@ -1,0 +1,148 @@
+{
+  "id": "slices-and-maps-basics",
+  "intro": {
+    "title": "Slices and maps",
+    "slides": [
+      {
+        "text": "Go has two built-in collections: a **slice**, a growable list, and a **map**, which holds values under keys.\n\nThis module shows only what the next modules need.",
+        "code": "ports := []int{80, 443}\nsky := map[string]string{\"day\": \"blue\"}"
+      },
+      {
+        "text": "**Arrays** have a length that is part of their type, so `[3]int` and `[4]int` are different types. Real code uses slices almost everywhere.",
+        "code": "var week [7]string"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "slice-literal",
+          "title": "A list of values",
+          "guide": "Write a slice literal and read from it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice literal: the type `[]int` comes first, then the values in braces.", "notes": [{"on": "[]int{", "text": "A slice of ints: the type comes before the values."}], "text": "    scores := []int{72, 88, 95}\n"},
+            {"mode": "ghost", "line": 8, "guide": "Index from 0, and `len` counts the elements.", "text": "    fmt.Println(scores)\n    fmt.Println(scores[0], len(scores))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[72 88 95]\n72 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "append-returns",
+          "title": "Append returns the slice",
+          "guide": "Start from an empty slice and grow it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice declared without a value is empty and ready to use. `len` is 0.", "notes": [{"on": "var queue []string", "text": "No value yet: an empty slice."}], "text": "    var queue []string\n    fmt.Println(queue, len(queue))\n"},
+            {"mode": "ghost", "line": 9, "guide": "`append` returns the longer slice, so you store it back. It takes one value or several.", "notes": [{"on": "append(queue, \"ana\")", "text": "The original slice is unchanged, so assign the result back."}], "text": "    queue = append(queue, \"ana\")\n    queue = append(queue, \"li\", \"sam\")\n"},
+            {"mode": "ghost", "line": 12, "guide": "Print the grown slice.", "text": "    fmt.Println(queue, len(queue))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "[] 0\n[ana li sam] 3"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "store-the-append",
+          "title": "Keep the longer slice",
+          "guide": "Store the result so `queue` holds all three names.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    queue := []string{\"ana\", \"li\"}\n    ___ = append(queue, \"kim\")\n    fmt.Println(queue)\n}",
+          "gaps": [{ "answers": ["queue"] }]
+        },
+        {
+          "type": "quiz",
+          "id": "append-original",
+          "title": "What does it print?",
+          "guide": "Pick the output.",
+          "kind": "output",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    s := []int{1, 2}\n    t := append(s, 3)\n    fmt.Println(len(s), len(t))\n}",
+          "options": [
+            "3 3",
+            "2 3",
+            "2 2",
+            "It does not compile"
+          ],
+          "answer": 1,
+          "explanation": "`append` returns a new slice and leaves `s` as it was. `s` still has 2 values and `t` has 3."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Maps",
+        "slides": [
+          {
+            "text": "A **map** holds values under keys. Its type names both: `map[string]int` has string keys and int values.",
+            "code": "sky := map[string]string{\"day\": \"blue\"}\nages := map[string]int{\"ana\": 31}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "map-literal",
+          "title": "A map of values",
+          "guide": "Write a map literal, read a key and add one.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`map[string]int` has string keys and int values.", "notes": [{"on": "map[string]int{", "text": "Keys are strings, values are ints."}], "text": "    stock := map[string]int{\"tea\": 3, \"milk\": 2}\n"},
+            {"mode": "ghost", "line": 8, "guide": "`stock[\"tea\"]` reads a key. Assigning to a key that is not there adds it.", "notes": [{"on": "stock[\"bread\"] = 1", "text": "Assigning to a new key adds it."}], "text": "    fmt.Println(stock[\"tea\"])\n    stock[\"milk\"] = 5\n    stock[\"bread\"] = 1\n"},
+            {"mode": "ghost", "line": 12, "guide": "`Println` prints a map sorted by key, so the output is always the same.", "text": "    fmt.Println(stock, len(stock))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3\nmap[bread:1 milk:5 tea:3] 3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "missing-key",
+          "title": "A key that is not there",
+          "guide": "Read a key that does not exist, then ask whether it does.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A missing key is not an error: you get the zero value.", "text": "    stock := map[string]int{\"tea\": 3}\n\n    fmt.Println(stock[\"coffee\"])\n"},
+            {"mode": "ghost", "line": 10, "guide": "A lookup can return a second value, `true` when the key was there. By convention it is named `ok`.", "notes": [{"on": "qty, ok :=", "text": "The second value says if the key exists."}], "text": "    qty, ok := stock[\"coffee\"]\n    fmt.Println(qty, ok)\n"},
+            {"mode": "ghost", "line": 13, "guide": "Look up a key that exists.", "text": "    qty, ok = stock[\"tea\"]\n    fmt.Println(qty, ok)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0\n0 false\n3 true"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "delete-a-key",
+          "title": "Remove keys",
+          "guide": "Remove keys from a map.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A map with three items, one per line.", "notes": [{"on": "\"bread\": 1,", "text": "Go requires the comma after the last item too."}], "text": "    stock := map[string]int{\n        \"tea\": 3,\n        \"milk\": 2,\n        \"bread\": 1,\n    }\n"},
+            {"mode": "ghost", "line": 12, "guide": "`delete` removes a key. Deleting a key that is not there does nothing.", "notes": [{"on": "delete(stock, \"salt\")", "text": "No error: the key was never there."}], "text": "    delete(stock, \"milk\")\n    delete(stock, \"salt\")\n"},
+            {"mode": "ghost", "line": 15, "guide": "Print what is left.", "text": "    fmt.Println(stock, len(stock))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "map[bread:1 tea:3] 2"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "comma-ok-gap",
+          "title": "Name the flag",
+          "guide": "Name the value that says whether the key exists.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    stock := map[string]int{\"tea\": 3}\n    qty, ___ := stock[\"milk\"]\n    fmt.Println(qty, ok)\n}",
+          "gaps": [{ "answers": ["ok"] }]
+        }
+      ]
+    }
+  ]
+}
