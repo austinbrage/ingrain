@@ -18,11 +18,13 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module]`. With a module, it sco
 
 ## The scale
 One axis, three points. The middle is the goal.
+
+**The default is engaging.** Move off it only when something is clearly wrong, and in doubt keep engaging.
 | Verdict | The reader feels | Cause |
 |---|---|---|
 | **condescending** | "I know this" | the exercise fails the non-obvious test (`ingrain-exercises/references/writing-rules.md`) |
-| **engaging** | "I'm learning something, and I can do it" | one new thing, a form or a rule or a trap the reader could not guess |
-| **overwhelming** | "too much at once" | too many new things together (density), or a step that uses what was not shown yet (gap) |
+| **engaging** | "I'm learning something, and I can do it" | one new thing the reader could not guess: a form, a rule, a trap, or a complex concept taught plainly |
+| **overwhelming** | "too much at once" | too many new things together (density), or a step that uses what was not shown yet and that a slide cannot explain simply (gap) |
 
 A verdict is judged against **a programmer who knows another language and knows only what the modules before it taught, plus any later concept the module names and uses simply** (`writing-rules.md`, "Concepts taught later"), with **the bar of the module's position** (`writing-rules.md`, "The bar moves with position"). The same exercise can be engaging in the first module and condescending in a `medium` one. A general programming idea is condescending at every position.
 
@@ -30,17 +32,16 @@ A verdict is judged against **a programmer who knows another language and knows 
 
 ## What it measures
 Judgment, backed by counts. Every verdict quotes its evidence.
-- **Condescending signals:** the exercise hinges on none of the five hinges; a plain trace; a gap on a word any language needs; an intro that defines a general idea. **Scope, not title, decides** whether a module is universal: `Variables` that teaches `var`, `:=` and zero values passes, and a module that would read the same in every language fails
+- **Condescending signals:** the exercise clearly hinges on none of the five hinges (in doubt, it is engaging); a plain trace; a gap on a word any language needs; an intro that defines a general idea. **Scope, not title, decides** whether a module is universal: `Variables` that teaches `var`, `:=` and zero values passes, and a module that would read the same in every language fails
 - **Missing notes:** at the low end of the bar (first module, `basic` tier), a chunk that types a new piece of syntax with no note is reported, with the notes it should have
-- **Overwhelming has two causes, with different fixes.** The limits are **starting values**, to calibrate on Go `syntax` before they are trusted:
+- **Overwhelming comes from density, or from an unseen piece that a slide cannot explain.** The limits are **starting values**, to calibrate on Go `syntax` before they are trusted:
   - **Density** (fix: split the exercise or move a piece to another one):
     - an exercise with 2 or more new things. A typing exercise whose first chunk is new and whose other chunks repeat it is fine
     - a session with more than about 3 new forms
     - a chunk or guide near the card limits (`docs/content-structure.md`)
-  - **Gap** (fix: add a bridge exercise, or move the exercise later):
-    - an exercise that uses a form or a rule no earlier exercise or module showed
-    - an intro that relies on something not taught yet
-    - not a gap: a later concept used in its plain form, named on the slide as taught in depth in a later course, with no exercise hinging on it. If the exercise hinges on the later concept, or the slide does not name it, it is a gap
+  - **Unseen piece.** An exercise or an intro uses a form or a rule that no earlier exercise or module showed. Two cases:
+    - **A slide can explain it simply** (one or two sentences, in its plain form, with no exercise hinging on it): it is only a **gap**, a flag and not a verdict. Fix: add that slide (`writing-rules.md`, "Concepts taught later"). The slide never says the concept is taught later and never names the course that teaches it
+    - **A slide cannot explain it simply,** or the exercise hinges on it: it is **overwhelming**. Fix: a bridge exercise, or move the exercise later
 - **Repetitive is a flag, not a verdict.** A module whose exercises repeat the same forms (three exercises of the same declarations), or whose 3 or more sessions are not filled by named traps or forms, is padded. It is not overwhelming. Its fix is to trim or merge, so it gets its own label next to the verdict
 - **Irrelevant is a flag, not a verdict, and it is lax.** It marks an exercise whose hinge a working programmer never meets in real code (the test is in `writing-rules.md`, "The hinge must also be used in real code"). Its fix is cut. Flag only the clear cases, like `&^`. A rare-but-real topic is not irrelevant: it gets one light exercise. In doubt, do not flag
 - **Engaging signals:** one hinge named and hit, a program that shows a result, variety across the module, the next exercise builds on the last
@@ -55,13 +56,14 @@ Judgment, backed by counts. Every verdict quotes its evidence.
 - Never JSON, never a number out of 10
 
 ## How it runs
-- One **fresh subagent per module**, all in the same turn. A fresh agent has none of the writer's bias. Each reads its module, its entry in `course.json` and the modules before it
+- **The scorer always runs in a fresh subagent, never in the agent that wrote the content, and never inline, even for one module.** The writer knows why each exercise is the way it is and judges it by its own intent, so its verdict is biased. A fresh agent has none of that context and reads the content as the learner would. A scorer that skips this is not a review
+- One **fresh subagent per module**, all in the same turn. Each reads its module, its entry in `course.json` and the modules before it
 - A last fresh subagent scores the course from the module reports
 - **Anchors:** they calibrate where the middle is (see "Read first")
 - The parent collects the reports and ranks the modules by weak exercises. When it presents them to the author, it shows each weak exercise with its snippet in the chat and never summarizes the code away
 
 ## Calling it from another skill
-- `ingrain-exercises` and `ingrain-modules` run it **once**, after writing. They show the author **only the scorer's report** and **stop and wait**
+- `ingrain-exercises` and `ingrain-modules` run it **once**, after writing, **in a fresh subagent** (see "How it runs"), because the agent that wrote the content is biased toward it. They show the author **only the scorer's report** and **stop and wait**
 - No fixing, no second run, no other review: what to change is the author's answer
 
 ## Not its job

@@ -32,11 +32,11 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
   1. Updates `sessions` in `course.json` for every count reported
   2. Handles every "needs a split": calls `ingrain-modules` to add the modules, then runs a second batch of subagents for the added modules, in parallel, with the same two-part list
   3. Runs `cargo test --test content` for the whole course and fixes what it reports. If a module still fails, report which one and why
-  4. Runs `ingrain-score` once for the course, shows its report, and stops. There is no flow review and no second pass
+  4. Runs `ingrain-score` once for the course, in a fresh subagent (never inline: the agent that wrote the content is biased toward it), shows its report, and stops. There is no flow review and no second pass
 - Do not commit anything
 - At the end, report the exercises written per module, every warning, every "needs a split" and every session count changed in `course.json`, then the scorer's report and nothing after it. The author decides what changes; a fix goes through mode 2 (a named exercise and a prompt), so the ids and the saved progress stay safe
 
-**4. Review: `<language> <course> <module> review`, or `<language> <course> review`.** It runs `ingrain-score` and shows its report. It changes nothing.
+**4. Review: `<language> <course> <module> review`, or `<language> <course> review`.** It runs `ingrain-score` in a fresh subagent (never inline, to avoid the writer's bias) and shows its report. It changes nothing.
 
 **The same idea holds for the other two skills:** a general call, with no request, never touches what already exists. Only a specific, named target with a request can change something that is written.
 
@@ -108,4 +108,4 @@ Then report:
 - the exercises written or changed: id, type and title, per session
 - warnings: an exercise that exists and had no prompt, a module that looked complete, a universal-concept module
 - any session count changed in `course.json`, every module added with `ingrain-modules`, and every existing module that "needs a split"
-- then the `ingrain-score` report, run once, and nothing after it. Stop and wait for the author
+- then the `ingrain-score` report, run once in a fresh subagent (never inline, to avoid the writer's bias), and nothing after it. Stop and wait for the author
