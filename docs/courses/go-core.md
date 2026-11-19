@@ -58,7 +58,7 @@ Rules:
 ## Later concepts used simply
 | Module | Uses | Taught in |
 |---|---|---|
-| functions / variadic-functions | slices (the spread `xs...`), `any` | collections, interfaces |
+| functions / variadic-functions | `any` | interfaces |
 | functions / multiple-returns | `error`, `errors.New` | error-handling |
 | functions / defer | `os.Open` as a copied idiom | standard-library |
 | functions / what-go-leaves-out | a config struct | structs-and-methods |
