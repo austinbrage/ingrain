@@ -93,6 +93,7 @@ content/
 - **Code width.** The code is shown in cards and in the editor, whose width depends on the terminal, so write it as if formatted for a narrow screen:
   - aim for 40 columns or less per line, and never go over 50
   - break long lines the way `rustfmt` does with a small `max_width`: one argument per line, a closure body on its own lines, a long signature split over lines
+  - a literal with several items (a map, an object, an array, a struct) goes one item per line, with the closing bracket on its own line
   - for example `terminal.draw(|frame| render(frame, presses))?;` becomes `terminal.draw(|frame| {` then `render(frame, presses);` then `})?;`
   - the app wraps what still does not fit, but a wrapped line is harder to read and to type, so the author should avoid relying on it
 - Inserting every chunk at its `line`, in order, must give a file that compiles. `content/prod/*/syntax/loops.json` can be checked this way. The validator does not check it (dropped on 2026-10-30), so the review skill reads the code

@@ -66,6 +66,7 @@ The clearest case is the line every Go program starts with, `package main`: it i
 - **In a typing exercise, helper functions come first and the entry function (`main`) comes last,** in every language. It is coherent and good teaching: nobody uses a function before defining it, so the user types the function and then the code that uses it
 - Never start a chunk with `\n`, and never put a chunk after the closing brace of `main`: the editor has no line to insert it before, so the learner has to press Enter first
 - A blank line between two pieces is the trailing `\n` of the first chunk
+- **A literal with several items (any language: a map, an object, an array, a struct) goes on several lines, one item per line.** Do not align the values: the reader would type extra spaces for nothing
 
 ## Go code
 - **Indent with 4 spaces, never tabs.** `gofmt` uses tabs, but the editor of the exercise types a Tab key as 4 spaces and fills the indentation of a new line with spaces, so a tab in a chunk can never be typed correctly. That `gofmt` would reformat the code to tabs is fine (the author, 2026-11-02): the goal is to learn by seeing, typing and debugging the code
@@ -144,6 +145,7 @@ Cutting has a floor. The rules above remove weak exercises; this says what must 
 - **As much as the difference needs, not a fixed number.** A concept that works as in other languages (conditionals) gets one slide on what is different, or none. A hard concept (ownership, concurrency) gets longer texts, more slides and snippets. An intro never defines a general concept: it says what is different here and what the user is about to see. Judge it from the course and the module
 - One idea per slide, in the markdown subset of the guide. The limits are in `docs/content-structure.md` ("Intro")
 - The module intro is an overview of what the module covers. A session intro teaches what its exercises practice
+- **The module intro shows only once.** A later session that introduces a new construct gets a short intro with its definition and form, never what its exercises hinge on
 - The text teaches. It never gives away the answer of an exercise that follows
 - **Pseudo code is welcome in an intro snippet,** especially for a new concept: it shows the idea before the syntax. Say in the text that it is pseudo code. A snippet that is real code uses real syntax and APIs, and compiles
 - A snippet only when the slide is about code. It is illustrative: it may use placeholder names to show a shape (`pattern_a => do_this`), but every piece of syntax and every API in it is real, and a snippet meant as real code compiles. It uses only what the course has taught, what the slide itself introduces, or a later concept used simply and explained on a slide (see "Concepts taught later")

@@ -10,6 +10,7 @@ Rules:
 - When a module is renamed, moved or removed, change its line here
 - Typing exercises follow "Order of the code" in `writing-rules.md`: helpers first, `main` last. In Go the `auto` chunk is `"package main\n\nimport \"fmt\"\n"`, each helper starts at line 5 and ends with `\n`, and `main` is the last chunk, one balanced block
 - A function declared below its caller cannot be shown in a typing exercise. Say it on an intro slide
+- A map or slice literal with 3 or more items is written on several lines, one item per line
 
 ## Where each course stops
 | Course | Leaves to |
