@@ -444,7 +444,7 @@
             "text": "A scanner has a limit: a line longer than its buffer stops the loop. The loop ends the same way as at the end of the input, so only `Err` tells you something went wrong."
           },
           {
-            "text": "When the text has a known shape, `fmt.Sscan` and `fmt.Sscanf` read values straight into variables. They need the address of each variable, written with `&`: take it as a recipe for now, the pointers course explains it."
+            "text": "When the text has a known shape, `fmt.Sscan` and `fmt.Sscanf` read values straight into variables. They need the address of each variable, written with `&`: `&n` is where `n` lives, so the function can fill it in."
           }
         ]
       },

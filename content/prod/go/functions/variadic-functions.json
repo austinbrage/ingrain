@@ -8,7 +8,7 @@
         "code": "func name(fixed type, rest ...type) {\n    // rest behaves like []type\n}\n\nname(a)\nname(a, b, c)"
       },
       {
-        "text": "To pass a slice you already have, put `...` after it. The slice's type must match exactly.\n\nTwo things appear here in their plain form. A slice is a list of values, like `[]string{\"go\", \"cli\"}`. `any` is a type that accepts a value of any type, so `...any` takes mixed values, as `Printf` does."
+        "text": "To pass a slice you already have, put `...` after it. The slice's type must match exactly.\n\n`any` is a type that accepts a value of any type, so `...any` takes mixed values, as `Printf` does."
       }
     ]
   },

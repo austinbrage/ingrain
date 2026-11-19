@@ -113,7 +113,7 @@
             "code": "rule(a, b):\n    a goes first  -> a negative number\n    a and b tie   -> 0\n    b goes first  -> a positive number"
           },
           {
-            "text": "The `cmp` package has `cmp.Compare(x, y)`, which gives exactly those answers for numbers and text. Swap its arguments and the order flips.\n\nThe rule is a function value, so it can be written in place or kept in a variable, as in the functions course.",
+            "text": "The `cmp` package has `cmp.Compare(x, y)`, which gives exactly those answers for numbers and text. Swap its arguments and the order flips.\n\nThe rule is a function value, so it can be written in place or kept in a variable.",
             "code": "slices.SortFunc(list, rule)"
           }
         ]

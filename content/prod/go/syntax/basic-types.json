@@ -597,7 +597,7 @@
             {
               "mode": "ghost",
               "line": 8,
-              "guide": "The number itself is unchanged. To get the text \"72\" you use `strconv`, in a later course.",
+              "guide": "The number itself is unchanged. To get the text \"72\" you use the `strconv` package.",
               "text": "    fmt.Println(code)"
             }
           ],
@@ -620,7 +620,7 @@
             "it does not compile"
           ],
           "answer": 1,
-          "explanation": "An `int` converted to `string` becomes the character with that number, and 97 is `a`. For the text \"97\", `strconv` comes in a later course."
+          "explanation": "An `int` converted to `string` becomes the character with that number, and 97 is `a`. For the text \"97\", use the `strconv` package."
         }
       ]
     }
