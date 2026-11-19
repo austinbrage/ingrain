@@ -44,7 +44,7 @@ Home → Languages → Course navigator → Exercise
 
 ## Tiers
 A module section belongs to a tier, and **a tier is the difficulty of the concepts it shows, not the shape of the exercises** (the author, 2026-11-02). Every tier uses the same kinds of exercises and the same mix of modes (`docs/content-structure.md`, "The mode of a chunk"). What changes from a tier to the next is what the user learns.
-- **The tier also sets the bar for the writer and the scorer:** a simple language-specific form passes in the first module and the `basic` tier, and needs a rule or a trap in `medium` and `advanced`. A general programming idea never passes (`.claude/skills/ingrain-exercises/references/writing-rules.md`, "The bar moves with position")
+- **The position also sets the bar for the writer and the scorer:** what counts as new changes as the course goes on. A simple language-specific form counts in the first module of a language, and later only when it is new and the modules before did not show it. A concept the reader has not met counts at any tier, taught plainly, and the tier of its section says how complex it is. A concept already taught counts only with a new rule, trap or combination of features. A general programming idea never counts (`.claude/skills/ingrain-exercises/references/writing-rules.md`, "The bar moves with position")
 
 | Tier | Concepts | Access |
 |---|---|---|

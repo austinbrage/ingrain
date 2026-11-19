@@ -28,14 +28,12 @@ If a programmer from another language would get it right without reading anythin
 - **Never in everyday work:** cut. The model case is Go's `&^`: it is unguessable and almost nobody writes it, so it hinges on nothing the reader needs. Boolean algebra for its own sake is the same
 - When in doubt, keep it
 
-**The bar moves with position, for language-specific forms only.** The reader always knows programming, but their knowledge of the language grows as the course goes on. A simple form that is new to the language passes early and fails later. A general programming idea never passes, at any position.
-
-| Position (from `course.json` and the catalog order) | A simple language-specific form | A general programming idea |
-|---|---|---|
-| First module of the first course of a language | passes (`import "fmt"`, `Println`) | never |
-| Any other module of the `basic` tier | passes if it is new to the language and the modules before did not show it | never |
-| `medium` | needs a rule or a trap | never |
-| `advanced` | needs a trap or an interaction between features | never |
+**The bar moves with position.** The reader always knows programming, but their knowledge of the language grows as the course goes on. The test is always "is something new here for this reader?", and the position only changes what counts as new:
+- **First module of the first course of a language:** a simple form counts (`import "fmt"`, `Println`), because the reader has seen none of the language
+- **Any other module:** a simple form counts only if it is new to the language and the modules before did not show it
+- **A concept the reader has not met** counts at any tier, taught plainly. It needs no rule or trap: the concept is the new thing. The tier of its section says how hard it is: the concepts of `medium` and `advanced` sections (semaphores, closures, generics) are the complex ones
+- **A concept the reader was already taught** counts only if the exercise adds a rule, a trap or a new combination of features
+- **A general programming idea never counts, at any position**
 
 - A general idea is anything a programmer knows from any language: what a comment, a variable, a call order or a loop is. Typing it never earns the exercise, even in the first module
 - The tier changes only what counts as non-obvious. It never changes the shape of the exercises (the mix of modes, the quiz kinds)
