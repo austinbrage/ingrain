@@ -75,15 +75,24 @@ Arguments: `$ARGUMENTS` is `<language> <course> [module] [exercise] [prompt]`. I
 - `ingrain-modules` never calls this skill back: this skill writes the exercises of the modules it added
 
 ## Draft first
-Modes 1 and 2 never write the file before the author has seen it. Mode 3 is exempt: its subagents write in parallel and the scorer reviews the result.
-1. Draft the module in the chat, with nothing written to disk. Per session, each exercise gets its type and title, and its code as readable Go (never JSON):
-   - typing: the program as it ends up in `main.go`, with its output and the notes it will carry
+Modes 1 and 2 never write the module file before the author has approved the draft. Mode 3 is exempt: its subagents write in parallel and the scorer reviews the result.
+
+**The draft is a file the author edits, not a chat message.** It lives in `docs/drafts/<language>-<course>-<module>.md` (the folder is in `.gitignore`), and the author changes it directly. This is faster than describing changes in chat.
+1. Write the draft to that file, with nothing written to the module file. **It must be light to read, so the decision is easy:** the code is the main content, and the text around it is short.
+   - **The first line of the file is the session count** (`**2 sessions** · tier · section and place`), and right below it one bullet per session: its theme and how many exercises it has, by type
+   - **Per exercise:** one header line (type, id, title and the hinge it hits), then the code as readable Go (never JSON), then its output. The guide follows in one short line. **The inline notes of an exercise go below the code as a `Notes:` list,** one bullet each: the anchor in backticks, an arrow and the note text. Never paragraphs
+   - typing: the program as it ends up in `main.go`, with its output
    - fill-blank: the code with the `___` gaps, and the answers
-   - quiz: the code, the options with the right one marked, and the explanation
-   - the intro slides: their text and snippets
-2. **Say what was left out and why:** every item of the mastery list that got no exercise, with the reason (a later module owns it, every language does it the same way, or it is too rare to matter), and the module that owns it. Add a one-line mastery check: which exercise covers which item
-3. Stop and wait. The author approves or corrects the draft
-4. Write exactly what was approved. If `cargo test --test content` forces a change (a card limit, a line count), say what changed and why
+   - quiz: the code, the options with the right one marked, and a one-line explanation
+   - **Intro slides:** one or two lines of text and the snippet
+   - **Everything else is one line each:** a left-out item and its reason, the mastery check, the session count and its reason
+2. **Put in the file what was left out and why:** every item of the mastery list that got no exercise, with the reason (a later module owns it, every language does it the same way, or it is too rare to matter), and the module that owns it. Add a one-line mastery check: which exercise covers which item
+3. Save a copy of what you wrote as `<draft>.last` in the same folder, and say in the chat where the file is, with one line on the main choices. Stop and wait
+4. **On every message of the author, read the draft file first.** Compare it with `<draft>.last`:
+   - **Different:** the differences are proposed changes. The author's edit wins, except when it breaks a rule that can be checked: a card or line limit, a program that does not compile or an output that cannot be traced, a fill-blank or quiz rule, the universal-concept guard. Then say so in the chat and leave that spot as it was. If an edit is unclear or not worth it, say so in the chat and leave it as it was. Redraft: apply the accepted edits to the file, replace a short "Round N" block at the top (what was applied, what was not and why), save a new `<draft>.last`, and stop and wait
+   - **Not different:** ask for approval once, in the chat
+5. Only an explicit "apply" or "approved" in the author's message applies the draft. A status line in the file never does
+6. **Apply:** write exactly what was approved to the module file, update `sessions` in `course.json`, and run `cargo test --test content`. If it forces a change (a card limit, a line count), say what changed and why. Run `ingrain-score` once in a fresh subagent, then delete the draft and its `.last` copy
 
 ## Writing
 - Ids are slugs, unique inside their session. The tier of the module only says how hard the concept is: it does not change the shape of the exercises
