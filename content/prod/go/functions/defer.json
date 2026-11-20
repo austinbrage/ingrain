@@ -1,0 +1,185 @@
+{
+  "id": "defer",
+  "intro": {
+    "title": "Defer",
+    "slides": [
+      {
+        "text": "`defer` schedules a call. It runs when the surrounding function returns, by whichever `return` it leaves.\n\nThe snippet is pseudo code, not Go.",
+        "code": "function runs:\n    schedule cleanup for the end\n    step one\n    step two\nfunction returns -> cleanup runs"
+      },
+      {
+        "text": "The usual use pairs a resource with its release: open it, check the error, defer the close on the next line.\n\n`f` is the open file: `f.Close()` releases it and `f.Name()` gives its name.\n\nThe snippet is pseudo code, not Go.",
+        "code": "f = open(path)\nif open failed: return\ndefer close(f)\nuse f"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "runs-on-return",
+          "title": "Run when the function ends",
+          "guide": "Write a call first that runs last.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The work the function does.", "text": "func backup(db string) {\n    fmt.Println(\"backing up\", db)\n}\n"},
+            {"mode": "ghost", "line": 6, "guide": "Put the call first. It runs last.", "notes": [{"on": "defer", "text": "Runs when backup returns, not on this line."}], "text": "    defer fmt.Println(\"unlocked\", db)"},
+            {"mode": "ghost", "line": 10, "guide": "Call it and watch the order.", "text": "func main() {\n    backup(\"orders\")\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "backing up orders\nunlocked orders"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "open-and-close",
+          "title": "Open a file, close it later",
+          "guide": "Open a file, and close it when the function ends.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport (\n    \"fmt\"\n    \"os\"\n)\n"},
+            {"mode": "ghost", "line": 8, "guide": "Open the file and use it.", "notes": [{"on": "os.Open(path)", "text": "Opens a file: gives the file and an error."}], "text": "func show(path string) {\n    f, err := os.Open(path)\n    fmt.Println(\"opened\", f.Name())\n}\n"},
+            {"mode": "ghost", "line": 10, "guide": "Check the error before using the file.", "text": "    if err != nil {\n        fmt.Println(\"cannot open:\", err)\n        return\n    }"},
+            {"mode": "ghost", "line": 14, "guide": "Defer the close right after the error check.", "notes": [{"on": "f.Close()", "text": "Runs on every way out of show."}], "text": "    defer f.Close()"},
+            {"mode": "ghost", "line": 18, "guide": "`main.go` is the file you are typing, so it exists.", "text": "func main() {\n    show(\"main.go\")\n    show(\"missing.txt\")\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "opened main.go\ncannot open: open missing.txt: no such file or directory"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "reverse-order",
+          "title": "Last in, first out",
+          "guide": "Defer three releases and watch the order they run in.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Prints which resource it releases.", "text": "func release(name string) {\n    fmt.Println(\"release\", name)\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Defer a release, then do the work.", "text": "func main() {\n    defer release(\"db\")\n    fmt.Println(\"serving\")\n}"},
+            {"mode": "ghost", "line": 11, "guide": "Defer two more, in this order.", "notes": [{"on": "release(\"queue\")", "text": "The last deferred call runs first."}], "text": "    defer release(\"cache\")\n    defer release(\"queue\")"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "serving\nrelease queue\nrelease cache\nrelease db"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "unreached-defer",
+          "title": "Which defers are registered?",
+          "guide": "Read the code, then pick the output. Each value prints on its own line.",
+          "code": "func check(stock int) {\n    defer fmt.Println(\"checked\")\n    if stock == 0 {\n        return\n    }\n    defer fmt.Println(\"in stock\")\n}\n\nfunc main() {\n    check(0)\n    fmt.Println(\"--\")\n    check(2)\n}",
+          "options": [
+            "in stock, checked, --, in stock, checked",
+            "checked, --, checked, in stock",
+            "checked, --, in stock, checked"
+          ],
+          "answer": 2,
+          "explanation": "A `defer` counts only once its line runs. `check(0)` returns before the second one, so only \"checked\" runs. After the `--`, `check(2)` runs both, last in first out."
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Deferring a literal",
+        "slides": [
+          {
+            "text": "`defer` needs a call, not a function. To defer a function literal, call it: the `()` after the closing brace is required.",
+            "code": "defer func() {\n    fmt.Println(\"bye\")\n}()"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "arguments-at-defer",
+          "title": "Arguments are read at the defer",
+          "guide": "Defer a call and a literal, then change the variable.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "The arguments of a deferred call are evaluated on this line.", "notes": [{"on": "\"attempts:\", attempts", "text": "The value is read on this line, not at the end."}], "text": "    attempts := 1\n    defer fmt.Println(\"attempts:\", attempts)"},
+            {"mode": "ghost", "line": 8, "guide": "A literal reads the variable itself when it runs.", "notes": [{"on": "}()", "text": "The () calls the literal: defer needs a call."}], "text": "    defer func() {\n        fmt.Println(\"closure:\", attempts)\n    }()"},
+            {"mode": "ghost", "line": 11, "guide": "Change the variable, then print it.", "text": "    attempts = 4\n    fmt.Println(\"now:\", attempts)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "now: 4\nclosure: 4\nattempts: 1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "named-result-defer",
+          "title": "Change the result after return",
+          "guide": "Add a fee in a deferred literal, after `return` has run.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The result has a name, so deferred code can reach it.", "notes": [{"on": "(total int)", "text": "A named result: deferred code can still change it."}, {"on": "return total", "text": "Sets the result, then deferred code runs."}], "text": "func invoice(prices []int) (total int) {\n    return total\n}\n"},
+            {"mode": "ghost", "line": 6, "guide": "Add the fee. It runs after `return` sets the result.", "text": "    defer func() {\n        total += 5\n    }()"},
+            {"mode": "ghost", "line": 9, "guide": "Add up the prices.", "text": "    for _, price := range prices {\n        total += price\n    }"},
+            {"mode": "ghost", "line": 15, "guide": "The prices add up to 50. What does the caller get?", "text": "func main() {\n    fmt.Println(invoice([]int{20, 30}))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "55"
+          }
+        },
+        {
+          "type": "fill-blank",
+          "id": "tax-gaps",
+          "title": "Add tax after the return",
+          "guide": "Name the result, then schedule the literal to run once `return` has set it.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc withTax(price int) (___ int) {\n    ___ func() {\n        total += total / 10\n    }()\n    return price\n}\n\nfunc main() {\n    fmt.Println(withTax(200))\n}",
+          "gaps": [
+            {
+              "answers": [
+                "total"
+              ]
+            },
+            {
+              "answers": [
+                "defer"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "defer-in-loop",
+          "title": "When do the loop's defers run?",
+          "guide": "Read the code, then pick the output. Each value prints on its own line.",
+          "code": "func batch() {\n    for id := 1; id <= 2; id++ {\n        defer fmt.Println(\"release\", id)\n        fmt.Println(\"work\", id)\n    }\n    fmt.Println(\"done\")\n}\n\nfunc main() {\n    batch()\n}",
+          "options": [
+            "work 1, release 1, work 2, release 2, done",
+            "work 1, work 2, done, release 2, release 1",
+            "work 1, work 2, done, release 1, release 2",
+            "work 1, work 2, release 2, release 1, done"
+          ],
+          "answer": 1,
+          "explanation": "A `defer` waits for the end of the function, not of the lap. Nothing is released while the loop runs, and the releases run last in, first out."
+        },
+        {
+          "type": "typing",
+          "id": "release-each-lap",
+          "title": "Release on every lap",
+          "guide": "Wrap the body of the loop in a literal, so each lap releases its own file.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Prints which file it closes.", "text": "func release(file string) {\n    fmt.Println(\"closed\", file)\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "Each lap runs its body inside a literal that is called at once.", "notes": [{"on": "func() {", "text": "A literal called at once: defer waits for it, not main."}], "text": "func main() {\n    files := []string{\"a.log\", \"b.log\"}\n    for _, name := range files {\n        func() {\n            fmt.Println(\"reading\", name)\n        }()\n    }\n}"},
+            {"mode": "ghost", "line": 13, "guide": "Defer the release inside the literal.", "text": "            defer release(name)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "reading a.log\nclosed a.log\nreading b.log\nclosed b.log"
+          }
+        }
+      ]
+    }
+  ]
+}

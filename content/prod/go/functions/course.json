@@ -16,7 +16,7 @@
       "modules": [
         { "id": "function-values", "name": "Function values & types", "sessions": 1 },
         { "id": "closures", "name": "Closures", "sessions": 2 },
-        { "id": "defer", "name": "Defer", "sessions": 1 }
+        { "id": "defer", "name": "Defer", "sessions": 2 }
       ]
     },
     {
