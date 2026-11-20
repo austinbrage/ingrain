@@ -1,0 +1,111 @@
+{
+  "id": "what-go-leaves-out",
+  "intro": {
+    "title": "No overloads & init",
+    "slides": [
+      {
+        "text": "Go has no overloading: one name, one function in a package. A second `connect` is rejected as redeclared, whatever its parameters. A variant gets a different name.",
+        "code": "func connect(host string) {}\n\nfunc connect(host string, port int) {}"
+      },
+      {
+        "text": "There are no default or optional parameters either: a call passes every argument. Code works around it with a value that means \"not set\", or with a struct of options.\n\nThe module ends with `init`, a function Go runs for you."
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "intro": {
+        "title": "init",
+        "slides": [
+          {
+            "text": "A function named `init`, with no parameters and no results, runs by itself before `main`. Calling it by hand does not compile. A package may declare several.",
+            "code": "func init() {\n    fmt.Println(\"ready\")\n}"
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "different-names",
+          "title": "One name per variant",
+          "guide": "Go rejects a second `connect`, so each variant gets its own name.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The plain variant: a URL with no port.", "text": "func connect(host string) string {\n    return \"http://\" + host\n}\n"},
+            {"mode": "ghost", "line": 9, "guide": "The secure variant gets another name, not another `connect`.", "notes": [{"on": "connectTLS", "text": "A second connect would not compile: name it apart."}], "text": "func connectTLS(host string, port int) string {\n    return fmt.Sprintf(\"https://%s:%d\", host, port)\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Call both variants.", "text": "func main() {\n    fmt.Println(connect(\"shop.dev\"))\n    fmt.Println(connectTLS(\"shop.dev\", 8443))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "http://shop.dev\nhttps://shop.dev:8443"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "zero-means-unset",
+          "title": "Default inside the function",
+          "guide": "No default parameters: every call passes every argument. Treat zero as not set.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Replace a zero port with the fallback.", "notes": [{"on": "port == 0", "text": "Zero reads as not set, even if the caller meant it."}], "text": "func listen(host string, port int) {\n    if port == 0 {\n        port = 8080\n    }\n    fmt.Printf(\"listening on %s:%d\\n\", host, port)\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "Pass the 0 to get the fallback, then a real port.", "notes": [{"on": "listen(\"shop.dev\", 0)", "text": "No defaults: leaving out the 0 does not compile."}], "text": "func main() {\n    listen(\"shop.dev\", 0)\n    listen(\"shop.dev\", 9000)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "listening on shop.dev:8080\nlistening on shop.dev:9000"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "fill-before-main",
+          "title": "Set up before main",
+          "guide": "Fill a table in `init`. Nothing calls it, yet `main` finds it full.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "A package variable, empty to start.", "text": "var limits = map[string]int{}\n"},
+            {"mode": "ghost", "line": 7, "guide": "Fill the table. Nothing calls this function.", "notes": [{"on": "func init()", "text": "Go calls it before main. You never do."}], "text": "func init() {\n    limits[\"free\"] = 3\n    limits[\"pro\"] = 50\n}\n"},
+            {"mode": "ghost", "line": 12, "guide": "Read the table. It is already full.", "text": "func main() {\n    fmt.Println(\"free:\", limits[\"free\"])\n    fmt.Println(\"pro:\", limits[\"pro\"])\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "free: 3\npro: 50"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "var-then-init",
+          "title": "Variables first",
+          "guide": "Print from a variable initializer, `init` and `main`. See what runs first.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Prints when it runs, so you can see the order.", "text": "func load(name string) int {\n    fmt.Println(\"loading\", name)\n    return 3\n}\n"},
+            {"mode": "ghost", "line": 10, "guide": "A package variable set from a call.", "notes": [{"on": "var retries = load(\"retries\")", "text": "Package variables are set before any init runs."}], "text": "var retries = load(\"retries\")\n"},
+            {"mode": "ghost", "line": 12, "guide": "Runs after the variables, before `main`.", "text": "func init() {\n    fmt.Println(\"init sees\", retries)\n}\n"},
+            {"mode": "ghost", "line": 16, "guide": "Print the same variable once more.", "text": "func main() {\n    fmt.Println(\"main sees\", retries)\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "loading retries\ninit sees 3\nmain sees 3"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "init-order",
+          "title": "Where do the inits run?",
+          "guide": "Read the code, then pick the output. Each call prints one line.",
+          "code": "func main() {\n    fmt.Println(\"main\")\n}\n\nfunc init() {\n    fmt.Println(\"init one\")\n}\n\nfunc init() {\n    fmt.Println(\"init two\")\n}",
+          "options": [
+            "main, init one, init two",
+            "init one, main, init two",
+            "init one, init two, main",
+            "init two, init one, main"
+          ],
+          "answer": 2,
+          "explanation": "`init` functions run before `main` wherever they sit in the file, in the order written. A package can have several, unlike any other name."
+        }
+      ]
+    }
+  ]
+}

@@ -45,7 +45,7 @@ Rules:
   - a deferred closure can change a named return (`func f() (n int) { defer func() { n *= 2 }(); return 5 }` returns 10), which builds on `multiple-returns`
   - a `defer` inside a loop runs when the function ends, not at the end of each iteration
   - `recover` and `panic` belong to error-handling and are never used here
-- `what-go-leaves-out` (medium, named `No overloads & init`): there is no overloading (a second `connect` is a "redeclared" compile error), no default arguments and no optional parameters. The substitutes are a different name, a config struct, and functional options, which are only named and never taught (they are advanced). Then `init()`: runs automatically before `main`, once per package, may appear more than once in a package, and is never called by hand. `main` itself was taught in `syntax` (`program-structure`)
+- `what-go-leaves-out` (medium, named `No overloads & init`): there is no overloading (a second `connect` is a "redeclared" compile error), no default arguments and no optional parameters. The substitutes taught are a different name and a zero value that means "not set". A struct of options and functional options are only named on the intro, never typed or quizzed: they need structs and belong to `structs-and-methods`. Then `init()`: runs automatically before `main`, once per package, may appear more than once in a package, and is never called by hand. `main` itself was taught in `syntax` (`program-structure`)
 
 ## What `functions` leaves to other courses
 
@@ -54,6 +54,7 @@ Rules:
 - **pointers / `pointers-and-functions`:** Go copies every argument, so changing a parameter never reaches the caller. The forms `*T`, `&x` and `*p`, and a pointer parameter that changes the caller's variable
 - **pointers / `slices-maps-and-pointers`:** a slice or map parameter is a copy of a small header that points at the same data. A write to an element or a key reaches the caller. Reassigning the parameter to a new slice or map only rebinds the copy
 - **collections / `append-and-copy`:** `append` inside a function is lost for the caller, so the function returns the slice and the caller stores it (`s = f(s)`)
+- **structs-and-methods / a module on options structs** (`constructors` fits): Go has no default parameters (`functions` / `what-go-leaves-out` says so), so a function takes one struct, the caller names only the fields it sets, and the function fills the defaults for fields left at their zero value. `functional-options` builds on it
 
 ## Later concepts used simply
 | Module | Uses | Taught in |
@@ -61,4 +62,3 @@ Rules:
 | functions / variadic-functions | `any` | interfaces |
 | functions / multiple-returns | `error`, `errors.New` | error-handling |
 | functions / defer | `os.Open` as a copied idiom | standard-library |
-| functions / what-go-leaves-out | a config struct | structs-and-methods |
