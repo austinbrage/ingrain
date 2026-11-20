@@ -1,0 +1,194 @@
+{
+  "id": "closures",
+  "intro": {
+    "title": "Closures",
+    "slides": [
+      {
+        "text": "A **closure** is a function literal together with the variables it uses from the function around it. The literal does not get a copy of them: it shares the variables themselves, so a change on either side is seen by the other. There is nothing to declare: you read and assign them by name.\n\nThe snippet is pseudo code, not Go.",
+        "code": "total = 0\nliteral uses total\nliteral adds 5 to total\ntotal is now 5"
+      },
+      {
+        "text": "A function can return a closure. The variables it uses stay alive as long as the closure does, even after the function that made them has returned. Every call makes new ones.\n\nThe snippet is pseudo code, not Go.",
+        "code": "make() creates variable v\nmake() returns a literal using v\nmake() ends, v is kept\na second make() creates another v"
+      }
+    ]
+  },
+  "sessions": [
+    {
+      "id": "session-1",
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "capture-variable",
+          "title": "Literals read the variable, not a copy",
+          "guide": "Read a variable from a literal, then change it.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A literal can read the variables of the function around it.", "notes": [{"on": "amount * rate", "text": "Reads the variable itself, not a copy."}], "text": "    rate := 5\n    fee := func(amount int) int {\n        return amount * rate / 100\n    }\n    fmt.Println(fee(200))"},
+            {"mode": "ghost", "line": 11, "guide": "Change the variable and call the literal again.", "notes": [{"on": "rate = 10", "text": "The literal sees this on its next call."}], "text": "    rate = 10\n    fmt.Println(fee(200))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "10\n20"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "update-captured",
+          "title": "A literal can change it",
+          "guide": "Two literals change the same variable.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Assigning inside a literal changes the outer variable.", "notes": [{"on": "stock = stock - units", "text": "Assigns the outer variable, not a new one."}], "text": "    stock := 10\n    sell := func(units int) {\n        stock = stock - units\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "A second literal over the same variable.", "text": "    restock := func(units int) {\n        stock = stock + units\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "Call both, then read the variable.", "text": "    sell(3)\n    restock(5)\n    fmt.Println(\"left:\", stock)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "left: 12"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "counter-factory",
+          "title": "Return a counter",
+          "guide": "Return a literal that remembers a count.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "A function can return a function. Its result type goes after the parameters.", "notes": [{"on": "counter() func() int", "text": "Result type: no input, an int out."}, {"on": "count := 0", "text": "Kept alive by the returned literal."}], "text": "func counter() func() int {\n    count := 0\n    return func() int {\n        count++\n        return count\n    }\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Each call of the result continues the count.", "notes": [{"on": "next := counter()", "text": "The returned literal, ready to call."}], "text": "func main() {\n    next := counter()\n    fmt.Println(next())\n    fmt.Println(next())\n    fmt.Println(next())\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "1\n2\n3"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "independent-counters",
+          "title": "One variable per call",
+          "guide": "Build two counters from one function.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "The literal also keeps the parameter.", "notes": [{"on": "label, count", "text": "The literal keeps the parameter too."}], "text": "func tally(label string) func() {\n    count := 0\n    return func() {\n        count++\n        fmt.Println(label, count)\n    }\n}\n"},
+            {"mode": "ghost", "line": 13, "guide": "Every call of `tally` makes its own variables.", "notes": [{"on": "pears := tally(\"pears\")", "text": "A new call makes a new count."}], "text": "func main() {\n    apples := tally(\"apples\")\n    pears := tally(\"pears\")\n    apples()\n    apples()\n    pears()\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "apples 1\napples 2\npears 1"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "shared-wallet",
+          "title": "Two closures, one variable",
+          "guide": "Return two literals that share one balance.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Two literals made in the same call share the variable.", "notes": [{"on": "(func(int), func() int)", "text": "Two results, and both are functions."}], "text": "func wallet() (func(int), func() int) {\n    balance := 0\n    deposit := func(amount int) {\n        balance += amount\n    }\n    total := func() int { return balance }\n    return deposit, total\n}\n"},
+            {"mode": "ghost", "line": 14, "guide": "Deposit through one literal, read through the other.", "notes": [{"on": "deposit, total := wallet()", "text": "Both literals share one balance."}], "text": "func main() {\n    deposit, total := wallet()\n    deposit(30)\n    deposit(20)\n    fmt.Println(total())\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "50"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "wrap-function",
+          "title": "Wrap a function",
+          "guide": "Return a literal that counts the calls of another function.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
+            {"mode": "ghost", "line": 5, "guide": "Take a function, return a wrapped one. The literal keeps `f` and its own count.", "notes": [{"on": "calls := 0", "text": "Lives as long as the wrapper does."}, {"on": "return f(n)", "text": "A parameter is kept like any variable."}], "text": "func logged(f func(int) int) func(int) int {\n    calls := 0\n    return func(n int) int {\n        calls++\n        fmt.Println(\"call\", calls)\n        return f(n)\n    }\n}\n"},
+            {"mode": "ghost", "line": 14, "guide": "Wrap a literal, then call the wrapper.", "text": "func main() {\n    double := logged(func(n int) int {\n        return n * 2\n    })\n    fmt.Println(double(4))\n    fmt.Println(double(5))\n}"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "call 1\n8\ncall 2\n10"
+          }
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "One variable per lap",
+        "slides": [
+          {
+            "text": "Since Go 1.22, a `for` loop makes a new copy of its variable on every lap, and so does `range`. A literal made in one lap keeps that lap's variable. Before 1.22 all the laps shared one variable.\n\nThe snippet is pseudo code, not Go.",
+            "code": "lap 1: a new i, kept by literal 1\nlap 2: a new i, kept by literal 2\nlap 3: a new i, kept by literal 3"
+          },
+          {
+            "text": "Only the loop's own variable is renewed. A variable declared **before** the loop is still a single one, shared by every literal that uses it."
+          }
+        ]
+      },
+      "exercises": [
+        {
+          "type": "typing",
+          "id": "last-literal",
+          "title": "The literal keeps its own lap",
+          "guide": "Keep the literal of the last lap, then call it after the loop.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A variable of a function type holds one literal at a time.", "text": "    var last func() int"},
+            {"mode": "ghost", "line": 7, "guide": "Each lap replaces the literal with a new one.", "notes": [{"on": "return i", "text": "Since Go 1.22 every lap has its own copy. Older Go printed 3."}], "text": "    for i := 0; i < 3; i++ {\n        last = func() int {\n            return i\n        }\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Call it after the loop.", "text": "    fmt.Println(last())"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "2"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "loop-variable",
+          "title": "Keep a literal from every lap",
+          "guide": "Collect a literal on each lap, then call them all.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A slice can hold functions.", "notes": [{"on": "[]func() int", "text": "A slice whose elements are functions."}], "text": "    var fns []func() int"},
+            {"mode": "ghost", "line": 7, "guide": "Append one literal on every lap.", "notes": [{"on": "return i * 10", "text": "One copy per lap. Older Go printed 30 three times."}], "text": "    for i := 0; i < 3; i++ {\n        fns = append(fns, func() int {\n            return i * 10\n        })\n    }"},
+            {"mode": "ghost", "line": 12, "guide": "Call every function in the slice.", "text": "    for _, fn := range fns {\n        fmt.Println(fn())\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0\n10\n20"
+          }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "outer-total",
+          "title": "Which variable is shared?",
+          "guide": "Read the code, then pick the output. Each value prints on its own line.",
+          "code": "var fns []func() int\ntotal := 0\nfor _, n := range []int{1, 2, 3} {\n    total += n\n    fns = append(fns, func() int {\n        return total + n\n    })\n}\nfor _, fn := range fns {\n    fmt.Println(fn())\n}",
+          "options": [
+            "9, 9, 9",
+            "7, 8, 9",
+            "2, 5, 9"
+          ],
+          "answer": 1,
+          "explanation": "`n` is new on every lap, so each literal keeps its own. `total` is one variable and ends at 6 before any literal runs, so they return 6+1, 6+2 and 6+3."
+        },
+        {
+          "type": "typing",
+          "id": "recursive-closure",
+          "title": "A literal that calls itself",
+          "guide": "Declare the variable first, then assign the literal.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "A literal cannot use its own name unless the variable exists before it.", "notes": [{"on": "var factorial func(n int) int", "text": "Declared first so the literal can name itself."}], "text": "    var factorial func(n int) int"},
+            {"mode": "ghost", "line": 7, "guide": "Assign the literal. It calls itself by the variable's name.", "notes": [{"on": "factorial = func", "text": "With := the literal could not see its name."}], "text": "    factorial = func(n int) int {\n        if n <= 1 {\n            return 1\n        }\n        return n * factorial(n-1)\n    }"},
+            {"mode": "ghost", "line": 13, "guide": "Call it and print the result.", "text": "    fmt.Println(factorial(5))"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "120"
+          }
+        }
+      ]
+    }
+  ]
+}
