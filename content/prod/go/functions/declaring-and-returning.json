@@ -38,7 +38,7 @@
           "guide": "Write a function with two kinds of parameter and nothing to return.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Names of different types cannot share a type: each group gets its own. With no result type, nothing is returned.", "notes": [{"on": "item string, qty int", "text": "Each group of names gets its own type."}], "text": "func report(item string, qty int) {\n    fmt.Println(item, qty > 0)\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "Names of different types cannot share a type: each group gets its own. With no result type, nothing is returned.", "notes": [{"on": "item string, qty int", "text": "Each group of names gets its own type."}, {"on": ") {", "text": "No result type, so nothing is returned."}], "text": "func report(item string, qty int) {\n    fmt.Println(item, qty > 0)\n}\n"},
             {"mode": "ghost", "line": 9, "guide": "A function that returns nothing is called as a statement.", "text": "func main() {\n    report(\"tea\", 3)\n}"}
           ],
           "output": {
@@ -51,8 +51,8 @@
           "id": "signature-gaps",
           "title": "Complete the signature",
           "guide": "Give the parameter and the result their types.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc describe(name string, age ___) ___ {\n    return fmt.Sprintf(\"%s is %d\", name, age)\n}\n\nfunc main() {\n    fmt.Println(describe(\"Ana\", 31))\n}",
-          "gaps": [{ "answers": ["int"] }, { "answers": ["string"] }]
+          "code": "package main\n\nimport \"fmt\"\n\nfunc isAdult(age ___) ___ {\n    return age >= 18\n}\n\nfunc main() {\n    fmt.Println(isAdult(31))\n}",
+          "gaps": [{ "answers": ["int"] }, { "answers": ["bool"] }]
         },
         {
           "type": "typing",
