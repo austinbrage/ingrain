@@ -8,7 +8,7 @@
         "code": "repeat while the condition holds\n    do this\n    maybe skip to the next lap\n    maybe stop the loop early"
       },
       {
-        "text": "Three sessions:\n\n- **Session 1:** the counter, the condition, the loop with no end and `break`\n- **Session 2:** `range`, `continue` and loops inside loops\n- **Session 3:** counting down, two variables, labels and `switch` inside a loop"
+        "text": "Three sessions:\n\n- **Session 1:** the counter, the condition, the loop with no end, `break` and `range` over a number\n- **Session 2:** `range` over a string, a slice and a map, `continue` and loops inside loops\n- **Session 3:** counting down, two variables, labels and `switch` inside a loop"
       }
     ]
   },
@@ -24,6 +24,9 @@
           },
           {
             "text": "Keep only the condition and the loop runs while it is true. Keep nothing and it runs until a `break` stops it."
+          },
+          {
+            "text": "`range` over a number counts from 0 up to one less than that number, so `range 3` gives 0, 1 and 2."
           }
         ]
       },
@@ -36,29 +39,13 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A running total.", "text": "    sum := 0"},
-            {"mode": "ghost", "line": 7, "guide": "`for` has three parts: the setup, the condition and the step. The block repeats while the condition is true.", "notes": [{"on": "i <= 4", "text": "Checked before every lap."}, {"on": "i++", "text": "Runs after every lap."}, {"on": "for", "text": "Go's only loop keyword; this form counts."}, {"on": "i := 1", "text": "Setup: runs once before the first lap."}], "text": "    for i := 1; i <= 4; i++ {\n        sum += i\n        fmt.Println(i, sum)\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "`for` has three parts: the setup, the condition and the step. The block repeats while the condition is true.", "notes": [{"on": "i <= 4", "text": "Checked before every lap."}, {"on": "i++", "text": "Adds 1 after every lap. Same as i = i + 1."}, {"on": "sum += i", "text": "Same as sum = sum + i."}, {"on": "for", "text": "Go's only loop keyword; this form counts."}, {"on": "i := 1", "text": "Setup: runs once before the first lap."}], "text": "    for i := 1; i <= 4; i++ {\n        sum += i\n        fmt.Println(i, sum)\n    }"},
             {"mode": "ghost", "line": 11, "guide": "This line runs once, after the loop ends.", "text": "    fmt.Println(\"total\", sum)"}
           ],
           "output": {
             "command": "go run main.go",
             "text": "1 1\n2 3\n3 6\n4 10\ntotal 10"
           }
-        },
-        {
-          "type": "quiz",
-          "kind": "compiler",
-          "id": "loop-scope",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:9:17: undefined: i",
-          "options": [
-            "`i` was declared and not used",
-            "A `for` loop cannot be followed by code",
-            "`i` only exists inside the loop",
-            "`i` needs a type before the loop"
-          ],
-          "answer": 2,
-          "explanation": "A variable declared in the setup of a `for` lives only in the loop. After the closing brace it is gone."
         },
         {
           "type": "typing",
@@ -68,7 +55,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A number to grow.", "text": "    n := 1"},
-            {"mode": "ghost", "line": 7, "guide": "With just a condition, `for` works like a `while` loop. You change the variable yourself inside the block.", "notes": [{"on": "n < 20", "text": "No setup and no step, only the check."}], "text": "    for n < 20 {\n        n *= 2\n        fmt.Println(n)\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "With just a condition, `for` works like a `while` loop. You change the variable yourself inside the block.", "notes": [{"on": "n < 20", "text": "No setup and no step, only the check."}, {"on": "n *= 2", "text": "Same as n = n * 2."}], "text": "    for n < 20 {\n        n *= 2\n        fmt.Println(n)\n    }"},
             {"mode": "ghost", "line": 11, "guide": "The loop ended because the condition became false.", "text": "    fmt.Println(\"stopped at\", n)"}
           ],
           "output": {
@@ -84,7 +71,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A counter for the laps.", "text": "    count := 0"},
-            {"mode": "ghost", "line": 7, "guide": "A `for` with nothing after it repeats forever. `break` leaves the loop at once, and the code after it runs.", "notes": [{"on": "break", "text": "Jumps out of the nearest loop."}, {"on": "for {", "text": "No check at all: it repeats until a break."}], "text": "    for {\n        count++\n        fmt.Println(\"tick\", count)\n        if count == 3 {\n            break\n        }\n    }"},
+            {"mode": "ghost", "line": 7, "guide": "A `for` with nothing after it repeats forever. `break` leaves the loop at once, and the code after it runs.", "notes": [{"on": "break", "text": "Jumps out of the nearest loop."}, {"on": "for {", "text": "No check at all: it repeats until a break."}, {"on": "count++", "text": "A statement, not a value. Same as count = count + 1."}], "text": "    for {\n        count++\n        fmt.Println(\"tick\", count)\n        if count == 3 {\n            break\n        }\n    }"},
             {"mode": "ghost", "line": 14, "guide": "This line runs after the `break`.", "text": "    fmt.Println(\"out of the loop\")"}
           ],
           "output": {
@@ -92,47 +79,6 @@
             "text": "tick 1\ntick 2\ntick 3\nout of the loop"
           }
         },
-        {
-          "type": "fill-blank",
-          "id": "stop-at-three",
-          "title": "Stop the loop",
-          "guide": "Stop the loop when `count` reaches 3.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    count := 0\n    for {\n        count++\n        if count == 3 {\n            ___\n        }\n    }\n    fmt.Println(count)\n}",
-          "gaps": [{ "answers": ["break"] }]
-        },
-        {
-          "type": "quiz",
-          "kind": "output",
-          "id": "break-output",
-          "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    for i := 1; i <= 5; i++ {\n        if i == 3 {\n            break\n        }\n        fmt.Println(i)\n    }\n    fmt.Println(\"end\")\n}",
-          "options": [
-            "1\n2\nend",
-            "1\n2\n3\nend",
-            "1\n2\n4\n5\nend",
-            "end"
-          ],
-          "answer": 0,
-          "explanation": "When `i` is 3 the `break` ends the loop before the print, so only 1 and 2 appear. Then the line after the loop runs."
-        }
-      ]
-    },
-    {
-      "id": "session-2",
-      "intro": {
-        "title": "Range and skipping",
-        "slides": [
-          {
-            "text": "`range` walks over a value. Over a number it counts from 0 up to one less than that number. Over a string it gives each character with its position.\n\nThe snippet is pseudo code, not Go.",
-            "code": "for each position and character\n    of the text\n        use them"
-          },
-          {
-            "text": "`continue` skips the rest of the current lap and starts the next one. `break` ends the whole loop, but only the innermost one when loops are nested."
-          }
-        ]
-      },
-      "exercises": [
         {
           "type": "typing",
           "id": "range-count",
@@ -148,7 +94,24 @@
             "command": "go run main.go",
             "text": "round 0\nround 1\nround 2\nhi\nhi\ndone"
           }
-        },
+        }
+      ]
+    },
+    {
+      "id": "session-2",
+      "intro": {
+        "title": "Range and skipping",
+        "slides": [
+          {
+            "text": "`range` walks over a value. Over a string it gives each character with its position, over a slice each position and value, over a map each key and value.\n\nThe snippet is pseudo code, not Go.",
+            "code": "for each position and character\n    of the text\n        use them"
+          },
+          {
+            "text": "`continue` skips the rest of the current lap and starts the next one. `break` ends the whole loop, but only the innermost one when loops are nested."
+          }
+        ]
+      },
+      "exercises": [
         {
           "type": "typing",
           "id": "range-string",
@@ -156,13 +119,28 @@
           "guide": "Walk a string one character at a time.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "`range` over a string gives the position and the character, as a `rune`. `string(r)` turns it back into text.", "notes": [{"on": "i, r", "text": "Position first, then the character."}, {"on": "range \"go\"", "text": "Walks the string one character at a time."}], "text": "    for i, r := range \"go\" {\n        fmt.Println(i, string(r))\n    }"},
+            {"mode": "ghost", "line": 6, "guide": "`range` over a string gives the position and the character, as a `rune`. `string(r)` turns it back into text.", "notes": [{"on": "i, r", "text": "Position first, then the character. The position counts bytes."}, {"on": "range \"héllo\"", "text": "Walks the string one character at a time."}], "text": "    for i, r := range \"héllo\" {\n        fmt.Println(i, string(r))\n    }"},
             {"mode": "ghost", "line": 9, "guide": "Use `_` for a value you do not need. Go would reject an unused variable.", "notes": [{"on": "_", "text": "Throws the position away."}], "text": "    for _, r := range \"hi\" {\n        fmt.Println(string(r))\n    }"},
             {"mode": "ghost", "line": 12, "guide": "Print a last line.", "text": "    fmt.Println(\"done\")"}
           ],
           "output": {
             "command": "go run main.go",
-            "text": "0 g\n1 o\nh\ni\ndone"
+            "text": "0 h\n1 é\n3 l\n4 l\n5 o\nh\ni\ndone"
+          }
+        },
+        {
+          "type": "typing",
+          "id": "walk-slice-and-map",
+          "title": "Range over a slice and a map",
+          "guide": "Walk a slice, then a map, with range.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "`range` over a slice gives the position and the value.", "notes": [{"on": "i, score :=", "text": "Position first, then the value."}], "text": "    scores := []int{72, 88, 95}\n    for i, score := range scores {\n        fmt.Println(i, score)\n    }"},
+            {"mode": "ghost", "line": 10, "guide": "`range` over a map gives the key and the value.", "notes": [{"on": "item, qty :=", "text": "A map gives the key, then the value."}], "text": "    stock := map[string]int{\"tea\": 3}\n    for item, qty := range stock {\n        fmt.Println(item, qty)\n    }"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "0 72\n1 88\n2 95\ntea 3"
           }
         },
         {
@@ -188,6 +166,22 @@
             "command": "go run main.go",
             "text": "1\n3\n5\nskipped 2"
           }
+        },
+        {
+          "type": "quiz",
+          "kind": "output",
+          "id": "continue-keeps-counting",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    laps := 0\n    for i := 0; i < 5; i++ {\n        laps++\n        if i%2 == 1 {\n            continue\n        }\n        fmt.Println(i, laps)\n    }\n}",
+          "options": [
+            "0 1\n2 2\n4 3",
+            "0 1\n1 2\n2 3\n3 4\n4 5",
+            "0 1\n2 3\n4 5",
+            "0 0\n2 1\n4 2"
+          ],
+          "answer": 2,
+          "explanation": "`continue` skips only the print. `laps` already grew on every lap, and the step `i++` still runs, so odd laps count but print nothing."
         },
         {
           "type": "quiz",
@@ -239,22 +233,6 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "output",
-          "id": "continue-keeps-counting",
-          "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    laps := 0\n    for i := 0; i < 5; i++ {\n        laps++\n        if i%2 == 1 {\n            continue\n        }\n        fmt.Println(i, laps)\n    }\n}",
-          "options": [
-            "0 1\n2 2\n4 3",
-            "0 1\n1 2\n2 3\n3 4\n4 5",
-            "0 1\n2 3\n4 5",
-            "0 0\n2 1\n4 2"
-          ],
-          "answer": 2,
-          "explanation": "`continue` skips only the print. `laps` already grew on every lap, and the step `i++` still runs, so odd laps count but print nothing."
-        },
-        {
           "type": "typing",
           "id": "labeled-break",
           "title": "Break out of both loops",
@@ -283,20 +261,6 @@
             "command": "go run main.go",
             "text": "2 1\n3 1\n3 2\ndone"
           }
-        },
-        {
-          "type": "fill-blank",
-          "id": "continue-the-outer",
-          "title": "Skip to the outer loop",
-          "guide": "When `j` passes `i`, go to the next lap of the outer loop.",
-          "code": "package main\nimport \"fmt\"\n\nfunc main() {\nouter:\n    for i := 1; i <= 3; i++ {\n        for j := 1; j <= 3; j++ {\n            if j > i {\n                continue ___\n            }\n            fmt.Println(i, j)\n        }\n    }\n}",
-          "gaps": [
-            {
-              "answers": [
-                "outer"
-              ]
-            }
-          ]
         },
         {
           "type": "typing",
