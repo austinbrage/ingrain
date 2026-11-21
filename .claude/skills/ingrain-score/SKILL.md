@@ -1,11 +1,11 @@
 ---
 name: ingrain-score
-description: Score the content of an Ingrain course or module as condescending, engaging or overwhelming, with the evidence and a fix for each weak exercise. Read only. Use it to review written content, or let ingrain-exercises and ingrain-modules call it on a draft.
+description: Score the content of an Ingrain course or module as condescending, engaging or overwhelming, with the evidence and a fix for each weak exercise. Writes only a review draft in docs/drafts/, never the content. Use it to review written content, or let ingrain-exercises and ingrain-modules call it on a draft.
 ---
 
 # ingrain-score
 
-Judges content already written, in `content/prod/<language>/<course>/`. It is the fourth skill: `ingrain-courses`, `ingrain-modules` and `ingrain-exercises` write, this one judges. **It changes nothing:** a fix goes through the other skills, so the ids and the saved progress stay safe.
+Judges content already written, in `content/prod/<language>/<course>/`. It is the fourth skill: `ingrain-courses`, `ingrain-modules` and `ingrain-exercises` write, this one judges. **It never changes content:** the only file it writes is the review draft. A fix goes through `ingrain-exercises`, so the ids and the saved progress stay safe.
 
 **It advises; the author decides.** Nothing it reports is applied without the author's answer.
 
@@ -47,11 +47,15 @@ Judgment, backed by counts. Every verdict quotes its evidence.
 - **Engaging signals:** one hinge named and hit, a program that shows a result, variety across the module, the next exercise builds on the last
 
 ## What it reports
-- **Short:** one line on top with the bar used and the module verdict (the worst common one, not an average), then only the weak exercises. The engaging ones are one line with their count
-- **Per weak exercise:** id, the flag (condescending, overwhelming density or gap, repetitive, irrelevant, missing notes), its code as a readable fenced block so the author sees the problem without opening the file, one line with the problem, and the proposed replacement in the same form, or "cut"
+- **The report is a draft file the author edits:** `docs/drafts/score-<language>-<course>-<module>.md` (the folder is in `.gitignore`). The chat gets only the verdict line, the path and the count of weak exercises
+- **First line:** module, bar used, verdict (the worst common one, not an average), engaging and weak counts. Below it: "Mark `[x]` the changes worth doing, edit the replacements directly"
+- **Per weak exercise:** a header (id, type, session, flag: condescending, overwhelming density or gap, repetitive, irrelevant, missing notes), a checkbox with the action (cut, trim, redo), the code as readable Go, one line with the problem, and the proposed replacement in the same form. Never paragraphs
   - typing: the program as it ends up in `main.go`, with its output
   - fill-blank: the code with the `___` gaps, and the answers
   - quiz: the code, then the options with the right one marked
+- **Every change to an existing exercise shows two snippets: "Now" and "Proposed".** "Now" is the code as it is in the file, copied from it, never retyped from memory. "Proposed" is the code after the change, in the same form. A change to one chunk of a typing exercise shows that chunk before and after. A note-only change shows the current code with a `Notes:` list below it, never a comment inside the code. A new exercise shows only the new code. The author must be able to compare without opening the file
+- **Optional block:** reorders and soft flags, each with a checkbox and no verdict. **Every item shows its code as a fenced Go block, like a weak exercise** (the exercise it is about, with the answers or the output), then one plain line on why it is flagged and what the change does. Never a description in prose alone: the author reads the code, not the explanation. An intro slide shows its text and snippet
+- **Last:** the engaging ids on one line, and the balance after the changes (typing share against "Balance" in `writing-rules.md`)
 - **One line per module** on what to keep, trim, merge, redo or reorder. On a whole-course call, one line on progression
 - Never JSON, never a number out of 10
 
@@ -60,11 +64,22 @@ Judgment, backed by counts. Every verdict quotes its evidence.
 - One **fresh subagent per module**, all in the same turn. Each reads its module, its entry in `course.json` and the modules before it
 - A last fresh subagent scores the course from the module reports
 - **Anchors:** they calibrate where the middle is (see "Read first")
-- The parent collects the reports and ranks the modules by weak exercises. When it presents them to the author, it shows each weak exercise with its snippet in the chat and never summarizes the code away
+- Each fresh subagent writes its own draft file. The parent collects the verdict lines, ranks the modules by weak exercises, and gives the author the paths. It does not paste the snippets into the chat
+
+## Review loop
+Same as the draft loop of `ingrain-exercises` ("Draft first"). The parent runs it, since the subagents end after writing.
+1. After writing, save a copy as `<draft>.last` in the same folder, give the path and one line on the main choices. Stop and wait
+2. **On every message of the author, read the draft file first** and compare it with `<draft>.last`:
+   - **Different:** the differences are the author's decisions: a ticked box, an unticked one, an edited replacement. The edit wins, except when it breaks a rule that can be checked (a card or line limit, a program that does not compile or an output that cannot be traced, a fill-blank or quiz rule, the universal-concept guard, the typing floor). Then say so in the chat and leave that spot as it was. Redraft: apply the accepted edits to the file, replace a short "Round N" block at the top (what was applied, what was not and why), save a new `.last`, and stop and wait
+   - **Not different:** ask for approval once, in the chat
+3. Any other message means reread the draft, never approval. Only an explicit "apply" or "approved" applies it
+4. **Apply:** hand the ticked changes to `ingrain-exercises` (mode 2: a replaced exercise gets a new id, nothing is removed without the author's word), update `sessions` in `course.json`, run `cargo test --test content`, then delete the draft and its `.last`. No re-scoring: the scorer runs once per module
+5. **Dismiss:** when the author drops the module, delete the draft and its `.last`. Nothing else changes
 
 ## Calling it from another skill
-- `ingrain-exercises` and `ingrain-modules` run it **once**, after writing, **in a fresh subagent** (see "How it runs"), because the agent that wrote the content is biased toward it. They show the author **only the scorer's report** and **stop and wait**
-- No fixing, no second run, no other review: what to change is the author's answer
+- `ingrain-exercises` mode 3 runs it once after a whole course, **in a fresh subagent** (see "How it runs"), because the agent that wrote the content is biased toward it. They give the author **only the path of the draft** and start the review loop above
+- `ingrain-exercises` modes 1 and 2 never run it after applying: the author approved the draft, and a module is scored on request
+- No second run and no other review: what to change is the author's answer, given by editing the draft
 
 ## Not its job
 The mechanical rules stay in `cargo test --test content`. Forward use that is not simple and named shows up here as a **gap**, and overlap with earlier modules as **repetitive**.

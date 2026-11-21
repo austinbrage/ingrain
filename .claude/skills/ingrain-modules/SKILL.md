@@ -96,7 +96,6 @@ When `ingrain-exercises` needs more modules because a concept does not fit in 4 
 ## Finish
 Run `cargo test --test content` and fix everything it reports. In the layer mode, this is the parent's run after the subagents return. Among other checks, it fails when an id is not a slug or repeats, when a module file is not listed in `course.json`, and when a written module has a different id or number of sessions than `course.json` says, and when a module name or a section name is longer than 24 characters.
 
-Then run `ingrain-score` once on the list, in a fresh subagent (never inline: the agent that wrote the list is biased toward it), show only its report, and wait for the author.
 
 Then ask the author whether to record the scope in `docs/courses/<language>-<layer>.md` (the scope file), and write only after a yes. The file is the recap of your thinking, so that `ingrain-exercises` can write the exercises in another chat without this one. If the file does not exist, create it in the shape of `docs/courses/rust-core.md`. Touch only the courses of this run:
 - the row of the course in "Where each course stops": what it leaves to later courses, and any topic dropped on purpose, with why

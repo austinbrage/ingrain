@@ -92,7 +92,7 @@ Modes 1 and 2 never write the module file before the author has approved the dra
    - **Different:** the differences are proposed changes. The author's edit wins, except when it breaks a rule that can be checked: a card or line limit, a program that does not compile or an output that cannot be traced, a fill-blank or quiz rule, the universal-concept guard. Then say so in the chat and leave that spot as it was. If an edit is unclear or not worth it, say so in the chat and leave it as it was. Redraft: apply the accepted edits to the file, replace a short "Round N" block at the top (what was applied, what was not and why), save a new `<draft>.last`, and stop and wait
    - **Not different:** ask for approval once, in the chat
 5. Only an explicit "apply" or "approved" in the author's message applies the draft. A status line in the file never does
-6. **Apply:** write exactly what was approved to the module file, update `sessions` in `course.json`, and run `cargo test --test content`. If it forces a change (a card limit, a line count), say what changed and why. Run `ingrain-score` once in a fresh subagent, then delete the draft and its `.last` copy
+6. **Apply:** write exactly what was approved to the module file, update `sessions` in `course.json`, and run `cargo test --test content`. If it forces a change (a card limit, a line count), say what changed and why. Then delete the draft and its `.last` copy. The scorer does not run after an apply
 
 ## Writing
 - Ids are slugs, unique inside their session. The tier of the module only says how hard the concept is: it does not change the shape of the exercises
@@ -117,4 +117,4 @@ Then report:
 - the exercises written or changed: id, type and title, per session
 - warnings: an exercise that exists and had no prompt, a module that looked complete, a universal-concept module
 - any session count changed in `course.json`, every module added with `ingrain-modules`, and every existing module that "needs a split"
-- then the `ingrain-score` report, run once in a fresh subagent (never inline, to avoid the writer's bias), and nothing after it. Stop and wait for the author
+- nothing after that: the scorer does not run after modes 1 and 2. Stop and wait for the author
