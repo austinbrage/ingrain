@@ -73,7 +73,7 @@ Same as the draft loop of `ingrain-exercises` ("Draft first"). The parent runs i
    - **Different:** the differences are the author's decisions: a ticked box, an unticked one, an edited replacement. The edit wins, except when it breaks a rule that can be checked (a card or line limit, a program that does not compile or an output that cannot be traced, a fill-blank or quiz rule, the universal-concept guard, the typing floor). Then say so in the chat and leave that spot as it was. Redraft: apply the accepted edits to the file, replace a short "Round N" block at the top (what was applied, what was not and why), save a new `.last`, and stop and wait
    - **Not different:** ask for approval once, in the chat
 3. Any other message means reread the draft, never approval. Only an explicit "apply" or "approved" applies it
-4. **Apply:** hand the ticked changes to `ingrain-exercises` (mode 2: a replaced exercise gets a new id, nothing is removed without the author's word), update `sessions` in `course.json`, run `cargo test --test content`, then delete the draft and its `.last`. No re-scoring: the scorer runs once per module
+4. **Apply:** with no box ticked, "apply" means leave the module as it is: change nothing, delete the draft and its `.last`, and do not ask. Otherwise hand the ticked changes to `ingrain-exercises` (mode 2: a replaced exercise gets a new id, nothing is removed without the author's word), update `sessions` in `course.json`, run `cargo test --test content`, then delete the draft and its `.last`. No re-scoring: the scorer runs once per module
 5. **Dismiss:** when the author drops the module, delete the draft and its `.last`. Nothing else changes
 
 ## Calling it from another skill
