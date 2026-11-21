@@ -43,10 +43,10 @@
           "guide": "Read the code, then pick the cause.",
           "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    stock := 3\n    if stock {\n        fmt.Println(\"in stock\")\n    }\n}",
           "options": [
-            "An `if` always needs an `else` branch",
+            "`stock` must be compared with `nil`",
             "The condition must be a `bool`, not an `int`",
             "`stock` has to be a constant in a condition",
-            "`fmt.Println` cannot run inside an `if`"
+            "`stock` has to be declared with `var`"
           ],
           "answer": 1,
           "explanation": "Go never turns a number into true or false. The condition must already be a `bool`, so write `stock > 0`."
