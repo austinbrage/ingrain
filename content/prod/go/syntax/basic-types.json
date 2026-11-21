@@ -4,7 +4,7 @@
     "title": "Basic types",
     "slides": [
       {
-        "text": "Every value in Go has a type, and Go checks it before the program runs. Here you use whole numbers, decimals, text and bools, convert between them by hand, and read the errors Go reports when types do not fit. The snippet is a map of the types, not Go.",
+        "text": "Every value in Go has a type, and Go checks it before the program runs. Here you use whole numbers, decimals, text and bools, and convert between them by hand. The snippet is a map of the types, not Go.",
         "code": "whole numbers  int, int8, int64, uint8\ndecimals       float64\ntext           string\ntrue or false  bool"
       }
     ]
@@ -58,9 +58,9 @@
           "type": "fill-blank",
           "id": "fit-the-number",
           "title": "Fit the number",
-          "guide": "Pick a type that can hold 200.",
+          "guide": "Pick the smallest type that holds 200 and has no negatives.",
           "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var level ___ = 200\n    fmt.Println(level)\n}",
-          "gaps": [{ "answers": ["uint8", "byte", "int16", "uint16", "int32", "uint32", "int64", "uint64", "int", "uint"] }]
+          "gaps": [{ "answers": ["uint8", "byte"] }]
         },
         {
           "type": "typing",
@@ -110,22 +110,6 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "compiler",
-          "id": "mixed-numbers",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:8:14: invalid operation:\n  count + price (mismatched types\n  int and float64)",
-          "options": [
-            "An int and a float64 cannot be added directly",
-            "`price` was never declared",
-            "`+` only works on text",
-            "`price` must be written as `9`"
-          ],
-          "answer": 0,
-          "explanation": "Go never mixes number types on its own. Convert one side so both have the same type."
-        },
-        {
           "type": "typing",
           "id": "convert-numbers",
           "title": "Convert a number",
@@ -139,7 +123,7 @@
             {
               "mode": "ghost",
               "line": 6,
-              "guide": "A type used like a function converts the value. `count` itself stays an `int`.",
+              "guide": "Go never mixes number types. A type used like a function converts the value; `count` stays an `int`.",
               "notes": [
                 {
                   "on": "float64(",
@@ -177,28 +161,29 @@
             "command": "go run main.go",
             "text": "7 9"
           }
+        },
+        {
+          "type": "typing",
+          "id": "integer-division",
+          "title": "Divide whole numbers",
+          "guide": "Divide whole numbers, then keep the decimals.",
+          "chunks": [
+            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
+            {"mode": "ghost", "line": 6, "guide": "Two whole numbers.", "text": "    total := 7\n    people := 2"},
+            {"mode": "ghost", "line": 8, "guide": "Two `int`s divide to an `int`. `%` is the remainder.", "notes": [{"on": "total / people", "text": "The decimals are dropped: 7 / 2 is 3."}, {"on": "%", "text": "What is left after dividing: 1."}], "text": "    fmt.Println(total / people, total % people)"},
+            {"mode": "ghost", "line": 9, "guide": "Convert first to keep the decimals.", "text": "    fmt.Println(float64(total) / float64(people))"},
+            {"mode": "copy", "line": 10, "guide": "The remainder takes the sign of the left number.", "notes": [{"on": "-total % 3", "text": "Negative on the left, negative result: -1."}], "text": "    fmt.Println(-total % 3)"}
+          ],
+          "output": {
+            "command": "go run main.go",
+            "text": "3 1\n3.5\n-1"
+          }
         }
       ]
     },
     {
       "id": "session-2",
       "exercises": [
-        {
-          "type": "quiz",
-          "kind": "output",
-          "id": "wrap-around",
-          "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    big := 300\n    fmt.Println(uint8(big))\n}",
-          "options": [
-            "300",
-            "255",
-            "44",
-            "it does not compile"
-          ],
-          "answer": 2,
-          "explanation": "`uint8` holds 0 to 255. `big` is a variable, so Go does not stop it: 300 wraps around to 300 - 256 = 44."
-        },
         {
           "type": "typing",
           "id": "text-and-bool",
@@ -231,7 +216,7 @@
             {
               "mode": "ghost",
               "line": 8,
-              "guide": "A `bool` is `true` or `false`, and nothing else.",
+              "guide": "A `bool` is `true` or `false`. Go never treats a number or text as one.",
               "notes": [
                 {
                   "on": "false",
@@ -314,14 +299,6 @@
             "command": "go run main.go",
             "text": "71\nG"
           }
-        },
-        {
-          "type": "fill-blank",
-          "id": "bool-value",
-          "title": "A true or false value",
-          "guide": "Go never turns a number into a bool. Give `open` a bool value.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    var open bool = ___\n    fmt.Println(open)\n}",
-          "gaps": [{ "answers": ["true", "false"] }]
         }
       ]
     },
@@ -526,47 +503,6 @@
         },
         {
           "type": "typing",
-          "id": "float-constant-to-int",
-          "title": "A whole decimal constant",
-          "guide": "Put whole-valued decimal constants into `int` variables.",
-          "chunks": [
-            {
-              "mode": "auto",
-              "line": 1,
-              "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"
-            },
-            {
-              "mode": "ghost",
-              "line": 6,
-              "guide": "`3.0` is a constant with nothing after the point, so it fits an `int`. `2.5` would not compile: the `.5` would be lost.",
-              "notes": [
-                {
-                  "on": "3.0",
-                  "text": "A whole-valued constant fits in an int."
-                }
-              ],
-              "text": "    var whole int = 3.0"
-            },
-            {
-              "mode": "ghost",
-              "line": 7,
-              "guide": "A named constant works the same way, since constants have no type until used.",
-              "text": "    const rows = 4.0\n    var count int = rows"
-            },
-            {
-              "mode": "ghost",
-              "line": 9,
-              "guide": "Both print as whole numbers.",
-              "text": "    fmt.Println(whole, count)"
-            }
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "3 4"
-          }
-        },
-        {
-          "type": "typing",
           "id": "number-to-character",
           "title": "A number as a string",
           "guide": "Convert an `int` to a `string` and see what you get.",
@@ -605,22 +541,6 @@
             "command": "go run main.go",
             "text": "H\n72"
           }
-        },
-        {
-          "type": "quiz",
-          "kind": "output",
-          "id": "string-of-an-int",
-          "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    n := 97\n    fmt.Println(string(n))\n}",
-          "options": [
-            "97",
-            "a",
-            "\"97\"",
-            "it does not compile"
-          ],
-          "answer": 1,
-          "explanation": "An `int` converted to `string` becomes the character with that number, and 97 is `a`. For the text \"97\", use the `strconv` package."
         }
       ]
     }
