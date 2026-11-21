@@ -4,7 +4,7 @@
     "title": "Printing values",
     "slides": [
       {
-        "text": "`Println` prints values as they are. To place values inside a sentence, Go uses `Printf` with **verbs**: placeholders that start with `%`. Here you use the three you will meet every day, and `Sprintf`, which builds the text without printing it. All the verbs come later, in Strings and text.\n\nThe snippet is pseudo code, not Go.",
+        "text": "`Println` prints values as they are. To place values inside a sentence, Go uses `Printf` with **verbs**: placeholders that start with `%`. Here you use the three you will meet every day, and `Sprintf`, which builds the text without printing it.\n\nThe snippet is pseudo code, not Go.",
         "code": "template  \"<name> is <age> years old\"\nvalues    \"Ana\", 30\nresult    Ana is 30 years old"
       }
     ]
@@ -28,22 +28,6 @@
             "command": "go run main.go",
             "text": "Ana is 30 years old"
           }
-        },
-        {
-          "type": "quiz",
-          "kind": "output",
-          "id": "printf-no-newline",
-          "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    name := \"Go\"\n    fmt.Printf(\"Hello, %s!\", name)\n    fmt.Println(\"Bye\")\n}",
-          "options": [
-            "Hello, Go! Bye",
-            "Hello, Go!Bye",
-            "Hello, %s!Bye",
-            "Hello, Go!"
-          ],
-          "answer": 1,
-          "explanation": "`Printf` adds no new line, so `Bye` follows on the same line. `%s` is replaced by `Go`."
         },
         {
           "type": "typing",
@@ -87,19 +71,19 @@
         },
         {
           "type": "quiz",
-          "kind": "compiler",
-          "id": "single-quotes",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:6:17: more than one character\n  in rune literal",
+          "kind": "output",
+          "id": "sprintf-prints-nothing",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    name := \"Ana\"\n    fmt.Sprintf(\"Hello, %s!\", name)\n    fmt.Println(\"done\")\n}",
           "options": [
-            "`fmt` was not imported",
-            "`Println` takes only one value",
-            "Text needs double quotes, not single quotes",
-            "The text is too long"
+            "Hello, Ana! then done",
+            "done",
+            "Hello, Ana!done",
+            "It does not compile"
           ],
-          "answer": 2,
-          "explanation": "Single quotes make one character, not text. Text goes between double quotes."
+          "answer": 1,
+          "explanation": "`Sprintf` only returns the text. Nothing prints it, so only `done` appears. Go lets you discard the result."
         }
       ]
     }
