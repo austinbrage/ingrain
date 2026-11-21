@@ -5,13 +5,13 @@
     "slides": [
       {
         "text": "A Go function can return several values: list the types in parentheses. The caller takes all of them in one `:=`, or discards one with `_`.\n\nThe snippet is pseudo code, not Go.",
-        "code": "func name() (first type, second type) {\n    return a, b\n}\n\nx, y := name()"
+        "code": "func name() (typeA, typeB) {\n    return a, b\n}\n\nx, y := name()"
       },
       {
         "text": "The common use is a result plus an `error`. By convention the error comes last, and `nil` means it worked. The caller checks it right away.\n\n`error` is the built-in type for a failure, and `errors.New(\"text\")` makes one."
       },
       {
-        "text": "Results can have names. They start at their zero value, and a bare `return` sends them back."
+        "text": "Results can have names, and a bare `return` sends them back. It reads well in a short function. In a long one it hides what is returned."
       }
     ]
   },
