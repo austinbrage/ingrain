@@ -76,7 +76,7 @@
           "guide": "Change a slice's elements from inside a variadic function.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n"},
-            {"mode": "ghost", "line": 5, "guide": "Halves every price it receives.", "text": "func discount(prices ...int) {\n    for i := range prices {\n        prices[i] = prices[i] / 2\n    }\n}\n"},
+            {"mode": "ghost", "line": 5, "guide": "Halves every price it receives.", "notes": [{"on": "prices[i] = prices[i] / 2", "text": "Writes into the slice's own element."}], "text": "func discount(prices ...int) {\n    for i := range prices {\n        prices[i] = prices[i] / 2\n    }\n}\n"},
             {"mode": "ghost", "line": 11, "guide": "A spread passes the same slice, not a copy. Check `cart` after the call.", "notes": [{"on": "cart...", "text": "The function works on cart's own elements."}], "text": "func main() {\n    cart := []int{40, 10, 6}\n    discount(cart...)\n    fmt.Println(cart)\n}"}
           ],
           "output": {
