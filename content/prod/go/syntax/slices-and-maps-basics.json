@@ -40,7 +40,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A slice declared without a value is empty and ready to use. `len` is 0.", "notes": [{"on": "var queue []string", "text": "No value yet: an empty slice."}], "text": "    var queue []string\n    fmt.Println(queue, len(queue))\n"},
-            {"mode": "ghost", "line": 9, "guide": "`append` returns the longer slice, so you store it back. It takes one value or several.", "notes": [{"on": "append(queue, \"ana\")", "text": "The original slice is unchanged, so assign the result back."}], "text": "    queue = append(queue, \"ana\")\n    queue = append(queue, \"li\", \"sam\")\n"},
+            {"mode": "ghost", "line": 9, "guide": "`append` returns the longer slice, so you store it back. It takes one value or several.", "notes": [{"on": "append(queue, \"ana\")", "text": "The original slice is unchanged, so assign the result back."}, {"on": "\"li\", \"sam\"", "text": "append takes any number of values."}], "text": "    queue = append(queue, \"ana\")\n    queue = append(queue, \"li\", \"sam\")\n"},
             {"mode": "ghost", "line": 12, "guide": "Print the grown slice.", "text": "    fmt.Println(queue, len(queue))"}
           ],
           "output": {
@@ -81,7 +81,7 @@
         "slides": [
           {
             "text": "A **map** holds values under keys. Its type names both: `map[string]int` has string keys and int values.",
-            "code": "sky := map[string]string{\"day\": \"blue\"}\nages := map[string]int{\"ana\": 31}"
+            "code": "ages := map[string]int{\"ana\": 31}"
           }
         ]
       },
@@ -109,7 +109,7 @@
           "guide": "Read a key that does not exist, then ask whether it does.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "A missing key is not an error: you get the zero value.", "text": "    stock := map[string]int{\"tea\": 3}\n\n    fmt.Println(stock[\"coffee\"])\n"},
+            {"mode": "ghost", "line": 6, "guide": "A missing key is not an error: you get the zero value.", "notes": [{"on": "stock[\"coffee\"]", "text": "A missing key gives the zero value."}], "text": "    stock := map[string]int{\"tea\": 3}\n\n    fmt.Println(stock[\"coffee\"])\n"},
             {"mode": "ghost", "line": 10, "guide": "A lookup can return a second value, `true` when the key was there. By convention it is named `ok`.", "notes": [{"on": "qty, ok :=", "text": "The second value says if the key exists."}], "text": "    qty, ok := stock[\"coffee\"]\n    fmt.Println(qty, ok)\n"},
             {"mode": "ghost", "line": 13, "guide": "Look up a key that exists.", "text": "    qty, ok = stock[\"tea\"]\n    fmt.Println(qty, ok)"}
           ],
@@ -126,7 +126,7 @@
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "A map with three items, one per line.", "notes": [{"on": "\"bread\": 1,", "text": "Go requires the comma after the last item too."}], "text": "    stock := map[string]int{\n        \"tea\": 3,\n        \"milk\": 2,\n        \"bread\": 1,\n    }\n"},
-            {"mode": "ghost", "line": 12, "guide": "`delete` removes a key. Deleting a key that is not there does nothing.", "notes": [{"on": "delete(stock, \"salt\")", "text": "No error: the key was never there."}], "text": "    delete(stock, \"milk\")\n    delete(stock, \"salt\")\n"},
+            {"mode": "ghost", "line": 12, "guide": "`delete` removes a key. Deleting a key that is not there does nothing.", "notes": [{"on": "delete(stock, \"milk\")", "text": "Removes the key and its value."}, {"on": "delete(stock, \"salt\")", "text": "No error: the key was never there."}], "text": "    delete(stock, \"milk\")\n    delete(stock, \"salt\")\n"},
             {"mode": "ghost", "line": 15, "guide": "Print what is left.", "text": "    fmt.Println(stock, len(stock))"}
           ],
           "output": {
