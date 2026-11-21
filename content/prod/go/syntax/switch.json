@@ -8,7 +8,7 @@
         "code": "look at a value\n    if it is A, do this\n    if it is B or C, do that\n    if nothing matches, do the other"
       },
       {
-        "text": "Two sessions:\n\n- **Session 1:** cases on a value, lists of values, a switch with no value and `fallthrough`\n- **Session 2:** a setup statement, `break` inside a case and the order of the cases"
+        "text": "Two sessions:\n\n- **Session 1:** cases on a value, lists of values, a switch with no value, the order of the cases and `fallthrough`\n- **Session 2:** a setup statement and `break` inside a case"
       }
     ]
   },
@@ -33,22 +33,6 @@
           }
         },
         {
-          "type": "quiz",
-          "kind": "output",
-          "id": "no-fall-through",
-          "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    level := 1\n    switch level {\n    case 1:\n        fmt.Println(\"low\")\n    case 2:\n        fmt.Println(\"mid\")\n    }\n    fmt.Println(\"end\")\n}",
-          "options": [
-            "low",
-            "low\nmid\nend",
-            "low\nend",
-            "mid\nend"
-          ],
-          "answer": 2,
-          "explanation": "Only the matching case runs, and the switch ends there. Go never continues into the next case on its own."
-        },
-        {
           "type": "typing",
           "id": "case-lists",
           "title": "Several values in a case",
@@ -63,22 +47,6 @@
             "command": "go run main.go",
             "text": "vowel\ne"
           }
-        },
-        {
-          "type": "quiz",
-          "kind": "compiler",
-          "id": "mismatched-case",
-          "title": "Why does it not compile?",
-          "guide": "Read the message, then pick the cause.",
-          "code": "./main.go:9:7: invalid case \"two\" in\n  switch on n (mismatched types\n  untyped string and int)",
-          "options": [
-            "Strings cannot be used in a `case`",
-            "A `case` value must match the type of the switch",
-            "`default` is missing from the switch",
-            "Each `case` needs a `break` to end it"
-          ],
-          "answer": 1,
-          "explanation": "Every case is compared with the switched value, so it must have the same type. `n` is an `int`, and `\"two\"` is a string."
         },
         {
           "type": "typing",
@@ -97,12 +65,20 @@
           }
         },
         {
-          "type": "fill-blank",
-          "id": "catch-the-rest",
-          "title": "Catch the rest",
-          "guide": "Run the last branch when no case matches.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    day := 6\n    switch day {\n    case 6, 7:\n        fmt.Println(\"weekend\")\n    ___:\n        fmt.Println(\"weekday\")\n    }\n}",
-          "gaps": [{ "answers": ["default"] }]
+          "type": "quiz",
+          "kind": "output",
+          "id": "broad-case-first",
+          "title": "What does it print?",
+          "guide": "Read the code, then pick the output.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    n := 12\n    switch {\n    case n%2 == 0:\n        fmt.Println(\"even\")\n    case n%3 == 0:\n        fmt.Println(\"multiple of three\")\n    }\n}",
+          "options": [
+            "multiple of three",
+            "even",
+            "even and multiple of three",
+            "nothing"
+          ],
+          "answer": 1,
+          "explanation": "Cases are tried from the top and the first true one runs. 12 divides by 2 and by 3, so only `even` prints."
         },
         {
           "type": "typing",
@@ -125,11 +101,11 @@
     {
       "id": "session-2",
       "intro": {
-        "title": "Init, break and order",
+        "title": "Init and break",
         "slides": [
           {
             "text": "Like `if`, a `switch` can start with a short statement, then a `;`. The variable it declares exists only inside the switch, and it can be the value that the cases compare.\n\nThe snippet is pseudo code, not Go.",
-            "code": "switch setup; value {\n    case A: ...\n}\n\nswitch setup; {\n    case condition: ...\n}"
+            "code": "switch setup; value {\n    case A: ...\n}"
           },
           {
             "text": "A `break` inside a case ends the switch early, which helps when a case has a check halfway through. Cases are tried from the top, and `default` runs last wherever it is written."
@@ -153,27 +129,12 @@
           }
         },
         {
-          "type": "typing",
-          "id": "init-tagless",
-          "title": "Setup and conditions",
-          "guide": "Combine a setup with cases that hold conditions.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "With a setup and no value, the `;` stays and each `case` holds a condition that can use the new variable.", "notes": [{"on": "7 * 2", "text": "An expression works as the setup."}, {"on": "; {", "text": "Nothing to compare after the setup: cases are conditions."}], "text": "    switch n := 7 * 2; {\n    case n > 20:\n        fmt.Println(\"large\")\n    case n > 10:\n        fmt.Println(\"medium\")\n    default:\n        fmt.Println(\"small\")\n    }"},
-            {"mode": "ghost", "line": 14, "guide": "This line runs after the switch.", "text": "    fmt.Println(\"checked\")"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "medium\nchecked"
-          }
-        },
-        {
           "type": "fill-blank",
           "id": "setup-and-default",
           "title": "Complete the switch",
-          "guide": "Compare the value from the setup, and catch every other value.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    switch score := 8 * 2; ___ {\n    case 16:\n        fmt.Println(\"sixteen\")\n    ___:\n        fmt.Println(\"other\")\n    }\n}",
-          "gaps": [{ "answers": ["score"] }, { "answers": ["default"] }]
+          "guide": "Compare the value from the setup.",
+          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    switch score := 8 * 2; ___ {\n    case 16:\n        fmt.Println(\"sixteen\")\n    default:\n        fmt.Println(\"other\")\n    }\n}",
+          "gaps": [{ "answers": ["score"] }]
         },
         {
           "type": "typing",
@@ -190,22 +151,6 @@
             "command": "go run main.go",
             "text": "minor\ndone"
           }
-        },
-        {
-          "type": "quiz",
-          "kind": "output",
-          "id": "default-first",
-          "title": "What does it print?",
-          "guide": "Read the code, then pick the output.",
-          "code": "package main\n\nimport \"fmt\"\nfunc main() {\n    x := 5\n    switch {\n    default:\n        fmt.Println(\"other\")\n    case x > 3:\n        fmt.Println(\"big\")\n    case x > 1:\n        fmt.Println(\"small\")\n    }\n}",
-          "options": [
-            "other",
-            "big\nsmall",
-            "other\nbig",
-            "big"
-          ],
-          "answer": 3,
-          "explanation": "`default` runs only when no case matches, wherever it is written. The first true case, `x > 3`, runs and ends the switch."
         }
       ]
     }
