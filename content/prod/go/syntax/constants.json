@@ -4,7 +4,7 @@
     "title": "Constants",
     "slides": [
       {
-        "text": "A constant is a named value that never changes. Here you declare constants with `const`, see why Go refuses to change them, give them a type, compute them at compile time and count with `iota` in several ways."
+        "text": "Go constants are fixed at compile time, can be untyped, and `iota` numbers a group of them. You declare them with `const`, type them, compute them and count with `iota` in several ways."
       }
     ]
   },
@@ -46,14 +46,6 @@
           }
         },
         {
-          "type": "fill-blank",
-          "id": "constant-or-variable",
-          "title": "Constant or variable",
-          "guide": "Go rejects a new value for a constant. `limit` has to change: declare it the other way.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    ___ limit = 10\n    limit = 20\n    fmt.Println(limit)\n}",
-          "gaps": [{ "answers": ["var"] }]
-        },
-        {
           "type": "typing",
           "id": "untyped-constant",
           "title": "One constant, two types",
@@ -69,14 +61,6 @@
             "command": "go run main.go",
             "text": "3 3"
           }
-        },
-        {
-          "type": "fill-blank",
-          "id": "constant-needs-a-value",
-          "title": "A constant needs a value",
-          "guide": "A constant is set when it is declared. Give `limit` its value.",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    const limit ___ 10\n    fmt.Println(limit)\n}",
-          "gaps": [{ "answers": ["="] }]
         },
         {
           "type": "typing",
@@ -162,23 +146,6 @@
           ],
           "answer": 1,
           "explanation": "`typed` is an `int` and never becomes a `float64`. `loose` is untyped, so it fits both."
-        },
-        {
-          "type": "typing",
-          "id": "constant-expression",
-          "title": "Compute at compile time",
-          "guide": "Build constants out of other constants.",
-          "chunks": [
-            {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
-            {"mode": "ghost", "line": 6, "guide": "The first constant is a plain number.", "text": "    const minute = 60"},
-            {"mode": "ghost", "line": 7, "guide": "A constant can be an expression on other constants. Go does the math while compiling.", "notes": [{"on": "60 * minute", "text": "Worked out while compiling, from another constant."}], "text": "    const hour = 60 * minute"},
-            {"mode": "ghost", "line": 8, "guide": "It can build on the one above it too.", "text": "    const day = 24 * hour"},
-            {"mode": "ghost", "line": 9, "guide": "Print the results.", "text": "    fmt.Println(hour, day)"}
-          ],
-          "output": {
-            "command": "go run main.go",
-            "text": "3600 86400"
-          }
         },
         {
           "type": "typing",
