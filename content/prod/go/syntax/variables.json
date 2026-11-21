@@ -4,7 +4,7 @@
     "title": "Variables",
     "slides": [
       {
-        "text": "A variable is a named place that holds a value. Here you declare variables with `var` and with `:=`, see which value they start with, change them, meet two errors Go reports before the program runs, and declare several variables at once."
+        "text": "Go declares variables with `var` and with `:=`. Here you see which value a variable starts with, change them, meet what Go rejects before the program runs, and declare several at once."
       }
     ]
   },
@@ -12,14 +12,10 @@
     {
       "id": "session-1",
       "intro": {
-        "title": "A named box for a value",
+        "title": "Two ways to declare",
         "slides": [
           {
-            "text": "Think of a variable as a labeled box: a **name**, a **type** that says what can go inside, and a **value**. Go checks the type, so a box for numbers never holds text.\n\nThe snippet is pseudo code, not Go.",
-            "code": "box age holds a whole number\nput 30 in age        ok\nput \"thirty\" in age  error"
-          },
-          {
-            "text": "Go has two ways to declare one. `var` is explicit and works everywhere. `:=` is the short form: it works inside functions and takes the type from the value.",
+            "text": "Go has two ways to declare a variable. `var` is explicit and works everywhere. `:=` is the short form: it works inside functions and takes the type from the value.",
             "code": "var age int = 30\ncity := \"Lima\""
           }
         ]
@@ -198,19 +194,18 @@
         },
         {
           "type": "typing",
-          "id": "several-on-a-line",
+          "id": "declare-several",
           "title": "Several on one line",
-          "guide": "Declare several variables per line, then print them.",
+          "guide": "Declare several variables per line with `var`, then print them.",
           "chunks": [
             {"mode": "auto", "line": 1, "text": "package main\n\nimport \"fmt\"\n\nfunc main() {\n}"},
             {"mode": "ghost", "line": 6, "guide": "Several names can share one type. Both start at 0.", "notes": [{"on": "width, height", "text": "Two variables of one type in a single line."}], "text": "    var width, height int"},
-            {"mode": "ghost", "line": 7, "guide": "Assign both in one line, in order.", "text": "    width, height = 4, 3"},
-            {"mode": "ghost", "line": 8, "guide": "`:=` also takes several names, and each one gets the type of its own value.", "text": "    name, age := \"Ana\", 30"},
-            {"mode": "copy", "line": 9, "guide": "Print all four.", "text": "    fmt.Println(width, height, name, age)"}
+            {"mode": "ghost", "line": 7, "guide": "Give each name its own value. There is no type here.", "notes": [{"on": "host, port", "text": "Each name takes the type of its value."}], "text": "    var host, port = \"localhost\", 8080"},
+            {"mode": "copy", "line": 8, "guide": "Print all four.", "text": "    fmt.Println(width, height, host, port)"}
           ],
           "output": {
             "command": "go run main.go",
-            "text": "4 3 Ana 30"
+            "text": "0 0 localhost 8080"
           }
         },
         {
